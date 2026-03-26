@@ -23,6 +23,12 @@ type Lead = {
   createdAt: string;
 };
 
+type ContentPage = {
+  slug: string;
+  title: string;
+  content: string;
+};
+
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 const ADMIN_PATH = '/catalog-control-7f3a';
 const ADMIN_KEY = 'catalog-control-7f3a';
@@ -73,6 +79,7 @@ function PublicPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   useEffect(() => {
+    document.title = "TMдом — строительство домов";
     fetch(`${API_BASE}/api/projects`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no api'))))
       .then((data: HouseProject[]) => {
@@ -167,7 +174,7 @@ function PublicPage() {
           </div>
 
           <nav className="hero-nav">
-            <a>О КОМПАНИИ</a>
+            <a href="/about">О КОМПАНИИ</a>
             <a>/</a>
             <a>ПРОЕКТЫ ДОМОВ</a>
             <a>/</a>
@@ -251,7 +258,7 @@ function PublicPage() {
         <div className="container">
           <h2>Популярные проекты</h2>
           <div className="catalog-grid">
-            {catalogProjects.map((project) => (
+            {projects.map((project) => (
               <article className="project-card" key={project.id}>
                 <div className="project-image" style={{ backgroundImage: `url(${project.image})` }}>
                   {project.badge ? <span className="badge">{project.badge}</span> : null}
@@ -471,12 +478,84 @@ function PublicPage() {
   );
 }
 
+
+function Breadcrumbs({ items }: { items: string[] }) {
+  return <div className="breadcrumbs">{items.join(' / ')}</div>;
+}
+
+function InternalTextBlock({ title, content }: { title: string; content: string }) {
+  return (
+    <section className="internal-body">
+      <div className="container">
+        <Breadcrumbs items={["Главная", title]} />
+        <h1>{title}</h1>
+        <div className="internal-text-box">
+          <p>{content}</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function InternalHeader() {
+  return (
+    <header className="hero hero-exact internal-header">
+      <div className="promo-strip">
+        <div className="container promo-inner">
+          <strong>СТРОИТЕЛЬСТВО ДОМОВ В КРЕДИТ И ИПОТЕКУ ОТ 9.5% ГОДОВЫХ!</strong>
+          <button>Узнать условия <span>»</span></button>
+        </div>
+      </div>
+      <div className="top-search-row">
+        <div className="container top-search-inner">
+          <div className="search-box"><input placeholder="Поиск по сайту..." /><button>Найти</button></div>
+          <div className="top-contacts"><span>село Засечное, улица Механизаторов, 22А</span><span>мы в VK</span><span><i>⤴</i> Свой проект на расчёт</span></div>
+        </div>
+      </div>
+      <div className="container hero-main">
+        <div className="hero-upper-row">
+          <div className="brand-line"><div className="logo-badge">⌂</div><div className="brand-text"><div className="brand-logo">TMдом</div><p>Строительная компания</p></div></div>
+          <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span><div className="phone-block"><strong>+7 (905) 365-47-39</strong><small>с 9:00 до 19:00</small></div><button className="call-btn">Заказать звонок</button></div>
+        </div>
+        <nav className="hero-nav"><a href="/about">О КОМПАНИИ</a><a>/</a><a>ПРОЕКТЫ ДОМОВ</a><a>/</a><a>БАНИ</a><a>/</a><a>УСЛУГИ</a><a>/</a><a>ПРОЕКТИРОВАНИЕ</a><a>/</a><a>ПОРТФОЛИО</a><a>/</a><a>КОНТАКТЫ</a></nav>
+      </div>
+    </header>
+  );
+}
+
+function AboutPage() {
+  const [page, setPage] = useState<ContentPage>({ slug: 'about', title: 'О компании', content: 'Загрузка...' });
+
+  useEffect(() => {
+    document.title = 'О компании — TMдом';
+    fetch(`${API_BASE}/api/pages/about`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('not found'))))
+      .then((payload: ContentPage) => setPage(payload))
+      .catch(() =>
+        setPage({
+          slug: 'about',
+          title: 'О компании',
+          content: 'Строительная компания «TMдом» открыта в 2014 году. Мы строим дома под ключ и сопровождаем клиентов на всех этапах.'
+        })
+      );
+  }, []);
+
+  return (
+    <div>
+      <InternalHeader />
+      <InternalTextBlock title={page.title} content={page.content} />
+    </div>
+  );
+}
+
 function AdminPage() {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [token, setToken] = useState('');
   const [projects, setProjects] = useState<HouseProject[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [pages, setPages] = useState<ContentPage[]>([]);
+  const [pageDraft, setPageDraft] = useState<ContentPage | null>(null);
   const [draft, setDraft] = useState<Partial<HouseProject>>({});
   const [error, setError] = useState('');
 
@@ -489,18 +568,24 @@ function AdminPage() {
   );
 
   const loadAdminData = async (currentToken: string) => {
-    const [projectsRes, leadsRes] = await Promise.all([
+    const [projectsRes, leadsRes, pagesRes] = await Promise.all([
       fetch(`${API_BASE}/api/admin/projects`, { headers: { 'x-admin-token': currentToken } }),
-      fetch(`${API_BASE}/api/admin/leads`, { headers: { 'x-admin-token': currentToken } })
+      fetch(`${API_BASE}/api/admin/leads`, { headers: { 'x-admin-token': currentToken } }),
+      fetch(`${API_BASE}/api/admin/pages`, { headers: { 'x-admin-token': currentToken } })
     ]);
 
-    if (!projectsRes.ok || !leadsRes.ok) {
+    if (!projectsRes.ok || !leadsRes.ok || !pagesRes.ok) {
       setError('Не удалось загрузить данные админки');
       return;
     }
 
+    const pagesPayload = (await pagesRes.json()) as ContentPage[];
     setProjects(await projectsRes.json());
     setLeads(await leadsRes.json());
+    setPages(pagesPayload);
+    if (!pageDraft && pagesPayload[0]) {
+      setPageDraft(pagesPayload[0]);
+    }
   };
 
   const doLogin = async (event: FormEvent) => {
@@ -552,6 +637,24 @@ function AdminPage() {
       method: 'DELETE',
       headers: adminHeaders
     });
+    await loadAdminData(token);
+  };
+
+
+  const savePage = async () => {
+    if (!pageDraft) return;
+
+    const response = await fetch(`${API_BASE}/api/admin/pages/${pageDraft.slug}`, {
+      method: 'PUT',
+      headers: adminHeaders,
+      body: JSON.stringify(pageDraft)
+    });
+
+    if (!response.ok) {
+      setError('Не удалось сохранить внутреннюю страницу');
+      return;
+    }
+
     await loadAdminData(token);
   };
 
@@ -620,6 +723,35 @@ function AdminPage() {
       </div>
 
       <section>
+        <h2>Внутренние страницы</h2>
+        <div className="admin-form">
+          <select
+            value={pageDraft?.slug || ''}
+            onChange={(e) => {
+              const selected = pages.find((item) => item.slug === e.target.value) || null;
+              setPageDraft(selected);
+            }}
+          >
+            {pages.map((page) => (
+              <option key={page.slug} value={page.slug}>{page.title}</option>
+            ))}
+          </select>
+          <input
+            placeholder="Заголовок"
+            value={pageDraft?.title || ''}
+            onChange={(e) => setPageDraft(pageDraft ? { ...pageDraft, title: e.target.value } : null)}
+          />
+          <textarea
+            rows={6}
+            placeholder="Контент"
+            value={pageDraft?.content || ''}
+            onChange={(e) => setPageDraft(pageDraft ? { ...pageDraft, content: e.target.value } : null)}
+          />
+          <button onClick={savePage}>Сохранить страницу</button>
+        </div>
+      </section>
+
+      <section>
         <h2>Заявки ({leads.length})</h2>
         <div className="list">
           {leads.map((lead) => (
@@ -641,12 +773,15 @@ function AdminPage() {
 
 function App() {
   const url = new URL(window.location.href);
+  const pathname = window.location.pathname;
   const isAdminRoute =
-    window.location.pathname.endsWith(ADMIN_PATH) ||
+    pathname.endsWith(ADMIN_PATH) ||
     window.location.hash === `#${ADMIN_KEY}` ||
     url.searchParams.get('admin') === ADMIN_KEY;
 
-  return isAdminRoute ? <AdminPage /> : <PublicPage />;
+  if (isAdminRoute) return <AdminPage />;
+  if (pathname === '/about') return <AboutPage />;
+  return <PublicPage />;
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

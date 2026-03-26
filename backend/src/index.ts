@@ -19,14 +19,22 @@ interface Lead {
   id: string;
   name: string;
   phone: string;
+  email?: string;
   message: string;
   projectId?: string;
   createdAt: string;
 }
 
+interface ContentPage {
+  slug: string;
+  title: string;
+  content: string;
+}
+
 interface DataStore {
   projects: HouseProject[];
   leads: Lead[];
+  pages: Record<string, ContentPage>;
 }
 
 const app = express();
@@ -35,7 +43,6 @@ const DATA_FILE = path.join(__dirname, '..', 'data.json');
 const ADMIN_LOGIN = process.env.ADMIN_LOGIN || 'admin_dom';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'DomPenza2026!';
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'hidden-admin-token-penza';
-
 const FRONTEND_DIST = path.join(__dirname, '..', '..', 'frontend', 'dist');
 
 const seedProjects: HouseProject[] = [
@@ -74,9 +81,18 @@ const seedProjects: HouseProject[] = [
   }
 ];
 
+const seedPages: Record<string, ContentPage> = {
+  about: {
+    slug: 'about',
+    title: 'О компании',
+    content:
+      'Строительная компания «TMдом» открыта в 2014 году. Мы строим качественные дома под ключ: от проекта и сметы до сдачи дома и передачи ключей. Каждый этап контролирует команда инженеров и прорабов.'
+  }
+};
+
 const ensureDataFile = (): void => {
   if (!fs.existsSync(DATA_FILE)) {
-    const initial: DataStore = { projects: seedProjects, leads: [] };
+    const initial: DataStore = { projects: seedProjects, leads: [], pages: seedPages };
     fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2), 'utf-8');
   }
 };
@@ -84,7 +100,12 @@ const ensureDataFile = (): void => {
 const readData = (): DataStore => {
   ensureDataFile();
   const content = fs.readFileSync(DATA_FILE, 'utf-8');
-  return JSON.parse(content) as DataStore;
+  const parsed = JSON.parse(content) as Partial<DataStore>;
+  return {
+    projects: parsed.projects || seedProjects,
+    leads: parsed.leads || [],
+    pages: parsed.pages || seedPages
+  };
 };
 
 const writeData = (data: DataStore): void => {
@@ -112,8 +133,20 @@ app.get('/api/projects', (_req, res) => {
   res.json(data.projects);
 });
 
+app.get('/api/pages/:slug', (req, res) => {
+  const data = readData();
+  const page = data.pages[req.params.slug];
+
+  if (!page) {
+    res.status(404).json({ message: 'Страница не найдена' });
+    return;
+  }
+
+  res.json(page);
+});
+
 app.post('/api/leads', (req, res) => {
-  const { name, phone, message, projectId } = req.body as Partial<Lead>;
+  const { name, phone, email, message, projectId } = req.body as Partial<Lead>;
 
   if (!name || !phone) {
     res.status(400).json({ message: 'Укажите имя и телефон' });
@@ -125,6 +158,7 @@ app.post('/api/leads', (req, res) => {
     id: `lead_${Date.now()}`,
     name,
     phone,
+    email: email || '',
     message: message || '',
     projectId,
     createdAt: new Date().toISOString()
@@ -201,11 +235,32 @@ app.delete('/api/admin/projects/:id', authMiddleware, (req, res) => {
   res.json({ ok: true });
 });
 
+app.get('/api/admin/pages', authMiddleware, (_req, res) => {
+  const data = readData();
+  res.json(Object.values(data.pages));
+});
+
+app.put('/api/admin/pages/:slug', authMiddleware, (req, res) => {
+  const slug = String(req.params.slug);
+  const incoming = req.body as Partial<ContentPage>;
+  const data = readData();
+
+  const existing = data.pages[slug] || { slug, title: '', content: '' };
+  const page: ContentPage = {
+    slug,
+    title: incoming.title || existing.title,
+    content: incoming.content || existing.content
+  };
+
+  data.pages[slug] = page;
+  writeData(data);
+  res.json(page);
+});
+
 app.get('/api/admin/leads', authMiddleware, (_req, res) => {
   const data = readData();
   res.json(data.leads);
 });
-
 
 if (fs.existsSync(FRONTEND_DIST)) {
   app.use(express.static(FRONTEND_DIST));
