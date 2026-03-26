@@ -5,13 +5,16 @@ import './styles.css';
 type HouseProject = {
   id: string;
   title: string;
+  shortDescription: string;
+  fullDescription: string;
+  coverImage: string;
+  images: string[];
   area: string;
   floors: string;
   bedrooms: string;
-  price: string;
-  image: string;
+  priceFrom: string;
+  constructionType: string;
   badge?: string;
-  description: string;
 };
 
 type Lead = {
@@ -39,10 +42,13 @@ const FALLBACK_PROJECTS: HouseProject[] = [
     area: '92 м²',
     floors: '1 этаж',
     bedrooms: '3 спальни',
-    price: 'от 4 150 000 ₽',
-    image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1200&q=80',
     badge: 'Хит продаж',
-    description: 'Компактный дом с просторной кухней-гостиной и выходом на террасу.'
+    shortDescription: 'Компактный дом с просторной кухней-гостиной и выходом на террасу.',
+    fullDescription: 'Полное описание проекта.',
+    coverImage: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1200&q=80',
+    images: [],
+    priceFrom: 'от 4 150 000 ₽',
+    constructionType: 'Газобетон'
   },
   {
     id: 'demo2',
@@ -50,10 +56,13 @@ const FALLBACK_PROJECTS: HouseProject[] = [
     area: '128 м²',
     floors: '1 этаж',
     bedrooms: '4 спальни',
-    price: 'от 5 730 000 ₽',
-    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
     badge: 'Для семьи',
-    description: 'Функциональная планировка для семьи: мастер-спальня, кладовая и большая гостиная.'
+    shortDescription: 'Функциональная планировка для семьи: мастер-спальня, кладовая и большая гостиная.',
+    fullDescription: 'Полное описание проекта.',
+    coverImage: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+    images: [],
+    priceFrom: 'от 5 730 000 ₽',
+    constructionType: 'Кирпич'
   },
   {
     id: 'demo3',
@@ -61,10 +70,13 @@ const FALLBACK_PROJECTS: HouseProject[] = [
     area: '164 м²',
     floors: '2 этажа',
     bedrooms: '5 спален',
-    price: 'от 7 450 000 ₽',
-    image: 'https://images.unsplash.com/photo-1576941089067-2de3c901e126?auto=format&fit=crop&w=1200&q=80',
     badge: 'Премиум',
-    description: 'Двухэтажный дом с кабинетом, гардеробными и полноценной террасой.'
+    shortDescription: 'Двухэтажный дом с кабинетом, гардеробными и полноценной террасой.',
+    fullDescription: 'Полное описание проекта.',
+    coverImage: 'https://images.unsplash.com/photo-1576941089067-2de3c901e126?auto=format&fit=crop&w=1200&q=80',
+    images: [],
+    priceFrom: 'от 7 450 000 ₽',
+    constructionType: 'Клееный брус'
   }
 ];
 
@@ -77,9 +89,13 @@ function PublicPage() {
   const [projectId, setProjectId] = useState(FALLBACK_PROJECTS[0].id);
   const [status, setStatus] = useState('');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [constructionTypes, setConstructionTypes] = useState<string[]>([]);
+  const [selectedType, setSelectedType] = useState('Все типы');
 
   useEffect(() => {
     document.title = "TMдом — строительство домов";
+    fetch(`${API_BASE}/api/construction-types`).then((r) => r.ok ? r.json() : []).then((t:string[]) => setConstructionTypes(['Все типы', ...t])).catch(() => setConstructionTypes(['Все типы']));
+
     fetch(`${API_BASE}/api/projects`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no api'))))
       .then((data: HouseProject[]) => {
@@ -96,15 +112,17 @@ function PublicPage() {
   }, []);
 
 
+  const filteredProjects = useMemo(() => selectedType === 'Все типы' ? projects : projects.filter((p) => p.constructionType === selectedType), [projects, selectedType]);
+
   const catalogProjects = useMemo(() => {
-    if (!projects.length) {
+    if (!filteredProjects.length) {
       return [] as HouseProject[];
     }
     return Array.from({ length: 12 }, (_, index) => {
-      const item = projects[index % projects.length];
+      const item = filteredProjects[index % filteredProjects.length];
       return { ...item, id: `${item.id}_tile_${index}` };
     });
-  }, [projects]);
+  }, [filteredProjects]);
 
   const submitLead = async (event: FormEvent) => {
     event.preventDefault();
@@ -257,21 +275,24 @@ function PublicPage() {
       <section className="section alt" id="catalog">
         <div className="container">
           <h2>Популярные проекты</h2>
+          <select className="type-filter" value={selectedType} onChange={(e) => setSelectedType(e.target.value)}>
+            {constructionTypes.map((t) => <option key={t} value={t}>{t}</option>)}
+          </select>
           <div className="catalog-grid">
-            {projects.map((project) => (
+            {catalogProjects.map((project) => (
               <article className="project-card" key={project.id}>
-                <div className="project-image" style={{ backgroundImage: `url(${project.image})` }}>
+                <div className="project-image" style={{ backgroundImage: `url(${project.coverImage || project.images?.[0] || ""})` }}>
                   {project.badge ? <span className="badge">{project.badge}</span> : null}
                 </div>
                 <div className="project-content">
                   <h3>{project.title}</h3>
-                  <p className="project-desc">{project.description}</p>
+                  <p className="project-desc">{project.shortDescription}</p>
                   <div className="project-meta">
                     <span>{project.area}</span>
                     <span>{project.floors}</span>
                     <span>{project.bedrooms}</span>
                   </div>
-                  <strong className="project-price">{project.price}</strong>
+                  <strong className="project-price">{project.priceFrom}</strong>
                 </div>
               </article>
             ))}
@@ -676,15 +697,34 @@ function AdminPage() {
             <input placeholder="Этажность" value={draft.floors || ''} onChange={(e) => setDraft({ ...draft, floors: e.target.value })} />
             <input placeholder="Спальни" value={draft.bedrooms || ''} onChange={(e) => setDraft({ ...draft, bedrooms: e.target.value })} />
             <input placeholder="Цена" value={draft.price || ''} onChange={(e) => setDraft({ ...draft, price: e.target.value })} />
-            <input placeholder="URL изображения" value={draft.image || ''} onChange={(e) => setDraft({ ...draft, image: e.target.value })} />
             <input placeholder="Бейдж" value={draft.badge || ''} onChange={(e) => setDraft({ ...draft, badge: e.target.value })} />
             <textarea
               rows={3}
               placeholder="Описание"
-              value={draft.description || ''}
-              onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+              value={draft.shortDescription || ''}
+              onChange={(e) => setDraft({ ...draft, shortDescription: e.target.value })}
             />
             <button onClick={saveProject}>Сохранить</button>
+            
+            <textarea
+              rows={4}
+              placeholder="Полное описание"
+              value={draft.fullDescription || ''}
+              onChange={(e) => setDraft({ ...draft, fullDescription: e.target.value })}
+            />
+            <input placeholder="Картинка обложка" value={draft.coverImage || ''} onChange={(e) => setDraft({ ...draft, coverImage: e.target.value })} />
+            <textarea
+              rows={2}
+              placeholder="Картинки (через запятую)"
+              value={Array.isArray(draft.images) ? draft.images.join(', ') : ''}
+              onChange={(e) => setDraft({ ...draft, images: e.target.value.split(',').map((v) => v.trim()).filter(Boolean) })}
+            />
+            <input placeholder="Сумма от" value={draft.priceFrom || ''} onChange={(e) => setDraft({ ...draft, priceFrom: e.target.value })} />
+            <select value={draft.constructionType || 'Газобетон'} onChange={(e) => setDraft({ ...draft, constructionType: e.target.value })}>
+              {["Газобетон","Арболит","Керамзитобетонные блоки","Кирпич","Оцилиндрованное бревно","Рубленное бревно","Лафет","Профилированный брус","Клееный брус","Двойной брус","Каркасные","SIP панели","Строительство дачных домов под ключ"].map((t) => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
             {draft.id ? <button onClick={() => setDraft({})}>Отменить</button> : null}
           </div>
         </section>
@@ -696,7 +736,7 @@ function AdminPage() {
               <div key={project.id} className="list-item">
                 <div>
                   <strong>{project.title}</strong>
-                  <p>{project.price}</p>
+                  <p>{project.priceFrom}</p>
                 </div>
                 <div className="actions">
                   <button onClick={() => setDraft(project)}>Изменить</button>
