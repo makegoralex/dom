@@ -241,7 +241,7 @@ function PublicPage() {
                 ))}
               </div>
             </div>
-            <a>/</a><a>БАНИ</a><a>/</a><a>УСЛУГИ</a><a>/</a><a>ПРОЕКТИРОВАНИЕ</a><a>/</a><a>ПОРТФОЛИО</a><a>/</a><a>КОНТАКТЫ</a>
+            <a>/</a><a>БАНИ</a><a>/</a><a>УСЛУГИ</a><a>/</a><a>ПРОЕКТИРОВАНИЕ</a><a>/</a><a>ПОРТФОЛИО</a><a>/</a><a href="/contacts" className="menu-link">КОНТАКТЫ</a>
           </nav>
 
           <div className="hero-content">
@@ -531,7 +531,7 @@ function InternalHeader() {
           <a href="/" className="brand-line"><div className="logo-badge">⌂</div><div className="brand-text"><div className="brand-logo">TMдом</div><p>Строительная компания</p></div></a>
           <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span><div className="phone-block"><strong>+7 (905) 365-47-39</strong><small>с 9:00 до 19:00</small></div><button className="call-btn">Заказать звонок</button></div>
         </div>
-        <nav className="hero-nav"><a href="/about" className={`menu-link ${window.location.pathname === '/about' ? 'active' : ''}`}>О КОМПАНИИ</a><a>/</a><div className="menu-projects"><a href="/projects" className={`menu-link ${window.location.pathname === '/projects' ? 'active' : ''}`}>ПРОЕКТЫ ДОМОВ ▾</a><div className="projects-dropdown">{PROJECT_GROUPS.map((column) => (<div key={column.title}><h4>{column.title}</h4>{column.groups.map((group) => (<div key={`${column.title}_${group.label}`}>{group.label ? <strong>{group.label}</strong> : null}{group.items.map((item) => (<a key={item} href={`/projects?type=${encodeURIComponent(item)}`} className="dropdown-link">{item}</a>))}</div>))}</div>))}</div></div><a>/</a><a>БАНИ</a><a>/</a><a>УСЛУГИ</a><a>/</a><a>ПРОЕКТИРОВАНИЕ</a><a>/</a><a>ПОРТФОЛИО</a><a>/</a><a>КОНТАКТЫ</a></nav>
+        <nav className="hero-nav"><a href="/about" className={`menu-link ${window.location.pathname === '/about' ? 'active' : ''}`}>О КОМПАНИИ</a><a>/</a><div className="menu-projects"><a href="/projects" className={`menu-link ${window.location.pathname === '/projects' ? 'active' : ''}`}>ПРОЕКТЫ ДОМОВ ▾</a><div className="projects-dropdown">{PROJECT_GROUPS.map((column) => (<div key={column.title}><h4>{column.title}</h4>{column.groups.map((group) => (<div key={`${column.title}_${group.label}`}>{group.label ? <strong>{group.label}</strong> : null}{group.items.map((item) => (<a key={item} href={`/projects?type=${encodeURIComponent(item)}`} className="dropdown-link">{item}</a>))}</div>))}</div>))}</div></div><a>/</a><a>БАНИ</a><a>/</a><a>УСЛУГИ</a><a>/</a><a>ПРОЕКТИРОВАНИЕ</a><a>/</a><a>ПОРТФОЛИО</a><a>/</a><a href="/contacts" className={`menu-link ${window.location.pathname === '/contacts' ? 'active' : ''}`}>КОНТАКТЫ</a></nav>
       </div>
     </header>
   );
@@ -623,6 +623,54 @@ function ProjectTypePage() {
                 </div>
               </article>
             ))}
+          </div>
+        </div>
+      </section>
+      <SiteFooter />
+    </div>
+  );
+}
+
+function ContactsPage() {
+  useEffect(() => {
+    document.title = 'Контакты — TMдом';
+  }, []);
+
+  return (
+    <div>
+      <InternalHeader />
+      <section className="internal-body">
+        <div className="container">
+          <Breadcrumbs items={["Главная", "Контакты"]} />
+          <h1>КОНТАКТЫ</h1>
+          <div className="contacts-box">
+            <div className="contacts-info">
+              <h3>Мы находимся по адресу:</h3>
+              <p>📍 г. Пенза, ул. Красная Горка, 36</p>
+
+              <h3>Телефон:</h3>
+              <p><a href="tel:+79053654739">+7 (905) 365-47-39</a></p>
+
+              <h3>Время работы:</h3>
+              <p>🕘 Без выходных: 9:00–18:00</p>
+
+              <h3>Почта:</h3>
+              <p><a href="mailto:penza@evereststroi.com">penza@evereststroi.com</a></p>
+
+              <div className="contacts-socials">
+                <a href="#" aria-label="VK">VK</a>
+                <a href="#" aria-label="OK">OK</a>
+                <a href="#" aria-label="YouTube">YT</a>
+              </div>
+            </div>
+            <div className="contacts-map-wrap">
+              <iframe
+                title="Карта офиса TMдом"
+                src="https://yandex.ru/map-widget/v1/?um=constructor%3A7f4b7ddad4534e0dbf4fc7174bc0f99384f0186b76310673b5628e6f03ec9552&amp;source=constructor"
+                loading="lazy"
+                allowFullScreen
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -884,6 +932,7 @@ function App() {
   if (isAdminRoute) return <AdminPage />;
   if (pathname === '/about') return <AboutPage />;
   if (pathname === '/projects') return <ProjectTypePage />;
+  if (pathname === '/contacts') return <ContactsPage />;
   return <PublicPage />;
 }
 

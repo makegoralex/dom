@@ -75,6 +75,17 @@ body {margin: 0; background: #fff;}
 .internal-text-box{background:#f7f7f8; border:1px solid #d8dce3; padding:22px;}
 .internal-text-box p{margin:0; font-size:13px; color:#323844; line-height:1.45;}
 
+.contacts-box{background:#f7f7f8; border:1px solid #d8dce3; padding:28px; display:grid; grid-template-columns:1fr 1.1fr; gap:20px;}
+.contacts-info h3{margin:0 0 8px; font-size:34px; color:#1e2531; font-family:Georgia, 'Times New Roman', serif; font-weight:700;}
+.contacts-info p{margin:0 0 14px; font-size:32px; line-height:1.25; color:#272e3a; font-family:Georgia, 'Times New Roman', serif;}
+.contacts-info p a{color:#272e3a;}
+.contacts-map-wrap iframe{border:0; width:100%; height:100%; min-height:380px;}
+.contacts-socials{display:flex; gap:8px; margin-top:10px;}
+.contacts-socials a{display:inline-flex; align-items:center; justify-content:center; width:44px; height:38px; color:#fff; text-decoration:none; font-size:13px; font-weight:700;}
+.contacts-socials a:nth-child(1){background:#2f79a8;}
+.contacts-socials a:nth-child(2){background:#f0801c;}
+.contacts-socials a:nth-child(3){background:#c43a31;}
+
 
 
 .offer-section{background:#e7e7ea; padding:32px 0 40px;}
@@ -220,6 +231,9 @@ body {margin: 0; background: #fff;}
 @media (max-width: 720px) {
   .internal-body h1{font-size:22px;}
   .internal-text-box p{font-size:12px;}
+  .contacts-box{grid-template-columns:1fr; padding:16px;}
+  .contacts-info h3{font-size:24px;}
+  .contacts-info p{font-size:22px;}
   .lead-side h2{font-size:34px;}
   .lead-top-row,.footer-columns{grid-template-columns:1fr;}
   .contact-card h4,.social-card h4{font-size:18px;}
