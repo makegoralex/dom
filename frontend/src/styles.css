@@ -11,42 +11,42 @@ body {margin: 0; background: #fff;}
   min-height: 760px;
 }
 .promo-strip {background:#eb7b17; border-bottom: 1px solid rgba(255,255,255,.35);}
-.promo-inner {display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:38px; font-size:26px; font-weight:700;}
+.promo-inner {display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:38px; font-size:16px; font-weight:700;}
 .promo-inner strong{font-size:13px; letter-spacing:.3px;}
-.promo-inner button{background:#d86b10; border:1px solid #f0b079; color:#fff; padding:8px 18px; font-weight:700; cursor:pointer;}
+.promo-inner button{background:#d86b10; border:1px solid #f0b079; color:#fff; padding:8px 18px; font-weight:700; cursor:pointer; font-size:13px;}
 
 .top-search-row {background: #ebebeb; color:#222;}
 .top-search-inner {display:flex; justify-content:space-between; gap:16px; align-items:center; min-height:50px;}
 .search-box {display:flex; gap:10px; align-items:center;}
 .search-box input {height:30px; width:220px; border:1px solid #7f7f7f; border-radius:5px; padding:0 10px;}
 .search-box button {height:30px; padding:0 18px; border:1px solid #444; border-radius:5px; background:#d7d7d7;}
-.top-contacts {display:flex; gap:24px; font-size:16px; text-decoration:underline;}
+.top-contacts {display:flex; gap:24px; font-size:14px; text-decoration:underline;}
 
 .hero-main {padding-top: 24px;}
-.brand-line {display:flex; align-items:center; gap:16px; font-size:32px; color:#f9c652; font-weight:700;}
-.brand-line p {margin:0; color:#f9d96d; font-size:34px;}
-.brand-logo{font-size:44px; font-weight:800;}
+.brand-line {display:flex; align-items:center; gap:14px; font-size:26px; color:#f9c652; font-weight:700;}
+.brand-line p {margin:0; color:#f9d96d; font-size:22px;}
+.brand-logo{font-size:52px; font-weight:800;}
 
 .hero-contact-line {display:flex; align-items:center; justify-content:space-between; gap:16px; border-top:1px solid rgba(255,255,255,.35); border-bottom:1px solid rgba(255,255,255,.35); padding:14px 0; margin:20px 0;}
-.hero-contact-line span {font-size:18px;}
-.hero-contact-line strong {font-size:49px; color:#ffdd4d;}
-.call-btn {background:#5dad2f; border:none; color:#fff; padding:14px 20px; font-size:30px; cursor:pointer;}
+.hero-contact-line span {font-size:15px;}
+.hero-contact-line strong {font-size:28px; color:#ffdd4d; line-height:1.15;}
+.call-btn {background:#5dad2f; border:none; color:#fff; padding:14px 20px; font-size:20px; cursor:pointer;}
 
 .hero-nav {display:flex; flex-wrap:wrap; gap:22px; padding:10px 0 16px; border-bottom:1px solid rgba(255,255,255,.35);}
-.hero-nav a {font-weight:700; font-size:16px; color:#fff; text-decoration:none;}
+.hero-nav a {font-weight:700; font-size:13px; color:#fff; text-decoration:none;}
 
 .hero-content {padding:44px 0 30px; max-width:940px;}
-.hero-content h1 {font-size:67px; line-height:1.02; margin:0 0 28px; max-width:760px;}
+.hero-content h1 {font-size:38px; line-height:1.06; margin:0 0 24px; max-width:620px;}
 .hero-stats {display:flex; gap:30px; margin-bottom:28px;}
 .hero-stats > div {max-width:230px;}
-.hero-stats strong {display:block; font-size:53px; margin-bottom:6px;}
-.hero-stats span {font-size:31px; line-height:1.2;}
+.hero-stats strong {display:block; font-size:24px; margin-bottom:6px;}
+.hero-stats span {font-size:13px; line-height:1.2;}
 .hero-buttons {display:flex; gap:16px;}
-.btn-green, .btn-yellow {text-decoration:none; color:#fff; font-size:27px; font-weight:700; padding:17px 22px;}
+.btn-green, .btn-yellow {text-decoration:none; color:#fff; font-size:18px; font-weight:700; padding:14px 18px;}
 .btn-green {background:#53ab28;}
 .btn-yellow {background:#d5ae34; color:#2b2b2b;}
 
-.floating-call {position:absolute; right:24px; bottom:24px; width:60px; height:60px; border-radius:50%; border:none; background:#1dbc45; color:#fff; font-size:30px;}
+.floating-call {position:absolute; right:24px; bottom:24px; width:54px; height:54px; border-radius:50%; border:none; background:#1dbc45; color:#fff; font-size:24px;}
 
 .section {padding:68px 0;}
 .section.alt {background:#f5f7fa;}
