@@ -36,6 +36,8 @@ const ADMIN_LOGIN = process.env.ADMIN_LOGIN || 'admin_dom';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'DomPenza2026!';
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'hidden-admin-token-penza';
 
+const FRONTEND_DIST = path.join(__dirname, '..', '..', 'frontend', 'dist');
+
 const seedProjects: HouseProject[] = [
   {
     id: 'p1',
@@ -203,6 +205,15 @@ app.get('/api/admin/leads', authMiddleware, (_req, res) => {
   const data = readData();
   res.json(data.leads);
 });
+
+
+if (fs.existsSync(FRONTEND_DIST)) {
+  app.use(express.static(FRONTEND_DIST));
+
+  app.get(/^(?!\/api).*/, (_req, res) => {
+    res.sendFile(path.join(FRONTEND_DIST, 'index.html'));
+  });
+}
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
