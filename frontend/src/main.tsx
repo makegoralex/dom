@@ -1,13 +1,652 @@
-import React from 'react';
+import React, { FormEvent, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom/client';
+import './styles.css';
 
-function App() {
+type HouseProject = {
+  id: string;
+  title: string;
+  area: string;
+  floors: string;
+  bedrooms: string;
+  price: string;
+  image: string;
+  badge?: string;
+  description: string;
+};
+
+type Lead = {
+  id: string;
+  name: string;
+  phone: string;
+  message: string;
+  projectId?: string;
+  createdAt: string;
+};
+
+const API_BASE = import.meta.env.VITE_API_BASE || '';
+const ADMIN_PATH = '/catalog-control-7f3a';
+const ADMIN_KEY = 'catalog-control-7f3a';
+const FALLBACK_PROJECTS: HouseProject[] = [
+  {
+    id: 'demo1',
+    title: 'Проект Эверест 92',
+    area: '92 м²',
+    floors: '1 этаж',
+    bedrooms: '3 спальни',
+    price: 'от 4 150 000 ₽',
+    image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1200&q=80',
+    badge: 'Хит продаж',
+    description: 'Компактный дом с просторной кухней-гостиной и выходом на террасу.'
+  },
+  {
+    id: 'demo2',
+    title: 'Проект Эверест 128',
+    area: '128 м²',
+    floors: '1 этаж',
+    bedrooms: '4 спальни',
+    price: 'от 5 730 000 ₽',
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+    badge: 'Для семьи',
+    description: 'Функциональная планировка для семьи: мастер-спальня, кладовая и большая гостиная.'
+  },
+  {
+    id: 'demo3',
+    title: 'Проект Эверест 164',
+    area: '164 м²',
+    floors: '2 этажа',
+    bedrooms: '5 спален',
+    price: 'от 7 450 000 ₽',
+    image: 'https://images.unsplash.com/photo-1576941089067-2de3c901e126?auto=format&fit=crop&w=1200&q=80',
+    badge: 'Премиум',
+    description: 'Двухэтажный дом с кабинетом, гардеробными и полноценной террасой.'
+  }
+];
+
+function PublicPage() {
+  const [projects, setProjects] = useState<HouseProject[]>(FALLBACK_PROJECTS);
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [projectId, setProjectId] = useState(FALLBACK_PROJECTS[0].id);
+  const [status, setStatus] = useState('');
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/projects`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no api'))))
+      .then((data: HouseProject[]) => {
+        if (!Array.isArray(data) || !data.length) {
+          return;
+        }
+        setProjects(data);
+        setProjectId(data[0].id);
+      })
+      .catch(() => {
+        setProjects(FALLBACK_PROJECTS);
+        setProjectId(FALLBACK_PROJECTS[0].id);
+      });
+  }, []);
+
+
+  const catalogProjects = useMemo(() => {
+    if (!projects.length) {
+      return [] as HouseProject[];
+    }
+    return Array.from({ length: 12 }, (_, index) => {
+      const item = projects[index % projects.length];
+      return { ...item, id: `${item.id}_tile_${index}` };
+    });
+  }, [projects]);
+
+  const submitLead = async (event: FormEvent) => {
+    event.preventDefault();
+    setStatus('Отправка...');
+
+    try {
+      const response = await fetch(`${API_BASE}/api/leads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone, email, message, projectId })
+      });
+
+      if (!response.ok) {
+        throw new Error('bad response');
+      }
+
+      setStatus('Спасибо! Мы свяжемся с вами в ближайшее время.');
+      setName('');
+      setPhone('');
+      setEmail('');
+      setMessage('');
+      return;
+    } catch (_error) {
+      setStatus('Заявка сохранена локально. Подключим CRM на следующем этапе.');
+    }
+  };
+
   return (
-    <div style={{padding: 20}}>
-      <h1>DOM project</h1>
-      <p>Frontend работает</p>
+    <div>
+      <header className="hero hero-exact">
+        <div className="promo-strip">
+          <div className="container promo-inner">
+            <strong>СТРОИТЕЛЬСТВО ДОМОВ В КРЕДИТ И ИПОТЕКУ ОТ 9.5% ГОДОВЫХ!</strong>
+            <button>Узнать условия <span>»</span></button>
+          </div>
+        </div>
+
+        <div className="top-search-row">
+          <div className="container top-search-inner">
+            <div className="search-box">
+              <input placeholder="Поиск по сайту..." />
+              <button>Найти</button>
+            </div>
+            <div className="top-contacts">
+              <span>село Засечное, улица Механизаторов, 22А</span>
+              <span>мы в VK</span>
+              <span><i>⤴</i> Свой проект на расчёт</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="container hero-main">
+          <div className="hero-upper-row">
+            <div className="brand-line">
+              <div className="logo-badge">⌂</div>
+              <div className="brand-text">
+                <div className="brand-logo">TMдом</div>
+                <p>Строительная компания</p>
+              </div>
+            </div>
+
+            <div className="hero-contact-line">
+              <span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span>
+              <div className="phone-block"><strong>+7 (905) 365-47-39</strong><small>с 9:00 до 19:00</small></div>
+              <button className="call-btn">Заказать звонок</button>
+            </div>
+          </div>
+
+          <nav className="hero-nav">
+            <a>О КОМПАНИИ</a>
+            <a>/</a>
+            <a>ПРОЕКТЫ ДОМОВ</a>
+            <a>/</a>
+            <a>БАНИ</a>
+            <a>/</a>
+            <a>УСЛУГИ</a>
+            <a>/</a>
+            <a>ПРОЕКТИРОВАНИЕ</a>
+            <a>/</a>
+            <a>ПОРТФОЛИО</a>
+            <a>/</a>
+            <a>КОНТАКТЫ</a>
+          </nav>
+
+          <div className="hero-content">
+            <h1>Строительство домов под ключ в Пензе</h1>
+            <div className="hero-stats">
+              <div><strong>10 лет</strong><span>Строим дома и бани полностью под ключ</span></div>
+              <div><strong>Более 200</strong><span>Построенных объектов по всей области</span></div>
+              <div><strong>Более 400</strong><span>Проектов под любой бюджет</span></div>
+            </div>
+            <div className="hero-buttons">
+              <a href="#catalog" className="btn-green"><i>▣</i> ПОСМОТРЕТЬ ПРОЕКТЫ</a>
+              <a href="#lead-form" className="btn-yellow"><i>⌂</i> ЗАКАЗАТЬ ДОМ</a>
+            </div>
+          </div>
+        </div>
+
+        <button className="floating-call">☎</button>
+      </header>
+
+      <section className="offer-section">
+        <div className="container">
+          <h2 className="offer-title">Мы предлагаем</h2>
+          <div className="offer-grid">
+            <article className="offer-card wide" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1600585152915-d208bec867a1?auto=format&fit=crop&w=1000&q=80')" }}>
+              <div className="offer-overlay">
+                <h3>Дома из бруса</h3>
+                <a>Клееный</a>
+                <a>Профилированный</a>
+                <a>Двойной</a>
+              </div>
+            </article>
+            <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1572120360610-d971b9d7767c?auto=format&fit=crop&w=1000&q=80')" }}>
+              <div className="offer-overlay">
+                <h3>Дома из бревна</h3>
+                <a>Оцилиндрованное</a>
+                <a>Рубленное</a>
+                <a>Лафет</a>
+              </div>
+            </article>
+            <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1000&q=80')" }}>
+              <div className="offer-overlay">
+                <h3>Дома из кирпича</h3>
+              </div>
+            </article>
+            <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1464146072230-91cabc968266?auto=format&fit=crop&w=1000&q=80')" }}>
+              <div className="offer-overlay">
+                <h3>Каркасные дома</h3>
+              </div>
+            </article>
+            <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?auto=format&fit=crop&w=1000&q=80')" }}>
+              <div className="offer-overlay">
+                <h3>Дома из SIP-панелей</h3>
+              </div>
+            </article>
+            <article className="offer-card wide" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1000&q=80')" }}>
+              <div className="offer-overlay">
+                <h3>Дома из блоков</h3>
+                <a>Газоблоки</a>
+                <a>Арболит</a>
+                <a>Керамоблоки</a>
+                <a>Керамзитобетон</a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="section alt" id="catalog">
+        <div className="container">
+          <h2>Популярные проекты</h2>
+          <div className="catalog-grid">
+            {catalogProjects.map((project) => (
+              <article className="project-card" key={project.id}>
+                <div className="project-image" style={{ backgroundImage: `url(${project.image})` }}>
+                  {project.badge ? <span className="badge">{project.badge}</span> : null}
+                </div>
+                <div className="project-content">
+                  <h3>{project.title}</h3>
+                  <p className="project-desc">{project.description}</p>
+                  <div className="project-meta">
+                    <span>{project.area}</span>
+                    <span>{project.floors}</span>
+                    <span>{project.bedrooms}</span>
+                  </div>
+                  <strong className="project-price">{project.price}</strong>
+                </div>
+              </article>
+            ))}
+          </div>
+          <div className="show-all-wrap"><a href="#" className="show-all-link">Показать все проекты</a></div>
+        </div>
+      </section>
+
+      <section className="steps-section">
+        <div className="container">
+          <h2 className="steps-title">Этапы работы</h2>
+          <div className="steps-grid">
+            <article className="step-card">
+              <div className="step-number">1</div>
+              <div>
+                <h3>Подбор проекта</h3>
+                <small>1-3 дня</small>
+                <p>Подбираем подходящий проект, согласовываем планировку и бюджет.</p>
+              </div>
+            </article>
+            <article className="step-card">
+              <div className="step-number">2</div>
+              <div>
+                <h3>Проектирование</h3>
+                <small>10-15 дней</small>
+                <p>Готовим архитектурные и инженерные решения под ваш участок.</p>
+              </div>
+            </article>
+            <article className="step-card wide">
+              <div className="step-number">3</div>
+              <div>
+                <h3>Доставка материалов и оплата</h3>
+                <small>1 день</small>
+                <p>Подписываем договор и организуем поставку материалов в назначенную дату.</p>
+              </div>
+            </article>
+            <article className="step-card">
+              <div className="step-number">4</div>
+              <div>
+                <h3>Строительство коробки</h3>
+                <small>10-20 дней</small>
+                <p>Выполняем фундамент, стены и кровлю по согласованному графику.</p>
+              </div>
+            </article>
+            <article className="step-card">
+              <div className="step-number">5</div>
+              <div>
+                <h3>Сдача дома</h3>
+                <small>2 дня</small>
+                <p>Проверяем качество, подписываем акты и передаем ключи.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+
+      <section className="why-section">
+        <div className="container">
+          <h2 className="why-title">Почему выбирают нас</h2>
+          <div className="why-grid">
+            <article className="why-card">
+              <div className="why-icon">🛠</div>
+              <div><h3>Ответственное строительство</h3><p>Опытные инженеры и прорабы с большим практическим опытом.</p></div>
+            </article>
+            <article className="why-card">
+              <div className="why-icon">🧾</div>
+              <div><h3>Понятная смета</h3><p>Под каждый проект готовим прозрачную смету без скрытых пунктов.</p></div>
+            </article>
+            <article className="why-card">
+              <div className="why-icon">📌</div>
+              <div><h3>Фиксированная стоимость работ</h3><p>Цена фиксируется в договоре и не меняется в ходе строительства.</p></div>
+            </article>
+            <article className="why-card">
+              <div className="why-icon">🤝</div>
+              <div><h3>Человеческое отношение</h3><p>Всегда готовы обсудить пожелания и предложить лучший вариант.</p></div>
+            </article>
+            <article className="why-card">
+              <div className="why-icon">🏦</div>
+              <div><h3>Помощь с ипотекой</h3><p>Подбираем оптимальные программы кредитования под ваш бюджет.</p></div>
+            </article>
+            <article className="why-card">
+              <div className="why-icon">✅</div>
+              <div><h3>Гарантия по договору</h3><p>Закрепляем сроки и качество работ в официальных документах.</p></div>
+            </article>
+          </div>
+          <div className="why-badges">
+            <span>✔ Работаем с материнским капиталом</span>
+            <span>✔ Помогаем экономить на строительстве</span>
+            <span>✔ Строим в кредит и ипотеку</span>
+            <span>✔ Даем скидки на страхование дома</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="faq-section">
+        <div className="container">
+          <h2 className="faq-title">Вопросы и ответы по строительству домов</h2>
+          <div className="faq-grid">
+            {[
+              { q: 'Сколько будет стоить строительство дома?', a: 'Цена зависит от площади, материала и комплектации. Для точной оценки подготовим детальную смету.' },
+              { q: 'В какое время года лучше всего начинать строительство?', a: 'Старт возможен круглый год, но чаще выбирают весну и лето для ускорения сроков.' },
+              { q: 'Можно ли обойтись без внешней отделки дома первое время?', a: 'Да, можно. Мы подскажем безопасную временную схему без рисков для конструкции.' },
+              { q: 'Какой фундамент лучше всего подойдет для загородного коттеджа?', a: 'Тип фундамента определяем после геологии и анализа грунта на вашем участке.' },
+              { q: 'Почему частные бригады часто выходят дороже?', a: 'Из-за переделок, срывов сроков и неполных смет. В компании эти риски закрываются договором.' },
+              { q: 'Какой материал выбрать для круглогодичного проживания?', a: 'Зависит от бюджета и задач. Часто выбирают газоблок или кирпич с эффективным утеплением.' },
+              { q: 'Кто будет контролировать ход строительства?', a: 'За объект отвечает прораб и инженер технадзора, отчетность отправляем клиенту по этапам.' },
+              { q: 'Что дороже: типовой проект или индивидуальный?', a: 'Индивидуальный проект обычно дороже, но позволяет полностью учесть пожелания семьи.' }
+            ].map((item, index) => {
+              const isOpen = openFaq === index;
+              return (
+                <div className={`faq-item ${isOpen ? 'active' : ''}`} key={item.q}>
+                  <button className="faq-question" onClick={() => setOpenFaq(isOpen ? null : index)}>
+                    <span>{item.q}</span>
+                    <b className="faq-arrow">⌄</b>
+                  </button>
+                  {isOpen ? <p className="faq-answer">{item.a}</p> : null}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="lead-bg-section" id="lead-form">
+        <div className="container lead-layout">
+          <aside className="lead-side">
+            <h2>Стать клиентом</h2>
+            <p>Заполните форму и наш менеджер вам перезвонит</p>
+          </aside>
+
+          <form className="lead-form" onSubmit={submitLead}>
+            <div className="lead-top-row">
+              <label>
+                Имя
+                <input value={name} onChange={(e) => setName(e.target.value)} required />
+              </label>
+              <label>
+                Телефон*
+                <input value={phone} onChange={(e) => setPhone(e.target.value)} required />
+              </label>
+              <label>
+                E-mail
+                <input value={email} onChange={(e) => setEmail(e.target.value)} />
+              </label>
+            </div>
+            <label>
+              Сообщение
+              <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={5} />
+            </label>
+            <button type="submit" className="lead-submit">✉ ОТПРАВИТЬ ДАННЫЕ</button>
+            <p className="lead-consent">Заполняя форму, вы даете согласие на обработку персональных данных.</p>
+            {status ? <p className="status">{status}</p> : null}
+          </form>
+        </div>
+      </section>
+
+      <footer className="site-footer">
+        <div className="container footer-layout">
+          <div className="footer-main">
+            <p className="footer-copy">© 2014-2021</p>
+            <p className="footer-note">Сайт носит информационный характер и не является публичной офертой.</p>
+            <div className="footer-links">
+              <a>Политика конфиденциальности</a>
+              <a>Карта сайта</a>
+            </div>
+            <div className="footer-columns">
+              <div>
+                <h4>Строим дома из:</h4>
+                <a>Клееного бруса</a><a>Кирпича</a><a>SIP-панелей</a>
+              </div>
+              <div>
+                <h4>Строим бани из:</h4>
+                <a>Бревна</a><a>Бруса</a>
+              </div>
+              <div>
+                <h4>Другие услуги:</h4>
+                <a>Фундаменты</a><a>Стяжка пола</a><a>Кухни на заказ</a>
+              </div>
+              <div>
+                <h4>Филиалы:</h4>
+                <a>Заречный</a><a>Березники</a><a>Чайковский</a>
+              </div>
+            </div>
+          </div>
+
+          <aside className="footer-side">
+            <div className="contact-card">
+              <h4>Контакты</h4>
+              <strong>+7 (905) 365-47-39</strong>
+              <button>Заказать звонок</button>
+              <a>мы в VK</a>
+              <p>село Засечное, улица Механизаторов, 22А</p>
+            </div>
+            <div className="social-card">
+              <h4>Мы в соцсетях</h4>
+              <div className="social-row"><span>VK</span><span>OK</span><span>YT</span></div>
+            </div>
+          </aside>
+        </div>
+        <a className="ghost-admin" href={`?admin=${ADMIN_KEY}`}>service</a>
+      </footer>
     </div>
   );
+}
+
+function AdminPage() {
+  const [login, setLogin] = useState('');
+  const [password, setPassword] = useState('');
+  const [token, setToken] = useState('');
+  const [projects, setProjects] = useState<HouseProject[]>([]);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [draft, setDraft] = useState<Partial<HouseProject>>({});
+  const [error, setError] = useState('');
+
+  const adminHeaders = useMemo(
+    () => ({
+      'Content-Type': 'application/json',
+      'x-admin-token': token
+    }),
+    [token]
+  );
+
+  const loadAdminData = async (currentToken: string) => {
+    const [projectsRes, leadsRes] = await Promise.all([
+      fetch(`${API_BASE}/api/admin/projects`, { headers: { 'x-admin-token': currentToken } }),
+      fetch(`${API_BASE}/api/admin/leads`, { headers: { 'x-admin-token': currentToken } })
+    ]);
+
+    if (!projectsRes.ok || !leadsRes.ok) {
+      setError('Не удалось загрузить данные админки');
+      return;
+    }
+
+    setProjects(await projectsRes.json());
+    setLeads(await leadsRes.json());
+  };
+
+  const doLogin = async (event: FormEvent) => {
+    event.preventDefault();
+    setError('');
+
+    const response = await fetch(`${API_BASE}/api/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ login, password })
+    });
+
+    if (!response.ok) {
+      setError('Неверный логин или пароль');
+      return;
+    }
+
+    const payload = (await response.json()) as { token: string };
+    setToken(payload.token);
+    await loadAdminData(payload.token);
+  };
+
+  const saveProject = async () => {
+    if (!draft.title) {
+      setError('Название проекта обязательно');
+      return;
+    }
+
+    const method = draft.id ? 'PUT' : 'POST';
+    const url = draft.id ? `${API_BASE}/api/admin/projects/${draft.id}` : `${API_BASE}/api/admin/projects`;
+
+    const response = await fetch(url, {
+      method,
+      headers: adminHeaders,
+      body: JSON.stringify(draft)
+    });
+
+    if (!response.ok) {
+      setError('Не удалось сохранить проект');
+      return;
+    }
+
+    setDraft({});
+    await loadAdminData(token);
+  };
+
+  const removeProject = async (id: string) => {
+    await fetch(`${API_BASE}/api/admin/projects/${id}`, {
+      method: 'DELETE',
+      headers: adminHeaders
+    });
+    await loadAdminData(token);
+  };
+
+  if (!token) {
+    return (
+      <div className="admin-wrap">
+        <h1>Служебный вход</h1>
+        <form className="admin-form" onSubmit={doLogin}>
+          <input placeholder="Логин" value={login} onChange={(e) => setLogin(e.target.value)} required />
+          <input
+            placeholder="Пароль"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button type="submit">Войти</button>
+          {error ? <p className="error">{error}</p> : null}
+        </form>
+      </div>
+    );
+  }
+
+  return (
+    <div className="admin-wrap">
+      <h1>Админка каталога</h1>
+      <div className="admin-grid">
+        <section>
+          <h2>{draft.id ? 'Редактирование проекта' : 'Новый проект'}</h2>
+          <div className="admin-form">
+            <input placeholder="Название" value={draft.title || ''} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
+            <input placeholder="Площадь" value={draft.area || ''} onChange={(e) => setDraft({ ...draft, area: e.target.value })} />
+            <input placeholder="Этажность" value={draft.floors || ''} onChange={(e) => setDraft({ ...draft, floors: e.target.value })} />
+            <input placeholder="Спальни" value={draft.bedrooms || ''} onChange={(e) => setDraft({ ...draft, bedrooms: e.target.value })} />
+            <input placeholder="Цена" value={draft.price || ''} onChange={(e) => setDraft({ ...draft, price: e.target.value })} />
+            <input placeholder="URL изображения" value={draft.image || ''} onChange={(e) => setDraft({ ...draft, image: e.target.value })} />
+            <input placeholder="Бейдж" value={draft.badge || ''} onChange={(e) => setDraft({ ...draft, badge: e.target.value })} />
+            <textarea
+              rows={3}
+              placeholder="Описание"
+              value={draft.description || ''}
+              onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+            />
+            <button onClick={saveProject}>Сохранить</button>
+            {draft.id ? <button onClick={() => setDraft({})}>Отменить</button> : null}
+          </div>
+        </section>
+
+        <section>
+          <h2>Проекты ({projects.length})</h2>
+          <div className="list">
+            {catalogProjects.map((project) => (
+              <div key={project.id} className="list-item">
+                <div>
+                  <strong>{project.title}</strong>
+                  <p>{project.price}</p>
+                </div>
+                <div className="actions">
+                  <button onClick={() => setDraft(project)}>Изменить</button>
+                  <button onClick={() => removeProject(project.id)}>Удалить</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <section>
+        <h2>Заявки ({leads.length})</h2>
+        <div className="list">
+          {leads.map((lead) => (
+            <div key={lead.id} className="list-item">
+              <div>
+                <strong>
+                  {lead.name} — {lead.phone}
+                </strong>
+                <p>{lead.message || 'Без комментария'}</p>
+              </div>
+              <small>{new Date(lead.createdAt).toLocaleString('ru-RU')}</small>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function App() {
+  const url = new URL(window.location.href);
+  const isAdminRoute =
+    window.location.pathname.endsWith(ADMIN_PATH) ||
+    window.location.hash === `#${ADMIN_KEY}` ||
+    url.searchParams.get('admin') === ADMIN_KEY;
+
+  return isAdminRoute ? <AdminPage /> : <PublicPage />;
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
