@@ -27,7 +27,7 @@ body {margin: 0; background: #fff;}
 .hero-main {padding-top: 14px;}
 
 .hero-upper-row{display:flex; align-items:center; justify-content:space-between; gap:18px; border-top:1px solid rgba(255,255,255,.35); border-bottom:1px solid rgba(255,255,255,.35); padding:10px 0;}
-.brand-line {display:flex; align-items:center; gap:14px; color:#f9c652; font-weight:700;}
+.brand-line {display:flex; align-items:center; gap:14px; color:#f9c652; font-weight:700; text-decoration:none;}
 .brand-line p {margin:0; color:#f9d96d; font-size:14px;}
 .brand-logo{font-size:42px; font-weight:800; line-height:1;}
 
@@ -44,7 +44,8 @@ body {margin: 0; background: #fff;}
 .call-btn {background:#5dad2f; border:none; color:#fff; padding:10px 14px; font-size:14px; cursor:pointer;}
 
 .hero-nav {display:flex; flex-wrap:wrap; gap:12px; justify-content:center; padding:10px 0 10px; border-bottom:1px solid rgba(255,255,255,.35);}
-.hero-nav a {font-weight:700; font-size:15px; color:#fff; text-decoration:none; opacity:.95;}
+.hero-nav a {font-weight:500; font-size:15px; color:#fff; text-decoration:none; opacity:.95;}
+.menu-link.active{color:#f8cc52; font-weight:600;}
 
 .hero-content {padding:18px 0 16px; max-width:860px;}
 .hero-content h1 {font-size:50px; line-height:1.02; margin:0 0 14px; max-width:680px;}
@@ -63,9 +64,9 @@ body {margin: 0; background: #fff;}
 .internal-header{min-height:auto;}
 .breadcrumbs{font-size:14px; color:#7d8490; margin-bottom:14px;}
 .internal-body{background:#ececef; padding:30px 0 36px;}
-.internal-body h1{margin:0 0 18px; font-size:52px; color:#1e2531; text-transform:uppercase;}
+.internal-body h1{margin:0 0 18px; font-size:26px; color:#1e2531; text-transform:uppercase;}
 .internal-text-box{background:#f7f7f8; border:1px solid #d8dce3; padding:22px;}
-.internal-text-box p{margin:0; font-size:26px; color:#323844; line-height:1.45;}
+.internal-text-box p{margin:0; font-size:13px; color:#323844; line-height:1.45;}
 
 
 
@@ -207,8 +208,8 @@ body {margin: 0; background: #fff;}
   .adv-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width: 720px) {
-  .internal-body h1{font-size:34px;}
-  .internal-text-box p{font-size:18px;}
+  .internal-body h1{font-size:22px;}
+  .internal-text-box p{font-size:12px;}
   .lead-side h2{font-size:34px;}
   .lead-top-row,.footer-columns{grid-template-columns:1fr;}
   .contact-card h4,.social-card h4{font-size:18px;}

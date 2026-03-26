@@ -158,13 +158,13 @@ function PublicPage() {
 
         <div className="container hero-main">
           <div className="hero-upper-row">
-            <div className="brand-line">
+            <a href="/" className="brand-line">
               <div className="logo-badge">⌂</div>
               <div className="brand-text">
                 <div className="brand-logo">TMдом</div>
                 <p>Строительная компания</p>
               </div>
-            </div>
+            </a>
 
             <div className="hero-contact-line">
               <span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span>
@@ -174,7 +174,7 @@ function PublicPage() {
           </div>
 
           <nav className="hero-nav">
-            <a href="/about">О КОМПАНИИ</a>
+            <a href="/about" className="menu-link">О КОМПАНИИ</a>
             <a>/</a>
             <a>ПРОЕКТЫ ДОМОВ</a>
             <a>/</a>
@@ -429,51 +429,7 @@ function PublicPage() {
         </div>
       </section>
 
-      <footer className="site-footer">
-        <div className="container footer-layout">
-          <div className="footer-main">
-            <p className="footer-copy">© 2014-2021</p>
-            <p className="footer-note">Сайт носит информационный характер и не является публичной офертой.</p>
-            <div className="footer-links">
-              <a>Политика конфиденциальности</a>
-              <a>Карта сайта</a>
-            </div>
-            <div className="footer-columns">
-              <div>
-                <h4>Строим дома из:</h4>
-                <a>Клееного бруса</a><a>Кирпича</a><a>SIP-панелей</a>
-              </div>
-              <div>
-                <h4>Строим бани из:</h4>
-                <a>Бревна</a><a>Бруса</a>
-              </div>
-              <div>
-                <h4>Другие услуги:</h4>
-                <a>Фундаменты</a><a>Стяжка пола</a><a>Кухни на заказ</a>
-              </div>
-              <div>
-                <h4>Филиалы:</h4>
-                <a>Заречный</a><a>Березники</a><a>Чайковский</a>
-              </div>
-            </div>
-          </div>
-
-          <aside className="footer-side">
-            <div className="contact-card">
-              <h4>Контакты</h4>
-              <strong>+7 (905) 365-47-39</strong>
-              <button>Заказать звонок</button>
-              <a>мы в VK</a>
-              <p>село Засечное, улица Механизаторов, 22А</p>
-            </div>
-            <div className="social-card">
-              <h4>Мы в соцсетях</h4>
-              <div className="social-row"><span>VK</span><span>OK</span><span>YT</span></div>
-            </div>
-          </aside>
-        </div>
-        <a className="ghost-admin" href={`?admin=${ADMIN_KEY}`}>service</a>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
@@ -514,10 +470,10 @@ function InternalHeader() {
       </div>
       <div className="container hero-main">
         <div className="hero-upper-row">
-          <div className="brand-line"><div className="logo-badge">⌂</div><div className="brand-text"><div className="brand-logo">TMдом</div><p>Строительная компания</p></div></div>
+          <a href="/" className="brand-line"><div className="logo-badge">⌂</div><div className="brand-text"><div className="brand-logo">TMдом</div><p>Строительная компания</p></div></a>
           <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span><div className="phone-block"><strong>+7 (905) 365-47-39</strong><small>с 9:00 до 19:00</small></div><button className="call-btn">Заказать звонок</button></div>
         </div>
-        <nav className="hero-nav"><a href="/about">О КОМПАНИИ</a><a>/</a><a>ПРОЕКТЫ ДОМОВ</a><a>/</a><a>БАНИ</a><a>/</a><a>УСЛУГИ</a><a>/</a><a>ПРОЕКТИРОВАНИЕ</a><a>/</a><a>ПОРТФОЛИО</a><a>/</a><a>КОНТАКТЫ</a></nav>
+        <nav className="hero-nav"><a href="/about" className={`menu-link ${window.location.pathname === '/about' ? 'active' : ''}`}>О КОМПАНИИ</a><a>/</a><a>ПРОЕКТЫ ДОМОВ</a><a>/</a><a>БАНИ</a><a>/</a><a>УСЛУГИ</a><a>/</a><a>ПРОЕКТИРОВАНИЕ</a><a>/</a><a>ПОРТФОЛИО</a><a>/</a><a>КОНТАКТЫ</a></nav>
       </div>
     </header>
   );
@@ -544,7 +500,37 @@ function AboutPage() {
     <div>
       <InternalHeader />
       <InternalTextBlock title={page.title} content={page.content} />
+      <SiteFooter />
     </div>
+  );
+}
+
+
+function SiteFooter() {
+  return (
+    <footer className="site-footer">
+      <div className="container footer-layout">
+        <div className="footer-main">
+          <p className="footer-copy">© 2014-2021</p>
+          <p className="footer-note">Сайт носит информационный характер и не является публичной офертой.</p>
+          <div className="footer-links">
+            <a>Политика конфиденциальности</a>
+            <a>Карта сайта</a>
+          </div>
+          <div className="footer-columns">
+            <div><h4>Строим дома из:</h4><a>Клееного бруса</a><a>Кирпича</a><a>SIP-панелей</a></div>
+            <div><h4>Строим бани из:</h4><a>Бревна</a><a>Бруса</a></div>
+            <div><h4>Другие услуги:</h4><a>Фундаменты</a><a>Стяжка пола</a><a>Кухни на заказ</a></div>
+            <div><h4>Филиалы:</h4><a>Заречный</a><a>Березники</a><a>Чайковский</a></div>
+          </div>
+        </div>
+        <aside className="footer-side">
+          <div className="contact-card"><h4>Контакты</h4><strong>+7 (905) 365-47-39</strong><button>Заказать звонок</button><a>мы в VK</a><p>село Засечное, улица Механизаторов, 22А</p></div>
+          <div className="social-card"><h4>Мы в соцсетях</h4><div className="social-row"><span>VK</span><span>OK</span><span>YT</span></div></div>
+        </aside>
+      </div>
+      <a className="ghost-admin" href={`?admin=${ADMIN_KEY}`}>service</a>
+    </footer>
   );
 }
 
@@ -706,7 +692,7 @@ function AdminPage() {
         <section>
           <h2>Проекты ({projects.length})</h2>
           <div className="list">
-            {catalogProjects.map((project) => (
+            {projects.map((project) => (
               <div key={project.id} className="list-item">
                 <div>
                   <strong>{project.title}</strong>
