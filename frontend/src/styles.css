@@ -62,14 +62,14 @@ body {margin: 0; background: #fff;}
 
 
 
-.offer-section{background:#e7e7ea; padding:42px 0 54px;}
-.offer-title{font-size:52px; text-align:center; margin:0 0 24px; color:#212733;}
-.offer-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
-.offer-card{min-height:280px; background-size:cover; background-position:center; position:relative; border:1px solid #dadada;}
+.offer-section{background:#e7e7ea; padding:32px 0 40px;}
+.offer-title{font-size:40px; text-align:center; margin:0 0 18px; color:#212733;}
+.offer-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+.offer-card{min-height:230px; background-size:cover; background-position:center; position:relative; border:1px solid #dadada;}
 .offer-card.wide{grid-column:span 2;}
-.offer-overlay{position:absolute; inset:0; background:linear-gradient(90deg, rgba(247,247,247,.95) 32%, rgba(247,247,247,0) 70%); padding:26px 18px; display:flex; flex-direction:column; align-items:flex-start;}
-.offer-overlay h3{margin:0 0 14px; font-size:21px; color:#252525; text-decoration:underline; text-underline-offset:4px;}
-.offer-overlay a{font-size:16px; color:#252525; text-decoration:underline; text-underline-offset:4px; margin-bottom:8px;}
+.offer-overlay{position:absolute; inset:0; background:linear-gradient(90deg, rgba(247,247,247,.95) 32%, rgba(247,247,247,0) 70%); padding:18px 14px; display:flex; flex-direction:column; align-items:flex-start;}
+.offer-overlay h3{margin:0 0 10px; font-size:17px; color:#252525; text-decoration:underline; text-underline-offset:4px;}
+.offer-overlay a{font-size:13px; color:#252525; text-decoration:underline; text-underline-offset:4px; margin-bottom:6px;}
 
 .section {padding:68px 0;}
 .section.alt {background:#f5f7fa;}
@@ -114,7 +114,7 @@ body {margin: 0; background: #fff;}
 @media (max-width: 992px) {
   .offer-grid{grid-template-columns:repeat(2,1fr);}
   .offer-card.wide{grid-column:span 2;}
-  .offer-title{font-size:42px;}
+  .offer-title{font-size:32px;}
   .hero-upper-row{flex-direction:column; align-items:flex-start; gap:10px; padding:8px 0;}
   .hero-contact-line{justify-content:flex-start; flex-wrap:wrap; gap:10px;}
   .phone-block small{font-size:11px}
@@ -127,8 +127,8 @@ body {margin: 0; background: #fff;}
 }
 @media (max-width: 720px) {
   .offer-grid{grid-template-columns:1fr;}
-  .offer-card,.offer-card.wide{grid-column:span 1; min-height:220px;}
-  .offer-title{font-size:34px;}
+  .offer-card,.offer-card.wide{grid-column:span 1; min-height:190px;}
+  .offer-title{font-size:26px;}
   .hero-main{padding-top:8px}
   .hero-upper-row{gap:8px}
   .brand-logo{font-size:34px}
