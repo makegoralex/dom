@@ -34,8 +34,20 @@ interface ContentPage {
   content: string;
 }
 
+interface PortfolioItem {
+  id: string;
+  title: string;
+  image: string;
+  boxPrice: string;
+  buildDuration: string;
+  rating: number;
+  clientName: string;
+  review: string;
+}
+
 interface DataStore {
   projects: HouseProject[];
+  portfolio: PortfolioItem[];
   leads: Lead[];
   pages: Record<string, ContentPage>;
 }
@@ -138,9 +150,72 @@ const seedPages: Record<string, ContentPage> = {
   }
 };
 
+const seedPortfolio: PortfolioItem[] = [
+  {
+    id: 'portfolio_1',
+    title: 'Дом из двойного бруса 69 кв.м.',
+    image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80',
+    boxPrice: 'от 2 449 500 руб',
+    buildDuration: '2 месяца',
+    rating: 5,
+    clientName: 'Юлия Александровна',
+    review: 'Купила участок недалеко от города, сразу решила строиться. Ребята помогли выбрать проект и сделали всё в срок.'
+  },
+  {
+    id: 'portfolio_2',
+    title: 'Дом из профилированного бруса 131 кв.м.',
+    image: 'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?auto=format&fit=crop&w=1200&q=80',
+    boxPrice: 'от 4 847 000 руб',
+    buildDuration: '2 месяца',
+    rating: 5,
+    clientName: 'Ирина Савельева',
+    review: 'Сбылась мечта о новом уютном доме. Организация работ и обратная связь с прорабом были отличными.'
+  },
+  {
+    id: 'portfolio_3',
+    title: 'Каркасный дом 104 кв.м.',
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+    boxPrice: 'от 3 950 000 руб',
+    buildDuration: '1.5 месяца',
+    rating: 5,
+    clientName: 'Андрей Петров',
+    review: 'Дом построили быстро и аккуратно, тепло держит отлично. Результат полностью устроил.'
+  },
+  {
+    id: 'portfolio_4',
+    title: 'Кирпичный дом 156 кв.м.',
+    image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80',
+    boxPrice: 'от 7 100 000 руб',
+    buildDuration: '4 месяца',
+    rating: 5,
+    clientName: 'Наталья Ефремова',
+    review: 'Сложный рельеф участка, но команда всё продумала. Получилось красиво и надежно.'
+  },
+  {
+    id: 'portfolio_5',
+    title: 'Дом из газобетона 118 кв.м.',
+    image: 'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80',
+    boxPrice: 'от 5 200 000 руб',
+    buildDuration: '3 месяца',
+    rating: 5,
+    clientName: 'Евгений Климов',
+    review: 'Прозрачная смета, адекватные сроки и отличная работа бригады. Рекомендуем.'
+  },
+  {
+    id: 'portfolio_6',
+    title: 'Дачный дом 82 кв.м.',
+    image: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=1200&q=80',
+    boxPrice: 'от 3 600 000 руб',
+    buildDuration: '1 месяц',
+    rating: 5,
+    clientName: 'Олег и Марина',
+    review: 'Нужен был удобный дом для выходных — получили именно то, что хотели, без лишних затрат.'
+  }
+];
+
 const ensureDataFile = (): void => {
   if (!fs.existsSync(DATA_FILE)) {
-    const initial: DataStore = { projects: seedProjects, leads: [], pages: seedPages };
+    const initial: DataStore = { projects: seedProjects, portfolio: seedPortfolio, leads: [], pages: seedPages };
     fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2), 'utf-8');
   }
 };
@@ -149,7 +224,12 @@ const readData = (): DataStore => {
   ensureDataFile();
   const content = fs.readFileSync(DATA_FILE, 'utf-8');
   const parsed = JSON.parse(content) as Partial<DataStore>;
-  return { projects: parsed.projects || seedProjects, leads: parsed.leads || [], pages: parsed.pages || seedPages };
+  return {
+    projects: parsed.projects || seedProjects,
+    portfolio: parsed.portfolio || seedPortfolio,
+    leads: parsed.leads || [],
+    pages: parsed.pages || seedPages
+  };
 };
 
 const writeData = (data: DataStore): void => {
@@ -174,6 +254,7 @@ app.get('/api/projects', (_req, res) => {
   const data = readData();
   res.json(data.projects);
 });
+app.get('/api/portfolio', (_req, res) => res.json(readData().portfolio));
 
 app.get('/api/pages/:slug', (req, res) => {
   const page = readData().pages[req.params.slug];
@@ -249,6 +330,40 @@ app.put('/api/admin/pages/:slug', authMiddleware, (req, res) => {
 });
 
 app.get('/api/admin/leads', authMiddleware, (_req, res) => res.json(readData().leads));
+app.get('/api/admin/portfolio', authMiddleware, (_req, res) => res.json(readData().portfolio));
+app.post('/api/admin/portfolio', authMiddleware, (req, res) => {
+  const incoming = req.body as Partial<PortfolioItem>;
+  const data = readData();
+  const entry: PortfolioItem = {
+    id: `portfolio_${Date.now()}`,
+    title: incoming.title || 'Новый кейс',
+    image: incoming.image || '',
+    boxPrice: incoming.boxPrice || '',
+    buildDuration: incoming.buildDuration || '',
+    rating: typeof incoming.rating === 'number' ? incoming.rating : 5,
+    clientName: incoming.clientName || '',
+    review: incoming.review || ''
+  };
+  data.portfolio.unshift(entry);
+  writeData(data);
+  res.status(201).json(entry);
+});
+app.put('/api/admin/portfolio/:id', authMiddleware, (req, res) => {
+  const id = String(req.params.id);
+  const data = readData();
+  const idx = data.portfolio.findIndex((item) => item.id === id);
+  if (idx === -1) return res.status(404).json({ message: 'Кейс не найден' });
+  data.portfolio[idx] = { ...data.portfolio[idx], ...(req.body as Partial<PortfolioItem>), id };
+  writeData(data);
+  res.json(data.portfolio[idx]);
+});
+app.delete('/api/admin/portfolio/:id', authMiddleware, (req, res) => {
+  const id = String(req.params.id);
+  const data = readData();
+  data.portfolio = data.portfolio.filter((item) => item.id !== id);
+  writeData(data);
+  res.json({ ok: true });
+});
 
 if (fs.existsSync(FRONTEND_DIST)) {
   app.use(express.static(FRONTEND_DIST));
