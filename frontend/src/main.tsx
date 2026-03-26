@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect, useState } from 'react';
+import React, { FormEvent, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles.css';
 
@@ -85,6 +85,17 @@ function PublicPage() {
         setProjectId(FALLBACK_PROJECTS[0].id);
       });
   }, []);
+
+
+  const catalogProjects = useMemo(() => {
+    if (!projects.length) {
+      return [] as HouseProject[];
+    }
+    return Array.from({ length: 12 }, (_, index) => {
+      const item = projects[index % projects.length];
+      return { ...item, id: `${item.id}_tile_${index}` };
+    });
+  }, [projects]);
 
   const submitLead = async (event: FormEvent) => {
     event.preventDefault();
@@ -237,7 +248,7 @@ function PublicPage() {
         <div className="container">
           <h2>Популярные проекты</h2>
           <div className="catalog-grid">
-            {projects.map((project) => (
+            {catalogProjects.map((project) => (
               <article className="project-card" key={project.id}>
                 <div className="project-image" style={{ backgroundImage: `url(${project.image})` }}>
                   {project.badge ? <span className="badge">{project.badge}</span> : null}
@@ -255,6 +266,55 @@ function PublicPage() {
               </article>
             ))}
           </div>
+          <a href="#" className="show-all-link">Показать все проекты</a>
+        </div>
+      </section>
+
+      <section className="steps-section">
+        <div className="container">
+          <h2 className="steps-title">Этапы работы</h2>
+          <div className="steps-grid">
+            <article className="step-card">
+              <div className="step-number">1</div>
+              <div>
+                <h3>Подбор проекта</h3>
+                <small>1-3 дня</small>
+                <p>Подбираем подходящий проект, согласовываем планировку и бюджет.</p>
+              </div>
+            </article>
+            <article className="step-card">
+              <div className="step-number">2</div>
+              <div>
+                <h3>Проектирование</h3>
+                <small>10-15 дней</small>
+                <p>Готовим архитектурные и инженерные решения под ваш участок.</p>
+              </div>
+            </article>
+            <article className="step-card wide">
+              <div className="step-number">3</div>
+              <div>
+                <h3>Доставка материалов и оплата</h3>
+                <small>1 день</small>
+                <p>Подписываем договор и организуем поставку материалов в назначенную дату.</p>
+              </div>
+            </article>
+            <article className="step-card">
+              <div className="step-number">4</div>
+              <div>
+                <h3>Строительство коробки</h3>
+                <small>10-20 дней</small>
+                <p>Выполняем фундамент, стены и кровлю по согласованному графику.</p>
+              </div>
+            </article>
+            <article className="step-card">
+              <div className="step-number">5</div>
+              <div>
+                <h3>Сдача дома</h3>
+                <small>2 дня</small>
+                <p>Проверяем качество, подписываем акты и передаем ключи.</p>
+              </div>
+            </article>
+          </div>
         </div>
       </section>
 
@@ -265,7 +325,7 @@ function PublicPage() {
             <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ваше имя" required />
             <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Телефон" required />
             <select value={projectId} onChange={(e) => setProjectId(e.target.value)}>
-              {projects.map((project) => (
+              {catalogProjects.map((project) => (
                 <option key={project.id} value={project.id}>
                   {project.title}
                 </option>
@@ -427,7 +487,7 @@ function AdminPage() {
         <section>
           <h2>Проекты ({projects.length})</h2>
           <div className="list">
-            {projects.map((project) => (
+            {catalogProjects.map((project) => (
               <div key={project.id} className="list-item">
                 <div>
                   <strong>{project.title}</strong>

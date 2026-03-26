@@ -87,6 +87,18 @@ body {margin: 0; background: #fff;}
 .project-meta span {padding:6px 10px; background:#f3f5f9; border-radius:8px; font-size:13px;}
 .project-price {display:block; margin-top:14px; font-size:20px;}
 
+.show-all-link{display:inline-block; margin-top:14px; color:#222; text-decoration:underline; font-size:14px;}
+
+.steps-section{background:#ececef; padding:34px 0;}
+.steps-title{text-align:center; margin:0 0 18px; font-size:34px; color:#1f2631;}
+.steps-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.step-card{background:#f6f6f7; border:1px solid #d8d8db; padding:14px; display:grid; grid-template-columns:70px 1fr; gap:12px; align-items:flex-start;}
+.step-card.wide{grid-column:span 2;}
+.step-number{font-size:96px; line-height:.8; font-weight:700; color:#27282e;}
+.step-card h3{margin:0 0 4px; font-size:24px; color:#252b36;}
+.step-card small{display:block; margin-bottom:6px; font-size:13px; color:#555;}
+.step-card p{margin:0; font-size:14px; line-height:1.35; color:#333;}
+
 .lead-form {max-width:620px; display:grid; gap:12px;}
 .lead-form input,.lead-form select,.lead-form textarea,.admin-form input,.admin-form textarea {
   width:100%; border:1px solid #d0d7e3; border-radius:10px; padding:12px 14px; font-size:16px;
@@ -112,6 +124,8 @@ body {margin: 0; background: #fff;}
   .brand-line p{font-size:14px}
 }
 @media (max-width: 992px) {
+  .steps-grid{grid-template-columns:1fr;}
+  .step-card.wide{grid-column:span 1;}
   .offer-grid{grid-template-columns:repeat(2,1fr);}
   .offer-card.wide{grid-column:span 2;}
   .offer-title{font-size:32px;}
@@ -126,6 +140,11 @@ body {margin: 0; background: #fff;}
   .adv-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width: 720px) {
+  .steps-title{font-size:26px;}
+  .step-card{grid-template-columns:56px 1fr; padding:12px;}
+  .step-number{font-size:72px;}
+  .step-card h3{font-size:18px;}
+  .step-card p{font-size:13px;}
   .offer-grid{grid-template-columns:1fr;}
   .offer-card,.offer-card.wide{grid-column:span 1; min-height:190px;}
   .offer-title{font-size:26px;}
