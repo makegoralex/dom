@@ -123,22 +123,65 @@ function PublicPage() {
 
   return (
     <div>
-      <header className="hero">
-        <div className="container">
-          <div className="hero-top">
-            <div className="logo">EVEREST STROI</div>
-            <a href="#catalog" className="hero-link">
-              Каталог проектов
-            </a>
+      <header className="hero hero-exact">
+        <div className="promo-strip">
+          <div className="container promo-inner">
+            <strong>СТРОИТЕЛЬСТВО ДОМОВ В КРЕДИТ И ИПОТЕКУ ОТ 9.5% ГОДОВЫХ!</strong>
+            <button>Узнать условия</button>
           </div>
-          <h1>Строительство домов в Пензе под ключ</h1>
-          <p>
-            Индивидуальные и типовые проекты, прозрачная стоимость строительства и сопровождение до передачи ключей.
-          </p>
-          <a href="#lead-form" className="cta-btn">
-            Получить консультацию
-          </a>
         </div>
+
+        <div className="top-search-row">
+          <div className="container top-search-inner">
+            <div className="search-box">
+              <input placeholder="Поиск по сайту..." />
+              <button>Найти</button>
+            </div>
+            <div className="top-contacts">
+              <span>г. Пенза, ул. Красная Горка, 36</span>
+              <span>penza@evereststroi.com</span>
+              <span>Свой проект на расчёт</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="container hero-main">
+          <div className="brand-line">
+            <div className="brand-logo">Эверест</div>
+            <p>Строительная компания</p>
+          </div>
+
+          <div className="hero-contact-line">
+            <span>Нужна примерная оценка стоимости строительства? <u>Рассчитать онлайн</u></span>
+            <strong>+7 (499) 286-92-19</strong>
+            <button className="call-btn">Заказать звонок</button>
+          </div>
+
+          <nav className="hero-nav">
+            <a>О КОМПАНИИ</a>
+            <a>ПРОЕКТЫ ДОМОВ</a>
+            <a>БАНИ</a>
+            <a>УСЛУГИ</a>
+            <a>ПРОЕКТИРОВАНИЕ</a>
+            <a>ПОРТФОЛИО</a>
+            <a>КОНТАКТЫ</a>
+          </nav>
+
+          <div className="hero-content">
+            <h1>Строительство домов под ключ в Пензе</h1>
+            <div className="hero-stats">
+              <div><strong>10 лет</strong><span>Строим дома и бани полностью под ключ</span></div>
+              <div><strong>Более 200</strong><span>Построенных объектов по всей области</span></div>
+              <div><strong>Более 400</strong><span>Проектов под любой бюджет</span></div>
+            </div>
+            <div className="hero-buttons">
+              <a href="#catalog" className="btn-green">ПОСМОТРЕТЬ ПРОЕКТЫ</a>
+              <a href="#lead-form" className="btn-yellow">ЗАКАЗАТЬ ДОМ</a>
+            </div>
+          </div>
+        </div>
+
+        <button className="floating-call">☎</button>
       </header>
 
       <section className="section">
