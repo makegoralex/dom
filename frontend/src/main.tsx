@@ -66,6 +66,7 @@ function PublicPage() {
   const [projects, setProjects] = useState<HouseProject[]>(FALLBACK_PROJECTS);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [projectId, setProjectId] = useState(FALLBACK_PROJECTS[0].id);
   const [status, setStatus] = useState('');
@@ -106,7 +107,7 @@ function PublicPage() {
       const response = await fetch(`${API_BASE}/api/leads`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, message, projectId })
+        body: JSON.stringify({ name, phone, email, message, projectId })
       });
 
       if (!response.ok) {
@@ -116,6 +117,7 @@ function PublicPage() {
       setStatus('Спасибо! Мы свяжемся с вами в ближайшее время.');
       setName('');
       setPhone('');
+      setEmail('');
       setMessage('');
       return;
     } catch (_error) {
@@ -387,38 +389,83 @@ function PublicPage() {
         </div>
       </section>
 
-      <section className="section" id="lead-form">
-        <div className="container">
-          <h2>Оставьте заявку</h2>
+      <section className="lead-bg-section" id="lead-form">
+        <div className="container lead-layout">
+          <aside className="lead-side">
+            <h2>Стать клиентом</h2>
+            <p>Заполните форму и наш менеджер вам перезвонит</p>
+          </aside>
+
           <form className="lead-form" onSubmit={submitLead}>
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ваше имя" required />
-            <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Телефон" required />
-            <select value={projectId} onChange={(e) => setProjectId(e.target.value)}>
-              {catalogProjects.map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.title}
-                </option>
-              ))}
-            </select>
-            <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Комментарий (необязательно)"
-              rows={4}
-            />
-            <button type="submit">Отправить</button>
+            <div className="lead-top-row">
+              <label>
+                Имя
+                <input value={name} onChange={(e) => setName(e.target.value)} required />
+              </label>
+              <label>
+                Телефон*
+                <input value={phone} onChange={(e) => setPhone(e.target.value)} required />
+              </label>
+              <label>
+                E-mail
+                <input value={email} onChange={(e) => setEmail(e.target.value)} />
+              </label>
+            </div>
+            <label>
+              Сообщение
+              <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={5} />
+            </label>
+            <button type="submit" className="lead-submit">✉ ОТПРАВИТЬ ДАННЫЕ</button>
+            <p className="lead-consent">Заполняя форму, вы даете согласие на обработку персональных данных.</p>
             {status ? <p className="status">{status}</p> : null}
           </form>
         </div>
       </section>
 
-      <footer className="section alt">
-        <div className="container">
-          <p>© Everest Stroi, Пенза</p>
-          <a className="ghost-admin" href={`?admin=${ADMIN_KEY}`}>
-            service
-          </a>
+      <footer className="site-footer">
+        <div className="container footer-layout">
+          <div className="footer-main">
+            <p className="footer-copy">© 2014-2021</p>
+            <p className="footer-note">Сайт носит информационный характер и не является публичной офертой.</p>
+            <div className="footer-links">
+              <a>Политика конфиденциальности</a>
+              <a>Карта сайта</a>
+            </div>
+            <div className="footer-columns">
+              <div>
+                <h4>Строим дома из:</h4>
+                <a>Клееного бруса</a><a>Кирпича</a><a>SIP-панелей</a>
+              </div>
+              <div>
+                <h4>Строим бани из:</h4>
+                <a>Бревна</a><a>Бруса</a>
+              </div>
+              <div>
+                <h4>Другие услуги:</h4>
+                <a>Фундаменты</a><a>Стяжка пола</a><a>Кухни на заказ</a>
+              </div>
+              <div>
+                <h4>Филиалы:</h4>
+                <a>Заречный</a><a>Березники</a><a>Чайковский</a>
+              </div>
+            </div>
+          </div>
+
+          <aside className="footer-side">
+            <div className="contact-card">
+              <h4>Контакты</h4>
+              <strong>+7 (905) 365-47-39</strong>
+              <button>Заказать звонок</button>
+              <a>мы в VK</a>
+              <p>село Засечное, улица Механизаторов, 22А</p>
+            </div>
+            <div className="social-card">
+              <h4>Мы в соцсетях</h4>
+              <div className="social-row"><span>VK</span><span>OK</span><span>YT</span></div>
+            </div>
+          </aside>
         </div>
+        <a className="ghost-admin" href={`?admin=${ADMIN_KEY}`}>service</a>
       </footer>
     </div>
   );
