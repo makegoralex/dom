@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect, useMemo, useState } from 'react';
+import React, { FormEvent, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles.css';
 
@@ -85,16 +85,6 @@ function PublicPage() {
         setProjectId(FALLBACK_PROJECTS[0].id);
       });
   }, []);
-
-  const advantages = useMemo(
-    () => [
-      'Фиксированная смета без скрытых доплат',
-      'Ипотека от банков-партнёров',
-      'Авторский надзор на каждом этапе',
-      'Гарантия по договору и срокам'
-    ],
-    []
-  );
 
   const submitLead = async (event: FormEvent) => {
     event.preventDefault();
@@ -195,15 +185,50 @@ function PublicPage() {
         <button className="floating-call">☎</button>
       </header>
 
-      <section className="section">
+      <section className="offer-section">
         <div className="container">
-          <h2>Почему выбирают нас</h2>
-          <div className="adv-grid">
-            {advantages.map((item) => (
-              <div className="adv-card" key={item}>
-                {item}
+          <h2 className="offer-title">Мы предлагаем</h2>
+          <div className="offer-grid">
+            <article className="offer-card wide" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1600585152915-d208bec867a1?auto=format&fit=crop&w=1000&q=80')" }}>
+              <div className="offer-overlay">
+                <h3>Дома из бруса</h3>
+                <a>Клееный</a>
+                <a>Профилированный</a>
+                <a>Двойной</a>
               </div>
-            ))}
+            </article>
+            <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1572120360610-d971b9d7767c?auto=format&fit=crop&w=1000&q=80')" }}>
+              <div className="offer-overlay">
+                <h3>Дома из бревна</h3>
+                <a>Оцилиндрованное</a>
+                <a>Рубленное</a>
+                <a>Лафет</a>
+              </div>
+            </article>
+            <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1000&q=80')" }}>
+              <div className="offer-overlay">
+                <h3>Дома из кирпича</h3>
+              </div>
+            </article>
+            <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1464146072230-91cabc968266?auto=format&fit=crop&w=1000&q=80')" }}>
+              <div className="offer-overlay">
+                <h3>Каркасные дома</h3>
+              </div>
+            </article>
+            <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?auto=format&fit=crop&w=1000&q=80')" }}>
+              <div className="offer-overlay">
+                <h3>Дома из SIP-панелей</h3>
+              </div>
+            </article>
+            <article className="offer-card wide" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1000&q=80')" }}>
+              <div className="offer-overlay">
+                <h3>Дома из блоков</h3>
+                <a>Газоблоки</a>
+                <a>Арболит</a>
+                <a>Керамоблоки</a>
+                <a>Керамзитобетон</a>
+              </div>
+            </article>
           </div>
         </div>
       </section>

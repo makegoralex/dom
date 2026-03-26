@@ -60,6 +60,17 @@ body {margin: 0; background: #fff;}
 
 .floating-call {position:absolute; right:24px; bottom:24px; width:54px; height:54px; border-radius:50%; border:none; background:#1dbc45; color:#fff; font-size:24px;}
 
+
+
+.offer-section{background:#e7e7ea; padding:42px 0 54px;}
+.offer-title{font-size:52px; text-align:center; margin:0 0 24px; color:#212733;}
+.offer-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
+.offer-card{min-height:280px; background-size:cover; background-position:center; position:relative; border:1px solid #dadada;}
+.offer-card.wide{grid-column:span 2;}
+.offer-overlay{position:absolute; inset:0; background:linear-gradient(90deg, rgba(247,247,247,.95) 32%, rgba(247,247,247,0) 70%); padding:26px 18px; display:flex; flex-direction:column; align-items:flex-start;}
+.offer-overlay h3{margin:0 0 14px; font-size:21px; color:#252525; text-decoration:underline; text-underline-offset:4px;}
+.offer-overlay a{font-size:16px; color:#252525; text-decoration:underline; text-underline-offset:4px; margin-bottom:8px;}
+
 .section {padding:68px 0;}
 .section.alt {background:#f5f7fa;}
 .section h2 {font-size:clamp(28px,4vw,40px); margin:0 0 24px;}
@@ -101,6 +112,9 @@ body {margin: 0; background: #fff;}
   .brand-line p{font-size:14px}
 }
 @media (max-width: 992px) {
+  .offer-grid{grid-template-columns:repeat(2,1fr);}
+  .offer-card.wide{grid-column:span 2;}
+  .offer-title{font-size:42px;}
   .hero-upper-row{flex-direction:column; align-items:flex-start; gap:10px; padding:8px 0;}
   .hero-contact-line{justify-content:flex-start; flex-wrap:wrap; gap:10px;}
   .phone-block small{font-size:11px}
@@ -112,6 +126,9 @@ body {margin: 0; background: #fff;}
   .adv-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width: 720px) {
+  .offer-grid{grid-template-columns:1fr;}
+  .offer-card,.offer-card.wide{grid-column:span 1; min-height:220px;}
+  .offer-title{font-size:34px;}
   .hero-main{padding-top:8px}
   .hero-upper-row{gap:8px}
   .brand-logo{font-size:34px}
