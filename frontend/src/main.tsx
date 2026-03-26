@@ -138,8 +138,8 @@ function PublicPage() {
               <button>Найти</button>
             </div>
             <div className="top-contacts">
-              <span>г. Пенза, ул. Красная Горка, 36</span>
-              <span>penza@evereststroi.com</span>
+              <span>село Засечное, улица Механизаторов, 22А</span>
+              <span>мы в VK</span>
               <span><i>⤴</i> Свой проект на расчёт</span>
             </div>
           </div>
@@ -150,14 +150,14 @@ function PublicPage() {
             <div className="brand-line">
               <div className="logo-badge">⌂</div>
               <div className="brand-text">
-                <div className="brand-logo">Эверест</div>
+                <div className="brand-logo">TMдом</div>
                 <p>Строительная компания</p>
               </div>
             </div>
 
             <div className="hero-contact-line">
               <span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span>
-              <strong>+7 (499) 286-92-19</strong>
+              <div className="phone-block"><strong>+7 (905) 365-47-39</strong><small>с 9:00 до 19:00</small></div>
               <button className="call-btn">Заказать звонок</button>
             </div>
           </div>

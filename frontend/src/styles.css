@@ -39,6 +39,8 @@ body {margin: 0; background: #fff;}
 .hero-contact-line b{opacity:.6; font-weight:400; margin:0 4px;}
 .hero-contact-line u{color:#ffcc55; text-decoration-thickness:1px;}
 .hero-contact-line strong {font-size:22px; color:#ffdd4d; line-height:1.1;}
+.phone-block{display:flex; flex-direction:column; align-items:flex-start; line-height:1.1;}
+.phone-block small{color:#d9ecff; font-size:12px; margin-top:3px;}
 .call-btn {background:#5dad2f; border:none; color:#fff; padding:10px 14px; font-size:14px; cursor:pointer;}
 
 .hero-nav {display:flex; flex-wrap:wrap; gap:12px; justify-content:center; padding:10px 0 10px; border-bottom:1px solid rgba(255,255,255,.35);}
@@ -50,7 +52,7 @@ body {margin: 0; background: #fff;}
 .hero-stats > div {max-width:220px;}
 .hero-stats strong {display:block; font-size:24px; margin-bottom:4px;}
 .hero-stats span {font-size:14px; line-height:1.25;}
-.hero-buttons {display:flex; gap:10px; margin-top:10px;}
+.hero-buttons {display:flex; gap:10px; margin-top:22px;}
 .btn-green, .btn-yellow {text-decoration:none; color:#fff; font-size:14px; font-weight:700; padding:10px 14px;}
 .btn-green {background:#53ab28;}
 .btn-yellow {background:#d5ae34; color:#2b2b2b;}
@@ -101,6 +103,7 @@ body {margin: 0; background: #fff;}
 @media (max-width: 992px) {
   .hero-upper-row{flex-direction:column; align-items:flex-start; gap:10px; padding:8px 0;}
   .hero-contact-line{justify-content:flex-start; flex-wrap:wrap; gap:10px;}
+  .phone-block small{font-size:11px}
   .hero-contact-line span{max-width:none;}
   .top-search-inner{flex-direction:column; align-items:flex-start;}
   .top-contacts{flex-wrap:wrap; gap:10px; font-size:14px;}
