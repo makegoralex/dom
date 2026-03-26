@@ -194,17 +194,25 @@ function PublicPage() {
           <nav className="hero-nav">
             <a href="/about" className="menu-link">О КОМПАНИИ</a>
             <a>/</a>
-            <a>ПРОЕКТЫ ДОМОВ</a>
-            <a>/</a>
-            <a>БАНИ</a>
-            <a>/</a>
-            <a>УСЛУГИ</a>
-            <a>/</a>
-            <a>ПРОЕКТИРОВАНИЕ</a>
-            <a>/</a>
-            <a>ПОРТФОЛИО</a>
-            <a>/</a>
-            <a>КОНТАКТЫ</a>
+            <div className="menu-projects">
+              <a href="/projects" className="menu-link">ПРОЕКТЫ ДОМОВ ▾</a>
+              <div className="projects-dropdown">
+                {PROJECT_GROUPS.map((column) => (
+                  <div key={column.title}>
+                    <h4>{column.title}</h4>
+                    {column.groups.map((group) => (
+                      <div key={`${column.title}_${group.label}`}>
+                        {group.label ? <strong>{group.label}</strong> : null}
+                        {group.items.map((item) => (
+                          <a key={item} href={`/projects?type=${encodeURIComponent(item)}`} className="dropdown-link">{item}</a>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <a>/</a><a>БАНИ</a><a>/</a><a>УСЛУГИ</a><a>/</a><a>ПРОЕКТИРОВАНИЕ</a><a>/</a><a>ПОРТФОЛИО</a><a>/</a><a>КОНТАКТЫ</a>
           </nav>
 
           <div className="hero-content">
@@ -494,7 +502,7 @@ function InternalHeader() {
           <a href="/" className="brand-line"><div className="logo-badge">⌂</div><div className="brand-text"><div className="brand-logo">TMдом</div><p>Строительная компания</p></div></a>
           <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span><div className="phone-block"><strong>+7 (905) 365-47-39</strong><small>с 9:00 до 19:00</small></div><button className="call-btn">Заказать звонок</button></div>
         </div>
-        <nav className="hero-nav"><a href="/about" className={`menu-link ${window.location.pathname === '/about' ? 'active' : ''}`}>О КОМПАНИИ</a><a>/</a><a>ПРОЕКТЫ ДОМОВ</a><a>/</a><a>БАНИ</a><a>/</a><a>УСЛУГИ</a><a>/</a><a>ПРОЕКТИРОВАНИЕ</a><a>/</a><a>ПОРТФОЛИО</a><a>/</a><a>КОНТАКТЫ</a></nav>
+        <nav className="hero-nav"><a href="/about" className={`menu-link ${window.location.pathname === '/about' ? 'active' : ''}`}>О КОМПАНИИ</a><a>/</a><div className="menu-projects"><a href="/projects" className={`menu-link ${window.location.pathname === '/projects' ? 'active' : ''}`}>ПРОЕКТЫ ДОМОВ ▾</a><div className="projects-dropdown">{PROJECT_GROUPS.map((column) => (<div key={column.title}><h4>{column.title}</h4>{column.groups.map((group) => (<div key={`${column.title}_${group.label}`}>{group.label ? <strong>{group.label}</strong> : null}{group.items.map((item) => (<a key={item} href={`/projects?type=${encodeURIComponent(item)}`} className="dropdown-link">{item}</a>))}</div>))}</div>))}</div></div><a>/</a><a>БАНИ</a><a>/</a><a>УСЛУГИ</a><a>/</a><a>ПРОЕКТИРОВАНИЕ</a><a>/</a><a>ПОРТФОЛИО</a><a>/</a><a>КОНТАКТЫ</a></nav>
       </div>
     </header>
   );
@@ -552,6 +560,45 @@ function SiteFooter() {
       </div>
       <a className="ghost-admin" href={`?admin=${ADMIN_KEY}`}>service</a>
     </footer>
+  );
+}
+
+
+function ProjectTypePage() {
+  const params = new URLSearchParams(window.location.search);
+  const type = params.get('type') || 'Все типы';
+  const [projects, setProjects] = useState<HouseProject[]>([]);
+
+  useEffect(() => {
+    document.title = `${type} — проекты TMдом`;
+    fetch(`${API_BASE}/api/projects`).then((res) => res.json()).then((data: HouseProject[]) => setProjects(data)).catch(() => setProjects(FALLBACK_PROJECTS));
+  }, [type]);
+
+  const filtered = type === 'Все типы' ? projects : projects.filter((item) => item.constructionType === type);
+
+  return (
+    <div>
+      <InternalHeader />
+      <section className="internal-body">
+        <div className="container">
+          <Breadcrumbs items={["Главная", "Проекты домов", type]} />
+          <h1>{type}</h1>
+          <div className="catalog-grid">
+            {filtered.map((project) => (
+              <article className="project-card" key={project.id}>
+                <div className="project-image" style={{ backgroundImage: `url(${project.coverImage || project.images?.[0] || ""})` }} />
+                <div className="project-content">
+                  <h3>{project.title}</h3>
+                  <p className="project-desc">{project.shortDescription}</p>
+                  <strong className="project-price">{project.priceFrom}</strong>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+      <SiteFooter />
+    </div>
   );
 }
 
@@ -807,6 +854,7 @@ function App() {
 
   if (isAdminRoute) return <AdminPage />;
   if (pathname === '/about') return <AboutPage />;
+  if (pathname === '/projects') return <ProjectTypePage />;
   return <PublicPage />;
 }
 

@@ -47,6 +47,13 @@ body {margin: 0; background: #fff;}
 .hero-nav a {font-weight:500; font-size:15px; color:#fff; text-decoration:none; opacity:.95;}
 .menu-link.active{color:#f8cc52; font-weight:600;}
 
+.menu-projects{position:relative;}
+.projects-dropdown{position:absolute; left:0; top:100%; min-width:980px; background:#f1f1f2; color:#1f2330; border:1px solid #d3d6de; padding:16px 20px; display:none; grid-template-columns:repeat(3,1fr); gap:20px; z-index:50;}
+.menu-projects:hover .projects-dropdown{display:grid;}
+.projects-dropdown h4{margin:0 0 10px; font-size:14px; color:#1f2530;}
+.projects-dropdown strong{display:block; margin:6px 0; font-size:13px;}
+.dropdown-link{display:block; margin:4px 0; color:#2d313a !important; text-decoration:underline !important; font-size:13px !important;}
+
 .hero-content {padding:18px 0 16px; max-width:860px;}
 .hero-content h1 {font-size:50px; line-height:1.02; margin:0 0 14px; max-width:680px;}
 .hero-stats {display:flex; gap:16px; margin-bottom:12px;}
@@ -186,6 +193,8 @@ body {margin: 0; background: #fff;}
   .brand-line p{font-size:14px}
 }
 @media (max-width: 992px) {
+  .projects-dropdown{position:static; min-width:0; display:none; margin-top:6px;}
+  .menu-projects:hover .projects-dropdown{display:grid;}
   .lead-layout{grid-template-columns:1fr;}
   .lead-top-row{grid-template-columns:1fr 1fr;}
   .footer-layout{grid-template-columns:1fr;}
