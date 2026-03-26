@@ -127,7 +127,7 @@ function PublicPage() {
         <div className="promo-strip">
           <div className="container promo-inner">
             <strong>СТРОИТЕЛЬСТВО ДОМОВ В КРЕДИТ И ИПОТЕКУ ОТ 9.5% ГОДОВЫХ!</strong>
-            <button>Узнать условия</button>
+            <button>Узнать условия <span>»</span></button>
           </div>
         </div>
 
@@ -140,7 +140,7 @@ function PublicPage() {
             <div className="top-contacts">
               <span>г. Пенза, ул. Красная Горка, 36</span>
               <span>penza@evereststroi.com</span>
-              <span>Свой проект на расчёт</span>
+              <span><i>⤴</i> Свой проект на расчёт</span>
             </div>
           </div>
         </div>
@@ -156,7 +156,7 @@ function PublicPage() {
             </div>
 
             <div className="hero-contact-line">
-              <span>Нужна примерная оценка стоимости строительства? <u>Рассчитать онлайн</u></span>
+              <span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span>
               <strong>+7 (499) 286-92-19</strong>
               <button className="call-btn">Заказать звонок</button>
             </div>
@@ -186,8 +186,8 @@ function PublicPage() {
               <div><strong>Более 400</strong><span>Проектов под любой бюджет</span></div>
             </div>
             <div className="hero-buttons">
-              <a href="#catalog" className="btn-green">ПОСМОТРЕТЬ ПРОЕКТЫ</a>
-              <a href="#lead-form" className="btn-yellow">ЗАКАЗАТЬ ДОМ</a>
+              <a href="#catalog" className="btn-green"><i>▣</i> ПОСМОТРЕТЬ ПРОЕКТЫ</a>
+              <a href="#lead-form" className="btn-yellow"><i>⌂</i> ЗАКАЗАТЬ ДОМ</a>
             </div>
           </div>
         </div>
