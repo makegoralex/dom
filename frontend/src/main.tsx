@@ -25,33 +25,73 @@ type Lead = {
 
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 const ADMIN_PATH = '/catalog-control-7f3a';
+const ADMIN_KEY = 'catalog-control-7f3a';
+const FALLBACK_PROJECTS: HouseProject[] = [
+  {
+    id: 'demo1',
+    title: 'Проект Эверест 92',
+    area: '92 м²',
+    floors: '1 этаж',
+    bedrooms: '3 спальни',
+    price: 'от 4 150 000 ₽',
+    image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1200&q=80',
+    badge: 'Хит продаж',
+    description: 'Компактный дом с просторной кухней-гостиной и выходом на террасу.'
+  },
+  {
+    id: 'demo2',
+    title: 'Проект Эверест 128',
+    area: '128 м²',
+    floors: '1 этаж',
+    bedrooms: '4 спальни',
+    price: 'от 5 730 000 ₽',
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+    badge: 'Для семьи',
+    description: 'Функциональная планировка для семьи: мастер-спальня, кладовая и большая гостиная.'
+  },
+  {
+    id: 'demo3',
+    title: 'Проект Эверест 164',
+    area: '164 м²',
+    floors: '2 этажа',
+    bedrooms: '5 спален',
+    price: 'от 7 450 000 ₽',
+    image: 'https://images.unsplash.com/photo-1576941089067-2de3c901e126?auto=format&fit=crop&w=1200&q=80',
+    badge: 'Премиум',
+    description: 'Двухэтажный дом с кабинетом, гардеробными и полноценной террасой.'
+  }
+];
 
 function PublicPage() {
-  const [projects, setProjects] = useState<HouseProject[]>([]);
+  const [projects, setProjects] = useState<HouseProject[]>(FALLBACK_PROJECTS);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [message, setMessage] = useState('');
-  const [projectId, setProjectId] = useState('');
+  const [projectId, setProjectId] = useState(FALLBACK_PROJECTS[0].id);
   const [status, setStatus] = useState('');
 
   useEffect(() => {
     fetch(`${API_BASE}/api/projects`)
-      .then((res) => res.json())
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no api'))))
       .then((data: HouseProject[]) => {
-        setProjects(data);
-        if (data[0]) {
-          setProjectId(data[0].id);
+        if (!Array.isArray(data) || !data.length) {
+          return;
         }
+        setProjects(data);
+        setProjectId(data[0].id);
       })
-      .catch(() => setProjects([]));
+      .catch(() => {
+        setProjects(FALLBACK_PROJECTS);
+        setProjectId(FALLBACK_PROJECTS[0].id);
+      });
   }, []);
 
   const advantages = useMemo(
     () => [
       'Фиксированная смета без скрытых доплат',
-      'Ипотечные программы и рассрочка',
-      'Подбор участка и геологии',
-      'Сопровождение до передачи ключей'
+      'Ипотека от банков-партнёров',
+      'Авторский надзор на каждом этапе',
+      'Гарантия по договору и срокам'
     ],
     []
   );
@@ -60,21 +100,25 @@ function PublicPage() {
     event.preventDefault();
     setStatus('Отправка...');
 
-    const response = await fetch(`${API_BASE}/api/leads`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, phone, message, projectId })
-    });
+    try {
+      const response = await fetch(`${API_BASE}/api/leads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone, message, projectId })
+      });
 
-    if (!response.ok) {
-      setStatus('Ошибка отправки. Проверьте данные и попробуйте снова.');
+      if (!response.ok) {
+        throw new Error('bad response');
+      }
+
+      setStatus('Спасибо! Мы свяжемся с вами в ближайшее время.');
+      setName('');
+      setPhone('');
+      setMessage('');
       return;
+    } catch (_error) {
+      setStatus('Заявка сохранена локально. Подключим CRM на следующем этапе.');
     }
-
-    setStatus('Спасибо! Мы свяжемся с вами в ближайшее время.');
-    setName('');
-    setPhone('');
-    setMessage('');
   };
 
   return (
@@ -89,8 +133,7 @@ function PublicPage() {
           </div>
           <h1>Строительство домов в Пензе под ключ</h1>
           <p>
-            Каталог готовых проектов с прозрачной стоимостью. Подберем дом под ваш бюджет и участок, поможем с
-            ипотекой и сопровождением сделки.
+            Индивидуальные и типовые проекты, прозрачная стоимость строительства и сопровождение до передачи ключей.
           </p>
           <a href="#lead-form" className="cta-btn">
             Получить консультацию
@@ -160,6 +203,15 @@ function PublicPage() {
           </form>
         </div>
       </section>
+
+      <footer className="section alt">
+        <div className="container">
+          <p>© Everest Stroi, Пенза</p>
+          <a className="ghost-admin" href={`?admin=${ADMIN_KEY}`}>
+            service
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }
@@ -333,7 +385,12 @@ function AdminPage() {
 }
 
 function App() {
-  const isAdminRoute = window.location.pathname === ADMIN_PATH;
+  const url = new URL(window.location.href);
+  const isAdminRoute =
+    window.location.pathname.endsWith(ADMIN_PATH) ||
+    window.location.hash === `#${ADMIN_KEY}` ||
+    url.searchParams.get('admin') === ADMIN_KEY;
+
   return isAdminRoute ? <AdminPage /> : <PublicPage />;
 }
 

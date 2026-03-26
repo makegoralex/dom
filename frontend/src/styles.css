@@ -266,3 +266,10 @@ body {
     font-size: 16px;
   }
 }
+
+
+.ghost-admin {
+  opacity: 0;
+  pointer-events: none;
+  font-size: 10px;
+}
