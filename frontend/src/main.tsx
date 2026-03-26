@@ -266,7 +266,7 @@ function PublicPage() {
               </article>
             ))}
           </div>
-          <a href="#" className="show-all-link">Показать все проекты</a>
+          <div className="show-all-wrap"><a href="#" className="show-all-link">Показать все проекты</a></div>
         </div>
       </section>
 
@@ -314,6 +314,60 @@ function PublicPage() {
                 <p>Проверяем качество, подписываем акты и передаем ключи.</p>
               </div>
             </article>
+          </div>
+        </div>
+      </section>
+
+
+      <section className="why-section">
+        <div className="container">
+          <h2 className="why-title">Почему выбирают нас</h2>
+          <div className="why-grid">
+            <article className="why-card">
+              <div className="why-icon">🛠</div>
+              <div><h3>Ответственное строительство</h3><p>Опытные инженеры и прорабы с большим практическим опытом.</p></div>
+            </article>
+            <article className="why-card">
+              <div className="why-icon">🧾</div>
+              <div><h3>Понятная смета</h3><p>Под каждый проект готовим прозрачную смету без скрытых пунктов.</p></div>
+            </article>
+            <article className="why-card">
+              <div className="why-icon">📌</div>
+              <div><h3>Фиксированная стоимость работ</h3><p>Цена фиксируется в договоре и не меняется в ходе строительства.</p></div>
+            </article>
+            <article className="why-card">
+              <div className="why-icon">🤝</div>
+              <div><h3>Человеческое отношение</h3><p>Всегда готовы обсудить пожелания и предложить лучший вариант.</p></div>
+            </article>
+          </div>
+          <div className="why-badges">
+            <span>✔ Работаем с материнским капиталом</span>
+            <span>✔ Помогаем экономить на строительстве</span>
+            <span>✔ Строим в кредит и ипотеку</span>
+            <span>✔ Даем скидки на страхование дома</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="faq-section">
+        <div className="container">
+          <h2 className="faq-title">Вопросы и ответы по строительству домов</h2>
+          <div className="faq-grid">
+            {[
+              'Сколько будет стоить строительство дома?',
+              'В какое время года лучше всего начинать строительство?',
+              'Можно ли обойтись без внешней отделки дома первое время?',
+              'Какой фундамент лучше всего подойдет для загородного коттеджа?',
+              'Почему частные бригады часто выходят дороже?',
+              'Какой материал выбрать для круглогодичного проживания?',
+              'Кто будет контролировать ход строительства?',
+              'Что дороже: типовой проект или индивидуальный?'
+            ].map((question) => (
+              <button className="faq-item" key={question}>
+                <span>{question}</span>
+                <b>⌄</b>
+              </button>
+            ))}
           </div>
         </div>
       </section>
