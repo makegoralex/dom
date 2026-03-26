@@ -32,9 +32,38 @@ type ContentPage = {
   content: string;
 };
 
+type ProjectGroupColumn = {
+  title: string;
+  groups: Array<{
+    label?: string;
+    items: string[];
+  }>;
+};
+
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 const ADMIN_PATH = '/catalog-control-7f3a';
 const ADMIN_KEY = 'catalog-control-7f3a';
+const PROJECT_GROUPS: ProjectGroupColumn[] = [
+  {
+    title: 'Каменные дома',
+    groups: [
+      { items: ['Газобетон', 'Арболит', 'Керамзитобетонные блоки', 'Кирпич'] }
+    ]
+  },
+  {
+    title: 'Деревянные дома',
+    groups: [
+      { label: 'Бревенчатые', items: ['Оцилиндрованное бревно', 'Рубленное бревно', 'Лафет'] },
+      { label: 'Брусовые', items: ['Профилированный брус', 'Клееный брус', 'Двойной брус'] }
+    ]
+  },
+  {
+    title: 'Быстровозводимые дома',
+    groups: [
+      { items: ['Каркасные', 'SIP панели', 'Строительство дачных домов под ключ'] }
+    ]
+  }
+];
 const FALLBACK_PROJECTS: HouseProject[] = [
   {
     id: 'demo1',
