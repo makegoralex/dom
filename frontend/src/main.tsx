@@ -14,6 +14,7 @@ type HouseProject = {
   bedrooms: string;
   priceFrom: string;
   constructionType: string;
+  category: 'house' | 'bath';
   badge?: string;
 };
 
@@ -102,7 +103,8 @@ const FALLBACK_PROJECTS: HouseProject[] = [
     coverImage: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1200&q=80',
     images: [],
     priceFrom: 'от 4 150 000 ₽',
-    constructionType: 'Газобетон'
+    constructionType: 'Газобетон',
+    category: 'house'
   },
   {
     id: 'demo2',
@@ -116,7 +118,8 @@ const FALLBACK_PROJECTS: HouseProject[] = [
     coverImage: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
     images: [],
     priceFrom: 'от 5 730 000 ₽',
-    constructionType: 'Кирпич'
+    constructionType: 'Кирпич',
+    category: 'house'
   },
   {
     id: 'demo3',
@@ -130,7 +133,8 @@ const FALLBACK_PROJECTS: HouseProject[] = [
     coverImage: 'https://images.unsplash.com/photo-1576941089067-2de3c901e126?auto=format&fit=crop&w=1200&q=80',
     images: [],
     priceFrom: 'от 7 450 000 ₽',
-    constructionType: 'Клееный брус'
+    constructionType: 'Клееный брус',
+    category: 'house'
   }
 ];
 
@@ -266,7 +270,7 @@ function PublicPage() {
                 ))}
               </div>
             </div>
-            <a>/</a><a>БАНИ</a><a>/</a>
+            <a>/</a><a href="/baths" className="menu-link">БАНИ</a><a>/</a>
             <div className="menu-services">
               <a className="menu-link">УСЛУГИ ▾</a>
               <div className="services-dropdown">
@@ -275,7 +279,7 @@ function PublicPage() {
                 ))}
               </div>
             </div>
-            <a>/</a><a href="/design" className="menu-link">ПРОЕКТИРОВАНИЕ</a><a>/</a><a href="/portfolio" className="menu-link">ПОРТФОЛИО</a><a>/</a><a href="/contacts" className="menu-link">КОНТАКТЫ</a><a>/</a>
+            <a>/</a><a href="/design" className="menu-link">ПРОЕКТИРОВАНИЕ</a><a>/</a><a href="/portfolio" className="menu-link">ПОРТФОЛИО</a><a>/</a>
             <div className="menu-promotions">
               <a className="menu-link">СКИДКИ И АКЦИИ ▾</a>
               <div className="services-dropdown">
@@ -284,6 +288,7 @@ function PublicPage() {
                 ))}
               </div>
             </div>
+            <a>/</a><a href="/contacts" className="menu-link">КОНТАКТЫ</a>
           </nav>
 
           <div className="hero-content">
@@ -593,7 +598,7 @@ function InternalHeader() {
               ))}
             </div>
           </div>
-          <a>/</a><a>БАНИ</a><a>/</a>
+          <a>/</a><a href="/baths" className={`menu-link ${window.location.pathname === '/baths' ? 'active' : ''}`}>БАНИ</a><a>/</a>
           <div className="menu-services">
             <a className={`menu-link ${window.location.pathname.startsWith('/services/') ? 'active' : ''}`}>УСЛУГИ ▾</a>
             <div className="services-dropdown">
@@ -605,7 +610,6 @@ function InternalHeader() {
           <a>/</a>
           <a href="/design" className={`menu-link ${window.location.pathname === '/design' ? 'active' : ''}`}>ПРОЕКТИРОВАНИЕ</a><a>/</a>
           <a href="/portfolio" className={`menu-link ${window.location.pathname === '/portfolio' ? 'active' : ''}`}>ПОРТФОЛИО</a><a>/</a>
-          <a href="/contacts" className={`menu-link ${window.location.pathname === '/contacts' ? 'active' : ''}`}>КОНТАКТЫ</a><a>/</a>
           <div className="menu-promotions">
             <a className={`menu-link ${window.location.pathname.startsWith('/discounts/') ? 'active' : ''}`}>СКИДКИ И АКЦИИ ▾</a>
             <div className="services-dropdown">
@@ -614,6 +618,7 @@ function InternalHeader() {
               ))}
             </div>
           </div>
+          <a>/</a><a href="/contacts" className={`menu-link ${window.location.pathname === '/contacts' ? 'active' : ''}`}>КОНТАКТЫ</a>
         </nav>
       </div>
     </header>
@@ -676,42 +681,101 @@ function SiteFooter() {
 }
 
 
-function ProjectTypePage() {
+function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; sectionTitle: string }) {
   const params = new URLSearchParams(window.location.search);
   const type = params.get('type') || 'Все типы';
   const [projects, setProjects] = useState<HouseProject[]>([]);
+  const [selectedFloors, setSelectedFloors] = useState<string[]>([]);
+  const [maxArea, setMaxArea] = useState(300);
+  const [maxBedrooms, setMaxBedrooms] = useState(6);
 
   useEffect(() => {
-    document.title = `${type} — проекты TMдом`;
-    fetch(`${API_BASE}/api/projects`).then((res) => res.json()).then((data: HouseProject[]) => setProjects(data)).catch(() => setProjects(FALLBACK_PROJECTS));
-  }, [type]);
+    document.title = `${sectionTitle} — TMдом`;
+    fetch(`${API_BASE}/api/projects`)
+      .then((res) => res.json())
+      .then((data: HouseProject[]) => setProjects(data))
+      .catch(() => setProjects(FALLBACK_PROJECTS));
+  }, [sectionTitle]);
 
-  const filtered = type === 'Все типы' ? projects : projects.filter((item) => item.constructionType === type);
+  const byCategory = projects.filter((item) => (item.category || 'house') === category);
+  const floorOptions = Array.from(new Set(byCategory.map((item) => item.floors))).filter(Boolean);
+  const typeOptions = Array.from(new Set(byCategory.map((item) => item.constructionType))).filter(Boolean);
+  const minArea = 20;
+  const parseNum = (value: string) => Number((value.match(/\d+/) || ['0'])[0]);
+
+  const filtered = byCategory.filter((item) => {
+    const byType = type === 'Все типы' || item.constructionType === type;
+    const byFloor = !selectedFloors.length || selectedFloors.includes(item.floors);
+    const byArea = parseNum(item.area) <= maxArea;
+    const byBedrooms = parseNum(item.bedrooms) <= maxBedrooms;
+    return byType && byFloor && byArea && byBedrooms;
+  });
 
   return (
     <div>
       <InternalHeader />
       <section className="internal-body">
         <div className="container">
-          <Breadcrumbs items={["Главная", "Проекты домов", type]} />
-          <h1>{type}</h1>
-          <div className="catalog-grid">
-            {filtered.map((project) => (
-              <article className="project-card" key={project.id}>
-                <div className="project-image" style={{ backgroundImage: `url(${project.coverImage || project.images?.[0] || ""})` }} />
-                <div className="project-content">
-                  <h3>{project.title}</h3>
-                  <p className="project-desc">{project.shortDescription}</p>
-                  <strong className="project-price">{project.priceFrom}</strong>
-                </div>
-              </article>
-            ))}
+          <Breadcrumbs items={["Главная", sectionTitle, type]} />
+          <h1>{sectionTitle}</h1>
+          <div className="catalog-layout">
+            <aside className="catalog-filters">
+              <h3>Фильтр</h3>
+              <div className="filter-block">
+                <h4>Этажность</h4>
+                {floorOptions.map((floor) => (
+                  <label key={floor}><input type="checkbox" checked={selectedFloors.includes(floor)} onChange={(e) => setSelectedFloors(e.target.checked ? [...selectedFloors, floor] : selectedFloors.filter((f) => f !== floor))} /> {floor}</label>
+                ))}
+              </div>
+              <div className="filter-block">
+                <h4>Площадь до {maxArea} м²</h4>
+                <input type="range" min={minArea} max={300} value={maxArea} onChange={(e) => setMaxArea(Number(e.target.value))} />
+              </div>
+              <div className="filter-block">
+                <h4>Спальни до {maxBedrooms}</h4>
+                <input type="range" min={1} max={8} value={maxBedrooms} onChange={(e) => setMaxBedrooms(Number(e.target.value))} />
+              </div>
+            </aside>
+
+            <div>
+              <div className="type-chips">
+                <button className={type === 'Все типы' ? 'active' : ''} onClick={() => { window.location.href = `${window.location.pathname}?type=${encodeURIComponent('Все типы')}`; }}>Все типы</button>
+                {typeOptions.map((option) => (
+                  <button key={option} className={type === option ? 'active' : ''} onClick={() => { window.location.href = `${window.location.pathname}?type=${encodeURIComponent(option)}`; }}>{option}</button>
+                ))}
+              </div>
+              <div className="catalog-grid">
+                {filtered.map((project) => (
+                  <article className="project-card" key={project.id}>
+                    <div className="project-image" style={{ backgroundImage: `url(${project.coverImage || project.images?.[0] || ""})` }} />
+                    <div className="project-content">
+                      <h3>{project.title}</h3>
+                      <p className="project-desc">{project.shortDescription}</p>
+                      <div className="project-meta">
+                        <span>{project.area}</span>
+                        <span>{project.floors}</span>
+                        <span>{project.bedrooms}</span>
+                      </div>
+                      <strong className="project-price">{project.priceFrom}</strong>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
       <SiteFooter />
     </div>
   );
+}
+
+function ProjectTypePage() {
+  return <CatalogPage category="house" sectionTitle="Проекты домов" />;
+}
+
+function BathsPage() {
+  return <CatalogPage category="bath" sectionTitle="Бани" />;
 }
 
 function ContactsPage() {
@@ -1133,6 +1197,10 @@ function AdminPage() {
               onChange={(e) => setDraft({ ...draft, images: e.target.value.split(',').map((v) => v.trim()).filter(Boolean) })}
             />
             <input placeholder="Сумма от" value={draft.priceFrom || ''} onChange={(e) => setDraft({ ...draft, priceFrom: e.target.value })} />
+            <select value={draft.category || 'house'} onChange={(e) => setDraft({ ...draft, category: e.target.value as 'house' | 'bath' })}>
+              <option value="house">Проекты домов</option>
+              <option value="bath">Бани</option>
+            </select>
             <select value={draft.constructionType || 'Газобетон'} onChange={(e) => setDraft({ ...draft, constructionType: e.target.value })}>
               {["Газобетон","Арболит","Керамзитобетонные блоки","Кирпич","Оцилиндрованное бревно","Рубленное бревно","Лафет","Профилированный брус","Клееный брус","Двойной брус","Каркасные","SIP панели","Строительство дачных домов под ключ"].map((t) => (
                 <option key={t} value={t}>{t}</option>
@@ -1260,6 +1328,7 @@ function App() {
   if (isAdminRoute) return <AdminPage />;
   if (pathname === '/about') return <AboutPage />;
   if (pathname === '/projects') return <ProjectTypePage />;
+  if (pathname === '/baths') return <BathsPage />;
   if (pathname === '/design') return <DesignPage />;
   if (servicePage) return <SubsectionPage sectionTitle="Услуги" pageTitle={servicePage.title} text={servicePage.text} />;
   if (discountPage) return <SubsectionPage sectionTitle="Скидки и акции" pageTitle={discountPage.title} text={discountPage.text} />;

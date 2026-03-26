@@ -15,6 +15,7 @@ interface HouseProject {
   bedrooms: string;
   priceFrom: string;
   constructionType: string;
+  category: 'house' | 'bath';
   badge?: string;
 }
 
@@ -82,63 +83,84 @@ const seedProjects: HouseProject[] = [
     fullDescription: 'Проект с большой кухней-гостиной, тремя спальнями и отдельной котельной.',
     coverImage: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1200&q=80',
     images: ['https://images.unsplash.com/photo-1605146768851-eda79da39897?auto=format&fit=crop&w=1200&q=80'],
-    area: '118 м²', floors: '1 этаж', bedrooms: '3 спальни', priceFrom: 'от 5 200 000 ₽', constructionType: 'Газобетон', badge: 'Хит'
+    area: '118 м²', floors: '1 этаж', bedrooms: '3 спальни', priceFrom: 'от 5 200 000 ₽', constructionType: 'Газобетон', category: 'house', badge: 'Хит'
   },
   {
     id: 'p2', title: 'Арболит 126', shortDescription: 'Экологичный проект из арболита.',
     fullDescription: 'Комфортный дом с тремя спальнями и кабинетом.',
     coverImage: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
     images: ['https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1200&q=80'],
-    area: '126 м²', floors: '1 этаж', bedrooms: '3 спальни', priceFrom: 'от 5 500 000 ₽', constructionType: 'Арболит'
+    area: '126 м²', floors: '1 этаж', bedrooms: '3 спальни', priceFrom: 'от 5 500 000 ₽', constructionType: 'Арболит', category: 'house'
   },
   {
     id: 'p3', title: 'Кирпич 164', shortDescription: 'Надежный кирпичный дом.',
     fullDescription: 'Двухэтажный проект с мастер-спальней и просторной террасой.',
     coverImage: 'https://images.unsplash.com/photo-1576941089067-2de3c901e126?auto=format&fit=crop&w=1200&q=80',
     images: ['https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80'],
-    area: '164 м²', floors: '2 этажа', bedrooms: '4 спальни', priceFrom: 'от 7 450 000 ₽', constructionType: 'Кирпич', badge: 'Премиум'
+    area: '164 м²', floors: '2 этажа', bedrooms: '4 спальни', priceFrom: 'от 7 450 000 ₽', constructionType: 'Кирпич', category: 'house', badge: 'Премиум'
   },
   {
     id: 'p4', title: 'Брус 96', shortDescription: 'Дом из профилированного бруса.',
     fullDescription: 'Компактный загородный дом для круглогодичного проживания.',
     coverImage: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1200&q=80',
     images: ['https://images.unsplash.com/photo-1464146072230-91cabc968266?auto=format&fit=crop&w=1200&q=80'],
-    area: '96 м²', floors: '1 этаж', bedrooms: '2 спальни', priceFrom: 'от 4 300 000 ₽', constructionType: 'Профилированный брус'
+    area: '96 м²', floors: '1 этаж', bedrooms: '2 спальни', priceFrom: 'от 4 300 000 ₽', constructionType: 'Профилированный брус', category: 'house'
   },
   {
     id: 'p5', title: 'Брус 122', shortDescription: 'Клееный брус с панорамным остеклением.',
     fullDescription: 'Современный проект с высокими потолками и выходом на террасу.',
     coverImage: 'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?auto=format&fit=crop&w=1200&q=80',
     images: ['https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80'],
-    area: '122 м²', floors: '1 этаж', bedrooms: '3 спальни', priceFrom: 'от 5 900 000 ₽', constructionType: 'Клееный брус'
+    area: '122 м²', floors: '1 этаж', bedrooms: '3 спальни', priceFrom: 'от 5 900 000 ₽', constructionType: 'Клееный брус', category: 'house'
   },
   {
     id: 'p6', title: 'Бревно 132', shortDescription: 'Классический дом из бревна.',
     fullDescription: 'Традиционный стиль с просторной гостиной и печной зоной.',
     coverImage: 'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?auto=format&fit=crop&w=1200&q=80',
     images: ['https://images.unsplash.com/photo-1600047509782-20d39509f26d?auto=format&fit=crop&w=1200&q=80'],
-    area: '132 м²', floors: '2 этажа', bedrooms: '3 спальни', priceFrom: 'от 6 100 000 ₽', constructionType: 'Оцилиндрованное бревно'
+    area: '132 м²', floors: '2 этажа', bedrooms: '3 спальни', priceFrom: 'от 6 100 000 ₽', constructionType: 'Оцилиндрованное бревно', category: 'house'
   },
   {
     id: 'p7', title: 'Каркас 108', shortDescription: 'Быстровозводимый каркасный дом.',
     fullDescription: 'Энергоэффективный проект для постоянного проживания.',
     coverImage: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1200&q=80',
     images: ['https://images.unsplash.com/photo-1600047509358-9dc75507daeb?auto=format&fit=crop&w=1200&q=80'],
-    area: '108 м²', floors: '1 этаж', bedrooms: '3 спальни', priceFrom: 'от 4 800 000 ₽', constructionType: 'Каркасные'
+    area: '108 м²', floors: '1 этаж', bedrooms: '3 спальни', priceFrom: 'от 4 800 000 ₽', constructionType: 'Каркасные', category: 'house'
   },
   {
     id: 'p8', title: 'SIP 94', shortDescription: 'Компактный дом из SIP панелей.',
     fullDescription: 'Современный проект под дачное и постоянное проживание.',
     coverImage: 'https://images.unsplash.com/photo-1600607687644-c7171b42498f?auto=format&fit=crop&w=1200&q=80',
     images: ['https://images.unsplash.com/photo-1600566752355-35792bedcfea?auto=format&fit=crop&w=1200&q=80'],
-    area: '94 м²', floors: '1 этаж', bedrooms: '2 спальни', priceFrom: 'от 4 100 000 ₽', constructionType: 'SIP панели'
+    area: '94 м²', floors: '1 этаж', bedrooms: '2 спальни', priceFrom: 'от 4 100 000 ₽', constructionType: 'SIP панели', category: 'house'
   },
   {
     id: 'p9', title: 'Дачный 82', shortDescription: 'Дачный дом под ключ.',
     fullDescription: 'Бюджетный проект с двумя спальнями и кухней-гостиной.',
     coverImage: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=1200&q=80',
     images: ['https://images.unsplash.com/photo-1593696140826-c58b021acf8b?auto=format&fit=crop&w=1200&q=80'],
-    area: '82 м²', floors: '1 этаж', bedrooms: '2 спальни', priceFrom: 'от 3 600 000 ₽', constructionType: 'Строительство дачных домов под ключ'
+    area: '82 м²', floors: '1 этаж', bedrooms: '2 спальни', priceFrom: 'от 3 600 000 ₽', constructionType: 'Строительство дачных домов под ключ', category: 'house'
+  },
+  {
+    id: 'b1', title: 'Баня Б-36', shortDescription: 'Компактная баня из бруса с террасой.',
+    fullDescription: 'Функциональная парная, моечная и комната отдыха в одном проекте.',
+    coverImage: 'https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80',
+    images: ['https://images.unsplash.com/photo-1600585154154-7125d447f3d9?auto=format&fit=crop&w=1200&q=80'],
+    area: '36 м²', floors: '1 этаж', bedrooms: '1 спальня', priceFrom: 'от 1 650 000 ₽', constructionType: 'Профилированный брус', category: 'bath', badge: 'Баня'
+  },
+  {
+    id: 'b2', title: 'Баня Б-52', shortDescription: 'Баня с гостевой комнатой и большой верандой.',
+    fullDescription: 'Проект для семьи: парная, душевая, санузел и уютная зона отдыха.',
+    coverImage: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=1200&q=80',
+    images: ['https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&w=1200&q=80'],
+    area: '52 м²', floors: '1 этаж', bedrooms: '2 спальни', priceFrom: 'от 2 240 000 ₽', constructionType: 'Клееный брус', category: 'bath', badge: 'Хит'
+  },
+  {
+    id: 'b3', title: 'Баня Б-74', shortDescription: 'Двухэтажная баня-дом с мансардой.',
+    fullDescription: 'Полноценный загородный формат: банный блок, кухня-гостиная и спальни на втором уровне.',
+    coverImage: 'https://images.unsplash.com/photo-1448630360428-65456885c650?auto=format&fit=crop&w=1200&q=80',
+    images: ['https://images.unsplash.com/photo-1571055107559-3e67626fa8be?auto=format&fit=crop&w=1200&q=80'],
+    area: '74 м²', floors: '2 этажа', bedrooms: '2 спальни', priceFrom: 'от 3 480 000 ₽', constructionType: 'Оцилиндрованное бревно', category: 'bath', badge: 'Премиум'
   }
 ];
 
@@ -293,6 +315,7 @@ app.post('/api/admin/projects', authMiddleware, (req, res) => {
     bedrooms: incoming.bedrooms || '',
     priceFrom: incoming.priceFrom || '',
     constructionType: incoming.constructionType || CONSTRUCTION_TYPES[0],
+    category: incoming.category === 'bath' ? 'bath' : 'house',
     badge: incoming.badge || ''
   };
   data.projects.unshift(project);
