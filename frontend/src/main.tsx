@@ -75,6 +75,20 @@ const PROJECT_GROUPS: ProjectGroupColumn[] = [
     ]
   }
 ];
+
+const SERVICES_MENU = [
+  { slug: 'fundament', title: 'Фундамент', text: 'Проектируем и устраиваем фундаменты под тип грунта и нагрузку дома.' },
+  { slug: 'besedki', title: 'Беседки', text: 'Строим беседки под ключ: от эскиза до финальной отделки.' },
+  { slug: 'septik', title: 'Септик', text: 'Подбираем и монтируем септики с учетом объема стоков и участка.' },
+  { slug: 'zabory', title: 'Заборы', text: 'Устанавливаем заборы разных типов: профлист, евроштакетник, дерево.' },
+  { slug: 'mebel', title: 'Мебель', text: 'Делаем встроенную и корпусную мебель под размеры вашего дома.' },
+  { slug: 'podbor-uchastka', title: 'Подбор участка', text: 'Помогаем выбрать участок с проверкой рельефа, подъезда и коммуникаций.' }
+];
+
+const PROMOTIONS_MENU = [
+  { slug: 'ipoteka-i-kredit', title: 'Ипотека и кредит', text: 'Подберем комфортную программу ипотеки или кредита на строительство.' },
+  { slug: 'vse-akcii', title: 'Все акции', text: 'Здесь публикуем актуальные скидки, акции и специальные предложения.' }
+];
 const FALLBACK_PROJECTS: HouseProject[] = [
   {
     id: 'demo1',
@@ -252,7 +266,24 @@ function PublicPage() {
                 ))}
               </div>
             </div>
-            <a>/</a><a>БАНИ</a><a>/</a><a>УСЛУГИ</a><a>/</a><a href="/design" className="menu-link">ПРОЕКТИРОВАНИЕ</a><a>/</a><a href="/portfolio" className="menu-link">ПОРТФОЛИО</a><a>/</a><a href="/contacts" className="menu-link">КОНТАКТЫ</a>
+            <a>/</a><a>БАНИ</a><a>/</a>
+            <div className="menu-services">
+              <a className="menu-link">УСЛУГИ ▾</a>
+              <div className="services-dropdown">
+                {SERVICES_MENU.map((item) => (
+                  <a key={item.slug} href={`/services/${item.slug}`} className="dropdown-link">{item.title}</a>
+                ))}
+              </div>
+            </div>
+            <a>/</a><a href="/design" className="menu-link">ПРОЕКТИРОВАНИЕ</a><a>/</a><a href="/portfolio" className="menu-link">ПОРТФОЛИО</a><a>/</a><a href="/contacts" className="menu-link">КОНТАКТЫ</a><a>/</a>
+            <div className="menu-promotions">
+              <a className="menu-link">СКИДКИ И АКЦИИ ▾</a>
+              <div className="services-dropdown">
+                {PROMOTIONS_MENU.map((item) => (
+                  <a key={item.slug} href={`/discounts/${item.slug}`} className="dropdown-link">{item.title}</a>
+                ))}
+              </div>
+            </div>
           </nav>
 
           <div className="hero-content">
@@ -542,7 +573,48 @@ function InternalHeader() {
           <a href="/" className="brand-line"><div className="logo-badge">⌂</div><div className="brand-text"><div className="brand-logo">TMдом</div><p>Строительная компания</p></div></a>
           <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span><div className="phone-block"><strong>+7 (905) 365-47-39</strong><small>с 9:00 до 19:00</small></div><button className="call-btn">Заказать звонок</button></div>
         </div>
-        <nav className="hero-nav"><a href="/about" className={`menu-link ${window.location.pathname === '/about' ? 'active' : ''}`}>О КОМПАНИИ</a><a>/</a><div className="menu-projects"><a href="/projects" className={`menu-link ${window.location.pathname === '/projects' ? 'active' : ''}`}>ПРОЕКТЫ ДОМОВ ▾</a><div className="projects-dropdown">{PROJECT_GROUPS.map((column) => (<div key={column.title}><h4>{column.title}</h4>{column.groups.map((group) => (<div key={`${column.title}_${group.label}`}>{group.label ? <strong>{group.label}</strong> : null}{group.items.map((item) => (<a key={item} href={`/projects?type=${encodeURIComponent(item)}`} className="dropdown-link">{item}</a>))}</div>))}</div>))}</div></div><a>/</a><a>БАНИ</a><a>/</a><a>УСЛУГИ</a><a>/</a><a href="/design" className={`menu-link ${window.location.pathname === '/design' ? 'active' : ''}`}>ПРОЕКТИРОВАНИЕ</a><a>/</a><a href="/portfolio" className={`menu-link ${window.location.pathname === '/portfolio' ? 'active' : ''}`}>ПОРТФОЛИО</a><a>/</a><a href="/contacts" className={`menu-link ${window.location.pathname === '/contacts' ? 'active' : ''}`}>КОНТАКТЫ</a></nav>
+        <nav className="hero-nav">
+          <a href="/about" className={`menu-link ${window.location.pathname === '/about' ? 'active' : ''}`}>О КОМПАНИИ</a><a>/</a>
+          <div className="menu-projects">
+            <a href="/projects" className={`menu-link ${window.location.pathname === '/projects' ? 'active' : ''}`}>ПРОЕКТЫ ДОМОВ ▾</a>
+            <div className="projects-dropdown">
+              {PROJECT_GROUPS.map((column) => (
+                <div key={column.title}>
+                  <h4>{column.title}</h4>
+                  {column.groups.map((group) => (
+                    <div key={`${column.title}_${group.label}`}>
+                      {group.label ? <strong>{group.label}</strong> : null}
+                      {group.items.map((item) => (
+                        <a key={item} href={`/projects?type=${encodeURIComponent(item)}`} className="dropdown-link">{item}</a>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+          <a>/</a><a>БАНИ</a><a>/</a>
+          <div className="menu-services">
+            <a className={`menu-link ${window.location.pathname.startsWith('/services/') ? 'active' : ''}`}>УСЛУГИ ▾</a>
+            <div className="services-dropdown">
+              {SERVICES_MENU.map((item) => (
+                <a key={item.slug} href={`/services/${item.slug}`} className="dropdown-link">{item.title}</a>
+              ))}
+            </div>
+          </div>
+          <a>/</a>
+          <a href="/design" className={`menu-link ${window.location.pathname === '/design' ? 'active' : ''}`}>ПРОЕКТИРОВАНИЕ</a><a>/</a>
+          <a href="/portfolio" className={`menu-link ${window.location.pathname === '/portfolio' ? 'active' : ''}`}>ПОРТФОЛИО</a><a>/</a>
+          <a href="/contacts" className={`menu-link ${window.location.pathname === '/contacts' ? 'active' : ''}`}>КОНТАКТЫ</a><a>/</a>
+          <div className="menu-promotions">
+            <a className={`menu-link ${window.location.pathname.startsWith('/discounts/') ? 'active' : ''}`}>СКИДКИ И АКЦИИ ▾</a>
+            <div className="services-dropdown">
+              {PROMOTIONS_MENU.map((item) => (
+                <a key={item.slug} href={`/discounts/${item.slug}`} className="dropdown-link">{item.title}</a>
+              ))}
+            </div>
+          </div>
+        </nav>
       </div>
     </header>
   );
@@ -831,6 +903,29 @@ function DesignPage() {
               {status ? <p className="status">{status}</p> : null}
             </form>
           </section>
+        </div>
+      </section>
+      <SiteFooter />
+    </div>
+  );
+}
+
+function SubsectionPage({ sectionTitle, pageTitle, text }: { sectionTitle: string; pageTitle: string; text: string }) {
+  useEffect(() => {
+    document.title = `${pageTitle} — TMдом`;
+  }, [pageTitle]);
+
+  return (
+    <div>
+      <InternalHeader />
+      <section className="internal-body">
+        <div className="container">
+          <Breadcrumbs items={["Главная", sectionTitle, pageTitle]} />
+          <h1>{pageTitle}</h1>
+          <div className="internal-text-box">
+            <p>{text}</p>
+            <p>Скоро добавим подробное описание услуги и примеры выполненных работ.</p>
+          </div>
         </div>
       </section>
       <SiteFooter />
@@ -1153,6 +1248,10 @@ function AdminPage() {
 function App() {
   const url = new URL(window.location.href);
   const pathname = window.location.pathname;
+  const serviceSlug = pathname.startsWith('/services/') ? pathname.replace('/services/', '') : '';
+  const discountSlug = pathname.startsWith('/discounts/') ? pathname.replace('/discounts/', '') : '';
+  const servicePage = SERVICES_MENU.find((item) => item.slug === serviceSlug);
+  const discountPage = PROMOTIONS_MENU.find((item) => item.slug === discountSlug);
   const isAdminRoute =
     pathname.endsWith(ADMIN_PATH) ||
     window.location.hash === `#${ADMIN_KEY}` ||
@@ -1162,6 +1261,8 @@ function App() {
   if (pathname === '/about') return <AboutPage />;
   if (pathname === '/projects') return <ProjectTypePage />;
   if (pathname === '/design') return <DesignPage />;
+  if (servicePage) return <SubsectionPage sectionTitle="Услуги" pageTitle={servicePage.title} text={servicePage.text} />;
+  if (discountPage) return <SubsectionPage sectionTitle="Скидки и акции" pageTitle={discountPage.title} text={discountPage.text} />;
   if (pathname === '/portfolio') return <PortfolioPage />;
   if (pathname === '/contacts') return <ContactsPage />;
   return <PublicPage />;
