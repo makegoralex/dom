@@ -76,8 +76,8 @@ body {margin: 0; background: #fff;}
 .internal-text-box p{margin:0; font-size:13px; color:#323844; line-height:1.45;}
 
 .contacts-box{background:#f7f7f8; border:1px solid #d8dce3; padding:28px; display:grid; grid-template-columns:1fr 1.1fr; gap:20px;}
-.contacts-info h3{margin:0 0 8px; font-size:26px; color:#1e2531; font-family:Georgia, 'Times New Roman', serif; font-weight:700;}
-.contacts-info p{margin:0 0 14px; font-size:22px; line-height:1.3; color:#272e3a; font-family:Georgia, 'Times New Roman', serif;}
+.contacts-info h3{margin:0 0 8px; font-size:20px; color:#1e2531; font-family:Georgia, 'Times New Roman', serif; font-weight:700;}
+.contacts-info p{margin:0 0 12px; font-size:17px; line-height:1.3; color:#272e3a; font-family:Georgia, 'Times New Roman', serif;}
 .contacts-info p a{color:#272e3a;}
 .contacts-map-wrap iframe{border:0; width:100%; height:100%; min-height:380px;}
 .contacts-socials{display:flex; gap:8px; margin-top:10px;}
@@ -89,14 +89,30 @@ body {margin: 0; background: #fff;}
 .portfolio-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:24px;}
 .portfolio-card{background:#f7f7f8; border:1px solid #d8dce3;}
 .portfolio-image{height:290px; background-size:cover; background-position:center; position:relative;}
-.portfolio-image h3{position:absolute; left:0; right:0; bottom:0; margin:0; padding:10px 12px; color:#fff; font-size:30px; font-family:Georgia, 'Times New Roman', serif; background:linear-gradient(180deg, transparent, rgba(0,0,0,.65));}
+.portfolio-image h3{position:absolute; left:0; right:0; bottom:0; margin:0; padding:10px 12px; color:#fff; font-size:20px; font-family:Georgia, 'Times New Roman', serif; background:linear-gradient(180deg, transparent, rgba(0,0,0,.65));}
 .portfolio-meta-row{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:12px 12px 4px;}
-.portfolio-meta-row strong{display:block; font-size:15px; margin-bottom:4px; font-family:Georgia, 'Times New Roman', serif;}
-.portfolio-meta-row span{font-size:14px; color:#2f3440;}
+.portfolio-meta-row strong{display:block; font-size:13px; margin-bottom:4px; font-family:Georgia, 'Times New Roman', serif;}
+.portfolio-meta-row span{font-size:13px; color:#2f3440;}
 .portfolio-review{display:grid; grid-template-columns:46px 1fr; gap:10px; padding:8px 12px 14px; border-top:1px solid #d0d4dc;}
 .portfolio-review .avatar{width:44px; height:44px; border-radius:50%; background:#e0e3eb; display:flex; align-items:center; justify-content:center;}
-.portfolio-review h4{margin:0 0 6px; font-size:28px; font-family:Georgia, 'Times New Roman', serif;}
-.portfolio-review p{margin:0; font-size:15px; line-height:1.35; color:#3a404c;}
+.portfolio-review h4{margin:0 0 6px; font-size:18px; font-family:Georgia, 'Times New Roman', serif;}
+.portfolio-review p{margin:0; font-size:13px; line-height:1.35; color:#3a404c;}
+
+.design-intro p{font-size:17px !important; margin:0 0 16px !important;}
+.design-intro h3{font-size:34px; margin:0 0 10px; font-family:Georgia, 'Times New Roman', serif;}
+.design-preview-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:12px;}
+.design-preview-grid img{width:100%; height:150px; object-fit:cover; border:1px solid #d6d8df;}
+.design-preview-grid h4{margin:6px 0 0; font-size:17px;}
+.design-tariffs{margin-top:20px;}
+.design-tariffs h2,.design-order h2{font-size:38px; margin:0 0 14px; font-family:Georgia, 'Times New Roman', serif;}
+.design-tariff-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+.design-tariff-card{background:#f7f7f8; border:1px solid #d8dce3; padding:12px;}
+.design-tariff-card h4{margin:0 0 8px; font-size:17px;}
+.design-tariff-card strong{display:block; color:#3d8c53; margin-bottom:8px; font-size:16px;}
+.design-tariff-card p{margin:0; font-size:14px; line-height:1.4;}
+.design-order{margin-top:22px; background:#f7f7f8; border:1px solid #d8dce3; padding:14px;}
+.design-order .lead-form{max-width:none;}
+.design-order .lead-form label{display:grid; gap:6px; font-size:14px;}
 
 
 
@@ -244,13 +260,18 @@ body {margin: 0; background: #fff;}
   .internal-body h1{font-size:22px;}
   .internal-text-box p{font-size:12px;}
   .contacts-box{grid-template-columns:1fr; padding:16px;}
-  .contacts-info h3{font-size:20px;}
-  .contacts-info p{font-size:17px;}
+  .contacts-info h3{font-size:18px;}
+  .contacts-info p{font-size:15px;}
+  .design-intro h3{font-size:24px;}
+  .design-intro p{font-size:15px !important;}
+  .design-preview-grid{grid-template-columns:1fr 1fr;}
+  .design-tariff-grid{grid-template-columns:1fr;}
+  .design-tariffs h2,.design-order h2{font-size:26px;}
   .portfolio-grid{grid-template-columns:1fr;}
   .portfolio-image{height:220px;}
-  .portfolio-image h3{font-size:22px;}
+  .portfolio-image h3{font-size:17px;}
   .portfolio-meta-row{grid-template-columns:1fr;}
-  .portfolio-review h4{font-size:22px;}
+  .portfolio-review h4{font-size:16px;}
   .lead-side h2{font-size:34px;}
   .lead-top-row,.footer-columns{grid-template-columns:1fr;}
   .contact-card h4,.social-card h4{font-size:18px;}

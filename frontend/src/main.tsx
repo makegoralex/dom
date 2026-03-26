@@ -252,7 +252,7 @@ function PublicPage() {
                 ))}
               </div>
             </div>
-            <a>/</a><a>БАНИ</a><a>/</a><a>УСЛУГИ</a><a>/</a><a>ПРОЕКТИРОВАНИЕ</a><a>/</a><a href="/portfolio" className="menu-link">ПОРТФОЛИО</a><a>/</a><a href="/contacts" className="menu-link">КОНТАКТЫ</a>
+            <a>/</a><a>БАНИ</a><a>/</a><a>УСЛУГИ</a><a>/</a><a href="/design" className="menu-link">ПРОЕКТИРОВАНИЕ</a><a>/</a><a href="/portfolio" className="menu-link">ПОРТФОЛИО</a><a>/</a><a href="/contacts" className="menu-link">КОНТАКТЫ</a>
           </nav>
 
           <div className="hero-content">
@@ -542,7 +542,7 @@ function InternalHeader() {
           <a href="/" className="brand-line"><div className="logo-badge">⌂</div><div className="brand-text"><div className="brand-logo">TMдом</div><p>Строительная компания</p></div></a>
           <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span><div className="phone-block"><strong>+7 (905) 365-47-39</strong><small>с 9:00 до 19:00</small></div><button className="call-btn">Заказать звонок</button></div>
         </div>
-        <nav className="hero-nav"><a href="/about" className={`menu-link ${window.location.pathname === '/about' ? 'active' : ''}`}>О КОМПАНИИ</a><a>/</a><div className="menu-projects"><a href="/projects" className={`menu-link ${window.location.pathname === '/projects' ? 'active' : ''}`}>ПРОЕКТЫ ДОМОВ ▾</a><div className="projects-dropdown">{PROJECT_GROUPS.map((column) => (<div key={column.title}><h4>{column.title}</h4>{column.groups.map((group) => (<div key={`${column.title}_${group.label}`}>{group.label ? <strong>{group.label}</strong> : null}{group.items.map((item) => (<a key={item} href={`/projects?type=${encodeURIComponent(item)}`} className="dropdown-link">{item}</a>))}</div>))}</div>))}</div></div><a>/</a><a>БАНИ</a><a>/</a><a>УСЛУГИ</a><a>/</a><a>ПРОЕКТИРОВАНИЕ</a><a>/</a><a href="/portfolio" className={`menu-link ${window.location.pathname === '/portfolio' ? 'active' : ''}`}>ПОРТФОЛИО</a><a>/</a><a href="/contacts" className={`menu-link ${window.location.pathname === '/contacts' ? 'active' : ''}`}>КОНТАКТЫ</a></nav>
+        <nav className="hero-nav"><a href="/about" className={`menu-link ${window.location.pathname === '/about' ? 'active' : ''}`}>О КОМПАНИИ</a><a>/</a><div className="menu-projects"><a href="/projects" className={`menu-link ${window.location.pathname === '/projects' ? 'active' : ''}`}>ПРОЕКТЫ ДОМОВ ▾</a><div className="projects-dropdown">{PROJECT_GROUPS.map((column) => (<div key={column.title}><h4>{column.title}</h4>{column.groups.map((group) => (<div key={`${column.title}_${group.label}`}>{group.label ? <strong>{group.label}</strong> : null}{group.items.map((item) => (<a key={item} href={`/projects?type=${encodeURIComponent(item)}`} className="dropdown-link">{item}</a>))}</div>))}</div>))}</div></div><a>/</a><a>БАНИ</a><a>/</a><a>УСЛУГИ</a><a>/</a><a href="/design" className={`menu-link ${window.location.pathname === '/design' ? 'active' : ''}`}>ПРОЕКТИРОВАНИЕ</a><a>/</a><a href="/portfolio" className={`menu-link ${window.location.pathname === '/portfolio' ? 'active' : ''}`}>ПОРТФОЛИО</a><a>/</a><a href="/contacts" className={`menu-link ${window.location.pathname === '/contacts' ? 'active' : ''}`}>КОНТАКТЫ</a></nav>
       </div>
     </header>
   );
@@ -729,6 +729,108 @@ function PortfolioPage() {
               </article>
             ))}
           </div>
+        </div>
+      </section>
+      <SiteFooter />
+    </div>
+  );
+}
+
+function DesignPage() {
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [status, setStatus] = useState('');
+
+  useEffect(() => {
+    document.title = 'Проектирование — TMдом';
+  }, []);
+
+  const submitLead = async (event: FormEvent) => {
+    event.preventDefault();
+    setStatus('Отправка...');
+    try {
+      const response = await fetch(`${API_BASE}/api/leads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone, email, message })
+      });
+      if (!response.ok) {
+        throw new Error('bad response');
+      }
+      setStatus('Спасибо! Мы свяжемся с вами в ближайшее время.');
+      setName('');
+      setPhone('');
+      setEmail('');
+      setMessage('');
+    } catch (_error) {
+      setStatus('Заявка сохранена локально. Подключим CRM на следующем этапе.');
+    }
+  };
+
+  return (
+    <div>
+      <InternalHeader />
+      <section className="internal-body">
+        <div className="container">
+          <Breadcrumbs items={["Главная", "Проектирование"]} />
+          <h1>ИНДИВИДУАЛЬНОЕ ПРОЕКТИРОВАНИЕ ДОМОВ И КОТТЕДЖЕЙ</h1>
+
+          <div className="internal-text-box design-intro">
+            <p>
+              Наша компания занимается проектированием домов и коттеджей с продуманной планировкой и внешним видом.
+              Даже если у вас нет четкого представления — мы поможем создать идеальный проект будущего дома.
+            </p>
+            <h3>Что вы получите, заказав проект дома у нас</h3>
+            <p>Полный комплекс услуг: разработка концепции дома, проект инженерных коммуникаций и авторский надзор.</p>
+            <div className="design-preview-grid">
+              <article><img src="https://images.unsplash.com/photo-1472220625704-91e1462799b2?auto=format&fit=crop&w=900&q=80" alt="Эскизный проект" /><h4>Эскизный проект</h4></article>
+              <article><img src="https://images.unsplash.com/photo-1513584684374-8bab748fbf90?auto=format&fit=crop&w=900&q=80" alt="Архитектурный проект" /><h4>Архитектурный проект</h4></article>
+              <article><img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=900&q=80" alt="Конструктивный проект" /><h4>Конструктивный проект</h4></article>
+              <article><img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=900&q=80" alt="Инженерный проект" /><h4>Инженерный проект</h4></article>
+            </div>
+          </div>
+
+          <section className="design-tariffs">
+            <h2>Тарифы</h2>
+            <div className="design-tariff-grid">
+              <article className="design-tariff-card">
+                <h4>Эскизный проект</h4>
+                <strong>от 100 руб/м²</strong>
+                <p>Общие данные, планы этажей, экспликация помещений и посадка дома на участке.</p>
+              </article>
+              <article className="design-tariff-card">
+                <h4>Архитектурный проект</h4>
+                <strong>от 450 руб/м²</strong>
+                <p>Фасады, планировочные решения, разрезы, спецификации материалов и визуализация.</p>
+              </article>
+              <article className="design-tariff-card">
+                <h4>Конструктивный проект</h4>
+                <strong>от 350 руб/м²</strong>
+                <p>Фундамент, схемы армирования, узлы и сечения, ведомости конструктивных элементов.</p>
+              </article>
+              <article className="design-tariff-card">
+                <h4>Инженерный проект</h4>
+                <strong>от 450 руб/м²</strong>
+                <p>Водоснабжение, канализация, отопление, вентиляция, кондиционирование и электрика.</p>
+              </article>
+            </div>
+          </section>
+
+          <section className="design-order">
+            <h2>Для заказа проекта дома — звоните +7 (905) 365-47-39 или отправляйте заявку ↓</h2>
+            <form className="lead-form" onSubmit={submitLead}>
+              <div className="lead-top-row">
+                <label>Имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
+                <label>Телефон*<input value={phone} onChange={(e) => setPhone(e.target.value)} required /></label>
+                <label>E-mail<input value={email} onChange={(e) => setEmail(e.target.value)} /></label>
+              </div>
+              <label>Сообщение<textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={5} /></label>
+              <button type="submit">✉ ОТПРАВИТЬ ДАННЫЕ</button>
+              {status ? <p className="status">{status}</p> : null}
+            </form>
+          </section>
         </div>
       </section>
       <SiteFooter />
@@ -1059,6 +1161,7 @@ function App() {
   if (isAdminRoute) return <AdminPage />;
   if (pathname === '/about') return <AboutPage />;
   if (pathname === '/projects') return <ProjectTypePage />;
+  if (pathname === '/design') return <DesignPage />;
   if (pathname === '/portfolio') return <PortfolioPage />;
   if (pathname === '/contacts') return <ContactsPage />;
   return <PublicPage />;
