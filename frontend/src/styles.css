@@ -23,6 +23,8 @@ body {margin: 0; background: #fff;}
 .top-contacts {display:flex; gap:24px; font-size:14px; text-decoration:underline;}
 
 .hero-main {padding-top: 14px;}
+
+.hero-upper-row{display:flex; align-items:center; justify-content:space-between; gap:18px; border-top:1px solid rgba(255,255,255,.35); border-bottom:1px solid rgba(255,255,255,.35); padding:10px 0;}
 .brand-line {display:flex; align-items:center; gap:14px; color:#f9c652; font-weight:700;}
 .brand-line p {margin:0; color:#f9d96d; font-size:14px;}
 .brand-logo{font-size:42px; font-weight:800; line-height:1;}
@@ -30,12 +32,12 @@ body {margin: 0; background: #fff;}
 .logo-badge{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#ffcb4d,#f1ab19);display:flex;align-items:center;justify-content:center;color:#2b2b2b;font-size:20px;font-weight:700;}
 .brand-text{display:flex;flex-direction:column;gap:0;}
 
-.hero-contact-line {display:flex; align-items:center; justify-content:space-between; gap:10px; border-top:1px solid rgba(255,255,255,.35); border-bottom:1px solid rgba(255,255,255,.35); padding:8px 0; margin:10px 0;}
-.hero-contact-line span {font-size:14px;}
+.hero-contact-line {display:flex; align-items:center; justify-content:flex-end; gap:14px; padding:0; margin:0; flex:1;}
+.hero-contact-line span {font-size:14px; max-width:340px;}
 .hero-contact-line strong {font-size:22px; color:#ffdd4d; line-height:1.1;}
 .call-btn {background:#5dad2f; border:none; color:#fff; padding:10px 14px; font-size:14px; cursor:pointer;}
 
-.hero-nav {display:flex; flex-wrap:wrap; gap:12px; padding:8px 0 10px; border-bottom:1px solid rgba(255,255,255,.35);}
+.hero-nav {display:flex; flex-wrap:wrap; gap:12px; padding:10px 0 10px; border-bottom:1px solid rgba(255,255,255,.35);}
 .hero-nav a {font-weight:700; font-size:13px; color:#fff; text-decoration:none; opacity:.95;}
 
 .hero-content {padding:18px 0 16px; max-width:860px;}
@@ -92,13 +94,23 @@ body {margin: 0; background: #fff;}
   .brand-line p{font-size:14px}
 }
 @media (max-width: 992px) {
-  .top-search-inner,.hero-contact-line{flex-direction:column; align-items:flex-start;}
+  .hero-upper-row{flex-direction:column; align-items:flex-start; gap:10px; padding:8px 0;}
+  .hero-contact-line{justify-content:flex-start; flex-wrap:wrap; gap:10px;}
+  .hero-contact-line span{max-width:none;}
+  .top-search-inner{flex-direction:column; align-items:flex-start;}
   .top-contacts{flex-wrap:wrap; gap:10px; font-size:14px;}
   .hero-content h1{font-size:32px}
   .catalog-grid{grid-template-columns:repeat(2,1fr)}
   .adv-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width: 720px) {
+  .hero-main{padding-top:8px}
+  .hero-upper-row{gap:8px}
+  .brand-logo{font-size:34px}
+  .logo-badge{width:34px;height:34px;font-size:16px}
+  .hero-contact-line strong{font-size:18px}
+  .call-btn{padding:8px 10px;font-size:13px}
+  .hero-contact-line span{font-size:13px}
   .section{padding:48px 0}
   .catalog-grid,.adv-grid,.admin-grid{grid-template-columns:1fr}
   .hero-nav{gap:10px}

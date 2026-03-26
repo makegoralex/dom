@@ -146,18 +146,20 @@ function PublicPage() {
         </div>
 
         <div className="container hero-main">
-          <div className="brand-line">
-            <div className="logo-badge">⌂</div>
-            <div className="brand-text">
-              <div className="brand-logo">Эверест</div>
-              <p>Строительная компания</p>
+          <div className="hero-upper-row">
+            <div className="brand-line">
+              <div className="logo-badge">⌂</div>
+              <div className="brand-text">
+                <div className="brand-logo">Эверест</div>
+                <p>Строительная компания</p>
+              </div>
             </div>
-          </div>
 
-          <div className="hero-contact-line">
-            <span>Нужна примерная оценка стоимости строительства? <u>Рассчитать онлайн</u></span>
-            <strong>+7 (499) 286-92-19</strong>
-            <button className="call-btn">Заказать звонок</button>
+            <div className="hero-contact-line">
+              <span>Нужна примерная оценка стоимости строительства? <u>Рассчитать онлайн</u></span>
+              <strong>+7 (499) 286-92-19</strong>
+              <button className="call-btn">Заказать звонок</button>
+            </div>
           </div>
 
           <nav className="hero-nav">
