@@ -6,7 +6,7 @@ body {margin: 0; background: #fff;}
 .hero-exact {
   color: #fff;
   background: linear-gradient(rgba(17, 30, 39, .45), rgba(10, 18, 24, .65)),
-    url('https://images.unsplash.com/photo-1513584684374-8bab748fbf90?auto=format&fit=crop&w=1900&q=80') center/cover;
+    url('https://images.unsplash.com/photo-1605146769289-440113cc3d00?auto=format&fit=crop&w=1900&q=80') center/cover;
   position: relative;
   min-height: 760px;
 }
@@ -23,9 +23,12 @@ body {margin: 0; background: #fff;}
 .top-contacts {display:flex; gap:24px; font-size:14px; text-decoration:underline;}
 
 .hero-main {padding-top: 24px;}
-.brand-line {display:flex; align-items:center; gap:14px; font-size:26px; color:#f9c652; font-weight:700;}
-.brand-line p {margin:0; color:#f9d96d; font-size:22px;}
-.brand-logo{font-size:52px; font-weight:800;}
+.brand-line {display:flex; align-items:center; gap:14px; color:#f9c652; font-weight:700;}
+.brand-line p {margin:0; color:#f9d96d; font-size:14px;}
+.brand-logo{font-size:60px; font-weight:800; line-height:1;}
+
+.logo-badge{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#ffcb4d,#f1ab19);display:flex;align-items:center;justify-content:center;color:#2b2b2b;font-size:27px;font-weight:700;}
+.brand-text{display:flex;flex-direction:column;gap:2px;}
 
 .hero-contact-line {display:flex; align-items:center; justify-content:space-between; gap:16px; border-top:1px solid rgba(255,255,255,.35); border-bottom:1px solid rgba(255,255,255,.35); padding:14px 0; margin:20px 0;}
 .hero-contact-line span {font-size:15px;}
@@ -33,14 +36,14 @@ body {margin: 0; background: #fff;}
 .call-btn {background:#5dad2f; border:none; color:#fff; padding:14px 20px; font-size:20px; cursor:pointer;}
 
 .hero-nav {display:flex; flex-wrap:wrap; gap:22px; padding:10px 0 16px; border-bottom:1px solid rgba(255,255,255,.35);}
-.hero-nav a {font-weight:700; font-size:13px; color:#fff; text-decoration:none;}
+.hero-nav a {font-weight:700; font-size:13px; color:#fff; text-decoration:none; opacity:.95;}
 
 .hero-content {padding:44px 0 30px; max-width:940px;}
-.hero-content h1 {font-size:38px; line-height:1.06; margin:0 0 24px; max-width:620px;}
+.hero-content h1 {font-size:57px; line-height:1.02; margin:0 0 24px; max-width:700px;}
 .hero-stats {display:flex; gap:30px; margin-bottom:28px;}
 .hero-stats > div {max-width:230px;}
-.hero-stats strong {display:block; font-size:24px; margin-bottom:6px;}
-.hero-stats span {font-size:13px; line-height:1.2;}
+.hero-stats strong {display:block; font-size:47px; margin-bottom:6px;}
+.hero-stats span {font-size:16px; line-height:1.2;}
 .hero-buttons {display:flex; gap:16px;}
 .btn-green, .btn-yellow {text-decoration:none; color:#fff; font-size:18px; font-weight:700; padding:14px 18px;}
 .btn-green {background:#53ab28;}
@@ -80,13 +83,13 @@ body {margin: 0; background: #fff;}
 .ghost-admin {opacity:0; pointer-events:none; font-size:10px;}
 
 @media (max-width: 1200px) {
-  .hero-content h1{font-size:54px}
-  .hero-contact-line strong{font-size:34px}
+  .hero-content h1{font-size:52px}
+  .hero-contact-line strong{font-size:32px}
   .hero-stats strong{font-size:40px}
-  .hero-stats span{font-size:24px}
-  .btn-green,.btn-yellow{font-size:22px}
-  .call-btn{font-size:22px}
-  .brand-line p{font-size:28px}
+  .hero-stats span{font-size:15px}
+  .btn-green,.btn-yellow{font-size:17px}
+  .call-btn{font-size:19px}
+  .brand-line p{font-size:14px}
 }
 @media (max-width: 992px) {
   .top-search-inner,.hero-contact-line{flex-direction:column; align-items:flex-start;}

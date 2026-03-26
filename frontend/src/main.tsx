@@ -147,8 +147,11 @@ function PublicPage() {
 
         <div className="container hero-main">
           <div className="brand-line">
-            <div className="brand-logo">Эверест</div>
-            <p>Строительная компания</p>
+            <div className="logo-badge">⌂</div>
+            <div className="brand-text">
+              <div className="brand-logo">Эверест</div>
+              <p>Строительная компания</p>
+            </div>
           </div>
 
           <div className="hero-contact-line">
@@ -159,11 +162,17 @@ function PublicPage() {
 
           <nav className="hero-nav">
             <a>О КОМПАНИИ</a>
+            <a>/</a>
             <a>ПРОЕКТЫ ДОМОВ</a>
+            <a>/</a>
             <a>БАНИ</a>
+            <a>/</a>
             <a>УСЛУГИ</a>
+            <a>/</a>
             <a>ПРОЕКТИРОВАНИЕ</a>
+            <a>/</a>
             <a>ПОРТФОЛИО</a>
+            <a>/</a>
             <a>КОНТАКТЫ</a>
           </nav>
 
