@@ -16,5 +16,9 @@ jobs:
           host: 85.239.54.244
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script_stop: true
+          command_timeout: 30m
           script: |
+            echo "Start deploy on server"
             /var/www/dom/deploy.sh
+            echo "Deploy finished"
