@@ -130,8 +130,10 @@ const FALLBACK_PROJECTS: HouseProject[] = [
   }
 ];
 
-function normalizePrice(price: string) {
-  return price.trim().toLowerCase().startsWith('от') ? price : `от ${price}`;
+function normalizePrice(price: unknown) {
+  const value = String(price ?? '').trim();
+  if (!value) return 'Цена по запросу';
+  return value.toLowerCase().startsWith('от') ? value : `от ${value}`;
 }
 
 function ProjectTile({ project }: { project: HouseProject }) {
