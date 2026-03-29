@@ -686,6 +686,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const type = params.get('type') || 'Все типы';
   const [projects, setProjects] = useState<HouseProject[]>([]);
   const [selectedFloors, setSelectedFloors] = useState<string[]>([]);
+  const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [maxArea, setMaxArea] = useState(300);
   const [maxBedrooms, setMaxBedrooms] = useState(6);
 
@@ -700,6 +701,11 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const byCategory = projects.filter((item) => (item.category || 'house') === category);
   const floorOptions = Array.from(new Set(byCategory.map((item) => item.floors))).filter(Boolean);
   const typeOptions = Array.from(new Set(byCategory.map((item) => item.constructionType))).filter(Boolean);
+  const styleOptions = [
+    'Классический', 'Шале', 'Современный', 'Хай-тек', 'Красивый', 'Скандинавский',
+    'Оригинальный', 'Стильный', 'Необычный', 'Европейский', 'Канадский', 'Американский',
+    'Немецкий', 'Модерн', 'Фахверк', 'Шведский', 'Простой', 'Барнхаус', 'Финский'
+  ];
   const minArea = 20;
   const parseNum = (value: string) => Number((value.match(/\d+/) || ['0'])[0]);
 
@@ -708,7 +714,8 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
     const byFloor = !selectedFloors.length || selectedFloors.includes(item.floors);
     const byArea = parseNum(item.area) <= maxArea;
     const byBedrooms = parseNum(item.bedrooms) <= maxBedrooms;
-    return byType && byFloor && byArea && byBedrooms;
+    const byStyle = !selectedStyles.length || selectedStyles.includes(item.style || '');
+    return byType && byFloor && byStyle && byArea && byBedrooms;
   });
 
   return (
@@ -720,12 +727,26 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
           <h1>{sectionTitle}</h1>
           <div className="catalog-layout">
             <aside className="catalog-filters">
-              <h3>Фильтр</h3>
               <div className="filter-block">
                 <h4>Этажность</h4>
                 {floorOptions.map((floor) => (
                   <label key={floor}><input type="checkbox" checked={selectedFloors.includes(floor)} onChange={(e) => setSelectedFloors(e.target.checked ? [...selectedFloors, floor] : selectedFloors.filter((f) => f !== floor))} /> {floor}</label>
                 ))}
+              </div>
+              <div className="filter-block filter-block-style">
+                <h4>Стиль</h4>
+                <div className="style-grid">
+                  {styleOptions.map((style) => (
+                    <label key={style}>
+                      <input
+                        type="checkbox"
+                        checked={selectedStyles.includes(style)}
+                        onChange={(e) => setSelectedStyles(e.target.checked ? [...selectedStyles, style] : selectedStyles.filter((s) => s !== style))}
+                      />
+                      {' '}{style}
+                    </label>
+                  ))}
+                </div>
               </div>
               <div className="filter-block">
                 <h4>Площадь до {maxArea} м²</h4>
@@ -738,7 +759,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
             </aside>
 
             <div>
-              <div className="type-chips">
+              <div className="type-chips hidden-type-chips">
                 <button className={type === 'Все типы' ? 'active' : ''} onClick={() => { window.location.href = `${window.location.pathname}?type=${encodeURIComponent('Все типы')}`; }}>Все типы</button>
                 {typeOptions.map((option) => (
                   <button key={option} className={type === option ? 'active' : ''} onClick={() => { window.location.href = `${window.location.pathname}?type=${encodeURIComponent(option)}`; }}>{option}</button>
@@ -749,14 +770,14 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                   <article className="project-card" key={project.id}>
                     <div className="project-image" style={{ backgroundImage: `url(${project.coverImage || project.images?.[0] || ""})` }} />
                     <div className="project-content">
-                      <h3>{project.title}</h3>
                       <p className="project-desc">{project.shortDescription}</p>
+                      <h3>{project.title}</h3>
                       <div className="project-meta">
-                        <span>{project.area}</span>
-                        <span>{project.floors}</span>
-                        <span>{project.bedrooms}</span>
+                        <span><small>Площадь:</small><strong>{project.area}</strong></span>
+                        <span><small>Габариты:</small><strong>{project.floors}</strong></span>
+                        <span><small>Комнат:</small><strong>{project.bedrooms}</strong></span>
                       </div>
-                      <strong className="project-price">{project.priceFrom}</strong>
+                      <strong className="project-price">от {project.priceFrom}</strong>
                     </div>
                   </article>
                 ))}
