@@ -120,7 +120,7 @@ const FALLBACK_PROJECTS: HouseProject[] = [
     priceFrom: 'от 5 730 000 ₽',
     constructionType: 'Каркасные',
     style: 'Скандинавский',
-    category: 'bath'
+    category: 'house'
   },
   {
     id: 'demo3',
@@ -197,7 +197,7 @@ const FALLBACK_PROJECTS: HouseProject[] = [
     priceFrom: '3 160 000 ₽',
     constructionType: 'Каркасные',
     style: 'Классический',
-    category: 'house'
+    category: 'bath'
   },
   {
     id: 'demo8',
@@ -220,6 +220,69 @@ function normalizePrice(price: unknown) {
   const value = String(price ?? '').trim();
   if (!value) return 'Цена по запросу';
   return value.toLowerCase().startsWith('от') ? value : `от ${value}`;
+}
+
+function SearchBox() {
+  const params = new URLSearchParams(window.location.search);
+  const [query, setQuery] = useState(params.get('q') || '');
+
+  const onSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    window.location.href = `/search?q=${encodeURIComponent(query.trim())}`;
+  };
+
+  return (
+    <form className="search-box" onSubmit={onSubmit}>
+      <input placeholder="Поиск по сайту..." value={query} onChange={(e) => setQuery(e.target.value)} />
+      <button type="submit">Найти</button>
+    </form>
+  );
+}
+
+function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [status, setStatus] = useState('');
+
+  if (!open) return null;
+
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    setStatus('Отправка...');
+    try {
+      const res = await fetch(`${API_BASE}/api/leads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          phone,
+          email: 'makegoralex@yandex.ru',
+          message: 'Заказ звонка с сайта'
+        })
+      });
+      if (!res.ok) throw new Error('bad');
+      setStatus('Заявка отправлена.');
+      setName('');
+      setPhone('');
+    } catch {
+      setStatus('Не удалось отправить заявку. Попробуйте позже.');
+    }
+  };
+
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+        <h3>Заказать звонок</h3>
+        <form onSubmit={submit}>
+          <label>Имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
+          <label>Телефон<input value={phone} onChange={(e) => setPhone(e.target.value)} required /></label>
+          <button type="submit">Отправить</button>
+        </form>
+        <a className="modal-policy" href="/about">Политика конфиденциальности</a>
+        {status ? <p>{status}</p> : null}
+      </div>
+    </div>
+  );
 }
 
 function ProjectTile({ project }: { project: HouseProject }) {
@@ -253,6 +316,7 @@ function PublicPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [constructionTypes, setConstructionTypes] = useState<string[]>([]);
   const [selectedType, setSelectedType] = useState('Все типы');
+  const [openCallback, setOpenCallback] = useState(false);
   const serviceColumns = useMemo(() => chunkBy(SERVICES_MENU, 6), []);
 
   useEffect(() => {
@@ -318,17 +382,14 @@ function PublicPage() {
       <header className="hero hero-exact">
         <div className="promo-strip">
           <div className="container promo-inner">
-            <strong>СТРОИТЕЛЬСТВО ДОМОВ В КРЕДИТ И ИПОТЕКУ ОТ 9.5% ГОДОВЫХ!</strong>
-            <button>Узнать условия <span>»</span></button>
+            <strong><a href="/discounts/ipoteka-i-kredit">СТРОИТЕЛЬСТВО ДОМОВ В КРЕДИТ И ИПОТЕКУ ОТ 9.5% ГОДОВЫХ!</a></strong>
+            <a className="promo-btn" href="/discounts/ipoteka-i-kredit">Узнать условия <span>»</span></a>
           </div>
         </div>
 
         <div className="top-search-row">
           <div className="container top-search-inner">
-            <div className="search-box">
-              <input placeholder="Поиск по сайту..." />
-              <button>Найти</button>
-            </div>
+            <SearchBox />
             <div className="top-contacts">
               <span>село Засечное, улица Механизаторов, 22А</span>
               <span>мы в VK</span>
@@ -340,7 +401,7 @@ function PublicPage() {
         <div className="container hero-main">
           <div className="hero-upper-row">
             <a href="/" className="brand-line">
-              <div className="logo-badge">⌂</div>
+              <div className="logo-badge"><img src="/assets/logo_small.png" alt="Evtenia" /></div>
               <div className="brand-text">
                 <div className="brand-logo">Evtenia</div>
                 <p>Строительная компания</p>
@@ -350,7 +411,7 @@ function PublicPage() {
             <div className="hero-contact-line">
               <span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span>
               <div className="phone-block"><strong>+7 (905) 365-47-39</strong><small>с 9:00 до 19:00</small></div>
-              <button className="call-btn">Заказать звонок</button>
+              <button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button>
             </div>
           </div>
 
@@ -430,42 +491,41 @@ function PublicPage() {
           <div className="offer-grid">
             <article className="offer-card wide" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1600585152915-d208bec867a1?auto=format&fit=crop&w=1000&q=80')" }}>
               <div className="offer-overlay">
-                <h3>Дома из бруса</h3>
-                <a>Клееный</a>
-                <a>Профилированный</a>
-                <a>Двойной</a>
+                <h3>Проекты домов</h3>
+                <a href="/projects?type=Из%20газобетона">Из газобетона</a>
+                <a href="/projects?type=Каркасные">Каркасные</a>
+                <a href="/projects?type=Модульные">Модульные</a>
               </div>
             </article>
             <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1572120360610-d971b9d7767c?auto=format&fit=crop&w=1000&q=80')" }}>
               <div className="offer-overlay">
-                <h3>Дома из бревна</h3>
-                <a>Оцилиндрованное</a>
-                <a>Рубленное</a>
-                <a>Лафет</a>
+                <h3>Бани</h3>
+                <a href="/baths?type=Модульные">Модульные</a>
+                <a href="/baths?type=Каркасные">Каркасные</a>
               </div>
             </article>
             <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1000&q=80')" }}>
               <div className="offer-overlay">
-                <h3>Дома из кирпича</h3>
+                <h3><a href="/design">Проектирование</a></h3>
               </div>
             </article>
             <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1464146072230-91cabc968266?auto=format&fit=crop&w=1000&q=80')" }}>
               <div className="offer-overlay">
-                <h3>Каркасные дома</h3>
+                <h3>Услуги</h3>
+                <a href="/services/fundament">Фундамент</a>
+                <a href="/services/skvazhiny">Скважины</a>
+                <a href="/services/remont">Ремонт</a>
               </div>
             </article>
             <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?auto=format&fit=crop&w=1000&q=80')" }}>
               <div className="offer-overlay">
-                <h3>Дома из SIP-панелей</h3>
+                <h3><a href="/discounts/vse-akcii">Скидки и акции</a></h3>
               </div>
             </article>
             <article className="offer-card wide" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1000&q=80')" }}>
               <div className="offer-overlay">
-                <h3>Дома из блоков</h3>
-                <a>Газоблоки</a>
-                <a>Арболит</a>
-                <a>Керамоблоки</a>
-                <a>Керамзитобетон</a>
+                <h3><a href="/portfolio">Портфолио проектов</a></h3>
+                <a href="/projects">Смотреть все проекты домов</a>
               </div>
             </article>
           </div>
@@ -481,7 +541,7 @@ function PublicPage() {
           <div className="catalog-grid home-project-grid">
             {catalogProjects.map((project) => <ProjectTile project={project} key={project.id} />)}
           </div>
-          <div className="show-all-wrap"><a href="#" className="show-all-link">Показать все проекты</a></div>
+          <div className="show-all-wrap"><a href="/projects" className="show-all-link">Показать все проекты</a></div>
         </div>
       </section>
 
@@ -635,6 +695,7 @@ function PublicPage() {
       </section>
 
       <SiteFooter />
+      <CallbackModal open={openCallback} onClose={() => setOpenCallback(false)} />
     </div>
   );
 }
@@ -660,24 +721,25 @@ function InternalTextBlock({ title, content }: { title: string; content: string 
 
 function InternalHeader() {
   const serviceColumns = chunkBy(SERVICES_MENU, 6);
+  const [openCallback, setOpenCallback] = useState(false);
   return (
     <header className="hero hero-exact internal-header">
       <div className="promo-strip">
         <div className="container promo-inner">
-          <strong>СТРОИТЕЛЬСТВО ДОМОВ В КРЕДИТ И ИПОТЕКУ ОТ 9.5% ГОДОВЫХ!</strong>
-          <button>Узнать условия <span>»</span></button>
+          <strong><a href="/discounts/ipoteka-i-kredit">СТРОИТЕЛЬСТВО ДОМОВ В КРЕДИТ И ИПОТЕКУ ОТ 9.5% ГОДОВЫХ!</a></strong>
+          <a className="promo-btn" href="/discounts/ipoteka-i-kredit">Узнать условия <span>»</span></a>
         </div>
       </div>
       <div className="top-search-row">
         <div className="container top-search-inner">
-          <div className="search-box"><input placeholder="Поиск по сайту..." /><button>Найти</button></div>
+          <SearchBox />
           <div className="top-contacts"><span>село Засечное, улица Механизаторов, 22А</span><span>мы в VK</span><span><i>⤴</i> Свой проект на расчёт</span></div>
         </div>
       </div>
       <div className="container hero-main">
         <div className="hero-upper-row">
-          <a href="/" className="brand-line"><div className="logo-badge">⌂</div><div className="brand-text"><div className="brand-logo">Evtenia</div><p>Строительная компания</p></div></a>
-          <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span><div className="phone-block"><strong>+7 (905) 365-47-39</strong><small>с 9:00 до 19:00</small></div><button className="call-btn">Заказать звонок</button></div>
+          <a href="/" className="brand-line"><div className="logo-badge"><img src="/assets/logo_small.png" alt="Evtenia" /></div><div className="brand-text"><div className="brand-logo">Evtenia</div><p>Строительная компания</p></div></a>
+          <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span><div className="phone-block"><strong>+7 (905) 365-47-39</strong><small>с 9:00 до 19:00</small></div><button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button></div>
         </div>
         <nav className="hero-nav">
           <a href="/about" className={`menu-link ${window.location.pathname === '/about' ? 'active' : ''}`}>О КОМПАНИИ</a><a>/</a>
@@ -733,7 +795,31 @@ function InternalHeader() {
           <a>/</a><a href="/contacts" className={`menu-link ${window.location.pathname === '/contacts' ? 'active' : ''}`}>КОНТАКТЫ</a>
         </nav>
       </div>
+      <CallbackModal open={openCallback} onClose={() => setOpenCallback(false)} />
     </header>
+  );
+}
+
+function SearchPage() {
+  const query = new URLSearchParams(window.location.search).get('q')?.trim() || '';
+  const [projects, setProjects] = useState<HouseProject[]>([]);
+  useEffect(() => {
+    document.title = `Поиск: ${query || 'запрос пуст'} — Evtenia`;
+    fetch(`${API_BASE}/api/projects`).then((r) => (r.ok ? r.json() : Promise.reject(new Error('no api')))).then(setProjects).catch(() => setProjects(FALLBACK_PROJECTS));
+  }, [query]);
+  const q = query.toLowerCase();
+  const results = projects.filter((p) => `${p.title} ${p.shortDescription} ${p.constructionType}`.toLowerCase().includes(q));
+  return (
+    <div>
+      <InternalHeader />
+      <section className="internal-body"><div className="container">
+        <Breadcrumbs items={["Главная", "Поиск"]} />
+        <h1>Результаты поиска</h1>
+        {query ? <p>Запрос: <b>{query}</b></p> : <p>Введите запрос в строке поиска.</p>}
+        <div className="catalog-grid">{results.map((p) => <ProjectTile key={p.id} project={p} />)}</div>
+      </div></section>
+      <SiteFooter />
+    </div>
   );
 }
 
@@ -1510,6 +1596,7 @@ function App() {
   if (pathname === '/baths') return <BathsPage />;
   if (pathname.startsWith('/project/')) return <ProjectDetailPage />;
   if (pathname === '/design') return <DesignPage />;
+  if (pathname === '/search') return <SearchPage />;
   if (servicePage) return <SubsectionPage sectionTitle="Услуги" pageTitle={servicePage.title} text={servicePage.text} />;
   if (discountPage) return <SubsectionPage sectionTitle="Скидки и акции" pageTitle={discountPage.title} text={discountPage.text} />;
   if (pathname === '/portfolio') return <PortfolioPage />;

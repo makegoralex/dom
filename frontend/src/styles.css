@@ -13,8 +13,9 @@ body {margin: 0; background: #fff;}
 .promo-strip {background:#eb7b17; border-bottom: 1px solid rgba(255,255,255,.35);}
 .promo-inner {display:flex; justify-content:flex-start; align-items:center; gap:14px; min-height:38px; font-size:16px; font-weight:500;}
 .promo-inner strong{font-size:13px; letter-spacing:.25px; font-weight:600;}
-.promo-inner button{background:#d86b10; border:1px solid #f0b079; color:#fff; padding:8px 16px; font-weight:600; cursor:pointer; font-size:13px;}
-.promo-inner button span{font-size:16px; line-height:1; margin-left:3px;}
+.promo-inner strong a{color:#fff; text-decoration:none;}
+.promo-btn{background:#d86b10; border:1px solid #f0b079; color:#fff; padding:8px 16px; font-weight:600; cursor:pointer; font-size:13px; text-decoration:none;}
+.promo-btn span{font-size:16px; line-height:1; margin-left:3px;}
 
 .top-search-row {background: #ebebeb; color:#222;}
 .top-search-inner {display:flex; justify-content:space-between; gap:16px; align-items:center; min-height:50px;}
@@ -31,7 +32,8 @@ body {margin: 0; background: #fff;}
 .brand-line p {margin:0; color:#f9d96d; font-size:14px;}
 .brand-logo{font-size:42px; font-weight:800; line-height:1;}
 
-.logo-badge{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#ffcb4d,#f1ab19);display:flex;align-items:center;justify-content:center;color:#2b2b2b;font-size:20px;font-weight:700;}
+.logo-badge{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#ffcb4d,#f1ab19);display:flex;align-items:center;justify-content:center;color:#2b2b2b;font-size:20px;font-weight:700;overflow:hidden;}
+.logo-badge img{width:100%; height:100%; object-fit:cover;}
 .brand-text{display:flex;flex-direction:column;gap:0;}
 
 .hero-contact-line {display:flex; align-items:center; justify-content:flex-end; gap:14px; padding:0; margin:0; flex:1;}
@@ -247,6 +249,15 @@ body {margin: 0; background: #fff;}
 .contact-card p{margin:0; color:#313844; font-size:14px;}
 .social-row{display:flex; gap:8px;}
 .social-row span{background:#2e4f7a; color:#fff; padding:6px 8px; font-size:13px;}
+
+.modal-backdrop{position:fixed; inset:0; background:rgba(20,24,33,.55); display:grid; place-items:center; z-index:120;}
+.modal-card{width:min(420px, calc(100vw - 24px)); background:#fff; padding:18px; border-radius:10px; border:1px solid #d7dce5;}
+.modal-card h3{margin:0 0 10px; font-size:24px; color:#1d2430;}
+.modal-card form{display:grid; gap:10px;}
+.modal-card label{display:grid; gap:4px; font-size:14px; color:#3d4350;}
+.modal-card input{border:1px solid #ccd3df; padding:10px 12px; font-size:14px;}
+.modal-card button{border:none; background:#49a727; color:#fff; padding:10px 12px; font-weight:700; cursor:pointer;}
+.modal-policy{font-size:12px; color:#6a707b; display:inline-block; margin-top:8px;}
 
 .lead-form {max-width:620px; display:grid; gap:12px;}
 .lead-form input,.lead-form select,.lead-form textarea,.admin-form input,.admin-form textarea {

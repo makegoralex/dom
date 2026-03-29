@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
+import nodemailer from 'nodemailer';
 
 interface HouseProject {
   id: string;
@@ -60,6 +61,21 @@ const ADMIN_LOGIN = process.env.ADMIN_LOGIN || 'admin_dom';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'DomPenza2026!';
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'hidden-admin-token-penza';
 const FRONTEND_DIST = path.join(__dirname, '..', '..', 'frontend', 'dist');
+const CALLBACK_RECEIVER = process.env.CALLBACK_EMAIL || 'makegoralex@yandex.ru';
+const SMTP_HOST = process.env.SMTP_HOST || '';
+const SMTP_PORT = Number(process.env.SMTP_PORT || 587);
+const SMTP_USER = process.env.SMTP_USER || '';
+const SMTP_PASS = process.env.SMTP_PASS || '';
+const SMTP_FROM = process.env.SMTP_FROM || SMTP_USER || CALLBACK_RECEIVER;
+
+const mailTransport = SMTP_HOST && SMTP_USER && SMTP_PASS
+  ? nodemailer.createTransport({
+      host: SMTP_HOST,
+      port: SMTP_PORT,
+      secure: SMTP_PORT === 465,
+      auth: { user: SMTP_USER, pass: SMTP_PASS }
+    })
+  : null;
 
 const CONSTRUCTION_TYPES = [
   'Газобетон',
@@ -284,12 +300,27 @@ app.get('/api/pages/:slug', (req, res) => {
   res.json(page);
 });
 
-app.post('/api/leads', (req, res) => {
+app.post('/api/leads', async (req, res) => {
   const { name, phone, email, message, projectId } = req.body as Partial<Lead>;
   if (!name || !phone) return res.status(400).json({ message: 'Укажите имя и телефон' });
   const data = readData();
-  data.leads.unshift({ id: `lead_${Date.now()}`, name, phone, email: email || '', message: message || '', projectId, createdAt: new Date().toISOString() });
+  const lead = { id: `lead_${Date.now()}`, name, phone, email: email || '', message: message || '', projectId, createdAt: new Date().toISOString() };
+  data.leads.unshift(lead);
   writeData(data);
+
+  if (mailTransport) {
+    try {
+      await mailTransport.sendMail({
+        from: SMTP_FROM,
+        to: CALLBACK_RECEIVER,
+        subject: `Новая заявка с сайта: ${name}`,
+        text: `Имя: ${name}\nТелефон: ${phone}\nEmail: ${email || '-'}\nПроект: ${projectId || '-'}\nСообщение: ${message || '-'}`
+      });
+    } catch (error) {
+      console.error('Не удалось отправить email по заявке', error);
+    }
+  }
+
   res.status(201).json({ ok: true });
 });
 
