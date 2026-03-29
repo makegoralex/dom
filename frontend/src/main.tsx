@@ -82,6 +82,12 @@ const PROMOTIONS_MENU = [
   { slug: 'ipoteka-i-kredit', title: 'Ипотека и кредит', text: 'Подберем комфортную программу ипотеки или кредита на строительство.' },
   { slug: 'vse-akcii', title: 'Все акции', text: 'Здесь публикуем актуальные скидки, акции и специальные предложения.' }
 ];
+
+function chunkBy<T>(items: T[], size: number) {
+  const chunks: T[][] = [];
+  for (let i = 0; i < items.length; i += size) chunks.push(items.slice(i, i + size));
+  return chunks;
+}
 const FALLBACK_PROJECTS: HouseProject[] = [
   {
     id: 'demo1',
@@ -165,6 +171,7 @@ function PublicPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [constructionTypes, setConstructionTypes] = useState<string[]>([]);
   const [selectedType, setSelectedType] = useState('Все типы');
+  const serviceColumns = useMemo(() => chunkBy(SERVICES_MENU, 6), []);
 
   useEffect(() => {
     document.title = "Evtenia — строительство домов";
@@ -273,10 +280,8 @@ function PublicPage() {
               <div className="projects-dropdown">
                 {PROJECT_GROUPS.map((column) => (
                   <div key={column.title}>
-                    <h4>{column.title}</h4>
                     {column.groups.map((group) => (
                       <div key={`${column.title}_${group.label}`}>
-                        {group.label ? <strong>{group.label}</strong> : null}
                         {group.items.map((item) => (
                           <a key={item} href={`/projects?type=${encodeURIComponent(item)}`} className="dropdown-link">{item}</a>
                         ))}
@@ -299,8 +304,12 @@ function PublicPage() {
             <div className="menu-services">
               <a className="menu-link">УСЛУГИ ▾</a>
               <div className="services-dropdown">
-                {SERVICES_MENU.map((item) => (
-                  <a key={item.slug} href={`/services/${item.slug}`} className="dropdown-link">{item.title}</a>
+                {serviceColumns.map((column, index) => (
+                  <div className="dropdown-col" key={`service-col-${index}`}>
+                    {column.map((item) => (
+                      <a key={item.slug} href={`/services/${item.slug}`} className="dropdown-link">{item.title}</a>
+                    ))}
+                  </div>
                 ))}
               </div>
             </div>
@@ -568,6 +577,7 @@ function InternalTextBlock({ title, content }: { title: string; content: string 
 }
 
 function InternalHeader() {
+  const serviceColumns = chunkBy(SERVICES_MENU, 6);
   return (
     <header className="hero hero-exact internal-header">
       <div className="promo-strip">
@@ -594,10 +604,8 @@ function InternalHeader() {
             <div className="projects-dropdown">
               {PROJECT_GROUPS.map((column) => (
                 <div key={column.title}>
-                  <h4>{column.title}</h4>
                   {column.groups.map((group) => (
                     <div key={`${column.title}_${group.label}`}>
-                      {group.label ? <strong>{group.label}</strong> : null}
                       {group.items.map((item) => (
                         <a key={item} href={`/projects?type=${encodeURIComponent(item)}`} className="dropdown-link">{item}</a>
                       ))}
@@ -620,8 +628,12 @@ function InternalHeader() {
           <div className="menu-services">
             <a className={`menu-link ${window.location.pathname.startsWith('/services/') ? 'active' : ''}`}>УСЛУГИ ▾</a>
             <div className="services-dropdown">
-              {SERVICES_MENU.map((item) => (
-                <a key={item.slug} href={`/services/${item.slug}`} className="dropdown-link">{item.title}</a>
+              {serviceColumns.map((column, index) => (
+                <div className="dropdown-col" key={`service-col-${index}`}>
+                  {column.map((item) => (
+                    <a key={item.slug} href={`/services/${item.slug}`} className="dropdown-link">{item.title}</a>
+                  ))}
+                </div>
               ))}
             </div>
           </div>
@@ -656,6 +668,9 @@ function AboutPage() {
           slug: 'about',
           title: 'О компании',
           content: 'Строительная компания «Evtenia» открыта в 2014 году. Мы строим дома под ключ и сопровождаем клиентов на всех этапах.'
+            + ' Evtenia занимается строительством домов и бань под ключ, проектированием, фундаментами, инженерными решениями и благоустройством участка.'
+            + ' Работаем по прозрачной смете и договору: от подбора проекта и посадки дома на участок до чистовой отделки и сдачи объекта.'
+            + ' В команде — проектировщики, строители, инженеры и дизайнеры, поэтому клиент получает единый центр ответственности, понятные сроки и прогнозируемый результат.'
         })
       );
   }, []);
@@ -678,14 +693,15 @@ function SiteFooter() {
           <p className="footer-copy">© 2014-2021</p>
           <p className="footer-note">Сайт носит информационный характер и не является публичной офертой.</p>
           <div className="footer-links">
-            <a>Политика конфиденциальности</a>
-            <a>Карта сайта</a>
+            <a href="/about">О компании</a>
+            <a href="/contacts">Контакты</a>
+            <a href="/portfolio">Портфолио</a>
           </div>
           <div className="footer-columns">
-            <div><h4>Строим дома из:</h4><a>Клееного бруса</a><a>Кирпича</a><a>SIP-панелей</a></div>
-            <div><h4>Строим бани из:</h4><a>Бревна</a><a>Бруса</a></div>
-            <div><h4>Другие услуги:</h4><a>Фундаменты</a><a>Стяжка пола</a><a>Кухни на заказ</a></div>
-            <div><h4>Филиалы:</h4><a>Заречный</a><a>Березники</a><a>Чайковский</a></div>
+            <div><h4>Проекты домов</h4><a href="/projects?type=Модульные">Модульные</a><a href="/projects?type=Каркасные">Каркасные</a><a href="/projects?type=Из%20газобетона">Из газобетона</a></div>
+            <div><h4>Бани</h4><a href="/baths?type=Модульные">Модульные</a><a href="/baths?type=Каркасные">Каркасные</a></div>
+            <div><h4>Услуги</h4><a href="/services/fundament">Фундамент</a><a href="/services/skvazhiny">Скважины</a><a href="/services/remont">Ремонт</a><a href="/services/dizainer">Дизайнер</a></div>
+            <div><h4>Разделы сайта</h4><a href="/design">Проектирование</a><a href="/portfolio">Портфолио</a><a href="/discounts/vse-akcii">Скидки и акции</a><a href="/contacts">Контакты</a></div>
           </div>
         </div>
         <aside className="footer-side">
