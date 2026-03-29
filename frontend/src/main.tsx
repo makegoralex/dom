@@ -56,26 +56,9 @@ const API_BASE = import.meta.env.VITE_API_BASE || '';
 const ADMIN_PATH = '/catalog-control-7f3a';
 const ADMIN_KEY = 'catalog-control-7f3a';
 const PROJECT_GROUPS: ProjectGroupColumn[] = [
-  {
-    title: 'Каменные дома',
-    groups: [
-      { items: ['Газобетон', 'Арболит', 'Керамзитобетонные блоки', 'Кирпич'] }
-    ]
-  },
-  {
-    title: 'Деревянные дома',
-    groups: [
-      { label: 'Бревенчатые', items: ['Оцилиндрованное бревно', 'Рубленное бревно', 'Лафет'] },
-      { label: 'Брусовые', items: ['Профилированный брус', 'Клееный брус', 'Двойной брус'] }
-    ]
-  },
-  {
-    title: 'Быстровозводимые дома',
-    groups: [
-      { items: ['Каркасные', 'SIP панели', 'Строительство дачных домов под ключ'] }
-    ]
-  }
+  { title: 'Проекты домов', groups: [{ items: ['Модульные', 'Каркасные', 'Из газобетона'] }] }
 ];
+const BATHS_MENU_ITEMS = ['Модульные', 'Каркасные'];
 
 const SERVICES_MENU = [
   { slug: 'fundament', title: 'Фундамент', text: 'Проектируем и устраиваем фундаменты под тип грунта и нагрузку дома.' },
@@ -83,13 +66,28 @@ const SERVICES_MENU = [
   { slug: 'septik', title: 'Септик', text: 'Подбираем и монтируем септики с учетом объема стоков и участка.' },
   { slug: 'zabory', title: 'Заборы', text: 'Устанавливаем заборы разных типов: профлист, евроштакетник, дерево.' },
   { slug: 'mebel', title: 'Мебель', text: 'Делаем встроенную и корпусную мебель под размеры вашего дома.' },
-  { slug: 'podbor-uchastka', title: 'Подбор участка', text: 'Помогаем выбрать участок с проверкой рельефа, подъезда и коммуникаций.' }
+  { slug: 'podbor-uchastka', title: 'Подбор участка', text: 'Помогаем выбрать участок с проверкой рельефа, подъезда и коммуникаций.' },
+  { slug: 'skvazhiny', title: 'Скважины', text: 'Бурим и обустраиваем скважины под дом и баню с подбором оборудования.' },
+  { slug: 'plastikovye-okna', title: 'Пластиковые окна', text: 'Подбираем и устанавливаем ПВХ-окна с учетом теплопотерь и дизайна.' },
+  { slug: 'dveri', title: 'Двери', text: 'Входные и межкомнатные двери с монтажом и фурнитурой.' },
+  { slug: 'remont', title: 'Ремонт', text: 'Выполняем внутренний ремонт и отделку домов под ключ.' },
+  { slug: 'lestnitsy', title: 'Лестницы', text: 'Проектируем и изготавливаем деревянные и комбинированные лестницы.' },
+  { slug: 'svai', title: 'Сваи', text: 'Монтаж винтовых и железобетонных свай под разные типы грунта.' },
+  { slug: 'dizainer', title: 'Дизайнер', text: 'Разрабатываем дизайн-концепцию интерьеров и экстерьеров.' },
+  { slug: 'landshaftnyy-dizayn', title: 'Ландшафтный дизайн', text: 'Проектируем благоустройство участка и озеленение территории.' },
+  { slug: 'mezhevanie', title: 'Межевание', text: 'Готовим документы и выполняем межевание земельных участков.' }
 ];
 
 const PROMOTIONS_MENU = [
   { slug: 'ipoteka-i-kredit', title: 'Ипотека и кредит', text: 'Подберем комфортную программу ипотеки или кредита на строительство.' },
   { slug: 'vse-akcii', title: 'Все акции', text: 'Здесь публикуем актуальные скидки, акции и специальные предложения.' }
 ];
+
+function chunkBy<T>(items: T[], size: number) {
+  const chunks: T[][] = [];
+  for (let i = 0; i < items.length; i += size) chunks.push(items.slice(i, i + size));
+  return chunks;
+}
 const FALLBACK_PROJECTS: HouseProject[] = [
   {
     id: 'demo1',
@@ -138,6 +136,30 @@ const FALLBACK_PROJECTS: HouseProject[] = [
   }
 ];
 
+function normalizePrice(price: unknown) {
+  const value = String(price ?? '').trim();
+  if (!value) return 'Цена по запросу';
+  return value.toLowerCase().startsWith('от') ? value : `от ${value}`;
+}
+
+function ProjectTile({ project }: { project: HouseProject }) {
+  return (
+    <article className="project-card">
+      <div className="project-image" style={{ backgroundImage: `url(${project.coverImage || project.images?.[0] || ""})` }} />
+      <div className="project-content">
+        <p className="project-desc">{project.shortDescription}</p>
+        <h3>{project.title}</h3>
+        <div className="project-meta">
+          <span><small>Площадь:</small><strong>{project.area}</strong></span>
+          <span><small>Габариты:</small><strong>{project.floors}</strong></span>
+          <span><small>Комнат:</small><strong>{project.bedrooms}</strong></span>
+        </div>
+        <strong className="project-price">{normalizePrice(project.priceFrom)}</strong>
+      </div>
+    </article>
+  );
+}
+
 function PublicPage() {
   const [projects, setProjects] = useState<HouseProject[]>(FALLBACK_PROJECTS);
   const [name, setName] = useState('');
@@ -149,9 +171,10 @@ function PublicPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [constructionTypes, setConstructionTypes] = useState<string[]>([]);
   const [selectedType, setSelectedType] = useState('Все типы');
+  const serviceColumns = useMemo(() => chunkBy(SERVICES_MENU, 6), []);
 
   useEffect(() => {
-    document.title = "TMдом — строительство домов";
+    document.title = "Evtenia — строительство домов";
     fetch(`${API_BASE}/api/construction-types`).then((r) => r.ok ? r.json() : []).then((t:string[]) => setConstructionTypes(['Все типы', ...t])).catch(() => setConstructionTypes(['Все типы']));
 
     fetch(`${API_BASE}/api/projects`)
@@ -237,7 +260,7 @@ function PublicPage() {
             <a href="/" className="brand-line">
               <div className="logo-badge">⌂</div>
               <div className="brand-text">
-                <div className="brand-logo">TMдом</div>
+                <div className="brand-logo">Evtenia</div>
                 <p>Строительная компания</p>
               </div>
             </a>
@@ -257,10 +280,8 @@ function PublicPage() {
               <div className="projects-dropdown">
                 {PROJECT_GROUPS.map((column) => (
                   <div key={column.title}>
-                    <h4>{column.title}</h4>
                     {column.groups.map((group) => (
                       <div key={`${column.title}_${group.label}`}>
-                        {group.label ? <strong>{group.label}</strong> : null}
                         {group.items.map((item) => (
                           <a key={item} href={`/projects?type=${encodeURIComponent(item)}`} className="dropdown-link">{item}</a>
                         ))}
@@ -270,12 +291,25 @@ function PublicPage() {
                 ))}
               </div>
             </div>
-            <a>/</a><a href="/baths" className="menu-link">БАНИ</a><a>/</a>
+            <a>/</a>
+            <div className="menu-services">
+              <a href="/baths" className="menu-link">БАНИ ▾</a>
+              <div className="services-dropdown">
+                {BATHS_MENU_ITEMS.map((item) => (
+                  <a key={item} href={`/baths?type=${encodeURIComponent(item)}`} className="dropdown-link">{item}</a>
+                ))}
+              </div>
+            </div>
+            <a>/</a>
             <div className="menu-services">
               <a className="menu-link">УСЛУГИ ▾</a>
               <div className="services-dropdown">
-                {SERVICES_MENU.map((item) => (
-                  <a key={item.slug} href={`/services/${item.slug}`} className="dropdown-link">{item.title}</a>
+                {serviceColumns.map((column, index) => (
+                  <div className="dropdown-col" key={`service-col-${index}`}>
+                    {column.map((item) => (
+                      <a key={item.slug} href={`/services/${item.slug}`} className="dropdown-link">{item.title}</a>
+                    ))}
+                  </div>
                 ))}
               </div>
             </div>
@@ -362,24 +396,8 @@ function PublicPage() {
           <select className="type-filter" value={selectedType} onChange={(e) => setSelectedType(e.target.value)}>
             {constructionTypes.map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
-          <div className="catalog-grid">
-            {catalogProjects.map((project) => (
-              <article className="project-card" key={project.id}>
-                <div className="project-image" style={{ backgroundImage: `url(${project.coverImage || project.images?.[0] || ""})` }}>
-                  {project.badge ? <span className="badge">{project.badge}</span> : null}
-                </div>
-                <div className="project-content">
-                  <h3>{project.title}</h3>
-                  <p className="project-desc">{project.shortDescription}</p>
-                  <div className="project-meta">
-                    <span>{project.area}</span>
-                    <span>{project.floors}</span>
-                    <span>{project.bedrooms}</span>
-                  </div>
-                  <strong className="project-price">{project.priceFrom}</strong>
-                </div>
-              </article>
-            ))}
+          <div className="catalog-grid home-project-grid">
+            {catalogProjects.map((project) => <ProjectTile project={project} key={project.id} />)}
           </div>
           <div className="show-all-wrap"><a href="#" className="show-all-link">Показать все проекты</a></div>
         </div>
@@ -559,6 +577,7 @@ function InternalTextBlock({ title, content }: { title: string; content: string 
 }
 
 function InternalHeader() {
+  const serviceColumns = chunkBy(SERVICES_MENU, 6);
   return (
     <header className="hero hero-exact internal-header">
       <div className="promo-strip">
@@ -575,7 +594,7 @@ function InternalHeader() {
       </div>
       <div className="container hero-main">
         <div className="hero-upper-row">
-          <a href="/" className="brand-line"><div className="logo-badge">⌂</div><div className="brand-text"><div className="brand-logo">TMдом</div><p>Строительная компания</p></div></a>
+          <a href="/" className="brand-line"><div className="logo-badge">⌂</div><div className="brand-text"><div className="brand-logo">Evtenia</div><p>Строительная компания</p></div></a>
           <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span><div className="phone-block"><strong>+7 (905) 365-47-39</strong><small>с 9:00 до 19:00</small></div><button className="call-btn">Заказать звонок</button></div>
         </div>
         <nav className="hero-nav">
@@ -585,10 +604,8 @@ function InternalHeader() {
             <div className="projects-dropdown">
               {PROJECT_GROUPS.map((column) => (
                 <div key={column.title}>
-                  <h4>{column.title}</h4>
                   {column.groups.map((group) => (
                     <div key={`${column.title}_${group.label}`}>
-                      {group.label ? <strong>{group.label}</strong> : null}
                       {group.items.map((item) => (
                         <a key={item} href={`/projects?type=${encodeURIComponent(item)}`} className="dropdown-link">{item}</a>
                       ))}
@@ -598,12 +615,25 @@ function InternalHeader() {
               ))}
             </div>
           </div>
-          <a>/</a><a href="/baths" className={`menu-link ${window.location.pathname === '/baths' ? 'active' : ''}`}>БАНИ</a><a>/</a>
+          <a>/</a>
+          <div className="menu-services">
+            <a href="/baths" className={`menu-link ${window.location.pathname === '/baths' ? 'active' : ''}`}>БАНИ ▾</a>
+            <div className="services-dropdown">
+              {BATHS_MENU_ITEMS.map((item) => (
+                <a key={item} href={`/baths?type=${encodeURIComponent(item)}`} className="dropdown-link">{item}</a>
+              ))}
+            </div>
+          </div>
+          <a>/</a>
           <div className="menu-services">
             <a className={`menu-link ${window.location.pathname.startsWith('/services/') ? 'active' : ''}`}>УСЛУГИ ▾</a>
             <div className="services-dropdown">
-              {SERVICES_MENU.map((item) => (
-                <a key={item.slug} href={`/services/${item.slug}`} className="dropdown-link">{item.title}</a>
+              {serviceColumns.map((column, index) => (
+                <div className="dropdown-col" key={`service-col-${index}`}>
+                  {column.map((item) => (
+                    <a key={item.slug} href={`/services/${item.slug}`} className="dropdown-link">{item.title}</a>
+                  ))}
+                </div>
               ))}
             </div>
           </div>
@@ -629,7 +659,7 @@ function AboutPage() {
   const [page, setPage] = useState<ContentPage>({ slug: 'about', title: 'О компании', content: 'Загрузка...' });
 
   useEffect(() => {
-    document.title = 'О компании — TMдом';
+    document.title = 'О компании — Evtenia';
     fetch(`${API_BASE}/api/pages/about`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('not found'))))
       .then((payload: ContentPage) => setPage(payload))
@@ -637,7 +667,10 @@ function AboutPage() {
         setPage({
           slug: 'about',
           title: 'О компании',
-          content: 'Строительная компания «TMдом» открыта в 2014 году. Мы строим дома под ключ и сопровождаем клиентов на всех этапах.'
+          content: 'Строительная компания «Evtenia» открыта в 2014 году. Мы строим дома под ключ и сопровождаем клиентов на всех этапах.'
+            + ' Evtenia занимается строительством домов и бань под ключ, проектированием, фундаментами, инженерными решениями и благоустройством участка.'
+            + ' Работаем по прозрачной смете и договору: от подбора проекта и посадки дома на участок до чистовой отделки и сдачи объекта.'
+            + ' В команде — проектировщики, строители, инженеры и дизайнеры, поэтому клиент получает единый центр ответственности, понятные сроки и прогнозируемый результат.'
         })
       );
   }, []);
@@ -660,14 +693,15 @@ function SiteFooter() {
           <p className="footer-copy">© 2014-2021</p>
           <p className="footer-note">Сайт носит информационный характер и не является публичной офертой.</p>
           <div className="footer-links">
-            <a>Политика конфиденциальности</a>
-            <a>Карта сайта</a>
+            <a href="/about">О компании</a>
+            <a href="/contacts">Контакты</a>
+            <a href="/portfolio">Портфолио</a>
           </div>
           <div className="footer-columns">
-            <div><h4>Строим дома из:</h4><a>Клееного бруса</a><a>Кирпича</a><a>SIP-панелей</a></div>
-            <div><h4>Строим бани из:</h4><a>Бревна</a><a>Бруса</a></div>
-            <div><h4>Другие услуги:</h4><a>Фундаменты</a><a>Стяжка пола</a><a>Кухни на заказ</a></div>
-            <div><h4>Филиалы:</h4><a>Заречный</a><a>Березники</a><a>Чайковский</a></div>
+            <div><h4>Проекты домов</h4><a href="/projects?type=Модульные">Модульные</a><a href="/projects?type=Каркасные">Каркасные</a><a href="/projects?type=Из%20газобетона">Из газобетона</a></div>
+            <div><h4>Бани</h4><a href="/baths?type=Модульные">Модульные</a><a href="/baths?type=Каркасные">Каркасные</a></div>
+            <div><h4>Услуги</h4><a href="/services/fundament">Фундамент</a><a href="/services/skvazhiny">Скважины</a><a href="/services/remont">Ремонт</a><a href="/services/dizainer">Дизайнер</a></div>
+            <div><h4>Разделы сайта</h4><a href="/design">Проектирование</a><a href="/portfolio">Портфолио</a><a href="/discounts/vse-akcii">Скидки и акции</a><a href="/contacts">Контакты</a></div>
           </div>
         </div>
         <aside className="footer-side">
@@ -686,11 +720,12 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const type = params.get('type') || 'Все типы';
   const [projects, setProjects] = useState<HouseProject[]>([]);
   const [selectedFloors, setSelectedFloors] = useState<string[]>([]);
+  const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [maxArea, setMaxArea] = useState(300);
   const [maxBedrooms, setMaxBedrooms] = useState(6);
 
   useEffect(() => {
-    document.title = `${sectionTitle} — TMдом`;
+    document.title = `${sectionTitle} — Evtenia`;
     fetch(`${API_BASE}/api/projects`)
       .then((res) => res.json())
       .then((data: HouseProject[]) => setProjects(data))
@@ -700,6 +735,11 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const byCategory = projects.filter((item) => (item.category || 'house') === category);
   const floorOptions = Array.from(new Set(byCategory.map((item) => item.floors))).filter(Boolean);
   const typeOptions = Array.from(new Set(byCategory.map((item) => item.constructionType))).filter(Boolean);
+  const styleOptions = [
+    'Классический', 'Шале', 'Современный', 'Хай-тек', 'Красивый', 'Скандинавский',
+    'Оригинальный', 'Стильный', 'Необычный', 'Европейский', 'Канадский', 'Американский',
+    'Немецкий', 'Модерн', 'Фахверк', 'Шведский', 'Простой', 'Барнхаус', 'Финский'
+  ];
   const minArea = 20;
   const parseNum = (value: string) => Number((value.match(/\d+/) || ['0'])[0]);
 
@@ -708,7 +748,8 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
     const byFloor = !selectedFloors.length || selectedFloors.includes(item.floors);
     const byArea = parseNum(item.area) <= maxArea;
     const byBedrooms = parseNum(item.bedrooms) <= maxBedrooms;
-    return byType && byFloor && byArea && byBedrooms;
+    const byStyle = !selectedStyles.length || selectedStyles.includes(item.style || '');
+    return byType && byFloor && byStyle && byArea && byBedrooms;
   });
 
   return (
@@ -720,12 +761,26 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
           <h1>{sectionTitle}</h1>
           <div className="catalog-layout">
             <aside className="catalog-filters">
-              <h3>Фильтр</h3>
               <div className="filter-block">
                 <h4>Этажность</h4>
                 {floorOptions.map((floor) => (
                   <label key={floor}><input type="checkbox" checked={selectedFloors.includes(floor)} onChange={(e) => setSelectedFloors(e.target.checked ? [...selectedFloors, floor] : selectedFloors.filter((f) => f !== floor))} /> {floor}</label>
                 ))}
+              </div>
+              <div className="filter-block filter-block-style">
+                <h4>Стиль</h4>
+                <div className="style-grid">
+                  {styleOptions.map((style) => (
+                    <label key={style}>
+                      <input
+                        type="checkbox"
+                        checked={selectedStyles.includes(style)}
+                        onChange={(e) => setSelectedStyles(e.target.checked ? [...selectedStyles, style] : selectedStyles.filter((s) => s !== style))}
+                      />
+                      {' '}{style}
+                    </label>
+                  ))}
+                </div>
               </div>
               <div className="filter-block">
                 <h4>Площадь до {maxArea} м²</h4>
@@ -738,28 +793,14 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
             </aside>
 
             <div>
-              <div className="type-chips">
+              <div className="type-chips hidden-type-chips">
                 <button className={type === 'Все типы' ? 'active' : ''} onClick={() => { window.location.href = `${window.location.pathname}?type=${encodeURIComponent('Все типы')}`; }}>Все типы</button>
                 {typeOptions.map((option) => (
                   <button key={option} className={type === option ? 'active' : ''} onClick={() => { window.location.href = `${window.location.pathname}?type=${encodeURIComponent(option)}`; }}>{option}</button>
                 ))}
               </div>
               <div className="catalog-grid">
-                {filtered.map((project) => (
-                  <article className="project-card" key={project.id}>
-                    <div className="project-image" style={{ backgroundImage: `url(${project.coverImage || project.images?.[0] || ""})` }} />
-                    <div className="project-content">
-                      <h3>{project.title}</h3>
-                      <p className="project-desc">{project.shortDescription}</p>
-                      <div className="project-meta">
-                        <span>{project.area}</span>
-                        <span>{project.floors}</span>
-                        <span>{project.bedrooms}</span>
-                      </div>
-                      <strong className="project-price">{project.priceFrom}</strong>
-                    </div>
-                  </article>
-                ))}
+                {filtered.map((project) => <ProjectTile project={project} key={project.id} />)}
               </div>
             </div>
           </div>
@@ -780,7 +821,7 @@ function BathsPage() {
 
 function ContactsPage() {
   useEffect(() => {
-    document.title = 'Контакты — TMдом';
+    document.title = 'Контакты — Evtenia';
   }, []);
 
   return (
@@ -812,7 +853,7 @@ function ContactsPage() {
             </div>
             <div className="contacts-map-wrap">
               <iframe
-                title="Карта офиса TMдом"
+                title="Карта офиса Evtenia"
                 src="https://yandex.ru/map-widget/v1/?um=constructor%3A7f4b7ddad4534e0dbf4fc7174bc0f99384f0186b76310673b5628e6f03ec9552&amp;source=constructor"
                 loading="lazy"
                 allowFullScreen
@@ -830,7 +871,7 @@ function PortfolioPage() {
   const [items, setItems] = useState<PortfolioItem[]>([]);
 
   useEffect(() => {
-    document.title = 'Портфолио — TMдом';
+    document.title = 'Портфолио — Evtenia';
     fetch(`${API_BASE}/api/portfolio`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('not found'))))
       .then((data: PortfolioItem[]) => setItems(data))
@@ -880,7 +921,7 @@ function DesignPage() {
   const [status, setStatus] = useState('');
 
   useEffect(() => {
-    document.title = 'Проектирование — TMдом';
+    document.title = 'Проектирование — Evtenia';
   }, []);
 
   const submitLead = async (event: FormEvent) => {
@@ -976,7 +1017,7 @@ function DesignPage() {
 
 function SubsectionPage({ sectionTitle, pageTitle, text }: { sectionTitle: string; pageTitle: string; text: string }) {
   useEffect(() => {
-    document.title = `${pageTitle} — TMдом`;
+    document.title = `${pageTitle} — Evtenia`;
   }, [pageTitle]);
 
   return (
