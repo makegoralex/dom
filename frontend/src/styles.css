@@ -48,9 +48,9 @@ body {margin: 0; background: #fff;}
 .menu-link.active{color:#f8cc52; font-weight:600;}
 
 .menu-projects,.menu-services,.menu-promotions{position:relative;}
-.projects-dropdown{position:absolute; left:0; top:calc(100% + 10px); min-width:320px; background:#f7f8fb; color:#1f2330; border:1px solid #d3d6de; border-radius:10px; padding:14px 16px; display:none; grid-template-columns:1fr; gap:10px; z-index:60; box-shadow:0 12px 28px rgba(18,32,52,.18);}
+.projects-dropdown{position:absolute; left:0; top:100%; min-width:320px; background:#f7f8fb; color:#1f2330; border:1px solid #d3d6de; border-radius:10px; padding:14px 16px; display:none; grid-template-columns:1fr; gap:10px; z-index:60; box-shadow:0 12px 28px rgba(18,32,52,.18);}
 .menu-projects:hover .projects-dropdown{display:grid;}
-.services-dropdown{position:absolute; left:0; top:calc(100% + 10px); min-width:280px; background:#f7f8fb; color:#1f2330; border:1px solid #d3d6de; border-radius:10px; padding:10px 12px; display:none; z-index:60; box-shadow:0 12px 28px rgba(18,32,52,.18);}
+.services-dropdown{position:absolute; left:0; top:100%; min-width:280px; background:#f7f8fb; color:#1f2330; border:1px solid #d3d6de; border-radius:10px; padding:10px 12px; display:none; z-index:60; box-shadow:0 12px 28px rgba(18,32,52,.18);}
 .menu-services:hover .services-dropdown,.menu-promotions:hover .services-dropdown{display:block;}
 .projects-dropdown h4{margin:0 0 8px; font-size:14px; color:#1f2530; padding-bottom:6px; border-bottom:1px solid #e2e5ed;}
 .projects-dropdown strong{display:block; margin:6px 0; font-size:13px;}
@@ -150,6 +150,7 @@ body {margin: 0; background: #fff;}
 .type-chips button{border:none; background:transparent; text-decoration:underline; cursor:pointer; font-size:14px; color:#222;}
 .type-chips button.active{color:#4f8a37; font-weight:700;}
 .catalog-grid {display:grid; grid-template-columns:repeat(2,1fr); gap:22px;}
+.home-project-grid{grid-template-columns:repeat(3,1fr);}
 .project-card {overflow:hidden; border:1px solid #d6d8dd; border-radius:0; background:#f4f4f5; box-shadow:none;}
 .project-image {height:258px; background-size:cover; background-position:center; position:relative;}
 .badge {position:absolute; top:12px; left:12px; background:rgba(31,32,34,.84); color:#fff; font-size:13px; padding:6px 12px; border-radius:999px;}
@@ -276,7 +277,7 @@ body {margin: 0; background: #fff;}
   .top-search-inner{flex-direction:column; align-items:flex-start;}
   .top-contacts{flex-wrap:wrap; gap:10px; font-size:14px;}
   .hero-content h1{font-size:36px}
-  .catalog-grid{grid-template-columns:1fr}
+  .catalog-grid,.home-project-grid{grid-template-columns:1fr}
   .catalog-layout{grid-template-columns:1fr;}
   .adv-grid{grid-template-columns:repeat(2,1fr)}
 }

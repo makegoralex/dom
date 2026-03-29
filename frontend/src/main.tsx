@@ -387,7 +387,7 @@ function PublicPage() {
           <select className="type-filter" value={selectedType} onChange={(e) => setSelectedType(e.target.value)}>
             {constructionTypes.map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
-          <div className="catalog-grid">
+          <div className="catalog-grid home-project-grid">
             {catalogProjects.map((project) => <ProjectTile project={project} key={project.id} />)}
           </div>
           <div className="show-all-wrap"><a href="#" className="show-all-link">Показать все проекты</a></div>
