@@ -48,13 +48,14 @@ body {margin: 0; background: #fff;}
 .menu-link.active{color:#f8cc52; font-weight:600;}
 
 .menu-projects,.menu-services,.menu-promotions{position:relative;}
-.projects-dropdown{position:absolute; left:0; top:100%; min-width:980px; background:#f1f1f2; color:#1f2330; border:1px solid #d3d6de; padding:16px 20px; display:none; grid-template-columns:repeat(3,1fr); gap:20px; z-index:50;}
+.projects-dropdown{position:absolute; left:0; top:calc(100% + 10px); min-width:320px; background:#f7f8fb; color:#1f2330; border:1px solid #d3d6de; border-radius:10px; padding:14px 16px; display:none; grid-template-columns:1fr; gap:10px; z-index:60; box-shadow:0 12px 28px rgba(18,32,52,.18);}
 .menu-projects:hover .projects-dropdown{display:grid;}
-.services-dropdown{position:absolute; left:0; top:100%; min-width:280px; background:#f1f1f2; color:#1f2330; border:1px solid #d3d6de; padding:10px 12px; display:none; z-index:50;}
+.services-dropdown{position:absolute; left:0; top:calc(100% + 10px); min-width:280px; background:#f7f8fb; color:#1f2330; border:1px solid #d3d6de; border-radius:10px; padding:10px 12px; display:none; z-index:60; box-shadow:0 12px 28px rgba(18,32,52,.18);}
 .menu-services:hover .services-dropdown,.menu-promotions:hover .services-dropdown{display:block;}
-.projects-dropdown h4{margin:0 0 10px; font-size:14px; color:#1f2530;}
+.projects-dropdown h4{margin:0 0 8px; font-size:14px; color:#1f2530; padding-bottom:6px; border-bottom:1px solid #e2e5ed;}
 .projects-dropdown strong{display:block; margin:6px 0; font-size:13px;}
-.dropdown-link{display:block; margin:4px 0; color:#2d313a !important; text-decoration:underline !important; font-size:13px !important;}
+.dropdown-link{display:block; margin:3px 0; color:#2d313a !important; text-decoration:none !important; font-size:13px !important; padding:6px 8px; border-radius:6px; transition:background .15s ease,color .15s ease;}
+.dropdown-link:hover{background:#e8edf6; color:#1c365b !important;}
 
 .hero-content {padding:18px 0 16px; max-width:860px;}
 .hero-content h1 {font-size:50px; line-height:1.02; margin:0 0 14px; max-width:680px;}
