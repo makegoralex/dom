@@ -74,6 +74,7 @@ const PROJECT_GROUPS: ProjectGroupColumn[] = [
 ];
 const BATHS_MENU_ITEMS = ['Модульные', 'Каркасные'];
 const ADMIN_CONSTRUCTION_TYPES = ['Из газобетона', 'Каркасные', 'Модульные'];
+const ADMIN_STYLE_OPTIONS = ['Классический', 'Современный', 'Скандинавский', 'Барнхаус', 'Минимализм', 'Русский'];
 
 const SERVICES_MENU = [
   { slug: 'fundament', title: 'Фундамент', text: 'Проектируем и устраиваем фундаменты под тип грунта и нагрузку дома.' },
@@ -931,13 +932,13 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const byCategory = projects.filter((item) => (item.category || 'house') === category);
   const floorOptions = Array.from(new Set(byCategory.map((item) => item.floors))).filter(Boolean);
   const typeOptions = Array.from(new Set(byCategory.map((item) => item.constructionType))).filter(Boolean);
-  const styleOptions = [
-    'Классический', 'Шале', 'Современный', 'Хай-тек', 'Красивый', 'Скандинавский',
-    'Оригинальный', 'Стильный', 'Необычный', 'Европейский', 'Канадский', 'Американский',
-    'Немецкий', 'Модерн', 'Фахверк', 'Шведский', 'Простой', 'Барнхаус', 'Финский'
-  ];
+  const styleOptions = Array.from(new Set(byCategory.map((item) => (item.style || '').trim()).filter(Boolean)));
   const minArea = 20;
   const parseNum = (value: string) => Number((value.match(/\d+/) || ['0'])[0]);
+
+  useEffect(() => {
+    setSelectedStyles((prev) => prev.filter((style) => styleOptions.includes(style)));
+  }, [styleOptions]);
 
   const filtered = byCategory.filter((item) => {
     const byType = type === 'Все типы' || item.constructionType === type;
@@ -964,21 +965,23 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                   <label key={floor}><input type="checkbox" checked={selectedFloors.includes(floor)} onChange={(e) => setSelectedFloors(e.target.checked ? [...selectedFloors, floor] : selectedFloors.filter((f) => f !== floor))} /> {floor}</label>
                 ))}
               </div>
-              <div className="filter-block filter-block-style">
-                <h4>Стиль</h4>
-                <div className="style-grid">
-                  {styleOptions.map((style) => (
-                    <label key={style}>
-                      <input
-                        type="checkbox"
-                        checked={selectedStyles.includes(style)}
-                        onChange={(e) => setSelectedStyles(e.target.checked ? [...selectedStyles, style] : selectedStyles.filter((s) => s !== style))}
-                      />
-                      {' '}{style}
-                    </label>
-                  ))}
+              {styleOptions.length ? (
+                <div className="filter-block filter-block-style">
+                  <h4>Стиль</h4>
+                  <div className="style-grid">
+                    {styleOptions.map((style) => (
+                      <label key={style}>
+                        <input
+                          type="checkbox"
+                          checked={selectedStyles.includes(style)}
+                          onChange={(e) => setSelectedStyles(e.target.checked ? [...selectedStyles, style] : selectedStyles.filter((s) => s !== style))}
+                        />
+                        {' '}{style}
+                      </label>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              ) : null}
               <div className="filter-block">
                 <h4>Площадь до {maxArea} м²</h4>
                 <input type="range" min={minArea} max={300} value={maxArea} onChange={(e) => setMaxArea(Number(e.target.value))} />
@@ -1524,11 +1527,45 @@ function AdminPage() {
   };
 
   const removePortfolio = async (id: string) => {
+    const currentItem = portfolio.find((item) => item.id === id);
+    if (currentItem?.image) {
+      await deleteProjectImage(currentItem.image);
+    }
     await fetch(`${API_BASE}/api/admin/portfolio/${id}`, {
       method: 'DELETE',
       headers: adminHeaders
     });
     await loadAdminData(token);
+  };
+
+  const uploadPortfolioImage = async (files: File[]) => {
+    if (!files.length) return;
+    setError('');
+    setUploadStatus('Загрузка изображения портфолио...');
+    const formData = new FormData();
+    files.forEach((file) => formData.append('images', file));
+    const response = await fetch(`${API_BASE}/api/admin/upload/project-image?target=cover`, {
+      method: 'POST',
+      headers: { 'x-admin-token': token },
+      body: formData
+    });
+    if (!response.ok) {
+      setUploadStatus('');
+      setError('Не удалось загрузить изображение портфолио');
+      return;
+    }
+    const payload = (await response.json()) as { urls: string[] };
+    const url = payload.urls?.[0];
+    if (!url) {
+      setUploadStatus('');
+      setError('Сервер не вернул URL изображения');
+      return;
+    }
+    if (portfolioDraft.image && portfolioDraft.image !== url) {
+      await deleteProjectImage(portfolioDraft.image);
+    }
+    setPortfolioDraft((prev) => ({ ...prev, image: url }));
+    setUploadStatus('Изображение портфолио загружено');
   };
 
   if (!token) {
@@ -1638,6 +1675,12 @@ function AdminPage() {
                 <option key={t} value={t}>{t}</option>
               ))}
             </select>
+            <select value={draft.style || ''} onChange={(e) => setDraft({ ...draft, style: e.target.value })}>
+              <option value="">Стиль не выбран</option>
+              {ADMIN_STYLE_OPTIONS.map((style) => (
+                <option key={style} value={style}>{style}</option>
+              ))}
+            </select>
             {draft.id ? <button onClick={() => setDraft({})}>Отменить</button> : null}
           </div>
         </section>
@@ -1695,6 +1738,22 @@ function AdminPage() {
           <div className="admin-form">
             <input placeholder="Название объекта" value={portfolioDraft.title || ''} onChange={(e) => setPortfolioDraft({ ...portfolioDraft, title: e.target.value })} />
             <input placeholder="Ссылка на фото" value={portfolioDraft.image || ''} onChange={(e) => setPortfolioDraft({ ...portfolioDraft, image: e.target.value })} />
+            <label>Загрузить фото портфолио<input type="file" accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadPortfolioImage(files); e.currentTarget.value = ''; }} /></label>
+            {portfolioDraft.image ? (
+              <div className="admin-media-preview">
+                <p>Превью обложки портфолио</p>
+                <div className="admin-image-card">
+                  <img src={resolveMediaUrl(portfolioDraft.image)} alt="Обложка портфолио" />
+                  <div className="admin-image-actions">
+                    <button type="button" onClick={async () => {
+                      const image = portfolioDraft.image || '';
+                      setPortfolioDraft((prev) => ({ ...prev, image: '' }));
+                      if (image) await deleteProjectImage(image);
+                    }}>Удалить фото</button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
             <input placeholder="Стоимость коробки" value={portfolioDraft.boxPrice || ''} onChange={(e) => setPortfolioDraft({ ...portfolioDraft, boxPrice: e.target.value })} />
             <input placeholder="Срок строительства" value={portfolioDraft.buildDuration || ''} onChange={(e) => setPortfolioDraft({ ...portfolioDraft, buildDuration: e.target.value })} />
             <input placeholder="Оценка заказчика (1-5)" value={String(portfolioDraft.rating || 5)} onChange={(e) => setPortfolioDraft({ ...portfolioDraft, rating: Number(e.target.value) })} />

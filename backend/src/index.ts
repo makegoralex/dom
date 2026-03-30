@@ -20,6 +20,7 @@ interface HouseProject {
   constructionType: string;
   category: 'house' | 'bath';
   badge?: string;
+  style?: string;
 }
 
 interface Lead {
@@ -379,7 +380,8 @@ app.post('/api/admin/projects', authMiddleware, (req, res) => {
     priceFrom: incoming.priceFrom || '',
     constructionType: incoming.constructionType || CONSTRUCTION_TYPES[0],
     category: incoming.category === 'bath' ? 'bath' : 'house',
-    badge: incoming.badge || ''
+    badge: incoming.badge || '',
+    style: incoming.style || ''
   };
   data.projects.unshift(project);
   writeData(data);
