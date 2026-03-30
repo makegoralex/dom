@@ -323,9 +323,12 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .offer-card.wide{grid-column:span 2;}
   .offer-title{font-size:32px;}
   .hero-upper-row{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:6px 0; position:relative;}
-  .hero-contact-line{justify-content:flex-end; flex-wrap:nowrap; gap:8px; flex:0 0 auto; margin-left:auto;}
+  .hero-contact-line{position:absolute; right:0; top:54px; justify-content:flex-end; flex-wrap:nowrap; gap:8px; flex:0 0 auto; margin-left:auto;}
+  .hero-upper-row{padding-bottom:46px; padding-right:64px;}
+  .call-btn{display:none;}
+  .hero-contact-line span{display:none;}
   .phone-block small{font-size:11px}
-  .hero-contact-line span{max-width:none;}
+  .phone-block{align-items:flex-end;}
   .top-search-inner{flex-direction:column; align-items:stretch; gap:8px;}
   .top-contacts{gap:10px; font-size:13px;}
   .hero-content h1{font-size:36px}
@@ -387,14 +390,11 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .offer-card,.offer-card.wide{grid-column:span 1; min-height:190px;}
   .offer-title{font-size:26px;}
   .hero-main{padding-top:8px}
-  .hero-upper-row{gap:8px; padding-right:120px;}
+  .hero-upper-row{gap:8px; padding-right:64px; padding-bottom:42px;}
   .brand-logo{font-size:34px}
   .logo-badge{width:34px;height:34px;font-size:16px}
   .hero-contact-line strong{font-size:18px}
-  .call-btn{padding:8px 10px;font-size:13px}
-  .hero-contact-line span{display:none;}
-  .hero-contact-line{margin-top:0; margin-left:auto;}
-  .phone-block{align-items:flex-end;}
+  .hero-contact-line{margin-top:0; margin-left:auto; top:50px;}
   .phone-block small{display:none;}
   .section{padding:48px 0}
   .catalog-grid,.adv-grid,.admin-grid{grid-template-columns:1fr}
