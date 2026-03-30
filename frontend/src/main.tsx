@@ -52,14 +52,29 @@ type ProjectGroupColumn = {
     items: string[];
   }>;
 };
+type AdminTab = 'projects' | 'pages' | 'portfolio' | 'leads';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '';
+const API_ORIGIN = API_BASE ? new URL(API_BASE, window.location.origin).origin : '';
 const ADMIN_PATH = '/catalog-control-7f3a';
 const ADMIN_KEY = 'catalog-control-7f3a';
+const CONTACTS = {
+  mainPhoneDisplay: '8-902-209-01-79',
+  mainPhoneHref: 'tel:+79022090179',
+  extraPhoneDisplay: '8-841-419-01-79',
+  extraPhoneHref: 'tel:+78414190179',
+  email: '89022099279@mail.ru',
+  emailHref: 'mailto:89022099279@mail.ru',
+  vk: 'https://vk.ru/evtenia_house',
+  max: 'https://max.ru/join/1zjkiv7Ex8ofTgGHuB212RBgUa_GcPjKokLeHSRDj0w',
+  telegram: 'https://t.me/evtenia_realty'
+};
 const PROJECT_GROUPS: ProjectGroupColumn[] = [
   { title: 'Проекты домов', groups: [{ items: ['Модульные', 'Каркасные', 'Из газобетона'] }] }
 ];
 const BATHS_MENU_ITEMS = ['Модульные', 'Каркасные'];
+const ADMIN_CONSTRUCTION_TYPES = ['Из газобетона', 'Каркасные', 'Модульные'];
+const ADMIN_STYLE_OPTIONS = ['Классический', 'Современный', 'Скандинавский', 'Барнхаус', 'Минимализм', 'Русский'];
 
 const SERVICES_MENU = [
   { slug: 'fundament', title: 'Фундамент', text: 'Проектируем и устраиваем фундаменты под тип грунта и нагрузку дома.' },
@@ -222,6 +237,23 @@ function normalizePrice(price: unknown) {
   return value.toLowerCase().startsWith('от') ? value : `от ${value}`;
 }
 
+function resolveMediaUrl(url?: string) {
+  const value = (url || '').trim();
+  if (!value) return '';
+  if (value.startsWith('/assets/')) return `${API_ORIGIN || window.location.origin}/api${value}`;
+  if (value.startsWith('http://') || value.startsWith('https://')) {
+    try {
+      const parsed = new URL(value);
+      if (parsed.pathname.startsWith('/assets/')) {
+        return `${parsed.origin}/api${parsed.pathname}`;
+      }
+    } catch {
+      return value;
+    }
+  }
+  return value;
+}
+
 function SearchBox() {
   const params = new URLSearchParams(window.location.search);
   const [query, setQuery] = useState(params.get('q') || '');
@@ -256,7 +288,7 @@ function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }
         body: JSON.stringify({
           name,
           phone,
-          email: 'makegoralex@yandex.ru',
+          email: CONTACTS.email,
           message: 'Заказ звонка с сайта'
         })
       });
@@ -286,10 +318,11 @@ function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }
 }
 
 function ProjectTile({ project }: { project: HouseProject }) {
+  const imageUrl = resolveMediaUrl(project.coverImage || project.images?.[0] || '');
   return (
     <article className="project-card">
       <a className="project-card-link" href={`/project/${project.id}`}>
-      <div className="project-image" style={{ backgroundImage: `url(${project.coverImage || project.images?.[0] || ""})` }} />
+      <div className="project-image" style={{ backgroundImage: `url(${imageUrl})` }} />
       <div className="project-content">
         <p className="project-desc">{project.shortDescription}</p>
         <h3>{project.title}</h3>
@@ -306,12 +339,12 @@ function ProjectTile({ project }: { project: HouseProject }) {
 }
 
 function PublicPage() {
-  const [projects, setProjects] = useState<HouseProject[]>(FALLBACK_PROJECTS);
+  const [projects, setProjects] = useState<HouseProject[]>([]);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
-  const [projectId, setProjectId] = useState(FALLBACK_PROJECTS[0].id);
+  const [projectId, setProjectId] = useState('');
   const [status, setStatus] = useState('');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [constructionTypes, setConstructionTypes] = useState<string[]>([]);
@@ -341,15 +374,7 @@ function PublicPage() {
 
   const filteredProjects = useMemo(() => selectedType === 'Все типы' ? projects : projects.filter((p) => p.constructionType === selectedType), [projects, selectedType]);
 
-  const catalogProjects = useMemo(() => {
-    if (!filteredProjects.length) {
-      return [] as HouseProject[];
-    }
-    return Array.from({ length: 12 }, (_, index) => {
-      const item = filteredProjects[index % filteredProjects.length];
-      return { ...item, id: `${item.id}_tile_${index}` };
-    });
-  }, [filteredProjects]);
+  const catalogProjects = useMemo(() => filteredProjects.slice(0, 9), [filteredProjects]);
 
   const submitLead = async (event: FormEvent) => {
     event.preventDefault();
@@ -391,8 +416,9 @@ function PublicPage() {
           <div className="container top-search-inner">
             <SearchBox />
             <div className="top-contacts">
-              <span>село Засечное, улица Механизаторов, 22А</span>
-              <span>мы в VK</span>
+              <a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a>
+              <a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a>
+              <a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a>
               <span><i>⤴</i> Свой проект на расчёт</span>
             </div>
           </div>
@@ -410,7 +436,7 @@ function PublicPage() {
 
             <div className="hero-contact-line">
               <span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span>
-              <div className="phone-block"><strong>+7 (905) 365-47-39</strong><small>с 9:00 до 19:00</small></div>
+              <div className="phone-block"><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><small>с 9:00 до 19:00</small></div>
               <button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button>
             </div>
           </div>
@@ -733,13 +759,13 @@ function InternalHeader() {
       <div className="top-search-row">
         <div className="container top-search-inner">
           <SearchBox />
-          <div className="top-contacts"><span>село Засечное, улица Механизаторов, 22А</span><span>мы в VK</span><span><i>⤴</i> Свой проект на расчёт</span></div>
+          <div className="top-contacts"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a><span><i>⤴</i> Свой проект на расчёт</span></div>
         </div>
       </div>
       <div className="container hero-main">
         <div className="hero-upper-row">
           <a href="/" className="brand-line"><div className="logo-badge"><img src="/assets/logo_small.png" alt="Evtenia" /></div><div className="brand-text"><div className="brand-logo">Evtenia</div><p>Строительная компания</p></div></a>
-          <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span><div className="phone-block"><strong>+7 (905) 365-47-39</strong><small>с 9:00 до 19:00</small></div><button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button></div>
+          <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span><div className="phone-block"><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><small>с 9:00 до 19:00</small></div><button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button></div>
         </div>
         <nav className="hero-nav">
           <a href="/about" className={`menu-link ${window.location.pathname === '/about' ? 'active' : ''}`}>О КОМПАНИИ</a><a>/</a>
@@ -855,6 +881,7 @@ function AboutPage() {
 
 function SiteFooter() {
   const currentYear = new Date().getFullYear();
+  const [openCallback, setOpenCallback] = useState(false);
   return (
     <footer className="site-footer">
       <div className="container footer-layout">
@@ -874,10 +901,11 @@ function SiteFooter() {
           </div>
         </div>
         <aside className="footer-side">
-          <div className="contact-card"><h4>Контакты</h4><strong>+7 (905) 365-47-39</strong><button>Заказать звонок</button><a>мы в VK</a><p>село Засечное, улица Механизаторов, 22А</p></div>
-          <div className="social-card"><h4>Мы в соцсетях</h4><div className="social-row"><span>VK</span><span>OK</span><span>YT</span></div></div>
+          <div className="contact-card"><h4>Контакты</h4><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><a className="extra-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a><button onClick={() => setOpenCallback(true)}>Заказать звонок</button><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a><a href={CONTACTS.emailHref}>{CONTACTS.email}</a></div>
+          <div className="social-card"><h4>Мы в соцсетях</h4><div className="social-row"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a></div></div>
         </aside>
       </div>
+      <CallbackModal open={openCallback} onClose={() => setOpenCallback(false)} />
       <a className="ghost-admin" href={`?admin=${ADMIN_KEY}`}>service</a>
     </footer>
   );
@@ -904,13 +932,13 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const byCategory = projects.filter((item) => (item.category || 'house') === category);
   const floorOptions = Array.from(new Set(byCategory.map((item) => item.floors))).filter(Boolean);
   const typeOptions = Array.from(new Set(byCategory.map((item) => item.constructionType))).filter(Boolean);
-  const styleOptions = [
-    'Классический', 'Шале', 'Современный', 'Хай-тек', 'Красивый', 'Скандинавский',
-    'Оригинальный', 'Стильный', 'Необычный', 'Европейский', 'Канадский', 'Американский',
-    'Немецкий', 'Модерн', 'Фахверк', 'Шведский', 'Простой', 'Барнхаус', 'Финский'
-  ];
+  const styleOptions = Array.from(new Set(byCategory.map((item) => (item.style || '').trim()).filter(Boolean)));
   const minArea = 20;
   const parseNum = (value: string) => Number((value.match(/\d+/) || ['0'])[0]);
+
+  useEffect(() => {
+    setSelectedStyles((prev) => prev.filter((style) => styleOptions.includes(style)));
+  }, [styleOptions]);
 
   const filtered = byCategory.filter((item) => {
     const byType = type === 'Все типы' || item.constructionType === type;
@@ -937,21 +965,23 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                   <label key={floor}><input type="checkbox" checked={selectedFloors.includes(floor)} onChange={(e) => setSelectedFloors(e.target.checked ? [...selectedFloors, floor] : selectedFloors.filter((f) => f !== floor))} /> {floor}</label>
                 ))}
               </div>
-              <div className="filter-block filter-block-style">
-                <h4>Стиль</h4>
-                <div className="style-grid">
-                  {styleOptions.map((style) => (
-                    <label key={style}>
-                      <input
-                        type="checkbox"
-                        checked={selectedStyles.includes(style)}
-                        onChange={(e) => setSelectedStyles(e.target.checked ? [...selectedStyles, style] : selectedStyles.filter((s) => s !== style))}
-                      />
-                      {' '}{style}
-                    </label>
-                  ))}
+              {styleOptions.length ? (
+                <div className="filter-block filter-block-style">
+                  <h4>Стиль</h4>
+                  <div className="style-grid">
+                    {styleOptions.map((style) => (
+                      <label key={style}>
+                        <input
+                          type="checkbox"
+                          checked={selectedStyles.includes(style)}
+                          onChange={(e) => setSelectedStyles(e.target.checked ? [...selectedStyles, style] : selectedStyles.filter((s) => s !== style))}
+                        />
+                        {' '}{style}
+                      </label>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              ) : null}
               <div className="filter-block">
                 <h4>Площадь до {maxArea} м²</h4>
                 <input type="range" min={minArea} max={300} value={maxArea} onChange={(e) => setMaxArea(Number(e.target.value))} />
@@ -992,6 +1022,7 @@ function BathsPage() {
 function ProjectDetailPage() {
   const projectId = window.location.pathname.replace('/project/', '');
   const [projects, setProjects] = useState<HouseProject[]>(FALLBACK_PROJECTS);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   useEffect(() => {
     fetch(`${API_BASE}/api/projects`)
@@ -1001,7 +1032,22 @@ function ProjectDetailPage() {
   }, []);
 
   const project = projects.find((item) => item.id === projectId) || FALLBACK_PROJECTS[0];
-  const gallery = [project.coverImage, ...(project.images || [])].filter(Boolean);
+  const gallery = [project.coverImage, ...(project.images || [])].filter(Boolean).map((img) => resolveMediaUrl(img));
+  const safeActiveImage = gallery[activeImageIndex] || gallery[0] || '';
+
+  useEffect(() => {
+    setActiveImageIndex(0);
+  }, [project.id]);
+
+  const showPrevImage = () => {
+    if (gallery.length <= 1) return;
+    setActiveImageIndex((prev) => (prev - 1 + gallery.length) % gallery.length);
+  };
+
+  const showNextImage = () => {
+    if (gallery.length <= 1) return;
+    setActiveImageIndex((prev) => (prev + 1) % gallery.length);
+  };
 
   useEffect(() => {
     document.title = `${project.title} — Evtenia`;
@@ -1016,9 +1062,27 @@ function ProjectDetailPage() {
           <h1>{project.title}</h1>
           <div className="project-detail-layout">
             <div>
-              <div className="project-detail-main-image" style={{ backgroundImage: `url(${gallery[0]})` }} />
+              <div className="project-detail-slider">
+                <div className="project-detail-main-image" style={{ backgroundImage: `url(${safeActiveImage})` }} />
+                {gallery.length > 1 ? (
+                  <div className="project-slider-controls">
+                    <button type="button" onClick={showPrevImage} aria-label="Предыдущее фото">‹</button>
+                    <span>{activeImageIndex + 1} / {gallery.length}</span>
+                    <button type="button" onClick={showNextImage} aria-label="Следующее фото">›</button>
+                  </div>
+                ) : null}
+              </div>
               <div className="project-detail-thumbs">
-                {gallery.slice(0, 4).map((img) => <span key={img} style={{ backgroundImage: `url(${img})` }} />)}
+                {gallery.map((img, index) => (
+                  <button
+                    type="button"
+                    key={`${img}_${index}`}
+                    className={`project-thumb ${index === activeImageIndex ? 'active' : ''}`}
+                    style={{ backgroundImage: `url(${img})` }}
+                    onClick={() => setActiveImageIndex(index)}
+                    aria-label={`Фото ${index + 1}`}
+                  />
+                ))}
               </div>
               <div className="project-detail-description">
                 <h3>Особенности проекта</h3>
@@ -1057,22 +1121,20 @@ function ContactsPage() {
           <h1>КОНТАКТЫ</h1>
           <div className="contacts-box">
             <div className="contacts-info">
-              <h3>Мы находимся по адресу:</h3>
-              <p>📍 г. Пенза, ул. Красная Горка, 36</p>
-
-              <h3>Телефон:</h3>
-              <p><a href="tel:+79053654739">+7 (905) 365-47-39</a></p>
+              <h3>Телефоны:</h3>
+              <p><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></p>
+              <p><a href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a></p>
 
               <h3>Время работы:</h3>
               <p>🕘 Без выходных: 9:00–18:00</p>
 
               <h3>Почта:</h3>
-              <p><a href="mailto:penza@evereststroi.com">penza@evereststroi.com</a></p>
+              <p><a href={CONTACTS.emailHref}>{CONTACTS.email}</a></p>
 
               <div className="contacts-socials">
-                <a href="#" aria-label="VK">VK</a>
-                <a href="#" aria-label="OK">OK</a>
-                <a href="#" aria-label="YouTube">YT</a>
+                <a href={CONTACTS.vk} target="_blank" rel="noreferrer" aria-label="VK">VK</a>
+                <a href={CONTACTS.telegram} target="_blank" rel="noreferrer" aria-label="Telegram">TG</a>
+                <a href={CONTACTS.max} target="_blank" rel="noreferrer" aria-label="MAX">MAX</a>
               </div>
             </div>
             <div className="contacts-map-wrap">
@@ -1112,7 +1174,7 @@ function PortfolioPage() {
           <div className="portfolio-grid">
             {items.map((item) => (
               <article className="portfolio-card" key={item.id}>
-                <div className="portfolio-image" style={{ backgroundImage: `url(${item.image})` }}>
+                <div className="portfolio-image" style={{ backgroundImage: `url(${resolveMediaUrl(item.image)})` }}>
                   <h3>{item.title}</h3>
                 </div>
                 <div className="portfolio-meta-row">
@@ -1220,7 +1282,7 @@ function DesignPage() {
           </section>
 
           <section className="design-order">
-            <h2>Для заказа проекта дома — звоните +7 (905) 365-47-39 или отправляйте заявку ↓</h2>
+            <h2>Для заказа проекта дома — звоните {CONTACTS.mainPhoneDisplay} или отправляйте заявку ↓</h2>
             <form className="lead-form" onSubmit={submitLead}>
               <div className="lead-top-row">
                 <label>Имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
@@ -1274,6 +1336,8 @@ function AdminPage() {
   const [draft, setDraft] = useState<Partial<HouseProject>>({});
   const [portfolioDraft, setPortfolioDraft] = useState<Partial<PortfolioItem>>({});
   const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState<AdminTab>('projects');
+  const [uploadStatus, setUploadStatus] = useState('');
 
   const adminHeaders = useMemo(
     () => ({
@@ -1351,11 +1415,74 @@ function AdminPage() {
   };
 
   const removeProject = async (id: string) => {
+    const currentProject = projects.find((item) => item.id === id);
+    const projectImages = [currentProject?.coverImage, ...(currentProject?.images || [])].filter(Boolean) as string[];
+    for (const imageUrl of projectImages) {
+      await deleteProjectImage(imageUrl);
+    }
     await fetch(`${API_BASE}/api/admin/projects/${id}`, {
       method: 'DELETE',
       headers: adminHeaders
     });
     await loadAdminData(token);
+  };
+
+  const uploadProjectImage = async (files: File[], target: 'cover' | 'gallery') => {
+    if (!files.length) return;
+    setError('');
+    setUploadStatus('Загрузка изображения...');
+    const formData = new FormData();
+    files.forEach((file) => formData.append('images', file));
+    const response = await fetch(`${API_BASE}/api/admin/upload/project-image?target=${target}`, {
+      method: 'POST',
+      headers: { 'x-admin-token': token },
+      body: formData
+    });
+    if (!response.ok) {
+      setUploadStatus('');
+      setError('Не удалось загрузить изображение');
+      return;
+    }
+    const payload = (await response.json()) as { urls: string[] };
+    const urls = payload.urls || [];
+    if (target === 'cover') {
+      setDraft((prev) => ({ ...prev, coverImage: urls[0] || prev.coverImage || '' }));
+    } else {
+      setDraft((prev) => ({ ...prev, images: [...(prev.images || []), ...urls] }));
+    }
+    setUploadStatus('Изображения загружены и оптимизированы');
+  };
+
+  const deleteProjectImage = async (url: string) => {
+    await fetch(`${API_BASE}/api/admin/upload/project-image`, {
+      method: 'DELETE',
+      headers: adminHeaders,
+      body: JSON.stringify({ url })
+    });
+  };
+
+  const removeImageFromDraft = async (index: number) => {
+    const currentImages = draft.images || [];
+    const removed = currentImages[index];
+    if (!removed) return;
+    setDraft((prev) => ({ ...prev, images: (prev.images || []).filter((_, idx) => idx !== index) }));
+    await deleteProjectImage(removed);
+    if (draft.coverImage === removed) {
+      setDraft((prev) => ({ ...prev, coverImage: '' }));
+    }
+  };
+
+  const moveDraftImage = (index: number, direction: -1 | 1) => {
+    const current = [...(draft.images || [])];
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= current.length) return;
+    const [item] = current.splice(index, 1);
+    current.splice(targetIndex, 0, item);
+    setDraft((prev) => ({ ...prev, images: current }));
+  };
+
+  const setCoverFromGallery = (url: string) => {
+    setDraft((prev) => ({ ...prev, coverImage: url }));
   };
 
 
@@ -1400,11 +1527,45 @@ function AdminPage() {
   };
 
   const removePortfolio = async (id: string) => {
+    const currentItem = portfolio.find((item) => item.id === id);
+    if (currentItem?.image) {
+      await deleteProjectImage(currentItem.image);
+    }
     await fetch(`${API_BASE}/api/admin/portfolio/${id}`, {
       method: 'DELETE',
       headers: adminHeaders
     });
     await loadAdminData(token);
+  };
+
+  const uploadPortfolioImage = async (files: File[]) => {
+    if (!files.length) return;
+    setError('');
+    setUploadStatus('Загрузка изображения портфолио...');
+    const formData = new FormData();
+    files.forEach((file) => formData.append('images', file));
+    const response = await fetch(`${API_BASE}/api/admin/upload/project-image?target=cover`, {
+      method: 'POST',
+      headers: { 'x-admin-token': token },
+      body: formData
+    });
+    if (!response.ok) {
+      setUploadStatus('');
+      setError('Не удалось загрузить изображение портфолио');
+      return;
+    }
+    const payload = (await response.json()) as { urls: string[] };
+    const url = payload.urls?.[0];
+    if (!url) {
+      setUploadStatus('');
+      setError('Сервер не вернул URL изображения');
+      return;
+    }
+    if (portfolioDraft.image && portfolioDraft.image !== url) {
+      await deleteProjectImage(portfolioDraft.image);
+    }
+    setPortfolioDraft((prev) => ({ ...prev, image: url }));
+    setUploadStatus('Изображение портфолио загружено');
   };
 
   if (!token) {
@@ -1430,8 +1591,16 @@ function AdminPage() {
   return (
     <div className="admin-wrap">
       <h1>Админка каталога</h1>
-      <div className="admin-grid">
-        <section>
+      <div className="admin-tabs">
+        <button className={activeTab === 'projects' ? 'active' : ''} onClick={() => setActiveTab('projects')}>Проекты</button>
+        <button className={activeTab === 'pages' ? 'active' : ''} onClick={() => setActiveTab('pages')}>Страницы</button>
+        <button className={activeTab === 'portfolio' ? 'active' : ''} onClick={() => setActiveTab('portfolio')}>Портфолио</button>
+        <button className={activeTab === 'leads' ? 'active' : ''} onClick={() => setActiveTab('leads')}>Заявки</button>
+      </div>
+      {error ? <p className="error">{error}</p> : null}
+      {uploadStatus ? <p>{uploadStatus}</p> : null}
+
+      {activeTab === 'projects' ? <div className="admin-grid"><section>
           <h2>{draft.id ? 'Редактирование проекта' : 'Новый проект'}</h2>
           <div className="admin-form">
             <input placeholder="Название" value={draft.title || ''} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
@@ -1455,20 +1624,61 @@ function AdminPage() {
               onChange={(e) => setDraft({ ...draft, fullDescription: e.target.value })}
             />
             <input placeholder="Картинка обложка" value={draft.coverImage || ''} onChange={(e) => setDraft({ ...draft, coverImage: e.target.value })} />
+            <label>Загрузить обложку<input type="file" accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadProjectImage(files, 'cover'); e.currentTarget.value = ''; }} /></label>
             <textarea
               rows={2}
               placeholder="Картинки (через запятую)"
               value={Array.isArray(draft.images) ? draft.images.join(', ') : ''}
               onChange={(e) => setDraft({ ...draft, images: e.target.value.split(',').map((v) => v.trim()).filter(Boolean) })}
             />
+            <label>Загрузить фото в галерею (можно несколько)<input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadProjectImage(files, 'gallery'); e.currentTarget.value = ''; }} /></label>
+            {draft.coverImage ? (
+              <div className="admin-media-preview">
+                <p>Текущая обложка</p>
+                <div className="admin-image-card">
+                  <img src={resolveMediaUrl(draft.coverImage)} alt="Обложка проекта" />
+                  <div className="admin-image-actions">
+                    <button type="button" onClick={async () => {
+                      const image = draft.coverImage || '';
+                      setDraft((prev) => ({ ...prev, coverImage: '' }));
+                      if (image) await deleteProjectImage(image);
+                    }}>Удалить обложку</button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+            {(draft.images || []).length ? (
+              <div className="admin-media-preview">
+                <p>Фотографии проекта</p>
+                <div className="admin-images-grid">
+                  {(draft.images || []).map((img, index) => (
+                    <div key={`${img}_${index}`} className="admin-image-card">
+                      <img src={resolveMediaUrl(img)} alt={`Фото проекта ${index + 1}`} />
+                      <div className="admin-image-actions">
+                        <button type="button" onClick={() => moveDraftImage(index, -1)}>←</button>
+                        <button type="button" onClick={() => moveDraftImage(index, 1)}>→</button>
+                        <button type="button" onClick={() => setCoverFromGallery(img)}>Сделать обложкой</button>
+                        <button type="button" onClick={() => removeImageFromDraft(index)}>Удалить</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             <input placeholder="Сумма от" value={draft.priceFrom || ''} onChange={(e) => setDraft({ ...draft, priceFrom: e.target.value })} />
             <select value={draft.category || 'house'} onChange={(e) => setDraft({ ...draft, category: e.target.value as 'house' | 'bath' })}>
               <option value="house">Проекты домов</option>
               <option value="bath">Бани</option>
             </select>
-            <select value={draft.constructionType || 'Газобетон'} onChange={(e) => setDraft({ ...draft, constructionType: e.target.value })}>
-              {["Газобетон","Арболит","Керамзитобетонные блоки","Кирпич","Оцилиндрованное бревно","Рубленное бревно","Лафет","Профилированный брус","Клееный брус","Двойной брус","Каркасные","SIP панели","Строительство дачных домов под ключ"].map((t) => (
+            <select value={draft.constructionType || 'Из газобетона'} onChange={(e) => setDraft({ ...draft, constructionType: e.target.value })}>
+              {ADMIN_CONSTRUCTION_TYPES.map((t) => (
                 <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
+            <select value={draft.style || ''} onChange={(e) => setDraft({ ...draft, style: e.target.value })}>
+              <option value="">Стиль не выбран</option>
+              {ADMIN_STYLE_OPTIONS.map((style) => (
+                <option key={style} value={style}>{style}</option>
               ))}
             </select>
             {draft.id ? <button onClick={() => setDraft({})}>Отменить</button> : null}
@@ -1492,9 +1702,9 @@ function AdminPage() {
             ))}
           </div>
         </section>
-      </div>
+      </div> : null}
 
-      <section>
+      {activeTab === 'pages' ? <section>
         <h2>Внутренние страницы</h2>
         <div className="admin-form">
           <select
@@ -1521,14 +1731,29 @@ function AdminPage() {
           />
           <button onClick={savePage}>Сохранить страницу</button>
         </div>
-      </section>
+      </section> : null}
 
-      <div className="admin-grid">
-        <section>
+      {activeTab === 'portfolio' ? <div className="admin-grid"><section>
           <h2>{portfolioDraft.id ? 'Редактирование кейса' : 'Новый кейс портфолио'}</h2>
           <div className="admin-form">
             <input placeholder="Название объекта" value={portfolioDraft.title || ''} onChange={(e) => setPortfolioDraft({ ...portfolioDraft, title: e.target.value })} />
             <input placeholder="Ссылка на фото" value={portfolioDraft.image || ''} onChange={(e) => setPortfolioDraft({ ...portfolioDraft, image: e.target.value })} />
+            <label>Загрузить фото портфолио<input type="file" accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadPortfolioImage(files); e.currentTarget.value = ''; }} /></label>
+            {portfolioDraft.image ? (
+              <div className="admin-media-preview">
+                <p>Превью обложки портфолио</p>
+                <div className="admin-image-card">
+                  <img src={resolveMediaUrl(portfolioDraft.image)} alt="Обложка портфолио" />
+                  <div className="admin-image-actions">
+                    <button type="button" onClick={async () => {
+                      const image = portfolioDraft.image || '';
+                      setPortfolioDraft((prev) => ({ ...prev, image: '' }));
+                      if (image) await deleteProjectImage(image);
+                    }}>Удалить фото</button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
             <input placeholder="Стоимость коробки" value={portfolioDraft.boxPrice || ''} onChange={(e) => setPortfolioDraft({ ...portfolioDraft, boxPrice: e.target.value })} />
             <input placeholder="Срок строительства" value={portfolioDraft.buildDuration || ''} onChange={(e) => setPortfolioDraft({ ...portfolioDraft, buildDuration: e.target.value })} />
             <input placeholder="Оценка заказчика (1-5)" value={String(portfolioDraft.rating || 5)} onChange={(e) => setPortfolioDraft({ ...portfolioDraft, rating: Number(e.target.value) })} />
@@ -1556,9 +1781,9 @@ function AdminPage() {
             ))}
           </div>
         </section>
-      </div>
+      </div> : null}
 
-      <section>
+      {activeTab === 'leads' ? <section>
         <h2>Заявки ({leads.length})</h2>
         <div className="list">
           {leads.map((lead) => (
@@ -1573,7 +1798,7 @@ function AdminPage() {
             </div>
           ))}
         </div>
-      </section>
+      </section> : null}
     </div>
   );
 }
