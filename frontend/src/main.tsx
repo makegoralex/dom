@@ -52,6 +52,7 @@ type ProjectGroupColumn = {
     items: string[];
   }>;
 };
+type AdminTab = 'projects' | 'pages' | 'portfolio' | 'leads';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 const ADMIN_PATH = '/catalog-control-7f3a';
@@ -352,15 +353,7 @@ function PublicPage() {
 
   const filteredProjects = useMemo(() => selectedType === 'Все типы' ? projects : projects.filter((p) => p.constructionType === selectedType), [projects, selectedType]);
 
-  const catalogProjects = useMemo(() => {
-    if (!filteredProjects.length) {
-      return [] as HouseProject[];
-    }
-    return Array.from({ length: 12 }, (_, index) => {
-      const item = filteredProjects[index % filteredProjects.length];
-      return { ...item, id: `${item.id}_tile_${index}` };
-    });
-  }, [filteredProjects]);
+  const catalogProjects = useMemo(() => filteredProjects.slice(0, 9), [filteredProjects]);
 
   const submitLead = async (event: FormEvent) => {
     event.preventDefault();
@@ -1286,6 +1279,8 @@ function AdminPage() {
   const [draft, setDraft] = useState<Partial<HouseProject>>({});
   const [portfolioDraft, setPortfolioDraft] = useState<Partial<PortfolioItem>>({});
   const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState<AdminTab>('projects');
+  const [uploadStatus, setUploadStatus] = useState('');
 
   const adminHeaders = useMemo(
     () => ({
@@ -1370,6 +1365,31 @@ function AdminPage() {
     await loadAdminData(token);
   };
 
+  const uploadProjectImage = async (file: File, target: 'cover' | 'gallery') => {
+    if (!file) return;
+    setError('');
+    setUploadStatus('Загрузка изображения...');
+    const formData = new FormData();
+    formData.append('image', file);
+    const response = await fetch(`${API_BASE}/api/admin/upload/project-image?target=${target}`, {
+      method: 'POST',
+      headers: { 'x-admin-token': token },
+      body: formData
+    });
+    if (!response.ok) {
+      setUploadStatus('');
+      setError('Не удалось загрузить изображение');
+      return;
+    }
+    const payload = (await response.json()) as { url: string };
+    if (target === 'cover') {
+      setDraft((prev) => ({ ...prev, coverImage: payload.url }));
+    } else {
+      setDraft((prev) => ({ ...prev, images: [...(prev.images || []), payload.url] }));
+    }
+    setUploadStatus('Изображение загружено и оптимизировано');
+  };
+
 
   const savePage = async () => {
     if (!pageDraft) return;
@@ -1442,8 +1462,16 @@ function AdminPage() {
   return (
     <div className="admin-wrap">
       <h1>Админка каталога</h1>
-      <div className="admin-grid">
-        <section>
+      <div className="admin-tabs">
+        <button className={activeTab === 'projects' ? 'active' : ''} onClick={() => setActiveTab('projects')}>Проекты</button>
+        <button className={activeTab === 'pages' ? 'active' : ''} onClick={() => setActiveTab('pages')}>Страницы</button>
+        <button className={activeTab === 'portfolio' ? 'active' : ''} onClick={() => setActiveTab('portfolio')}>Портфолио</button>
+        <button className={activeTab === 'leads' ? 'active' : ''} onClick={() => setActiveTab('leads')}>Заявки</button>
+      </div>
+      {error ? <p className="error">{error}</p> : null}
+      {uploadStatus ? <p>{uploadStatus}</p> : null}
+
+      {activeTab === 'projects' ? <div className="admin-grid"><section>
           <h2>{draft.id ? 'Редактирование проекта' : 'Новый проект'}</h2>
           <div className="admin-form">
             <input placeholder="Название" value={draft.title || ''} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
@@ -1467,12 +1495,14 @@ function AdminPage() {
               onChange={(e) => setDraft({ ...draft, fullDescription: e.target.value })}
             />
             <input placeholder="Картинка обложка" value={draft.coverImage || ''} onChange={(e) => setDraft({ ...draft, coverImage: e.target.value })} />
+            <label>Загрузить обложку<input type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) uploadProjectImage(file, 'cover'); e.currentTarget.value = ''; }} /></label>
             <textarea
               rows={2}
               placeholder="Картинки (через запятую)"
               value={Array.isArray(draft.images) ? draft.images.join(', ') : ''}
               onChange={(e) => setDraft({ ...draft, images: e.target.value.split(',').map((v) => v.trim()).filter(Boolean) })}
             />
+            <label>Загрузить фото в галерею<input type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) uploadProjectImage(file, 'gallery'); e.currentTarget.value = ''; }} /></label>
             <input placeholder="Сумма от" value={draft.priceFrom || ''} onChange={(e) => setDraft({ ...draft, priceFrom: e.target.value })} />
             <select value={draft.category || 'house'} onChange={(e) => setDraft({ ...draft, category: e.target.value as 'house' | 'bath' })}>
               <option value="house">Проекты домов</option>
@@ -1504,9 +1534,9 @@ function AdminPage() {
             ))}
           </div>
         </section>
-      </div>
+      </div> : null}
 
-      <section>
+      {activeTab === 'pages' ? <section>
         <h2>Внутренние страницы</h2>
         <div className="admin-form">
           <select
@@ -1533,10 +1563,9 @@ function AdminPage() {
           />
           <button onClick={savePage}>Сохранить страницу</button>
         </div>
-      </section>
+      </section> : null}
 
-      <div className="admin-grid">
-        <section>
+      {activeTab === 'portfolio' ? <div className="admin-grid"><section>
           <h2>{portfolioDraft.id ? 'Редактирование кейса' : 'Новый кейс портфолио'}</h2>
           <div className="admin-form">
             <input placeholder="Название объекта" value={portfolioDraft.title || ''} onChange={(e) => setPortfolioDraft({ ...portfolioDraft, title: e.target.value })} />
@@ -1568,9 +1597,9 @@ function AdminPage() {
             ))}
           </div>
         </section>
-      </div>
+      </div> : null}
 
-      <section>
+      {activeTab === 'leads' ? <section>
         <h2>Заявки ({leads.length})</h2>
         <div className="list">
           {leads.map((lead) => (
@@ -1585,7 +1614,7 @@ function AdminPage() {
             </div>
           ))}
         </div>
-      </section>
+      </section> : null}
     </div>
   );
 }
