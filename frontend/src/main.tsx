@@ -52,10 +52,22 @@ type ProjectGroupColumn = {
     items: string[];
   }>;
 };
+type AdminTab = 'projects' | 'pages' | 'portfolio' | 'leads';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 const ADMIN_PATH = '/catalog-control-7f3a';
 const ADMIN_KEY = 'catalog-control-7f3a';
+const CONTACTS = {
+  mainPhoneDisplay: '8-902-209-01-79',
+  mainPhoneHref: 'tel:+79022090179',
+  extraPhoneDisplay: '8-841-419-01-79',
+  extraPhoneHref: 'tel:+78414190179',
+  email: '89022099279@mail.ru',
+  emailHref: 'mailto:89022099279@mail.ru',
+  vk: 'https://vk.ru/evtenia_house',
+  max: 'https://max.ru/join/1zjkiv7Ex8ofTgGHuB212RBgUa_GcPjKokLeHSRDj0w',
+  telegram: 'https://t.me/evtenia_realty'
+};
 const PROJECT_GROUPS: ProjectGroupColumn[] = [
   { title: 'Проекты домов', groups: [{ items: ['Модульные', 'Каркасные', 'Из газобетона'] }] }
 ];
@@ -222,6 +234,13 @@ function normalizePrice(price: unknown) {
   return value.toLowerCase().startsWith('от') ? value : `от ${value}`;
 }
 
+function resolveMediaUrl(url?: string) {
+  const value = (url || '').trim();
+  if (!value) return '';
+  if (value.startsWith('/assets/') && API_BASE) return `${API_BASE}${value}`;
+  return value;
+}
+
 function SearchBox() {
   const params = new URLSearchParams(window.location.search);
   const [query, setQuery] = useState(params.get('q') || '');
@@ -256,7 +275,7 @@ function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }
         body: JSON.stringify({
           name,
           phone,
-          email: 'makegoralex@yandex.ru',
+          email: CONTACTS.email,
           message: 'Заказ звонка с сайта'
         })
       });
@@ -286,10 +305,11 @@ function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }
 }
 
 function ProjectTile({ project }: { project: HouseProject }) {
+  const imageUrl = resolveMediaUrl(project.coverImage || project.images?.[0] || '');
   return (
     <article className="project-card">
       <a className="project-card-link" href={`/project/${project.id}`}>
-      <div className="project-image" style={{ backgroundImage: `url(${project.coverImage || project.images?.[0] || ""})` }} />
+      <div className="project-image" style={{ backgroundImage: `url(${imageUrl})` }} />
       <div className="project-content">
         <p className="project-desc">{project.shortDescription}</p>
         <h3>{project.title}</h3>
@@ -341,15 +361,7 @@ function PublicPage() {
 
   const filteredProjects = useMemo(() => selectedType === 'Все типы' ? projects : projects.filter((p) => p.constructionType === selectedType), [projects, selectedType]);
 
-  const catalogProjects = useMemo(() => {
-    if (!filteredProjects.length) {
-      return [] as HouseProject[];
-    }
-    return Array.from({ length: 12 }, (_, index) => {
-      const item = filteredProjects[index % filteredProjects.length];
-      return { ...item, id: `${item.id}_tile_${index}` };
-    });
-  }, [filteredProjects]);
+  const catalogProjects = useMemo(() => filteredProjects.slice(0, 9), [filteredProjects]);
 
   const submitLead = async (event: FormEvent) => {
     event.preventDefault();
@@ -391,8 +403,9 @@ function PublicPage() {
           <div className="container top-search-inner">
             <SearchBox />
             <div className="top-contacts">
-              <span>село Засечное, улица Механизаторов, 22А</span>
-              <span>мы в VK</span>
+              <a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a>
+              <a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a>
+              <a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a>
               <span><i>⤴</i> Свой проект на расчёт</span>
             </div>
           </div>
@@ -410,7 +423,7 @@ function PublicPage() {
 
             <div className="hero-contact-line">
               <span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span>
-              <div className="phone-block"><strong>+7 (905) 365-47-39</strong><small>с 9:00 до 19:00</small></div>
+              <div className="phone-block"><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><small>с 9:00 до 19:00</small></div>
               <button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button>
             </div>
           </div>
@@ -733,13 +746,13 @@ function InternalHeader() {
       <div className="top-search-row">
         <div className="container top-search-inner">
           <SearchBox />
-          <div className="top-contacts"><span>село Засечное, улица Механизаторов, 22А</span><span>мы в VK</span><span><i>⤴</i> Свой проект на расчёт</span></div>
+          <div className="top-contacts"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a><span><i>⤴</i> Свой проект на расчёт</span></div>
         </div>
       </div>
       <div className="container hero-main">
         <div className="hero-upper-row">
           <a href="/" className="brand-line"><div className="logo-badge"><img src="/assets/logo_small.png" alt="Evtenia" /></div><div className="brand-text"><div className="brand-logo">Evtenia</div><p>Строительная компания</p></div></a>
-          <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span><div className="phone-block"><strong>+7 (905) 365-47-39</strong><small>с 9:00 до 19:00</small></div><button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button></div>
+          <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span><div className="phone-block"><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><small>с 9:00 до 19:00</small></div><button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button></div>
         </div>
         <nav className="hero-nav">
           <a href="/about" className={`menu-link ${window.location.pathname === '/about' ? 'active' : ''}`}>О КОМПАНИИ</a><a>/</a>
@@ -855,6 +868,7 @@ function AboutPage() {
 
 function SiteFooter() {
   const currentYear = new Date().getFullYear();
+  const [openCallback, setOpenCallback] = useState(false);
   return (
     <footer className="site-footer">
       <div className="container footer-layout">
@@ -874,10 +888,11 @@ function SiteFooter() {
           </div>
         </div>
         <aside className="footer-side">
-          <div className="contact-card"><h4>Контакты</h4><strong>+7 (905) 365-47-39</strong><button>Заказать звонок</button><a>мы в VK</a><p>село Засечное, улица Механизаторов, 22А</p></div>
-          <div className="social-card"><h4>Мы в соцсетях</h4><div className="social-row"><span>VK</span><span>OK</span><span>YT</span></div></div>
+          <div className="contact-card"><h4>Контакты</h4><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><a className="extra-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a><button onClick={() => setOpenCallback(true)}>Заказать звонок</button><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a><a href={CONTACTS.emailHref}>{CONTACTS.email}</a></div>
+          <div className="social-card"><h4>Мы в соцсетях</h4><div className="social-row"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a></div></div>
         </aside>
       </div>
+      <CallbackModal open={openCallback} onClose={() => setOpenCallback(false)} />
       <a className="ghost-admin" href={`?admin=${ADMIN_KEY}`}>service</a>
     </footer>
   );
@@ -1001,7 +1016,7 @@ function ProjectDetailPage() {
   }, []);
 
   const project = projects.find((item) => item.id === projectId) || FALLBACK_PROJECTS[0];
-  const gallery = [project.coverImage, ...(project.images || [])].filter(Boolean);
+  const gallery = [project.coverImage, ...(project.images || [])].filter(Boolean).map((img) => resolveMediaUrl(img));
 
   useEffect(() => {
     document.title = `${project.title} — Evtenia`;
@@ -1057,22 +1072,20 @@ function ContactsPage() {
           <h1>КОНТАКТЫ</h1>
           <div className="contacts-box">
             <div className="contacts-info">
-              <h3>Мы находимся по адресу:</h3>
-              <p>📍 г. Пенза, ул. Красная Горка, 36</p>
-
-              <h3>Телефон:</h3>
-              <p><a href="tel:+79053654739">+7 (905) 365-47-39</a></p>
+              <h3>Телефоны:</h3>
+              <p><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></p>
+              <p><a href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a></p>
 
               <h3>Время работы:</h3>
               <p>🕘 Без выходных: 9:00–18:00</p>
 
               <h3>Почта:</h3>
-              <p><a href="mailto:penza@evereststroi.com">penza@evereststroi.com</a></p>
+              <p><a href={CONTACTS.emailHref}>{CONTACTS.email}</a></p>
 
               <div className="contacts-socials">
-                <a href="#" aria-label="VK">VK</a>
-                <a href="#" aria-label="OK">OK</a>
-                <a href="#" aria-label="YouTube">YT</a>
+                <a href={CONTACTS.vk} target="_blank" rel="noreferrer" aria-label="VK">VK</a>
+                <a href={CONTACTS.telegram} target="_blank" rel="noreferrer" aria-label="Telegram">TG</a>
+                <a href={CONTACTS.max} target="_blank" rel="noreferrer" aria-label="MAX">MAX</a>
               </div>
             </div>
             <div className="contacts-map-wrap">
@@ -1112,7 +1125,7 @@ function PortfolioPage() {
           <div className="portfolio-grid">
             {items.map((item) => (
               <article className="portfolio-card" key={item.id}>
-                <div className="portfolio-image" style={{ backgroundImage: `url(${item.image})` }}>
+                <div className="portfolio-image" style={{ backgroundImage: `url(${resolveMediaUrl(item.image)})` }}>
                   <h3>{item.title}</h3>
                 </div>
                 <div className="portfolio-meta-row">
@@ -1220,7 +1233,7 @@ function DesignPage() {
           </section>
 
           <section className="design-order">
-            <h2>Для заказа проекта дома — звоните +7 (905) 365-47-39 или отправляйте заявку ↓</h2>
+            <h2>Для заказа проекта дома — звоните {CONTACTS.mainPhoneDisplay} или отправляйте заявку ↓</h2>
             <form className="lead-form" onSubmit={submitLead}>
               <div className="lead-top-row">
                 <label>Имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
@@ -1274,6 +1287,8 @@ function AdminPage() {
   const [draft, setDraft] = useState<Partial<HouseProject>>({});
   const [portfolioDraft, setPortfolioDraft] = useState<Partial<PortfolioItem>>({});
   const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState<AdminTab>('projects');
+  const [uploadStatus, setUploadStatus] = useState('');
 
   const adminHeaders = useMemo(
     () => ({
@@ -1358,6 +1373,31 @@ function AdminPage() {
     await loadAdminData(token);
   };
 
+  const uploadProjectImage = async (file: File, target: 'cover' | 'gallery') => {
+    if (!file) return;
+    setError('');
+    setUploadStatus('Загрузка изображения...');
+    const formData = new FormData();
+    formData.append('image', file);
+    const response = await fetch(`${API_BASE}/api/admin/upload/project-image?target=${target}`, {
+      method: 'POST',
+      headers: { 'x-admin-token': token },
+      body: formData
+    });
+    if (!response.ok) {
+      setUploadStatus('');
+      setError('Не удалось загрузить изображение');
+      return;
+    }
+    const payload = (await response.json()) as { url: string };
+    if (target === 'cover') {
+      setDraft((prev) => ({ ...prev, coverImage: payload.url }));
+    } else {
+      setDraft((prev) => ({ ...prev, images: [...(prev.images || []), payload.url] }));
+    }
+    setUploadStatus('Изображение загружено и оптимизировано');
+  };
+
 
   const savePage = async () => {
     if (!pageDraft) return;
@@ -1430,8 +1470,16 @@ function AdminPage() {
   return (
     <div className="admin-wrap">
       <h1>Админка каталога</h1>
-      <div className="admin-grid">
-        <section>
+      <div className="admin-tabs">
+        <button className={activeTab === 'projects' ? 'active' : ''} onClick={() => setActiveTab('projects')}>Проекты</button>
+        <button className={activeTab === 'pages' ? 'active' : ''} onClick={() => setActiveTab('pages')}>Страницы</button>
+        <button className={activeTab === 'portfolio' ? 'active' : ''} onClick={() => setActiveTab('portfolio')}>Портфолио</button>
+        <button className={activeTab === 'leads' ? 'active' : ''} onClick={() => setActiveTab('leads')}>Заявки</button>
+      </div>
+      {error ? <p className="error">{error}</p> : null}
+      {uploadStatus ? <p>{uploadStatus}</p> : null}
+
+      {activeTab === 'projects' ? <div className="admin-grid"><section>
           <h2>{draft.id ? 'Редактирование проекта' : 'Новый проект'}</h2>
           <div className="admin-form">
             <input placeholder="Название" value={draft.title || ''} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
@@ -1455,12 +1503,14 @@ function AdminPage() {
               onChange={(e) => setDraft({ ...draft, fullDescription: e.target.value })}
             />
             <input placeholder="Картинка обложка" value={draft.coverImage || ''} onChange={(e) => setDraft({ ...draft, coverImage: e.target.value })} />
+            <label>Загрузить обложку<input type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) uploadProjectImage(file, 'cover'); e.currentTarget.value = ''; }} /></label>
             <textarea
               rows={2}
               placeholder="Картинки (через запятую)"
               value={Array.isArray(draft.images) ? draft.images.join(', ') : ''}
               onChange={(e) => setDraft({ ...draft, images: e.target.value.split(',').map((v) => v.trim()).filter(Boolean) })}
             />
+            <label>Загрузить фото в галерею<input type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) uploadProjectImage(file, 'gallery'); e.currentTarget.value = ''; }} /></label>
             <input placeholder="Сумма от" value={draft.priceFrom || ''} onChange={(e) => setDraft({ ...draft, priceFrom: e.target.value })} />
             <select value={draft.category || 'house'} onChange={(e) => setDraft({ ...draft, category: e.target.value as 'house' | 'bath' })}>
               <option value="house">Проекты домов</option>
@@ -1492,9 +1542,9 @@ function AdminPage() {
             ))}
           </div>
         </section>
-      </div>
+      </div> : null}
 
-      <section>
+      {activeTab === 'pages' ? <section>
         <h2>Внутренние страницы</h2>
         <div className="admin-form">
           <select
@@ -1521,10 +1571,9 @@ function AdminPage() {
           />
           <button onClick={savePage}>Сохранить страницу</button>
         </div>
-      </section>
+      </section> : null}
 
-      <div className="admin-grid">
-        <section>
+      {activeTab === 'portfolio' ? <div className="admin-grid"><section>
           <h2>{portfolioDraft.id ? 'Редактирование кейса' : 'Новый кейс портфолио'}</h2>
           <div className="admin-form">
             <input placeholder="Название объекта" value={portfolioDraft.title || ''} onChange={(e) => setPortfolioDraft({ ...portfolioDraft, title: e.target.value })} />
@@ -1556,9 +1605,9 @@ function AdminPage() {
             ))}
           </div>
         </section>
-      </div>
+      </div> : null}
 
-      <section>
+      {activeTab === 'leads' ? <section>
         <h2>Заявки ({leads.length})</h2>
         <div className="list">
           {leads.map((lead) => (
@@ -1573,7 +1622,7 @@ function AdminPage() {
             </div>
           ))}
         </div>
-      </section>
+      </section> : null}
     </div>
   );
 }
