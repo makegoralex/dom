@@ -457,7 +457,8 @@ app.post('/api/admin/upload/project-image', authMiddleware, upload.single('image
       .webp({ lossless: true, nearLossless: true, quality: 100 })
       .toFile(outputPath);
 
-    return res.status(201).json({ url: `/assets/projects/${filename}`, width: dimensions.width, height: dimensions.height });
+    const absoluteUrl = `${req.protocol}://${req.get('host')}/assets/projects/${filename}`;
+    return res.status(201).json({ url: absoluteUrl, width: dimensions.width, height: dimensions.height });
   } catch (error) {
     console.error('Не удалось обработать изображение проекта', error);
     return res.status(500).json({ message: 'Не удалось обработать изображение' });

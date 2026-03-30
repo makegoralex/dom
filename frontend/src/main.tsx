@@ -55,6 +55,7 @@ type ProjectGroupColumn = {
 type AdminTab = 'projects' | 'pages' | 'portfolio' | 'leads';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '';
+const API_ORIGIN = API_BASE ? new URL(API_BASE, window.location.origin).origin : '';
 const ADMIN_PATH = '/catalog-control-7f3a';
 const ADMIN_KEY = 'catalog-control-7f3a';
 const CONTACTS = {
@@ -237,7 +238,7 @@ function normalizePrice(price: unknown) {
 function resolveMediaUrl(url?: string) {
   const value = (url || '').trim();
   if (!value) return '';
-  if (value.startsWith('/assets/') && API_BASE) return `${API_BASE}${value}`;
+  if (value.startsWith('/assets/')) return `${API_ORIGIN || window.location.origin}${value}`;
   return value;
 }
 
@@ -326,12 +327,12 @@ function ProjectTile({ project }: { project: HouseProject }) {
 }
 
 function PublicPage() {
-  const [projects, setProjects] = useState<HouseProject[]>(FALLBACK_PROJECTS);
+  const [projects, setProjects] = useState<HouseProject[]>([]);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
-  const [projectId, setProjectId] = useState(FALLBACK_PROJECTS[0].id);
+  const [projectId, setProjectId] = useState('');
   const [status, setStatus] = useState('');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [constructionTypes, setConstructionTypes] = useState<string[]>([]);
