@@ -1018,6 +1018,7 @@ function BathsPage() {
 function ProjectDetailPage() {
   const projectId = window.location.pathname.replace('/project/', '');
   const [projects, setProjects] = useState<HouseProject[]>(FALLBACK_PROJECTS);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   useEffect(() => {
     fetch(`${API_BASE}/api/projects`)
@@ -1028,6 +1029,21 @@ function ProjectDetailPage() {
 
   const project = projects.find((item) => item.id === projectId) || FALLBACK_PROJECTS[0];
   const gallery = [project.coverImage, ...(project.images || [])].filter(Boolean).map((img) => resolveMediaUrl(img));
+  const safeActiveImage = gallery[activeImageIndex] || gallery[0] || '';
+
+  useEffect(() => {
+    setActiveImageIndex(0);
+  }, [project.id]);
+
+  const showPrevImage = () => {
+    if (gallery.length <= 1) return;
+    setActiveImageIndex((prev) => (prev - 1 + gallery.length) % gallery.length);
+  };
+
+  const showNextImage = () => {
+    if (gallery.length <= 1) return;
+    setActiveImageIndex((prev) => (prev + 1) % gallery.length);
+  };
 
   useEffect(() => {
     document.title = `${project.title} — Evtenia`;
@@ -1042,9 +1058,27 @@ function ProjectDetailPage() {
           <h1>{project.title}</h1>
           <div className="project-detail-layout">
             <div>
-              <div className="project-detail-main-image" style={{ backgroundImage: `url(${gallery[0]})` }} />
+              <div className="project-detail-slider">
+                <div className="project-detail-main-image" style={{ backgroundImage: `url(${safeActiveImage})` }} />
+                {gallery.length > 1 ? (
+                  <div className="project-slider-controls">
+                    <button type="button" onClick={showPrevImage} aria-label="Предыдущее фото">‹</button>
+                    <span>{activeImageIndex + 1} / {gallery.length}</span>
+                    <button type="button" onClick={showNextImage} aria-label="Следующее фото">›</button>
+                  </div>
+                ) : null}
+              </div>
               <div className="project-detail-thumbs">
-                {gallery.slice(0, 4).map((img) => <span key={img} style={{ backgroundImage: `url(${img})` }} />)}
+                {gallery.map((img, index) => (
+                  <button
+                    type="button"
+                    key={`${img}_${index}`}
+                    className={`project-thumb ${index === activeImageIndex ? 'active' : ''}`}
+                    style={{ backgroundImage: `url(${img})` }}
+                    onClick={() => setActiveImageIndex(index)}
+                    aria-label={`Фото ${index + 1}`}
+                  />
+                ))}
               </div>
               <div className="project-detail-description">
                 <h3>Особенности проекта</h3>

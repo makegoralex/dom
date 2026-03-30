@@ -174,8 +174,13 @@ body {margin: 0; background: #fff;}
 
 .project-detail-layout{display:grid; grid-template-columns:1fr 340px; gap:22px; align-items:start;}
 .project-detail-main-image{height:460px; background-size:cover; background-position:center; border:1px solid #d8dce3;}
+.project-detail-slider{display:grid; gap:8px;}
+.project-slider-controls{display:flex; align-items:center; justify-content:center; gap:10px;}
+.project-slider-controls button{border:1px solid #c8ced9; background:#fff; width:34px; height:30px; cursor:pointer; font-size:20px; line-height:1;}
+.project-slider-controls span{font-size:13px; color:#3b4350;}
 .project-detail-thumbs{display:flex; gap:10px; margin-top:12px;}
-.project-detail-thumbs span{width:92px; height:70px; border:1px solid #d2d6dd; background-size:cover; background-position:center;}
+.project-thumb{width:92px; height:70px; border:1px solid #d2d6dd; background-size:cover; background-position:center; background-color:#f0f2f6; cursor:pointer;}
+.project-thumb.active{outline:2px solid #4f81c7; border-color:#4f81c7;}
 .project-detail-description{margin-top:16px; background:#f7f7f8; border:1px solid #d8dce3; padding:16px;}
 .project-detail-description h3{margin:0 0 8px; font-size:28px; font-family:Georgia, 'Times New Roman', serif;}
 .project-detail-description p{margin:0; font-size:14px; line-height:1.45;}
