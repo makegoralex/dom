@@ -457,7 +457,7 @@ app.post('/api/admin/upload/project-image', authMiddleware, upload.single('image
       .webp({ lossless: true, nearLossless: true, quality: 100 })
       .toFile(outputPath);
 
-    const absoluteUrl = `${req.protocol}://${req.get('host')}/assets/projects/${filename}`;
+    const absoluteUrl = `${req.protocol}://${req.get('host')}/api/assets/projects/${filename}`;
     return res.status(201).json({ url: absoluteUrl, width: dimensions.width, height: dimensions.height });
   } catch (error) {
     console.error('Не удалось обработать изображение проекта', error);
@@ -466,6 +466,7 @@ app.post('/api/admin/upload/project-image', authMiddleware, upload.single('image
 });
 
 app.use('/assets', express.static(ASSETS_DIR));
+app.use('/api/assets', express.static(ASSETS_DIR));
 if (fs.existsSync(FRONTEND_DIST)) {
   app.use(express.static(FRONTEND_DIST));
   app.get(/^(?!\/api).*/, (_req, res) => res.sendFile(path.join(FRONTEND_DIST, 'index.html')));

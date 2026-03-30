@@ -238,7 +238,17 @@ function normalizePrice(price: unknown) {
 function resolveMediaUrl(url?: string) {
   const value = (url || '').trim();
   if (!value) return '';
-  if (value.startsWith('/assets/')) return `${API_ORIGIN || window.location.origin}${value}`;
+  if (value.startsWith('/assets/')) return `${API_ORIGIN || window.location.origin}/api${value}`;
+  if (value.startsWith('http://') || value.startsWith('https://')) {
+    try {
+      const parsed = new URL(value);
+      if (parsed.pathname.startsWith('/assets/')) {
+        return `${parsed.origin}/api${parsed.pathname}`;
+      }
+    } catch {
+      return value;
+    }
+  }
   return value;
 }
 
