@@ -56,6 +56,17 @@ type ProjectGroupColumn = {
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 const ADMIN_PATH = '/catalog-control-7f3a';
 const ADMIN_KEY = 'catalog-control-7f3a';
+const CONTACTS = {
+  mainPhoneDisplay: '8-902-209-01-79',
+  mainPhoneHref: 'tel:+79022090179',
+  extraPhoneDisplay: '8-841-419-01-79',
+  extraPhoneHref: 'tel:+78414190179',
+  email: '89022099279@mail.ru',
+  emailHref: 'mailto:89022099279@mail.ru',
+  vk: 'https://vk.ru/evtenia_house',
+  max: 'https://max.ru/join/1zjkiv7Ex8ofTgGHuB212RBgUa_GcPjKokLeHSRDj0w',
+  telegram: 'https://t.me/evtenia_realty'
+};
 const PROJECT_GROUPS: ProjectGroupColumn[] = [
   { title: 'Проекты домов', groups: [{ items: ['Модульные', 'Каркасные', 'Из газобетона'] }] }
 ];
@@ -256,7 +267,7 @@ function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }
         body: JSON.stringify({
           name,
           phone,
-          email: 'makegoralex@yandex.ru',
+          email: CONTACTS.email,
           message: 'Заказ звонка с сайта'
         })
       });
@@ -391,8 +402,9 @@ function PublicPage() {
           <div className="container top-search-inner">
             <SearchBox />
             <div className="top-contacts">
-              <span>село Засечное, улица Механизаторов, 22А</span>
-              <span>мы в VK</span>
+              <a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a>
+              <a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a>
+              <a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a>
               <span><i>⤴</i> Свой проект на расчёт</span>
             </div>
           </div>
@@ -410,7 +422,7 @@ function PublicPage() {
 
             <div className="hero-contact-line">
               <span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span>
-              <div className="phone-block"><strong>+7 (905) 365-47-39</strong><small>с 9:00 до 19:00</small></div>
+              <div className="phone-block"><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><small>с 9:00 до 19:00</small></div>
               <button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button>
             </div>
           </div>
@@ -733,13 +745,13 @@ function InternalHeader() {
       <div className="top-search-row">
         <div className="container top-search-inner">
           <SearchBox />
-          <div className="top-contacts"><span>село Засечное, улица Механизаторов, 22А</span><span>мы в VK</span><span><i>⤴</i> Свой проект на расчёт</span></div>
+          <div className="top-contacts"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a><span><i>⤴</i> Свой проект на расчёт</span></div>
         </div>
       </div>
       <div className="container hero-main">
         <div className="hero-upper-row">
           <a href="/" className="brand-line"><div className="logo-badge"><img src="/assets/logo_small.png" alt="Evtenia" /></div><div className="brand-text"><div className="brand-logo">Evtenia</div><p>Строительная компания</p></div></a>
-          <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span><div className="phone-block"><strong>+7 (905) 365-47-39</strong><small>с 9:00 до 19:00</small></div><button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button></div>
+          <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span><div className="phone-block"><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><small>с 9:00 до 19:00</small></div><button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button></div>
         </div>
         <nav className="hero-nav">
           <a href="/about" className={`menu-link ${window.location.pathname === '/about' ? 'active' : ''}`}>О КОМПАНИИ</a><a>/</a>
@@ -855,6 +867,7 @@ function AboutPage() {
 
 function SiteFooter() {
   const currentYear = new Date().getFullYear();
+  const [openCallback, setOpenCallback] = useState(false);
   return (
     <footer className="site-footer">
       <div className="container footer-layout">
@@ -874,10 +887,11 @@ function SiteFooter() {
           </div>
         </div>
         <aside className="footer-side">
-          <div className="contact-card"><h4>Контакты</h4><strong>+7 (905) 365-47-39</strong><button>Заказать звонок</button><a>мы в VK</a><p>село Засечное, улица Механизаторов, 22А</p></div>
-          <div className="social-card"><h4>Мы в соцсетях</h4><div className="social-row"><span>VK</span><span>OK</span><span>YT</span></div></div>
+          <div className="contact-card"><h4>Контакты</h4><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><a className="extra-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a><button onClick={() => setOpenCallback(true)}>Заказать звонок</button><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a><a href={CONTACTS.emailHref}>{CONTACTS.email}</a></div>
+          <div className="social-card"><h4>Мы в соцсетях</h4><div className="social-row"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a></div></div>
         </aside>
       </div>
+      <CallbackModal open={openCallback} onClose={() => setOpenCallback(false)} />
       <a className="ghost-admin" href={`?admin=${ADMIN_KEY}`}>service</a>
     </footer>
   );
@@ -1057,22 +1071,20 @@ function ContactsPage() {
           <h1>КОНТАКТЫ</h1>
           <div className="contacts-box">
             <div className="contacts-info">
-              <h3>Мы находимся по адресу:</h3>
-              <p>📍 г. Пенза, ул. Красная Горка, 36</p>
-
-              <h3>Телефон:</h3>
-              <p><a href="tel:+79053654739">+7 (905) 365-47-39</a></p>
+              <h3>Телефоны:</h3>
+              <p><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></p>
+              <p><a href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a></p>
 
               <h3>Время работы:</h3>
               <p>🕘 Без выходных: 9:00–18:00</p>
 
               <h3>Почта:</h3>
-              <p><a href="mailto:penza@evereststroi.com">penza@evereststroi.com</a></p>
+              <p><a href={CONTACTS.emailHref}>{CONTACTS.email}</a></p>
 
               <div className="contacts-socials">
-                <a href="#" aria-label="VK">VK</a>
-                <a href="#" aria-label="OK">OK</a>
-                <a href="#" aria-label="YouTube">YT</a>
+                <a href={CONTACTS.vk} target="_blank" rel="noreferrer" aria-label="VK">VK</a>
+                <a href={CONTACTS.telegram} target="_blank" rel="noreferrer" aria-label="Telegram">TG</a>
+                <a href={CONTACTS.max} target="_blank" rel="noreferrer" aria-label="MAX">MAX</a>
               </div>
             </div>
             <div className="contacts-map-wrap">
@@ -1220,7 +1232,7 @@ function DesignPage() {
           </section>
 
           <section className="design-order">
-            <h2>Для заказа проекта дома — звоните +7 (905) 365-47-39 или отправляйте заявку ↓</h2>
+            <h2>Для заказа проекта дома — звоните {CONTACTS.mainPhoneDisplay} или отправляйте заявку ↓</h2>
             <form className="lead-form" onSubmit={submitLead}>
               <div className="lead-top-row">
                 <label>Имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
