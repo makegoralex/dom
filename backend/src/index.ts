@@ -82,19 +82,9 @@ const mailTransport = SMTP_HOST && SMTP_USER && SMTP_PASS
   : null;
 
 const CONSTRUCTION_TYPES = [
-  'Газобетон',
-  'Арболит',
-  'Керамзитобетонные блоки',
-  'Кирпич',
-  'Оцилиндрованное бревно',
-  'Рубленное бревно',
-  'Лафет',
-  'Профилированный брус',
-  'Клееный брус',
-  'Двойной брус',
+  'Из газобетона',
   'Каркасные',
-  'SIP панели',
-  'Строительство дачных домов под ключ'
+  'Модульные'
 ];
 
 const seedProjects: HouseProject[] = [
@@ -278,6 +268,31 @@ const writeData = (data: DataStore): void => {
   fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
 };
 
+const deleteAssetByUrl = (rawUrl: string): boolean => {
+  if (!rawUrl) return false;
+  try {
+    const parsed = rawUrl.startsWith('http://') || rawUrl.startsWith('https://')
+      ? new URL(rawUrl)
+      : new URL(rawUrl, 'http://localhost');
+    const pathname = parsed.pathname;
+    const normalized = pathname.startsWith('/api/assets/')
+      ? pathname.replace('/api/assets/', '')
+      : pathname.startsWith('/assets/')
+        ? pathname.replace('/assets/', '')
+        : '';
+    if (!normalized) return false;
+    const targetPath = path.resolve(ASSETS_DIR, normalized);
+    if (!targetPath.startsWith(path.resolve(ASSETS_DIR))) return false;
+    if (fs.existsSync(targetPath)) {
+      fs.unlinkSync(targetPath);
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+};
+
 const ensureAssetsDirs = (): void => {
   if (!fs.existsSync(ASSETS_DIR)) fs.mkdirSync(ASSETS_DIR, { recursive: true });
   if (!fs.existsSync(PROJECTS_ASSETS_DIR)) fs.mkdirSync(PROJECTS_ASSETS_DIR, { recursive: true });
@@ -436,8 +451,9 @@ app.delete('/api/admin/portfolio/:id', authMiddleware, (req, res) => {
   res.json({ ok: true });
 });
 
-app.post('/api/admin/upload/project-image', authMiddleware, upload.single('image'), async (req, res) => {
-  if (!req.file) {
+app.post('/api/admin/upload/project-image', authMiddleware, upload.array('images', 20), async (req, res) => {
+  const files = req.files as Express.Multer.File[] | undefined;
+  if (!files?.length) {
     return res.status(400).json({ message: 'Файл не передан' });
   }
 
@@ -447,22 +463,32 @@ app.post('/api/admin/upload/project-image', authMiddleware, upload.single('image
     : target === 'gallery'
       ? { width: 1200, height: 900 }
       : { width: 900, height: 600 };
-  const filename = `project_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.webp`;
-  const outputPath = path.join(PROJECTS_ASSETS_DIR, filename);
-
   try {
-    await sharp(req.file.buffer)
-      .rotate()
-      .resize(dimensions.width, dimensions.height, { fit: 'cover', position: 'attention' })
-      .webp({ lossless: true, nearLossless: true, quality: 100 })
-      .toFile(outputPath);
+    const urls: string[] = [];
+    for (const file of files) {
+      const filename = `project_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.webp`;
+      const outputPath = path.join(PROJECTS_ASSETS_DIR, filename);
+      await sharp(file.buffer)
+        .rotate()
+        .resize(dimensions.width, dimensions.height, { fit: 'cover', position: 'attention' })
+        .webp({ lossless: true, nearLossless: true, quality: 100 })
+        .toFile(outputPath);
+      urls.push(`${req.protocol}://${req.get('host')}/api/assets/projects/${filename}`);
+    }
 
-    const absoluteUrl = `${req.protocol}://${req.get('host')}/api/assets/projects/${filename}`;
-    return res.status(201).json({ url: absoluteUrl, width: dimensions.width, height: dimensions.height });
+    return res.status(201).json({ urls, width: dimensions.width, height: dimensions.height });
   } catch (error) {
     console.error('Не удалось обработать изображение проекта', error);
     return res.status(500).json({ message: 'Не удалось обработать изображение' });
   }
+});
+
+app.delete('/api/admin/upload/project-image', authMiddleware, (req, res) => {
+  const { url } = req.body as { url?: string };
+  if (!url) return res.status(400).json({ message: 'URL не передан' });
+  const deleted = deleteAssetByUrl(url);
+  if (!deleted) return res.status(404).json({ message: 'Файл не найден' });
+  return res.json({ ok: true });
 });
 
 app.use('/assets', express.static(ASSETS_DIR));

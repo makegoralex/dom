@@ -73,6 +73,7 @@ const PROJECT_GROUPS: ProjectGroupColumn[] = [
   { title: 'Проекты домов', groups: [{ items: ['Модульные', 'Каркасные', 'Из газобетона'] }] }
 ];
 const BATHS_MENU_ITEMS = ['Модульные', 'Каркасные'];
+const ADMIN_CONSTRUCTION_TYPES = ['Из газобетона', 'Каркасные', 'Модульные'];
 
 const SERVICES_MENU = [
   { slug: 'fundament', title: 'Фундамент', text: 'Проектируем и устраиваем фундаменты под тип грунта и нагрузку дома.' },
@@ -1411,6 +1412,11 @@ function AdminPage() {
   };
 
   const removeProject = async (id: string) => {
+    const currentProject = projects.find((item) => item.id === id);
+    const projectImages = [currentProject?.coverImage, ...(currentProject?.images || [])].filter(Boolean) as string[];
+    for (const imageUrl of projectImages) {
+      await deleteProjectImage(imageUrl);
+    }
     await fetch(`${API_BASE}/api/admin/projects/${id}`, {
       method: 'DELETE',
       headers: adminHeaders
@@ -1418,12 +1424,12 @@ function AdminPage() {
     await loadAdminData(token);
   };
 
-  const uploadProjectImage = async (file: File, target: 'cover' | 'gallery') => {
-    if (!file) return;
+  const uploadProjectImage = async (files: File[], target: 'cover' | 'gallery') => {
+    if (!files.length) return;
     setError('');
     setUploadStatus('Загрузка изображения...');
     const formData = new FormData();
-    formData.append('image', file);
+    files.forEach((file) => formData.append('images', file));
     const response = await fetch(`${API_BASE}/api/admin/upload/project-image?target=${target}`, {
       method: 'POST',
       headers: { 'x-admin-token': token },
@@ -1434,13 +1440,46 @@ function AdminPage() {
       setError('Не удалось загрузить изображение');
       return;
     }
-    const payload = (await response.json()) as { url: string };
+    const payload = (await response.json()) as { urls: string[] };
+    const urls = payload.urls || [];
     if (target === 'cover') {
-      setDraft((prev) => ({ ...prev, coverImage: payload.url }));
+      setDraft((prev) => ({ ...prev, coverImage: urls[0] || prev.coverImage || '' }));
     } else {
-      setDraft((prev) => ({ ...prev, images: [...(prev.images || []), payload.url] }));
+      setDraft((prev) => ({ ...prev, images: [...(prev.images || []), ...urls] }));
     }
-    setUploadStatus('Изображение загружено и оптимизировано');
+    setUploadStatus('Изображения загружены и оптимизированы');
+  };
+
+  const deleteProjectImage = async (url: string) => {
+    await fetch(`${API_BASE}/api/admin/upload/project-image`, {
+      method: 'DELETE',
+      headers: adminHeaders,
+      body: JSON.stringify({ url })
+    });
+  };
+
+  const removeImageFromDraft = async (index: number) => {
+    const currentImages = draft.images || [];
+    const removed = currentImages[index];
+    if (!removed) return;
+    setDraft((prev) => ({ ...prev, images: (prev.images || []).filter((_, idx) => idx !== index) }));
+    await deleteProjectImage(removed);
+    if (draft.coverImage === removed) {
+      setDraft((prev) => ({ ...prev, coverImage: '' }));
+    }
+  };
+
+  const moveDraftImage = (index: number, direction: -1 | 1) => {
+    const current = [...(draft.images || [])];
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= current.length) return;
+    const [item] = current.splice(index, 1);
+    current.splice(targetIndex, 0, item);
+    setDraft((prev) => ({ ...prev, images: current }));
+  };
+
+  const setCoverFromGallery = (url: string) => {
+    setDraft((prev) => ({ ...prev, coverImage: url }));
   };
 
 
@@ -1548,21 +1587,54 @@ function AdminPage() {
               onChange={(e) => setDraft({ ...draft, fullDescription: e.target.value })}
             />
             <input placeholder="Картинка обложка" value={draft.coverImage || ''} onChange={(e) => setDraft({ ...draft, coverImage: e.target.value })} />
-            <label>Загрузить обложку<input type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) uploadProjectImage(file, 'cover'); e.currentTarget.value = ''; }} /></label>
+            <label>Загрузить обложку<input type="file" accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadProjectImage(files, 'cover'); e.currentTarget.value = ''; }} /></label>
             <textarea
               rows={2}
               placeholder="Картинки (через запятую)"
               value={Array.isArray(draft.images) ? draft.images.join(', ') : ''}
               onChange={(e) => setDraft({ ...draft, images: e.target.value.split(',').map((v) => v.trim()).filter(Boolean) })}
             />
-            <label>Загрузить фото в галерею<input type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) uploadProjectImage(file, 'gallery'); e.currentTarget.value = ''; }} /></label>
+            <label>Загрузить фото в галерею (можно несколько)<input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadProjectImage(files, 'gallery'); e.currentTarget.value = ''; }} /></label>
+            {draft.coverImage ? (
+              <div className="admin-media-preview">
+                <p>Текущая обложка</p>
+                <div className="admin-image-card">
+                  <img src={resolveMediaUrl(draft.coverImage)} alt="Обложка проекта" />
+                  <div className="admin-image-actions">
+                    <button type="button" onClick={async () => {
+                      const image = draft.coverImage || '';
+                      setDraft((prev) => ({ ...prev, coverImage: '' }));
+                      if (image) await deleteProjectImage(image);
+                    }}>Удалить обложку</button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+            {(draft.images || []).length ? (
+              <div className="admin-media-preview">
+                <p>Фотографии проекта</p>
+                <div className="admin-images-grid">
+                  {(draft.images || []).map((img, index) => (
+                    <div key={`${img}_${index}`} className="admin-image-card">
+                      <img src={resolveMediaUrl(img)} alt={`Фото проекта ${index + 1}`} />
+                      <div className="admin-image-actions">
+                        <button type="button" onClick={() => moveDraftImage(index, -1)}>←</button>
+                        <button type="button" onClick={() => moveDraftImage(index, 1)}>→</button>
+                        <button type="button" onClick={() => setCoverFromGallery(img)}>Сделать обложкой</button>
+                        <button type="button" onClick={() => removeImageFromDraft(index)}>Удалить</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             <input placeholder="Сумма от" value={draft.priceFrom || ''} onChange={(e) => setDraft({ ...draft, priceFrom: e.target.value })} />
             <select value={draft.category || 'house'} onChange={(e) => setDraft({ ...draft, category: e.target.value as 'house' | 'bath' })}>
               <option value="house">Проекты домов</option>
               <option value="bath">Бани</option>
             </select>
-            <select value={draft.constructionType || 'Газобетон'} onChange={(e) => setDraft({ ...draft, constructionType: e.target.value })}>
-              {["Газобетон","Арболит","Керамзитобетонные блоки","Кирпич","Оцилиндрованное бревно","Рубленное бревно","Лафет","Профилированный брус","Клееный брус","Двойной брус","Каркасные","SIP панели","Строительство дачных домов под ключ"].map((t) => (
+            <select value={draft.constructionType || 'Из газобетона'} onChange={(e) => setDraft({ ...draft, constructionType: e.target.value })}>
+              {ADMIN_CONSTRUCTION_TYPES.map((t) => (
                 <option key={t} value={t}>{t}</option>
               ))}
             </select>
