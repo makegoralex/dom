@@ -52,6 +52,13 @@ type ProjectGroupColumn = {
     items: string[];
   }>;
 };
+type MenuChildItem = { label: string; href: string };
+type MenuItem = {
+  label: string;
+  href?: string;
+  children?: MenuChildItem[];
+  active?: boolean;
+};
 type AdminTab = 'projects' | 'pages' | 'portfolio' | 'leads';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '';
@@ -103,6 +110,124 @@ function chunkBy<T>(items: T[], size: number) {
   const chunks: T[][] = [];
   for (let i = 0; i < items.length; i += size) chunks.push(items.slice(i, i + size));
   return chunks;
+}
+
+function HeaderNav({
+  serviceColumns,
+  currentPath
+}: {
+  serviceColumns: Array<Array<{ slug: string; title: string }>>;
+  currentPath: string;
+}) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileStack, setMobileStack] = useState<Array<{ title: string; items: MenuChildItem[] }>>([]);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) {
+      setMobileStack([]);
+      return;
+    }
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileMenuOpen]);
+
+  const menuItems: MenuItem[] = useMemo(
+    () => [
+      { label: 'О КОМПАНИИ', href: '/about', active: currentPath === '/about' },
+      {
+        label: 'ПРОЕКТЫ ДОМОВ',
+        href: '/projects',
+        active: currentPath === '/projects',
+        children: PROJECT_GROUPS.flatMap((column) => column.groups.flatMap((group) => group.items.map((item) => ({ label: item, href: `/projects?type=${encodeURIComponent(item)}` }))))
+      },
+      {
+        label: 'БАНИ',
+        href: '/baths',
+        active: currentPath === '/baths',
+        children: BATHS_MENU_ITEMS.map((item) => ({ label: item, href: `/baths?type=${encodeURIComponent(item)}` }))
+      },
+      {
+        label: 'УСЛУГИ',
+        active: currentPath.startsWith('/services/'),
+        children: serviceColumns.flatMap((column) => column.map((item) => ({ label: item.title, href: `/services/${item.slug}` })))
+      },
+      { label: 'ПРОЕКТИРОВАНИЕ', href: '/design', active: currentPath === '/design' },
+      { label: 'ПОРТФОЛИО', href: '/portfolio', active: currentPath === '/portfolio' },
+      {
+        label: 'СКИДКИ И АКЦИИ',
+        active: currentPath.startsWith('/discounts/'),
+        children: PROMOTIONS_MENU.map((item) => ({ label: item.title, href: `/discounts/${item.slug}` }))
+      },
+      { label: 'КОНТАКТЫ', href: '/contacts', active: currentPath === '/contacts' }
+    ],
+    [currentPath, serviceColumns]
+  );
+
+  const activeMobileLevel = mobileStack[mobileStack.length - 1];
+
+  return (
+    <>
+      <div className="mobile-nav-trigger-row">
+        <button className="mobile-menu-trigger" onClick={() => setMobileMenuOpen(true)} aria-label="Открыть меню">
+          ☰ Меню
+        </button>
+      </div>
+      <nav className="hero-nav">
+        {menuItems.map((item, index) => (
+          <React.Fragment key={item.label}>
+            {item.children ? (
+              <div className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'СКИДКИ И АКЦИИ' ? 'menu-promotions' : ''}`}>
+                <a href={item.href || '#'} className={`menu-link ${item.active ? 'active' : ''}`}>{item.label} ▾</a>
+                <div className={item.label === 'ПРОЕКТЫ ДОМОВ' ? 'projects-dropdown' : 'services-dropdown'}>
+                  {item.children.map((child) => (
+                    <a key={child.href} href={child.href} className="dropdown-link">{child.label}</a>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <a href={item.href} className={`menu-link ${item.active ? 'active' : ''}`}>{item.label}</a>
+            )}
+            {index < menuItems.length - 1 ? <a>/</a> : null}
+          </React.Fragment>
+        ))}
+      </nav>
+      {mobileMenuOpen ? (
+        <div className="mobile-menu-overlay">
+          <div className="mobile-menu-panel">
+            <div className="mobile-menu-head">
+              {activeMobileLevel ? (
+                <button className="mobile-menu-back" onClick={() => setMobileStack((prev) => prev.slice(0, -1))}>← Назад</button>
+              ) : <span />}
+              <button className="mobile-menu-close" onClick={() => setMobileMenuOpen(false)} aria-label="Закрыть меню">✕</button>
+            </div>
+            <h3>{activeMobileLevel ? activeMobileLevel.title : 'Меню'}</h3>
+            <div className="mobile-menu-list">
+              {activeMobileLevel
+                ? activeMobileLevel.items.map((item) => (
+                  <a key={item.href} href={item.href} className="mobile-menu-item">{item.label}</a>
+                ))
+                : menuItems.map((item) => (
+                  item.children ? (
+                    <button
+                      key={item.label}
+                      className="mobile-menu-item mobile-menu-item-btn"
+                      onClick={() => setMobileStack((prev) => [...prev, { title: item.label, items: item.children || [] }])}
+                    >
+                      {item.label} →
+                    </button>
+                  ) : (
+                    <a key={item.label} href={item.href} className="mobile-menu-item">{item.label}</a>
+                  )
+                ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
 }
 const FALLBACK_PROJECTS: HouseProject[] = [
   {
@@ -419,7 +544,6 @@ function PublicPage() {
               <a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a>
               <a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a>
               <a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a>
-              <span><i>⤴</i> Свой проект на расчёт</span>
             </div>
           </div>
         </div>
@@ -435,64 +559,13 @@ function PublicPage() {
             </a>
 
             <div className="hero-contact-line">
-              <span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span>
+              <span>Нужна примерная оценка стоимости строительства? Поможем по телефону за 5 минут.</span>
               <div className="phone-block"><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><small>с 9:00 до 19:00</small></div>
               <button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button>
             </div>
           </div>
 
-          <nav className="hero-nav">
-            <a href="/about" className="menu-link">О КОМПАНИИ</a>
-            <a>/</a>
-            <div className="menu-projects">
-              <a href="/projects" className="menu-link">ПРОЕКТЫ ДОМОВ ▾</a>
-              <div className="projects-dropdown">
-                {PROJECT_GROUPS.map((column) => (
-                  <div key={column.title}>
-                    {column.groups.map((group) => (
-                      <div key={`${column.title}_${group.label}`}>
-                        {group.items.map((item) => (
-                          <a key={item} href={`/projects?type=${encodeURIComponent(item)}`} className="dropdown-link">{item}</a>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <a>/</a>
-            <div className="menu-services">
-              <a href="/baths" className="menu-link">БАНИ ▾</a>
-              <div className="services-dropdown">
-                {BATHS_MENU_ITEMS.map((item) => (
-                  <a key={item} href={`/baths?type=${encodeURIComponent(item)}`} className="dropdown-link">{item}</a>
-                ))}
-              </div>
-            </div>
-            <a>/</a>
-            <div className="menu-services">
-              <a className="menu-link">УСЛУГИ ▾</a>
-              <div className="services-dropdown">
-                {serviceColumns.map((column, index) => (
-                  <div className="dropdown-col" key={`service-col-${index}`}>
-                    {column.map((item) => (
-                      <a key={item.slug} href={`/services/${item.slug}`} className="dropdown-link">{item.title}</a>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <a>/</a><a href="/design" className="menu-link">ПРОЕКТИРОВАНИЕ</a><a>/</a><a href="/portfolio" className="menu-link">ПОРТФОЛИО</a><a>/</a>
-            <div className="menu-promotions">
-              <a className="menu-link">СКИДКИ И АКЦИИ ▾</a>
-              <div className="services-dropdown">
-                {PROMOTIONS_MENU.map((item) => (
-                  <a key={item.slug} href={`/discounts/${item.slug}`} className="dropdown-link">{item.title}</a>
-                ))}
-              </div>
-            </div>
-            <a>/</a><a href="/contacts" className="menu-link">КОНТАКТЫ</a>
-          </nav>
+          <HeaderNav serviceColumns={serviceColumns} currentPath={window.location.pathname} />
 
           <div className="hero-content">
             <h1>Строительство домов под ключ в Пензе</h1>
@@ -759,67 +832,15 @@ function InternalHeader() {
       <div className="top-search-row">
         <div className="container top-search-inner">
           <SearchBox />
-          <div className="top-contacts"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a><span><i>⤴</i> Свой проект на расчёт</span></div>
+          <div className="top-contacts"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a></div>
         </div>
       </div>
       <div className="container hero-main">
         <div className="hero-upper-row">
           <a href="/" className="brand-line"><div className="logo-badge"><img src="/assets/logo_small.png" alt="Evtenia" /></div><div className="brand-text"><div className="brand-logo">Evtenia</div><p>Строительная компания</p></div></a>
-          <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? <b>|</b> <u>Рассчитать онлайн</u></span><div className="phone-block"><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><small>с 9:00 до 19:00</small></div><button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button></div>
+          <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? Поможем по телефону за 5 минут.</span><div className="phone-block"><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><small>с 9:00 до 19:00</small></div><button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button></div>
         </div>
-        <nav className="hero-nav">
-          <a href="/about" className={`menu-link ${window.location.pathname === '/about' ? 'active' : ''}`}>О КОМПАНИИ</a><a>/</a>
-          <div className="menu-projects">
-            <a href="/projects" className={`menu-link ${window.location.pathname === '/projects' ? 'active' : ''}`}>ПРОЕКТЫ ДОМОВ ▾</a>
-            <div className="projects-dropdown">
-              {PROJECT_GROUPS.map((column) => (
-                <div key={column.title}>
-                  {column.groups.map((group) => (
-                    <div key={`${column.title}_${group.label}`}>
-                      {group.items.map((item) => (
-                        <a key={item} href={`/projects?type=${encodeURIComponent(item)}`} className="dropdown-link">{item}</a>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-          <a>/</a>
-          <div className="menu-services">
-            <a href="/baths" className={`menu-link ${window.location.pathname === '/baths' ? 'active' : ''}`}>БАНИ ▾</a>
-            <div className="services-dropdown">
-              {BATHS_MENU_ITEMS.map((item) => (
-                <a key={item} href={`/baths?type=${encodeURIComponent(item)}`} className="dropdown-link">{item}</a>
-              ))}
-            </div>
-          </div>
-          <a>/</a>
-          <div className="menu-services">
-            <a className={`menu-link ${window.location.pathname.startsWith('/services/') ? 'active' : ''}`}>УСЛУГИ ▾</a>
-            <div className="services-dropdown">
-              {serviceColumns.map((column, index) => (
-                <div className="dropdown-col" key={`service-col-${index}`}>
-                  {column.map((item) => (
-                    <a key={item.slug} href={`/services/${item.slug}`} className="dropdown-link">{item.title}</a>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-          <a>/</a>
-          <a href="/design" className={`menu-link ${window.location.pathname === '/design' ? 'active' : ''}`}>ПРОЕКТИРОВАНИЕ</a><a>/</a>
-          <a href="/portfolio" className={`menu-link ${window.location.pathname === '/portfolio' ? 'active' : ''}`}>ПОРТФОЛИО</a><a>/</a>
-          <div className="menu-promotions">
-            <a className={`menu-link ${window.location.pathname.startsWith('/discounts/') ? 'active' : ''}`}>СКИДКИ И АКЦИИ ▾</a>
-            <div className="services-dropdown">
-              {PROMOTIONS_MENU.map((item) => (
-                <a key={item.slug} href={`/discounts/${item.slug}`} className="dropdown-link">{item.title}</a>
-              ))}
-            </div>
-          </div>
-          <a>/</a><a href="/contacts" className={`menu-link ${window.location.pathname === '/contacts' ? 'active' : ''}`}>КОНТАКТЫ</a>
-        </nav>
+        <HeaderNav serviceColumns={serviceColumns} currentPath={window.location.pathname} />
       </div>
       <CallbackModal open={openCallback} onClose={() => setOpenCallback(false)} />
     </header>
@@ -898,6 +919,25 @@ function SiteFooter() {
             <div><h4>Бани</h4><a href="/baths?type=Модульные">Модульные</a><a href="/baths?type=Каркасные">Каркасные</a></div>
             <div><h4>Услуги</h4><a href="/services/fundament">Фундамент</a><a href="/services/skvazhiny">Скважины</a><a href="/services/remont">Ремонт</a><a href="/services/dizainer">Дизайнер</a></div>
             <div><h4>Разделы сайта</h4><a href="/design">Проектирование</a><a href="/portfolio">Портфолио</a><a href="/discounts/vse-akcii">Скидки и акции</a><a href="/contacts">Контакты</a></div>
+          </div>
+          <div className="footer-mobile-accordion">
+            <details>
+              <summary>Проекты домов</summary>
+              <a href="/projects?type=Модульные">Модульные</a>
+              <a href="/projects?type=Каркасные">Каркасные</a>
+              <a href="/projects?type=Из%20газобетона">Из газобетона</a>
+            </details>
+            <details>
+              <summary>Бани</summary>
+              <a href="/baths?type=Модульные">Модульные</a>
+              <a href="/baths?type=Каркасные">Каркасные</a>
+            </details>
+            <details>
+              <summary>Услуги</summary>
+              <a href="/services/fundament">Фундамент</a>
+              <a href="/services/skvazhiny">Скважины</a>
+              <a href="/services/remont">Ремонт</a>
+            </details>
           </div>
         </div>
         <aside className="footer-side">
