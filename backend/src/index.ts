@@ -3,6 +3,8 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import nodemailer from 'nodemailer';
+import multer from 'multer';
+import sharp from 'sharp';
 
 interface HouseProject {
   id: string;
@@ -61,7 +63,9 @@ const ADMIN_LOGIN = process.env.ADMIN_LOGIN || 'admin_dom';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'DomPenza2026!';
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'hidden-admin-token-penza';
 const FRONTEND_DIST = path.join(__dirname, '..', '..', 'frontend', 'dist');
-const CALLBACK_RECEIVER = process.env.CALLBACK_EMAIL || 'makegoralex@yandex.ru';
+const ASSETS_DIR = path.join(__dirname, '..', '..', 'assets');
+const PROJECTS_ASSETS_DIR = path.join(ASSETS_DIR, 'projects');
+const CALLBACK_RECEIVER = process.env.CALLBACK_EMAIL || '89022099279@mail.ru';
 const SMTP_HOST = process.env.SMTP_HOST || '';
 const SMTP_PORT = Number(process.env.SMTP_PORT || 587);
 const SMTP_USER = process.env.SMTP_USER || '';
@@ -274,6 +278,11 @@ const writeData = (data: DataStore): void => {
   fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
 };
 
+const ensureAssetsDirs = (): void => {
+  if (!fs.existsSync(ASSETS_DIR)) fs.mkdirSync(ASSETS_DIR, { recursive: true });
+  if (!fs.existsSync(PROJECTS_ASSETS_DIR)) fs.mkdirSync(PROJECTS_ASSETS_DIR, { recursive: true });
+};
+
 const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   if (req.header('x-admin-token') !== ADMIN_TOKEN) {
     res.status(401).json({ message: 'Unauthorized' });
@@ -284,6 +293,14 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction): void =
 
 app.use(cors());
 app.use(express.json());
+ensureAssetsDirs();
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 12 * 1024 * 1024
+  }
+});
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 app.get('/api/construction-types', (_req, res) => res.json(CONSTRUCTION_TYPES));
@@ -419,6 +436,36 @@ app.delete('/api/admin/portfolio/:id', authMiddleware, (req, res) => {
   res.json({ ok: true });
 });
 
+app.post('/api/admin/upload/project-image', authMiddleware, upload.single('image'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: 'Файл не передан' });
+  }
+
+  const target = req.query.target === 'thumb' ? 'thumb' : req.query.target === 'gallery' ? 'gallery' : 'cover';
+  const dimensions = target === 'thumb'
+    ? { width: 500, height: 500 }
+    : target === 'gallery'
+      ? { width: 1200, height: 900 }
+      : { width: 900, height: 600 };
+  const filename = `project_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.webp`;
+  const outputPath = path.join(PROJECTS_ASSETS_DIR, filename);
+
+  try {
+    await sharp(req.file.buffer)
+      .rotate()
+      .resize(dimensions.width, dimensions.height, { fit: 'cover', position: 'attention' })
+      .webp({ lossless: true, nearLossless: true, quality: 100 })
+      .toFile(outputPath);
+
+    const absoluteUrl = `${req.protocol}://${req.get('host')}/assets/projects/${filename}`;
+    return res.status(201).json({ url: absoluteUrl, width: dimensions.width, height: dimensions.height });
+  } catch (error) {
+    console.error('Не удалось обработать изображение проекта', error);
+    return res.status(500).json({ message: 'Не удалось обработать изображение' });
+  }
+});
+
+app.use('/assets', express.static(ASSETS_DIR));
 if (fs.existsSync(FRONTEND_DIST)) {
   app.use(express.static(FRONTEND_DIST));
   app.get(/^(?!\/api).*/, (_req, res) => res.sendFile(path.join(FRONTEND_DIST, 'index.html')));
