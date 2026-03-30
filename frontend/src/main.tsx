@@ -172,7 +172,7 @@ function HeaderNav({
     <>
       <div className="mobile-nav-trigger-row">
         <button className="mobile-menu-trigger" onClick={() => setMobileMenuOpen(true)} aria-label="Открыть меню">
-          ☰ Меню
+          ☰
         </button>
       </div>
       <nav className="hero-nav">
@@ -195,8 +195,8 @@ function HeaderNav({
         ))}
       </nav>
       {mobileMenuOpen ? (
-        <div className="mobile-menu-overlay">
-          <div className="mobile-menu-panel">
+        <div className="mobile-menu-overlay" onClick={() => setMobileMenuOpen(false)}>
+          <div className="mobile-menu-panel" onClick={(e) => e.stopPropagation()}>
             <div className="mobile-menu-head">
               {activeMobileLevel ? (
                 <button className="mobile-menu-back" onClick={() => setMobileStack((prev) => prev.slice(0, -1))}>← Назад</button>

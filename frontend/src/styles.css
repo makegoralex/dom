@@ -175,20 +175,21 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .project-price {display:block; margin:16px auto 0; width:max-content; padding:12px 28px; border:1px solid #2d2f33; border-radius:8px; font-size:20px; font-weight:700; color:#232832;}
 
 .project-detail-layout{display:grid; grid-template-columns:1fr 340px; gap:22px; align-items:start;}
+.project-detail-layout > *{min-width:0;}
 .project-detail-main-image{height:460px; background-size:cover; background-position:center; border:1px solid #d8dce3; width:100%; max-width:100%;}
 .project-detail-slider{display:grid; gap:8px;}
 .project-slider-controls{display:flex; align-items:center; justify-content:center; gap:10px; width:100%; max-width:100%;}
 .project-slider-controls button{border:1px solid #c8ced9; background:#fff; width:34px; height:30px; cursor:pointer; font-size:20px; line-height:1;}
 .project-slider-controls span{font-size:13px; color:#3b4350;}
-.project-detail-thumbs{display:flex; gap:10px; margin-top:12px;}
-.project-thumb{width:92px; height:70px; border:1px solid #d2d6dd; background-size:cover; background-position:center; background-color:#f0f2f6; cursor:pointer;}
+.project-detail-thumbs{display:flex; gap:10px; margin:12px 0 0; max-width:100%;}
+.project-thumb{width:92px; min-width:92px; height:70px; padding:0; border:1px solid #d2d6dd; background-size:cover; background-position:center; background-color:#f0f2f6; cursor:pointer;}
 .project-thumb.active{outline:2px solid #4f81c7; border-color:#4f81c7;}
 .project-detail-description{margin-top:16px; background:#f7f7f8; border:1px solid #d8dce3; padding:16px;}
 .project-detail-description h3{margin:0 0 8px; font-size:28px; font-family:Georgia, 'Times New Roman', serif;}
 .project-detail-description p{margin:0; font-size:14px; line-height:1.45;}
 .project-detail-side{background:#f7f7f8; border:1px solid #d8dce3; padding:18px;}
 .project-detail-side h3{margin:0 0 12px; font-size:20px; font-family:Georgia, 'Times New Roman', serif;}
-.detail-row{display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px dotted #ced2da; font-size:14px;}
+.detail-row{display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px dotted #ced2da; font-size:14px; flex-wrap:wrap;}
 .detail-row b{font-weight:600;}
 .detail-price{display:block; margin:14px 0 12px; font-size:34px; color:#1f2530;}
 .detail-btn{width:100%; border:none; background:#45a523; color:#fff; font-size:14px; font-weight:700; padding:12px; cursor:pointer;}
@@ -343,7 +344,7 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .promo-btn{padding:6px 10px; font-size:11px;}
   .hero-main{position:relative;}
   .mobile-nav-trigger-row{display:flex; justify-content:flex-end; position:absolute; right:0; top:8px; padding:0; z-index:5;}
-  .mobile-menu-trigger{border:1px solid rgba(255,255,255,.6); background:rgba(30,40,52,.55); color:#fff; font-size:14px; padding:8px 12px; border-radius:8px;}
+  .mobile-menu-trigger{border:1px solid rgba(255,255,255,.6); background:rgba(30,40,52,.55); color:#fff; font-size:23px; line-height:1; width:52px; height:44px; border-radius:8px; display:grid; place-items:center; padding:0;}
   .hero-nav{display:none;}
   .mobile-menu-overlay{position:fixed; inset:0; background:rgba(13,18,28,.56); z-index:130; display:grid; justify-items:end;}
   .mobile-menu-panel{width:min(360px, 92vw); height:100%; background:#fff; padding:14px 12px; color:#1f2631; overflow-y:auto;}
@@ -397,6 +398,8 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .phone-block small{display:none;}
   .section{padding:48px 0}
   .catalog-grid,.adv-grid,.admin-grid{grid-template-columns:1fr}
+  .project-detail-layout,.project-detail-side,.project-detail-description{min-width:0; overflow:hidden;}
+  .project-detail-thumbs{padding-bottom:2px;}
   .hero-content h1{font-size:34px}
   .hero-stats{flex-direction:column}
   .hero-stats strong{font-size:22px}
