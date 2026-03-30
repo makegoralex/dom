@@ -234,6 +234,13 @@ function normalizePrice(price: unknown) {
   return value.toLowerCase().startsWith('от') ? value : `от ${value}`;
 }
 
+function resolveMediaUrl(url?: string) {
+  const value = (url || '').trim();
+  if (!value) return '';
+  if (value.startsWith('/assets/') && API_BASE) return `${API_BASE}${value}`;
+  return value;
+}
+
 function SearchBox() {
   const params = new URLSearchParams(window.location.search);
   const [query, setQuery] = useState(params.get('q') || '');
@@ -298,10 +305,11 @@ function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }
 }
 
 function ProjectTile({ project }: { project: HouseProject }) {
+  const imageUrl = resolveMediaUrl(project.coverImage || project.images?.[0] || '');
   return (
     <article className="project-card">
       <a className="project-card-link" href={`/project/${project.id}`}>
-      <div className="project-image" style={{ backgroundImage: `url(${project.coverImage || project.images?.[0] || ""})` }} />
+      <div className="project-image" style={{ backgroundImage: `url(${imageUrl})` }} />
       <div className="project-content">
         <p className="project-desc">{project.shortDescription}</p>
         <h3>{project.title}</h3>
@@ -1008,7 +1016,7 @@ function ProjectDetailPage() {
   }, []);
 
   const project = projects.find((item) => item.id === projectId) || FALLBACK_PROJECTS[0];
-  const gallery = [project.coverImage, ...(project.images || [])].filter(Boolean);
+  const gallery = [project.coverImage, ...(project.images || [])].filter(Boolean).map((img) => resolveMediaUrl(img));
 
   useEffect(() => {
     document.title = `${project.title} — Evtenia`;
@@ -1117,7 +1125,7 @@ function PortfolioPage() {
           <div className="portfolio-grid">
             {items.map((item) => (
               <article className="portfolio-card" key={item.id}>
-                <div className="portfolio-image" style={{ backgroundImage: `url(${item.image})` }}>
+                <div className="portfolio-image" style={{ backgroundImage: `url(${resolveMediaUrl(item.image)})` }}>
                   <h3>{item.title}</h3>
                 </div>
                 <div className="portfolio-meta-row">
