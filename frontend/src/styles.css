@@ -75,6 +75,7 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 
 .floating-actions{position:fixed; right:18px; bottom:18px; display:flex; flex-direction:column; align-items:center; gap:10px; z-index:120;}
 .floating-call-fixed {width:56px; height:56px; border-radius:50%; border:none; background:rgba(29,188,69,.92); color:#fff; font-size:24px; box-shadow:0 10px 22px rgba(8,40,20,.35); cursor:pointer;}
+.floating-call-icon{width:24px; height:24px; display:block; margin:0 auto;}
 .to-top-btn{width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,.45); background:rgba(33,39,49,.52); color:#fff; font-size:22px; cursor:pointer;}
 
 .internal-header{min-height:auto;}
@@ -353,7 +354,7 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .promo-inner strong{line-height:1.25;}
   .promo-btn{padding:6px 10px; font-size:11px;}
   .hero-main{position:relative;}
-  .mobile-nav-trigger-row{display:flex; justify-content:flex-end; position:absolute; right:0; top:8px; padding:0; z-index:5;}
+  .mobile-nav-trigger-row{display:flex; justify-content:flex-end; position:absolute; right:0; top:4px; padding:0; z-index:5;}
   .mobile-menu-trigger{border:1px solid rgba(255,255,255,.6); background:rgba(30,40,52,.55); color:#fff; font-size:23px; line-height:1; width:52px; height:44px; border-radius:8px; display:grid; place-items:center; padding:0;}
   .hero-nav{display:none;}
   .mobile-menu-overlay{position:fixed; inset:0; background:rgba(13,18,28,.56); z-index:130; display:grid; justify-items:end;}
@@ -396,14 +397,15 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .offer-card,.offer-card.wide{grid-column:span 1; min-height:190px;}
   .offer-title{font-size:26px;}
   .hero-main{padding-top:8px}
-  .hero-upper-row{gap:8px; padding-right:64px; padding-bottom:42px;}
+  .hero-upper-row{display:grid; grid-template-columns:1fr; gap:8px; padding-right:64px; padding-bottom:0; align-items:start;}
   .brand-logo{font-size:34px}
   .logo-badge{width:34px;height:34px;font-size:16px}
   .hero-contact-line strong{font-size:18px}
-  .hero-contact-line{margin-top:0; margin-left:auto; top:50px;}
+  .hero-contact-line{position:static; margin-top:6px; margin-left:0; justify-content:flex-start;}
   .floating-actions{right:12px; bottom:12px;}
   .floating-call-fixed{width:52px; height:52px;}
   .phone-block small{display:none;}
+  .call-btn{display:none;}
   .section{padding:48px 0}
   .catalog-grid,.adv-grid,.admin-grid{grid-template-columns:1fr}
   .project-detail-layout,.project-detail-side,.project-detail-description{min-width:0; overflow:hidden;}

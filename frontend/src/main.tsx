@@ -2154,7 +2154,12 @@ function AppLayout({ children }: { children: ReactNode }) {
       {children}
       <div className="floating-actions">
         {showToTop ? <button className="to-top-btn" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Наверх">↑</button> : null}
-        <button className="floating-call-fixed" onClick={() => setOpenCallback(true)} aria-label="Заказать звонок">☎</button>
+        <button className="floating-call-fixed" onClick={() => setOpenCallback(true)} aria-label="Заказать звонок">
+          <svg className="floating-call-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="7" y="2.5" width="10" height="19" rx="2.5" stroke="currentColor" strokeWidth="1.8" />
+            <path d="M11 18.5h2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          </svg>
+        </button>
       </div>
       <CookieNotice />
       <CallbackModal open={openCallback} onClose={() => setOpenCallback(false)} />
