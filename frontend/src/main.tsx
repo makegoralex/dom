@@ -467,6 +467,20 @@ function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }
 
   if (!open) return null;
 
+  const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 11);
+    const normalized = digits.startsWith('8') ? `7${digits.slice(1)}` : digits;
+    const withCountry = normalized.startsWith('7') ? normalized : `7${normalized}`;
+    const d = withCountry.slice(0, 11);
+    let result = '+7';
+    if (d.length > 1) result += ` (${d.slice(1, 4)}`;
+    if (d.length >= 4) result += ')';
+    if (d.length > 4) result += ` ${d.slice(4, 7)}`;
+    if (d.length > 7) result += `-${d.slice(7, 9)}`;
+    if (d.length > 9) result += `-${d.slice(9, 11)}`;
+    return result;
+  };
+
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     setStatus('Отправка...');
@@ -503,7 +517,16 @@ function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }
           <>
             <h3>Заказать звонок</h3>
             <form onSubmit={submit}>
-              <label>Телефон<input value={phone} onChange={(e) => setPhone(e.target.value)} required /></label>
+              <label>
+                Телефон
+                <input
+                  type="tel"
+                  placeholder="+7 (___) ___-__-__"
+                  value={phone}
+                  onChange={(e) => setPhone(formatPhone(e.target.value))}
+                  required
+                />
+              </label>
               <button type="submit">Перезвоните мне</button>
             </form>
             <a className="modal-policy" href="/about">Политика конфиденциальности</a>
@@ -2129,8 +2152,10 @@ function AppLayout({ children }: { children: ReactNode }) {
   return (
     <>
       {children}
-      <button className="floating-call-fixed" onClick={() => setOpenCallback(true)} aria-label="Заказать звонок">☎</button>
-      {showToTop ? <button className="to-top-btn" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Наверх">↑</button> : null}
+      <div className="floating-actions">
+        {showToTop ? <button className="to-top-btn" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Наверх">↑</button> : null}
+        <button className="floating-call-fixed" onClick={() => setOpenCallback(true)} aria-label="Заказать звонок">☎</button>
+      </div>
       <CookieNotice />
       <CallbackModal open={openCallback} onClose={() => setOpenCallback(false)} />
     </>

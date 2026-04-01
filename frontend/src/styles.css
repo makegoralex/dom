@@ -73,8 +73,9 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .btn-yellow {background:#d5ae34; color:#2b2b2b;}
 .btn-green i,.btn-yellow i{font-style:normal; margin-right:8px; font-size:14px; vertical-align:middle;}
 
-.floating-call-fixed {position:fixed; right:18px; bottom:18px; width:56px; height:56px; border-radius:50%; border:none; background:rgba(29,188,69,.92); color:#fff; font-size:24px; box-shadow:0 10px 22px rgba(8,40,20,.35); cursor:pointer; z-index:120;}
-.to-top-btn{position:fixed; right:18px; bottom:86px; width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,.45); background:rgba(33,39,49,.52); color:#fff; font-size:22px; cursor:pointer; z-index:119;}
+.floating-actions{position:fixed; right:18px; bottom:18px; display:flex; flex-direction:column; align-items:center; gap:10px; z-index:120;}
+.floating-call-fixed {width:56px; height:56px; border-radius:50%; border:none; background:rgba(29,188,69,.92); color:#fff; font-size:24px; box-shadow:0 10px 22px rgba(8,40,20,.35); cursor:pointer;}
+.to-top-btn{width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,.45); background:rgba(33,39,49,.52); color:#fff; font-size:22px; cursor:pointer;}
 
 .internal-header{min-height:auto;}
 .breadcrumbs{font-size:14px; color:#7d8490; margin-bottom:14px;}
@@ -400,8 +401,8 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .logo-badge{width:34px;height:34px;font-size:16px}
   .hero-contact-line strong{font-size:18px}
   .hero-contact-line{margin-top:0; margin-left:auto; top:50px;}
-  .floating-call-fixed{right:12px; bottom:12px; width:52px; height:52px;}
-  .to-top-btn{right:12px; bottom:74px;}
+  .floating-actions{right:12px; bottom:12px;}
+  .floating-call-fixed{width:52px; height:52px;}
   .phone-block small{display:none;}
   .section{padding:48px 0}
   .catalog-grid,.adv-grid,.admin-grid{grid-template-columns:1fr}
