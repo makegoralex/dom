@@ -55,6 +55,7 @@ interface DataStore {
   portfolio: PortfolioItem[];
   leads: Lead[];
   pages: Record<string, ContentPage>;
+  menuOrder: string[];
 }
 
 const app = express();
@@ -87,6 +88,7 @@ const CONSTRUCTION_TYPES = [
   'Каркасные',
   'Модульные'
 ];
+const NAV_MENU_DEFAULT_ORDER = ['about', 'projects', 'services', 'design', 'portfolio', 'furniture', 'promotions', 'contacts'];
 
 const seedProjects: HouseProject[] = [
   {
@@ -280,7 +282,7 @@ const seedPortfolio: PortfolioItem[] = [
 
 const ensureDataFile = (): void => {
   if (!fs.existsSync(DATA_FILE)) {
-    const initial: DataStore = { projects: seedProjects, portfolio: seedPortfolio, leads: [], pages: seedPages };
+    const initial: DataStore = { projects: seedProjects, portfolio: seedPortfolio, leads: [], pages: seedPages, menuOrder: NAV_MENU_DEFAULT_ORDER };
     fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2), 'utf-8');
   }
 };
@@ -293,7 +295,8 @@ const readData = (): DataStore => {
     projects: parsed.projects || seedProjects,
     portfolio: parsed.portfolio || seedPortfolio,
     leads: parsed.leads || [],
-    pages: { ...seedPages, ...(parsed.pages || {}) }
+    pages: { ...seedPages, ...(parsed.pages || {}) },
+    menuOrder: Array.isArray(parsed.menuOrder) && parsed.menuOrder.length ? parsed.menuOrder : NAV_MENU_DEFAULT_ORDER
   };
 };
 
@@ -364,6 +367,7 @@ app.get('/api/pages/:slug', (req, res) => {
   if (!page) return res.status(404).json({ message: 'Страница не найдена' });
   res.json(page);
 });
+app.get('/api/menu-order', (_req, res) => res.json({ order: readData().menuOrder || NAV_MENU_DEFAULT_ORDER }));
 
 app.post('/api/leads', async (req, res) => {
   const { name, phone, email, message, projectId } = req.body as Partial<Lead>;
@@ -439,6 +443,18 @@ app.delete('/api/admin/projects/:id', authMiddleware, (req, res) => {
 });
 
 app.get('/api/admin/pages', authMiddleware, (_req, res) => res.json(Object.values(readData().pages)));
+app.get('/api/admin/menu-order', authMiddleware, (_req, res) => res.json({ order: readData().menuOrder || NAV_MENU_DEFAULT_ORDER }));
+app.put('/api/admin/menu-order', authMiddleware, (req, res) => {
+  const data = readData();
+  const incomingOrder = Array.isArray(req.body?.order) ? req.body.order.map(String) : [];
+  const normalizedOrder = NAV_MENU_DEFAULT_ORDER.filter((item) => incomingOrder.includes(item));
+  for (const item of NAV_MENU_DEFAULT_ORDER) {
+    if (!normalizedOrder.includes(item)) normalizedOrder.push(item);
+  }
+  data.menuOrder = normalizedOrder;
+  writeData(data);
+  res.json({ order: data.menuOrder });
+});
 app.put('/api/admin/pages/:slug', authMiddleware, (req, res) => {
   const slug = String(req.params.slug);
   const data = readData();
