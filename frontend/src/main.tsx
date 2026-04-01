@@ -95,7 +95,7 @@ const PROJECT_GROUPS: ProjectGroupColumn[] = [
   }
 ];
 const ADMIN_CONSTRUCTION_TYPES = ['Из газобетона', 'Каркасные', 'Модульные'];
-const ADMIN_STYLE_OPTIONS = ['Классический', 'Современный', 'Скандинавский', 'Барнхаус', 'Минимализм', 'Русский'];
+const ADMIN_STYLE_OPTIONS = ['Классический', 'Современный', 'Сканди', 'Барнхаус', 'Минимализм', 'Русский'];
 const DEFAULT_LOGO_URL = '/assets/logo_small.png';
 
 const SERVICES_MENU = [
@@ -337,7 +337,7 @@ const FALLBACK_PROJECTS: HouseProject[] = [
     images: [],
     priceFrom: 'от 5 730 000 ₽',
     constructionType: 'Каркасные',
-    style: 'Скандинавский',
+    style: 'Сканди',
     category: 'house'
   },
   {
@@ -461,9 +461,9 @@ function resolveMediaUrl(url?: string) {
 }
 
 function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [status, setStatus] = useState('');
+  const [submitted, setSubmitted] = useState(false);
 
   if (!open) return null;
 
@@ -475,16 +475,16 @@ function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name,
+          name: 'Клиент',
           phone,
           email: CONTACTS.email,
           message: 'Заказ звонка с сайта'
         })
       });
       if (!res.ok) throw new Error('bad');
-      setStatus('Заявка отправлена.');
-      setName('');
+      setStatus('');
       setPhone('');
+      setSubmitted(true);
     } catch {
       setStatus('Не удалось отправить заявку. Попробуйте позже.');
     }
@@ -492,15 +492,24 @@ function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-        <h3>Заказать звонок</h3>
-        <form onSubmit={submit}>
-          <label>Имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
-          <label>Телефон<input value={phone} onChange={(e) => setPhone(e.target.value)} required /></label>
-          <button type="submit">Отправить</button>
-        </form>
-        <a className="modal-policy" href="/about">Политика конфиденциальности</a>
-        {status ? <p>{status}</p> : null}
+      <div className="modal-card callback-modal" onClick={(e) => e.stopPropagation()}>
+        {submitted ? (
+          <div className="callback-success">
+            <h3>Спасибо!</h3>
+            <p>Заявка отправлена, мы перезвоним вам в ближайшее время.</p>
+            <button type="button" onClick={() => { setSubmitted(false); onClose(); }}>Закрыть</button>
+          </div>
+        ) : (
+          <>
+            <h3>Заказать звонок</h3>
+            <form onSubmit={submit}>
+              <label>Телефон<input value={phone} onChange={(e) => setPhone(e.target.value)} required /></label>
+              <button type="submit">Перезвоните мне</button>
+            </form>
+            <a className="modal-policy" href="/about">Политика конфиденциальности</a>
+            {status ? <p>{status}</p> : null}
+          </>
+        )}
       </div>
     </div>
   );
@@ -646,7 +655,6 @@ function PublicPage() {
           </div>
         </div>
 
-        <button className="floating-call">☎</button>
       </header>
 
       <section className="offer-section">
@@ -975,7 +983,7 @@ function SiteFooter() {
           </div>
         </div>
         <aside className="footer-side">
-          <div className="contact-card"><h4>Контакты</h4><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><a className="extra-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a><button onClick={() => setOpenCallback(true)}>Заказать звонок</button><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a><a href={CONTACTS.emailHref}>{CONTACTS.email}</a></div>
+          <div className="contact-card"><h4>Контакты</h4><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><a className="extra-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a><button onClick={() => setOpenCallback(true)}>Заказать звонок</button><a href={CONTACTS.emailHref}>{CONTACTS.email}</a></div>
           <div className="social-card"><h4>Мы в соцсетях</h4><div className="social-row"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a></div></div>
         </aside>
       </div>
@@ -2108,10 +2116,23 @@ function CookieNotice() {
 }
 
 function AppLayout({ children }: { children: ReactNode }) {
+  const [showToTop, setShowToTop] = useState(false);
+  const [openCallback, setOpenCallback] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setShowToTop(window.scrollY > 320);
+    onScroll();
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
     <>
       {children}
+      <button className="floating-call-fixed" onClick={() => setOpenCallback(true)} aria-label="Заказать звонок">☎</button>
+      {showToTop ? <button className="to-top-btn" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Наверх">↑</button> : null}
       <CookieNotice />
+      <CallbackModal open={openCallback} onClose={() => setOpenCallback(false)} />
     </>
   );
 }

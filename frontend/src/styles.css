@@ -73,7 +73,8 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .btn-yellow {background:#d5ae34; color:#2b2b2b;}
 .btn-green i,.btn-yellow i{font-style:normal; margin-right:8px; font-size:14px; vertical-align:middle;}
 
-.floating-call {position:absolute; right:24px; bottom:24px; width:54px; height:54px; border-radius:50%; border:none; background:#1dbc45; color:#fff; font-size:24px;}
+.floating-call-fixed {position:fixed; right:18px; bottom:18px; width:56px; height:56px; border-radius:50%; border:none; background:rgba(29,188,69,.92); color:#fff; font-size:24px; box-shadow:0 10px 22px rgba(8,40,20,.35); cursor:pointer; z-index:120;}
+.to-top-btn{position:fixed; right:18px; bottom:86px; width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,.45); background:rgba(33,39,49,.52); color:#fff; font-size:22px; cursor:pointer; z-index:119;}
 
 .internal-header{min-height:auto;}
 .breadcrumbs{font-size:14px; color:#7d8490; margin-bottom:14px;}
@@ -262,12 +263,18 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 
 .modal-backdrop{position:fixed; inset:0; background:rgba(20,24,33,.55); display:grid; place-items:center; z-index:120;}
 .modal-card{width:min(420px, calc(100vw - 24px)); background:#fff; padding:18px; border-radius:10px; border:1px solid #d7dce5;}
+.callback-modal{animation:callback-pop .24s ease;}
 .modal-card h3{margin:0 0 10px; font-size:24px; color:#1d2430;}
 .modal-card form{display:grid; gap:10px;}
 .modal-card label{display:grid; gap:4px; font-size:14px; color:#3d4350;}
 .modal-card input{border:1px solid #ccd3df; padding:10px 12px; font-size:14px;}
 .modal-card button{border:none; background:#49a727; color:#fff; padding:10px 12px; font-weight:700; cursor:pointer;}
 .modal-policy{font-size:12px; color:#6a707b; display:inline-block; margin-top:8px;}
+.callback-success p{margin:0 0 14px; color:#3b4250;}
+@keyframes callback-pop {
+  from {opacity:0; transform:translateY(10px) scale(.98);}
+  to {opacity:1; transform:translateY(0) scale(1);}
+}
 
 .lead-form {max-width:620px; display:grid; gap:12px;}
 .lead-form input,.lead-form select,.lead-form textarea,.admin-form input,.admin-form textarea {
@@ -393,6 +400,8 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .logo-badge{width:34px;height:34px;font-size:16px}
   .hero-contact-line strong{font-size:18px}
   .hero-contact-line{margin-top:0; margin-left:auto; top:50px;}
+  .floating-call-fixed{right:12px; bottom:12px; width:52px; height:52px;}
+  .to-top-btn{right:12px; bottom:74px;}
   .phone-block small{display:none;}
   .section{padding:48px 0}
   .catalog-grid,.adv-grid,.admin-grid{grid-template-columns:1fr}
