@@ -1028,12 +1028,6 @@ function SiteFooter() {
             <a href="/portfolio">Портфолио</a>
             <a href="/privacy-policy">Политика конфиденциальности</a>
           </div>
-          <div className="footer-requisites">
-            <h4>Реквизиты</h4>
-            <p><strong>ООО «Евтения»</strong></p>
-            <p>ИНН: 5836696238</p>
-            <p>ОГРН: 1215800005442</p>
-          </div>
           <div className="footer-columns">
             <div><h4>Проекты домов</h4><a href="/projects?type=Модульные">Модульные</a><a href="/projects?type=Каркасные">Каркасные</a><a href="/projects?type=Из%20газобетона">Из газобетона</a></div>
             <div><h4>Бани</h4><a href="/baths?type=Модульные">Модульные</a><a href="/baths?type=Каркасные">Каркасные</a></div>
@@ -1058,6 +1052,12 @@ function SiteFooter() {
               <a href="/services/skvazhiny">Скважины</a>
               <a href="/services/remont">Ремонт</a>
             </details>
+          </div>
+          <div className="footer-requisites">
+            <h4>Реквизиты</h4>
+            <p><strong>ООО «Евтения»</strong></p>
+            <p>ИНН: 5836696238</p>
+            <p>ОГРН: 1215800005442</p>
           </div>
         </div>
         <aside className="footer-side">
