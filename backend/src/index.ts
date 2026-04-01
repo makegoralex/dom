@@ -56,6 +56,9 @@ interface DataStore {
   leads: Lead[];
   pages: Record<string, ContentPage>;
   menuOrder: string[];
+  siteSettings: {
+    logoUrl: string;
+  };
 }
 
 const app = express();
@@ -89,6 +92,7 @@ const CONSTRUCTION_TYPES = [
   'Модульные'
 ];
 const NAV_MENU_DEFAULT_ORDER = ['about', 'projects', 'services', 'design', 'portfolio', 'furniture', 'promotions', 'contacts'];
+const DEFAULT_LOGO_URL = '/assets/logo_small.png';
 
 const seedProjects: HouseProject[] = [
   {
@@ -283,7 +287,14 @@ const seedPortfolio: PortfolioItem[] = [
 
 const ensureDataFile = (): void => {
   if (!fs.existsSync(DATA_FILE)) {
-    const initial: DataStore = { projects: seedProjects, portfolio: seedPortfolio, leads: [], pages: seedPages, menuOrder: NAV_MENU_DEFAULT_ORDER };
+    const initial: DataStore = {
+      projects: seedProjects,
+      portfolio: seedPortfolio,
+      leads: [],
+      pages: seedPages,
+      menuOrder: NAV_MENU_DEFAULT_ORDER,
+      siteSettings: { logoUrl: DEFAULT_LOGO_URL }
+    };
     fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2), 'utf-8');
   }
 };
@@ -297,7 +308,12 @@ const readData = (): DataStore => {
     portfolio: parsed.portfolio || seedPortfolio,
     leads: parsed.leads || [],
     pages: { ...seedPages, ...(parsed.pages || {}) },
-    menuOrder: Array.isArray(parsed.menuOrder) && parsed.menuOrder.length ? parsed.menuOrder : NAV_MENU_DEFAULT_ORDER
+    menuOrder: Array.isArray(parsed.menuOrder) && parsed.menuOrder.length ? parsed.menuOrder : NAV_MENU_DEFAULT_ORDER,
+    siteSettings: {
+      logoUrl: typeof parsed.siteSettings?.logoUrl === 'string' && parsed.siteSettings.logoUrl.trim()
+        ? parsed.siteSettings.logoUrl
+        : DEFAULT_LOGO_URL
+    }
   };
 };
 
@@ -369,6 +385,7 @@ app.get('/api/pages/:slug', (req, res) => {
   res.json(page);
 });
 app.get('/api/menu-order', (_req, res) => res.json({ order: readData().menuOrder || NAV_MENU_DEFAULT_ORDER }));
+app.get('/api/site-settings', (_req, res) => res.json(readData().siteSettings));
 
 app.post('/api/leads', async (req, res) => {
   const { name, phone, email, message, projectId } = req.body as Partial<Lead>;
@@ -445,6 +462,16 @@ app.delete('/api/admin/projects/:id', authMiddleware, (req, res) => {
 
 app.get('/api/admin/pages', authMiddleware, (_req, res) => res.json(Object.values(readData().pages)));
 app.get('/api/admin/menu-order', authMiddleware, (_req, res) => res.json({ order: readData().menuOrder || NAV_MENU_DEFAULT_ORDER }));
+app.get('/api/admin/site-settings', authMiddleware, (_req, res) => res.json(readData().siteSettings));
+app.put('/api/admin/site-settings', authMiddleware, (req, res) => {
+  const data = readData();
+  const incomingLogo = typeof req.body?.logoUrl === 'string' ? req.body.logoUrl.trim() : '';
+  data.siteSettings = {
+    logoUrl: incomingLogo || DEFAULT_LOGO_URL
+  };
+  writeData(data);
+  res.json(data.siteSettings);
+});
 app.put('/api/admin/menu-order', authMiddleware, (req, res) => {
   const data = readData();
   const incomingOrder: string[] = Array.isArray(req.body?.order) ? req.body.order.map(String) : [];
@@ -557,6 +584,27 @@ app.post('/api/admin/upload/page-image', authMiddleware, upload.array('images', 
   } catch (error) {
     console.error('Не удалось обработать изображение страницы', error);
     return res.status(500).json({ message: 'Не удалось обработать изображение' });
+  }
+});
+
+app.post('/api/admin/upload/logo', authMiddleware, upload.single('logo'), async (req, res) => {
+  const file = req.file;
+  if (!file) {
+    return res.status(400).json({ message: 'Файл не передан' });
+  }
+
+  try {
+    const filename = `logo_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.webp`;
+    const outputPath = path.join(ASSETS_DIR, filename);
+    await sharp(file.buffer)
+      .rotate()
+      .resize(240, 240, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .webp({ quality: 92 })
+      .toFile(outputPath);
+    return res.status(201).json({ url: `${req.protocol}://${req.get('host')}/api/assets/${filename}` });
+  } catch (error) {
+    console.error('Не удалось обработать логотип', error);
+    return res.status(500).json({ message: 'Не удалось обработать логотип' });
   }
 });
 
