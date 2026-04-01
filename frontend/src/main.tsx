@@ -34,6 +34,12 @@ type ContentPage = {
   content: string;
 };
 
+type ManagedPageLink = {
+  slug: string;
+  title: string;
+  sectionTitle: string;
+};
+
 type PortfolioItem = {
   id: string;
   title: string;
@@ -52,7 +58,7 @@ type ProjectGroupColumn = {
     items: string[];
   }>;
 };
-type MenuChildItem = { label: string; href: string };
+type MenuChildItem = { label: string; href?: string; heading?: boolean };
 type MenuItem = {
   label: string;
   href?: string;
@@ -77,9 +83,14 @@ const CONTACTS = {
   telegram: 'https://t.me/evtenia_realty'
 };
 const PROJECT_GROUPS: ProjectGroupColumn[] = [
-  { title: 'Проекты домов', groups: [{ items: ['Модульные', 'Каркасные', 'Из газобетона'] }] }
+  {
+    title: 'Проекты домов',
+    groups: [
+      { label: 'Дома', items: ['Модульные', 'Каркасные', 'Из газобетона'] },
+      { label: 'Бани', items: ['Каркасные', 'Модульные'] }
+    ]
+  }
 ];
-const BATHS_MENU_ITEMS = ['Модульные', 'Каркасные'];
 const ADMIN_CONSTRUCTION_TYPES = ['Из газобетона', 'Каркасные', 'Модульные'];
 const ADMIN_STYLE_OPTIONS = ['Классический', 'Современный', 'Скандинавский', 'Барнхаус', 'Минимализм', 'Русский'];
 
@@ -88,9 +99,12 @@ const SERVICES_MENU = [
   { slug: 'besedki', title: 'Беседки', text: 'Строим беседки под ключ: от эскиза до финальной отделки.' },
   { slug: 'septik', title: 'Септик', text: 'Подбираем и монтируем септики с учетом объема стоков и участка.' },
   { slug: 'zabory', title: 'Заборы', text: 'Устанавливаем заборы разных типов: профлист, евроштакетник, дерево.' },
-  { slug: 'mebel', title: 'Мебель', text: 'Делаем встроенную и корпусную мебель под размеры вашего дома.' },
-  { slug: 'podbor-uchastka', title: 'Подбор участка', text: 'Помогаем выбрать участок с проверкой рельефа, подъезда и коммуникаций.' },
   { slug: 'skvazhiny', title: 'Скважины', text: 'Бурим и обустраиваем скважины под дом и баню с подбором оборудования.' },
+  { slug: 'vyvoz-musora', title: 'Вывоз мусора', text: 'Организуем оперативный вывоз строительного и бытового мусора с объекта.' },
+  { slug: 'styazhka-pola', title: 'Стяжка пола', text: 'Делаем полусухую и бетонную стяжку с соблюдением уровня и сроков набора прочности.' },
+  { slug: 'konditsionery', title: 'Кондиционеры', text: 'Подбираем, устанавливаем и обслуживаем кондиционеры для дома и бани.' },
+  { slug: 'interernoe-ozelenenie', title: 'Интерьерное озеленение', text: 'Создаем проекты озеленения интерьера и подбираем растения под условия помещения.' },
+  { slug: 'otsenka-nedvizhimosti', title: 'Оценка недвижимости', text: 'Проводим профессиональную оценку недвижимости для продажи, ипотеки и юридических задач.' },
   { slug: 'plastikovye-okna', title: 'Пластиковые окна', text: 'Подбираем и устанавливаем ПВХ-окна с учетом теплопотерь и дизайна.' },
   { slug: 'dveri', title: 'Двери', text: 'Входные и межкомнатные двери с монтажом и фурнитурой.' },
   { slug: 'remont', title: 'Ремонт', text: 'Выполняем внутренний ремонт и отделку домов под ключ.' },
@@ -112,12 +126,36 @@ function chunkBy<T>(items: T[], size: number) {
   return chunks;
 }
 
+const NAV_MENU_DEFAULT_ORDER = ['about', 'projects', 'services', 'design', 'portfolio', 'furniture', 'promotions', 'contacts'] as const;
+type NavMenuKey = (typeof NAV_MENU_DEFAULT_ORDER)[number];
+
+function sanitizeCmsHtml(html: string) {
+  if (!html) return '';
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  doc.body.querySelectorAll('*').forEach((node) => {
+    ['style', 'id', 'width', 'height'].forEach((attr) => node.removeAttribute(attr));
+    const className = node.getAttribute('class') || '';
+    const allowedClasses = ['cms-image-grid', 'grid2', 'grid3'];
+    const normalized = className
+      .split(' ')
+      .filter((item) => allowedClasses.includes(item))
+      .join(' ')
+      .trim();
+    if (normalized) node.setAttribute('class', normalized);
+    else node.removeAttribute('class');
+  });
+  return doc.body.innerHTML;
+}
+
 function HeaderNav({
   serviceColumns,
-  currentPath
+  currentPath,
+  menuOrder = [...NAV_MENU_DEFAULT_ORDER]
 }: {
   serviceColumns: Array<Array<{ slug: string; title: string }>>;
   currentPath: string;
+  menuOrder?: NavMenuKey[];
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileStack, setMobileStack] = useState<Array<{ title: string; items: MenuChildItem[] }>>([]);
@@ -134,37 +172,28 @@ function HeaderNav({
     };
   }, [mobileMenuOpen]);
 
-  const menuItems: MenuItem[] = useMemo(
-    () => [
-      { label: 'О КОМПАНИИ', href: '/about', active: currentPath === '/about' },
-      {
-        label: 'ПРОЕКТЫ ДОМОВ',
-        href: '/projects',
-        active: currentPath === '/projects',
-        children: PROJECT_GROUPS.flatMap((column) => column.groups.flatMap((group) => group.items.map((item) => ({ label: item, href: `/projects?type=${encodeURIComponent(item)}` }))))
-      },
-      {
-        label: 'БАНИ',
-        href: '/baths',
-        active: currentPath === '/baths',
-        children: BATHS_MENU_ITEMS.map((item) => ({ label: item, href: `/baths?type=${encodeURIComponent(item)}` }))
-      },
-      {
-        label: 'УСЛУГИ',
-        active: currentPath.startsWith('/services/'),
-        children: serviceColumns.flatMap((column) => column.map((item) => ({ label: item.title, href: `/services/${item.slug}` })))
-      },
-      { label: 'ПРОЕКТИРОВАНИЕ', href: '/design', active: currentPath === '/design' },
-      { label: 'ПОРТФОЛИО', href: '/portfolio', active: currentPath === '/portfolio' },
-      {
-        label: 'СКИДКИ И АКЦИИ',
-        active: currentPath.startsWith('/discounts/'),
-        children: PROMOTIONS_MENU.map((item) => ({ label: item.title, href: `/discounts/${item.slug}` }))
-      },
-      { label: 'КОНТАКТЫ', href: '/contacts', active: currentPath === '/contacts' }
-    ],
-    [currentPath, serviceColumns]
-  );
+  const menuItems: MenuItem[] = useMemo(() => {
+    const projectsChildren: MenuChildItem[] = [
+      { label: 'Проекты домов', heading: true },
+      { label: 'Каркасные', href: `/projects?type=${encodeURIComponent('Каркасные')}` },
+      { label: 'Модульные', href: `/projects?type=${encodeURIComponent('Модульные')}` },
+      { label: 'Газобетонные', href: `/projects?type=${encodeURIComponent('Из газобетона')}` },
+      { label: 'Проекты бань', heading: true },
+      { label: 'Модульные', href: `/baths?type=${encodeURIComponent('Модульные')}` },
+      { label: 'Каркасные', href: `/baths?type=${encodeURIComponent('Каркасные')}` }
+    ];
+    const all: Record<NavMenuKey, MenuItem> = {
+      about: { label: 'О КОМПАНИИ', href: '/about', active: currentPath === '/about' },
+      projects: { label: 'ПРОЕКТЫ ДОМОВ', href: '/projects', active: currentPath === '/projects' || currentPath === '/baths', children: projectsChildren },
+      services: { label: 'УСЛУГИ', active: currentPath.startsWith('/services/'), children: serviceColumns.flatMap((column) => column.map((item) => ({ label: item.title, href: `/services/${item.slug}` }))) },
+      design: { label: 'ПРОЕКТИРОВАНИЕ', href: '/design', active: currentPath === '/design' },
+      portfolio: { label: 'ПОРТФОЛИО', href: '/portfolio', active: currentPath === '/portfolio' },
+      furniture: { label: 'МЕБЕЛЬ', href: '/furniture', active: currentPath === '/furniture' },
+      promotions: { label: 'СКИДКИ И АКЦИИ', active: currentPath.startsWith('/discounts/'), children: PROMOTIONS_MENU.map((item) => ({ label: item.title, href: `/discounts/${item.slug}` })) },
+      contacts: { label: 'КОНТАКТЫ', href: '/contacts', active: currentPath === '/contacts' }
+    };
+    return menuOrder.map((key) => all[key]).filter(Boolean);
+  }, [currentPath, serviceColumns, menuOrder]);
 
   const activeMobileLevel = mobileStack[mobileStack.length - 1];
 
@@ -182,8 +211,10 @@ function HeaderNav({
               <div className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'СКИДКИ И АКЦИИ' ? 'menu-promotions' : ''}`}>
                 <a href={item.href || '#'} className={`menu-link ${item.active ? 'active' : ''}`}>{item.label} ▾</a>
                 <div className={item.label === 'ПРОЕКТЫ ДОМОВ' ? 'projects-dropdown' : 'services-dropdown'}>
-                  {item.children.map((child) => (
-                    <a key={child.href} href={child.href} className="dropdown-link">{child.label}</a>
+                  {item.children.map((child, idx) => (
+                    child.heading
+                      ? <span key={`${child.label}_${idx}`} className="dropdown-heading">{child.label}</span>
+                      : <a key={child.href || `${child.label}_${idx}`} href={child.href} className="dropdown-link">{child.label}</a>
                   ))}
                 </div>
               </div>
@@ -206,8 +237,10 @@ function HeaderNav({
             <h3>{activeMobileLevel ? activeMobileLevel.title : 'Меню'}</h3>
             <div className="mobile-menu-list">
               {activeMobileLevel
-                ? activeMobileLevel.items.map((item) => (
-                  <a key={item.href} href={item.href} className="mobile-menu-item">{item.label}</a>
+                ? activeMobileLevel.items.map((item, idx) => (
+                  item.heading
+                    ? <strong key={`${item.label}_${idx}`} className="mobile-menu-item">{item.label}</strong>
+                    : <a key={item.href || `${item.label}_${idx}`} href={item.href} className="mobile-menu-item">{item.label}</a>
                 ))
                 : menuItems.map((item) => (
                   item.children ? (
@@ -359,7 +392,10 @@ const FALLBACK_PROJECTS: HouseProject[] = [
 function normalizePrice(price: unknown) {
   const value = String(price ?? '').trim();
   if (!value) return 'Цена по запросу';
-  return value.toLowerCase().startsWith('от') ? value : `от ${value}`;
+  const formattedDigits = value.replace(/\d{4,}/g, (chunk) => Number(chunk).toLocaleString('ru-RU'));
+  const withPrefix = formattedDigits.toLowerCase().startsWith('от') ? formattedDigits : `от ${formattedDigits}`;
+  const hasRuble = /₽|руб\.?/i.test(withPrefix);
+  return hasRuble ? withPrefix : `${withPrefix} ₽`;
 }
 
 function resolveMediaUrl(url?: string) {
@@ -475,6 +511,7 @@ function PublicPage() {
   const [constructionTypes, setConstructionTypes] = useState<string[]>([]);
   const [selectedType, setSelectedType] = useState('Все типы');
   const [openCallback, setOpenCallback] = useState(false);
+  const [menuOrder, setMenuOrder] = useState<NavMenuKey[]>([...NAV_MENU_DEFAULT_ORDER]);
   const serviceColumns = useMemo(() => chunkBy(SERVICES_MENU, 6), []);
 
   useEffect(() => {
@@ -494,6 +531,12 @@ function PublicPage() {
         setProjects(FALLBACK_PROJECTS);
         setProjectId(FALLBACK_PROJECTS[0].id);
       });
+    fetch(`${API_BASE}/api/menu-order`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no menu order'))))
+      .then((payload: { order?: NavMenuKey[] }) => {
+        if (Array.isArray(payload.order) && payload.order.length) setMenuOrder(payload.order);
+      })
+      .catch(() => setMenuOrder([...NAV_MENU_DEFAULT_ORDER]));
   }, []);
 
 
@@ -565,7 +608,7 @@ function PublicPage() {
             </div>
           </div>
 
-          <HeaderNav serviceColumns={serviceColumns} currentPath={window.location.pathname} />
+          <HeaderNav serviceColumns={serviceColumns} currentPath={window.location.pathname} menuOrder={menuOrder} />
 
           <div className="hero-content">
             <h1>Строительство домов под ключ в Пензе</h1>
@@ -820,6 +863,16 @@ function InternalTextBlock({ title, content }: { title: string; content: string 
 
 function InternalHeader() {
   const serviceColumns = chunkBy(SERVICES_MENU, 6);
+  const [menuOrder, setMenuOrder] = useState<NavMenuKey[]>([...NAV_MENU_DEFAULT_ORDER]);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/menu-order`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no menu order'))))
+      .then((payload: { order?: NavMenuKey[] }) => {
+        if (Array.isArray(payload.order) && payload.order.length) setMenuOrder(payload.order);
+      })
+      .catch(() => setMenuOrder([...NAV_MENU_DEFAULT_ORDER]));
+  }, []);
   const [openCallback, setOpenCallback] = useState(false);
   return (
     <header className="hero hero-exact internal-header">
@@ -840,7 +893,7 @@ function InternalHeader() {
           <a href="/" className="brand-line"><div className="logo-badge"><img src="/assets/logo_small.png" alt="Evtenia" /></div><div className="brand-text"><div className="brand-logo">Evtenia</div><p>Строительная компания</p></div></a>
           <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? Поможем по телефону за 5 минут.</span><div className="phone-block"><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><small>с 9:00 до 19:00</small></div><button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button></div>
         </div>
-        <HeaderNav serviceColumns={serviceColumns} currentPath={window.location.pathname} />
+        <HeaderNav serviceColumns={serviceColumns} currentPath={window.location.pathname} menuOrder={menuOrder} />
       </div>
       <CallbackModal open={openCallback} onClose={() => setOpenCallback(false)} />
     </header>
@@ -1341,7 +1394,7 @@ function DesignPage() {
   );
 }
 
-function SubsectionPage({ sectionTitle, pageTitle, text }: { sectionTitle: string; pageTitle: string; text: string }) {
+function SubsectionPage({ sectionTitle, pageTitle, text, isHtml = false }: { sectionTitle: string; pageTitle: string; text: string; isHtml?: boolean }) {
   useEffect(() => {
     document.title = `${pageTitle} — Evtenia`;
   }, [pageTitle]);
@@ -1354,14 +1407,27 @@ function SubsectionPage({ sectionTitle, pageTitle, text }: { sectionTitle: strin
           <Breadcrumbs items={["Главная", sectionTitle, pageTitle]} />
           <h1>{pageTitle}</h1>
           <div className="internal-text-box">
-            <p>{text}</p>
-            <p>Скоро добавим подробное описание услуги и примеры выполненных работ.</p>
+            {isHtml ? <div className="cms-content" dangerouslySetInnerHTML={{ __html: text }} /> : <><p>{text}</p><p>Скоро добавим подробное описание услуги и примеры выполненных работ.</p></>}
           </div>
         </div>
       </section>
       <SiteFooter />
     </div>
   );
+}
+
+
+function ManagedTextPage({ slug, fallbackTitle, fallbackContent, sectionTitle }: { slug: string; fallbackTitle: string; fallbackContent: string; sectionTitle: string }) {
+  const [page, setPage] = useState<ContentPage>({ slug, title: fallbackTitle, content: fallbackContent });
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/pages/${slug}`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('nf'))))
+      .then((payload: ContentPage) => setPage(payload))
+      .catch(() => setPage({ slug, title: fallbackTitle, content: fallbackContent }));
+  }, [slug, fallbackTitle, fallbackContent]);
+
+  return <SubsectionPage sectionTitle={sectionTitle} pageTitle={page.title} text={page.content} isHtml />;
 }
 
 function AdminPage() {
@@ -1378,6 +1444,10 @@ function AdminPage() {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<AdminTab>('projects');
   const [uploadStatus, setUploadStatus] = useState('');
+  const [menuOrderDraft, setMenuOrderDraft] = useState<NavMenuKey[]>([...NAV_MENU_DEFAULT_ORDER]);
+  const [menuSaveStatus, setMenuSaveStatus] = useState('');
+  const [imageInsertMode, setImageInsertMode] = useState<'cursor' | 'start' | 'end'>('cursor');
+  const [imageLayout, setImageLayout] = useState<'single' | 'grid2' | 'grid3'>('single');
 
   const adminHeaders = useMemo(
     () => ({
@@ -1388,14 +1458,15 @@ function AdminPage() {
   );
 
   const loadAdminData = async (currentToken: string) => {
-    const [projectsRes, leadsRes, pagesRes, portfolioRes] = await Promise.all([
+    const [projectsRes, leadsRes, pagesRes, portfolioRes, menuOrderRes] = await Promise.all([
       fetch(`${API_BASE}/api/admin/projects`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/leads`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/pages`, { headers: { 'x-admin-token': currentToken } }),
-      fetch(`${API_BASE}/api/admin/portfolio`, { headers: { 'x-admin-token': currentToken } })
+      fetch(`${API_BASE}/api/admin/portfolio`, { headers: { 'x-admin-token': currentToken } }),
+      fetch(`${API_BASE}/api/admin/menu-order`, { headers: { 'x-admin-token': currentToken } })
     ]);
 
-    if (!projectsRes.ok || !leadsRes.ok || !pagesRes.ok || !portfolioRes.ok) {
+    if (!projectsRes.ok || !leadsRes.ok || !pagesRes.ok || !portfolioRes.ok || !menuOrderRes.ok) {
       setError('Не удалось загрузить данные админки');
       return;
     }
@@ -1405,6 +1476,8 @@ function AdminPage() {
     setLeads(await leadsRes.json());
     setPages(pagesPayload);
     setPortfolio(await portfolioRes.json());
+    const orderPayload = (await menuOrderRes.json()) as { order?: NavMenuKey[] };
+    if (Array.isArray(orderPayload.order) && orderPayload.order.length) setMenuOrderDraft(orderPayload.order);
     if (!pageDraft && pagesPayload[0]) {
       setPageDraft(pagesPayload[0]);
     }
@@ -1528,11 +1601,12 @@ function AdminPage() {
 
   const savePage = async () => {
     if (!pageDraft) return;
+    const sanitizedPageDraft = { ...pageDraft, content: sanitizeCmsHtml(pageDraft.content || '') };
 
-    const response = await fetch(`${API_BASE}/api/admin/pages/${pageDraft.slug}`, {
+    const response = await fetch(`${API_BASE}/api/admin/pages/${sanitizedPageDraft.slug}`, {
       method: 'PUT',
       headers: adminHeaders,
-      body: JSON.stringify(pageDraft)
+      body: JSON.stringify(sanitizedPageDraft)
     });
 
     if (!response.ok) {
@@ -1540,6 +1614,76 @@ function AdminPage() {
       return;
     }
 
+    await loadAdminData(token);
+  };
+
+  const uploadPageImage = async (files: File[]) => {
+    if (!files.length || !pageDraft) return;
+    setUploadStatus('Загрузка изображения для страницы...');
+    const formData = new FormData();
+    files.forEach((file) => formData.append('images', file));
+    const response = await fetch(`${API_BASE}/api/admin/upload/page-image`, {
+      method: 'POST',
+      headers: { 'x-admin-token': token },
+      body: formData
+    });
+    if (!response.ok) {
+      setUploadStatus('');
+      setError('Не удалось загрузить фото для страницы');
+      return;
+    }
+    const payload = (await response.json()) as { urls: string[] };
+    const imageUrls = payload.urls || [];
+    if (!imageUrls.length) return;
+    const imagesHtml = imageLayout === 'single'
+      ? imageUrls.map((url) => `<p><img src="${url}" alt="Изображение страницы" /></p>`).join('')
+      : `<div class="cms-image-grid ${imageLayout}">${imageUrls.map((url) => `<figure><img src="${url}" alt="Изображение страницы" /></figure>`).join('')}</div>`;
+
+    if (imageInsertMode === 'cursor') {
+      const editor = document.getElementById('cms-page-editor');
+      if (editor) {
+        editor.focus();
+        document.execCommand('insertHTML', false, imagesHtml);
+        setPageDraft({ ...pageDraft, content: sanitizeCmsHtml(editor.innerHTML) });
+      }
+    } else if (imageInsertMode === 'start') {
+      setPageDraft({ ...pageDraft, content: sanitizeCmsHtml(`${imagesHtml}${pageDraft.content || ''}`) });
+    } else {
+      setPageDraft({ ...pageDraft, content: sanitizeCmsHtml(`${pageDraft.content || ''}${imagesHtml}`) });
+    }
+    setUploadStatus('Фото-блок добавлен в страницу');
+  };
+
+  const applyPageFormat = (command: string) => {
+    document.execCommand(command);
+    const editor = document.getElementById('cms-page-editor');
+    if (editor && pageDraft) {
+      setPageDraft({ ...pageDraft, content: editor.innerHTML });
+    }
+  };
+
+  const moveMenuItem = (index: number, direction: -1 | 1) => {
+    const nextIndex = index + direction;
+    if (nextIndex < 0 || nextIndex >= menuOrderDraft.length) return;
+    const next = [...menuOrderDraft];
+    const [item] = next.splice(index, 1);
+    next.splice(nextIndex, 0, item);
+    setMenuOrderDraft(next);
+  };
+
+  const saveMenuOrder = async () => {
+    setMenuSaveStatus('Сохраняем порядок меню...');
+    const response = await fetch(`${API_BASE}/api/admin/menu-order`, {
+      method: 'PUT',
+      headers: adminHeaders,
+      body: JSON.stringify({ order: menuOrderDraft })
+    });
+    if (!response.ok) {
+      setError('Не удалось сохранить порядок меню');
+      setMenuSaveStatus('');
+      return;
+    }
+    setMenuSaveStatus('Порядок меню сохранен');
     await loadAdminData(token);
   };
 
@@ -1732,7 +1876,7 @@ function AdminPage() {
               <div key={project.id} className="list-item">
                 <div>
                   <strong>{project.title}</strong>
-                  <p>{project.priceFrom}</p>
+                  <p>{normalizePrice(project.priceFrom)}</p>
                 </div>
                 <div className="actions">
                   <button onClick={() => setDraft(project)}>Изменить</button>
@@ -1763,13 +1907,56 @@ function AdminPage() {
             value={pageDraft?.title || ''}
             onChange={(e) => setPageDraft(pageDraft ? { ...pageDraft, title: e.target.value } : null)}
           />
-          <textarea
-            rows={6}
-            placeholder="Контент"
-            value={pageDraft?.content || ''}
-            onChange={(e) => setPageDraft(pageDraft ? { ...pageDraft, content: e.target.value } : null)}
+          <div className="cms-toolbar">
+            <button type="button" onClick={() => applyPageFormat('bold')}>Жирный</button>
+            <button type="button" onClick={() => applyPageFormat('italic')}>Курсив</button>
+            <button type="button" onClick={() => applyPageFormat('insertUnorderedList')}>Список</button>
+            <select value={imageInsertMode} onChange={(e) => setImageInsertMode(e.target.value as 'cursor' | 'start' | 'end')}>
+              <option value="cursor">Фото в позицию курсора</option>
+              <option value="start">Фото в начало страницы</option>
+              <option value="end">Фото в конец страницы</option>
+            </select>
+            <select value={imageLayout} onChange={(e) => setImageLayout(e.target.value as 'single' | 'grid2' | 'grid3')}>
+              <option value="single">Одиночные фото</option>
+              <option value="grid2">Сетка 2 колонки</option>
+              <option value="grid3">Сетка 3 колонки</option>
+            </select>
+            <label>Фото-блок<input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadPageImage(files); e.currentTarget.value = ''; }} /></label>
+          </div>
+          <div
+            id="cms-page-editor"
+            className="cms-editor"
+            contentEditable
+            suppressContentEditableWarning
+            onPaste={(e) => {
+              e.preventDefault();
+              const text = e.clipboardData.getData('text/plain');
+              document.execCommand('insertText', false, text);
+            }}
+            onInput={(e) => setPageDraft(pageDraft ? { ...pageDraft, content: sanitizeCmsHtml((e.target as HTMLDivElement).innerHTML) } : null)}
+            dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(pageDraft?.content || '') }}
           />
           <button onClick={savePage}>Сохранить страницу</button>
+          <div className="cms-preview">
+            <p>Порядок меню</p>
+            <div className="list">
+              {menuOrderDraft.map((item, index) => (
+                <div key={item} className="list-item">
+                  <strong>{item}</strong>
+                  <div className="actions">
+                    <button type="button" onClick={() => moveMenuItem(index, -1)}>↑</button>
+                    <button type="button" onClick={() => moveMenuItem(index, 1)}>↓</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button type="button" onClick={saveMenuOrder}>Сохранить порядок меню</button>
+            {menuSaveStatus ? <p>{menuSaveStatus}</p> : null}
+          </div>
+          <div className="cms-preview">
+            <p>Предпросмотр</p>
+            <div className="cms-content" dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(pageDraft?.content || '') }} />
+          </div>
         </div>
       </section> : null}
 
@@ -1862,8 +2049,9 @@ function App() {
   if (pathname.startsWith('/project/')) return <ProjectDetailPage />;
   if (pathname === '/design') return <DesignPage />;
   if (pathname === '/search') return <SearchPage />;
-  if (servicePage) return <SubsectionPage sectionTitle="Услуги" pageTitle={servicePage.title} text={servicePage.text} />;
-  if (discountPage) return <SubsectionPage sectionTitle="Скидки и акции" pageTitle={discountPage.title} text={discountPage.text} />;
+  if (servicePage) return <ManagedTextPage slug={`services-${servicePage.slug}`} fallbackTitle={servicePage.title} fallbackContent={servicePage.text} sectionTitle="Услуги" />;
+  if (discountPage) return <ManagedTextPage slug={`discounts-${discountPage.slug}`} fallbackTitle={discountPage.title} fallbackContent={discountPage.text} sectionTitle="Скидки и акции" />;
+  if (pathname === '/furniture') return <ManagedTextPage slug="furniture" fallbackTitle="Мебель" fallbackContent="Изготавливаем корпусную и встроенную мебель под ваши размеры и стиль интерьера." sectionTitle="Каталог" />;
   if (pathname === '/portfolio') return <PortfolioPage />;
   if (pathname === '/contacts') return <ContactsPage />;
   return <PublicPage />;
