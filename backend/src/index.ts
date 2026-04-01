@@ -447,8 +447,8 @@ app.get('/api/admin/pages', authMiddleware, (_req, res) => res.json(Object.value
 app.get('/api/admin/menu-order', authMiddleware, (_req, res) => res.json({ order: readData().menuOrder || NAV_MENU_DEFAULT_ORDER }));
 app.put('/api/admin/menu-order', authMiddleware, (req, res) => {
   const data = readData();
-  const incomingOrder = Array.isArray(req.body?.order) ? req.body.order.map(String) : [];
-  const normalizedOrder = NAV_MENU_DEFAULT_ORDER.filter((item) => incomingOrder.includes(item));
+  const incomingOrder: string[] = Array.isArray(req.body?.order) ? req.body.order.map(String) : [];
+  const normalizedOrder = incomingOrder.filter((item: string) => NAV_MENU_DEFAULT_ORDER.includes(item));
   for (const item of NAV_MENU_DEFAULT_ORDER) {
     if (!normalizedOrder.includes(item)) normalizedOrder.push(item);
   }

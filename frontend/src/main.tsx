@@ -383,7 +383,8 @@ const FALLBACK_PROJECTS: HouseProject[] = [
 function normalizePrice(price: unknown) {
   const value = String(price ?? '').trim();
   if (!value) return 'Цена по запросу';
-  const withPrefix = value.toLowerCase().startsWith('от') ? value : `от ${value}`;
+  const formattedDigits = value.replace(/\d{4,}/g, (chunk) => Number(chunk).toLocaleString('ru-RU'));
+  const withPrefix = formattedDigits.toLowerCase().startsWith('от') ? formattedDigits : `от ${formattedDigits}`;
   const hasRuble = /₽|руб\.?/i.test(withPrefix);
   return hasRuble ? withPrefix : `${withPrefix} ₽`;
 }
