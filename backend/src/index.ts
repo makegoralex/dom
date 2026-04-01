@@ -180,7 +180,39 @@ const seedPages: Record<string, ContentPage> = {
     slug: 'about',
     title: 'О компании',
     content: 'Строительная компания «TMдом» открыта в 2014 году. Мы строим качественные дома под ключ.'
-  }
+  },
+  furniture: {
+    slug: 'furniture',
+    title: 'Мебель',
+    content: '<p>Изготавливаем корпусную и встроенную мебель под размеры вашего дома, квартиры или бани.</p>'
+  },
+  'discounts-ipoteka-i-kredit': {
+    slug: 'discounts-ipoteka-i-kredit',
+    title: 'Ипотека и кредит',
+    content: '<p>Подберем комфортную программу ипотеки или кредита на строительство.</p>'
+  },
+  'discounts-vse-akcii': {
+    slug: 'discounts-vse-akcii',
+    title: 'Все акции',
+    content: '<p>Здесь публикуем актуальные скидки, акции и специальные предложения.</p>'
+  },
+  'services-fundament': { slug: 'services-fundament', title: 'Фундамент', content: '<p>Проектируем и устраиваем фундаменты под тип грунта и нагрузку дома.</p>' },
+  'services-besedki': { slug: 'services-besedki', title: 'Беседки', content: '<p>Строим беседки под ключ: от эскиза до финальной отделки.</p>' },
+  'services-septik': { slug: 'services-septik', title: 'Септик', content: '<p>Подбираем и монтируем септики с учетом объема стоков и участка.</p>' },
+  'services-zabory': { slug: 'services-zabory', title: 'Заборы', content: '<p>Устанавливаем заборы разных типов: профлист, евроштакетник, дерево.</p>' },
+  'services-skvazhiny': { slug: 'services-skvazhiny', title: 'Скважины', content: '<p>Бурим и обустраиваем скважины под дом и баню с подбором оборудования.</p>' },
+  'services-vyvoz-musora': { slug: 'services-vyvoz-musora', title: 'Вывоз мусора', content: '<p>Организуем оперативный вывоз строительного и бытового мусора с объекта.</p>' },
+  'services-styazhka-pola': { slug: 'services-styazhka-pola', title: 'Стяжка пола', content: '<p>Делаем полусухую и бетонную стяжку с соблюдением уровня и сроков набора прочности.</p>' },
+  'services-konditsionery': { slug: 'services-konditsionery', title: 'Кондиционеры', content: '<p>Подбираем, устанавливаем и обслуживаем кондиционеры для дома и бани.</p>' },
+  'services-interernoe-ozelenenie': { slug: 'services-interernoe-ozelenenie', title: 'Интерьерное озеленение', content: '<p>Создаем проекты озеленения интерьера и подбираем растения под условия помещения.</p>' },
+  'services-plastikovye-okna': { slug: 'services-plastikovye-okna', title: 'Пластиковые окна', content: '<p>Подбираем и устанавливаем ПВХ-окна с учетом теплопотерь и дизайна.</p>' },
+  'services-dveri': { slug: 'services-dveri', title: 'Двери', content: '<p>Входные и межкомнатные двери с монтажом и фурнитурой.</p>' },
+  'services-remont': { slug: 'services-remont', title: 'Ремонт', content: '<p>Выполняем внутренний ремонт и отделку домов под ключ.</p>' },
+  'services-lestnitsy': { slug: 'services-lestnitsy', title: 'Лестницы', content: '<p>Проектируем и изготавливаем деревянные и комбинированные лестницы.</p>' },
+  'services-svai': { slug: 'services-svai', title: 'Сваи', content: '<p>Монтаж винтовых и железобетонных свай под разные типы грунта.</p>' },
+  'services-dizainer': { slug: 'services-dizainer', title: 'Дизайнер', content: '<p>Разрабатываем дизайн-концепцию интерьеров и экстерьеров.</p>' },
+  'services-landshaftnyy-dizayn': { slug: 'services-landshaftnyy-dizayn', title: 'Ландшафтный дизайн', content: '<p>Проектируем благоустройство участка и озеленение территории.</p>' },
+  'services-mezhevanie': { slug: 'services-mezhevanie', title: 'Межевание', content: '<p>Готовим документы и выполняем межевание земельных участков.</p>' }
 };
 
 const seedPortfolio: PortfolioItem[] = [
@@ -261,7 +293,7 @@ const readData = (): DataStore => {
     projects: parsed.projects || seedProjects,
     portfolio: parsed.portfolio || seedPortfolio,
     leads: parsed.leads || [],
-    pages: parsed.pages || seedPages
+    pages: { ...seedPages, ...(parsed.pages || {}) }
   };
 };
 
@@ -481,6 +513,32 @@ app.post('/api/admin/upload/project-image', authMiddleware, upload.array('images
     return res.status(201).json({ urls, width: dimensions.width, height: dimensions.height });
   } catch (error) {
     console.error('Не удалось обработать изображение проекта', error);
+    return res.status(500).json({ message: 'Не удалось обработать изображение' });
+  }
+});
+
+
+app.post('/api/admin/upload/page-image', authMiddleware, upload.array('images', 10), async (req, res) => {
+  const files = req.files as Express.Multer.File[] | undefined;
+  if (!files?.length) {
+    return res.status(400).json({ message: 'Файл не передан' });
+  }
+
+  try {
+    const urls: string[] = [];
+    for (const file of files) {
+      const filename = `page_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.webp`;
+      const outputPath = path.join(PROJECTS_ASSETS_DIR, filename);
+      await sharp(file.buffer)
+        .rotate()
+        .resize(1400, 900, { fit: 'inside', withoutEnlargement: true })
+        .webp({ quality: 82 })
+        .toFile(outputPath);
+      urls.push(`${req.protocol}://${req.get('host')}/api/assets/projects/${filename}`);
+    }
+    return res.status(201).json({ urls });
+  } catch (error) {
+    console.error('Не удалось обработать изображение страницы', error);
     return res.status(500).json({ message: 'Не удалось обработать изображение' });
   }
 });
