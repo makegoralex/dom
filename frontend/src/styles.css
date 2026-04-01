@@ -84,6 +84,8 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .internal-body h1{margin:0 0 18px; font-size:26px; color:#1e2531; text-transform:uppercase;}
 .internal-text-box{background:#f7f7f8; border:1px solid #d8dce3; padding:22px;}
 .internal-text-box p{margin:0; font-size:13px; color:#323844; line-height:1.45;}
+.privacy-policy-box p{margin:0 0 12px; line-height:1.5;}
+.privacy-policy-box p:last-child{margin-bottom:0;}
 
 .contacts-box{background:#f7f7f8; border:1px solid #d8dce3; padding:28px; display:grid; grid-template-columns:1fr 1.1fr; gap:20px;}
 .contacts-info h3{margin:0 0 8px; font-size:20px; color:#1e2531; font-weight:700; font-family:inherit;}
@@ -237,6 +239,7 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .lead-bg-section textarea{border:2px solid rgba(255,255,255,.75); min-height:180px; padding:12px;}
 .lead-submit{justify-self:start; border:none; background:#53ab28; color:#fff; padding:12px 18px; font-size:14px; font-weight:700; cursor:pointer;}
 .lead-consent{margin:0; font-size:13px; color:#d7dbe1;}
+.lead-consent a{color:#fff; text-decoration:underline;}
 
 .site-footer{background:#ececef; padding:30px 0 24px;}
 .footer-layout{display:grid; grid-template-columns:1fr 280px; gap:16px;}
@@ -245,6 +248,10 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .footer-links{display:flex; gap:16px; margin-bottom:14px;}
 .footer-links a{text-decoration:underline; cursor:pointer;}
 .site-footer a,.site-footer a:visited{color:inherit;}
+.footer-requisites{background:#f6f6f7; border:1px solid #d9dde5; padding:14px; margin:0 0 14px;}
+.footer-requisites h4{margin:0 0 8px; font-size:17px;}
+.footer-requisites p{margin:0 0 4px; font-size:14px; color:#303744;}
+.footer-requisites p:last-child{margin-bottom:0;}
 .footer-columns{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; border-top:1px solid #d0d4dc; padding-top:14px;}
 .footer-mobile-accordion{display:none;}
 .footer-columns h4{margin:0 0 8px; font-size:17px;}
