@@ -134,7 +134,16 @@ function sanitizeCmsHtml(html: string) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
   doc.body.querySelectorAll('*').forEach((node) => {
-    ['style', 'class', 'id', 'width', 'height'].forEach((attr) => node.removeAttribute(attr));
+    ['style', 'id', 'width', 'height'].forEach((attr) => node.removeAttribute(attr));
+    const className = node.getAttribute('class') || '';
+    const allowedClasses = ['cms-image-grid', 'grid2', 'grid3'];
+    const normalized = className
+      .split(' ')
+      .filter((item) => allowedClasses.includes(item))
+      .join(' ')
+      .trim();
+    if (normalized) node.setAttribute('class', normalized);
+    else node.removeAttribute('class');
   });
   return doc.body.innerHTML;
 }
@@ -1437,6 +1446,8 @@ function AdminPage() {
   const [uploadStatus, setUploadStatus] = useState('');
   const [menuOrderDraft, setMenuOrderDraft] = useState<NavMenuKey[]>([...NAV_MENU_DEFAULT_ORDER]);
   const [menuSaveStatus, setMenuSaveStatus] = useState('');
+  const [imageInsertMode, setImageInsertMode] = useState<'cursor' | 'start' | 'end'>('cursor');
+  const [imageLayout, setImageLayout] = useState<'single' | 'grid2' | 'grid3'>('single');
 
   const adminHeaders = useMemo(
     () => ({
@@ -1622,11 +1633,25 @@ function AdminPage() {
       return;
     }
     const payload = (await response.json()) as { urls: string[] };
-    const imageUrl = payload.urls?.[0];
-    if (!imageUrl) return;
-    const html = sanitizeCmsHtml(`${pageDraft.content || ''}<p><img src="${imageUrl}" alt="Изображение страницы" /></p>`);
-    setPageDraft({ ...pageDraft, content: html });
-    setUploadStatus('Изображение добавлено в текст страницы');
+    const imageUrls = payload.urls || [];
+    if (!imageUrls.length) return;
+    const imagesHtml = imageLayout === 'single'
+      ? imageUrls.map((url) => `<p><img src="${url}" alt="Изображение страницы" /></p>`).join('')
+      : `<div class="cms-image-grid ${imageLayout}">${imageUrls.map((url) => `<figure><img src="${url}" alt="Изображение страницы" /></figure>`).join('')}</div>`;
+
+    if (imageInsertMode === 'cursor') {
+      const editor = document.getElementById('cms-page-editor');
+      if (editor) {
+        editor.focus();
+        document.execCommand('insertHTML', false, imagesHtml);
+        setPageDraft({ ...pageDraft, content: sanitizeCmsHtml(editor.innerHTML) });
+      }
+    } else if (imageInsertMode === 'start') {
+      setPageDraft({ ...pageDraft, content: sanitizeCmsHtml(`${imagesHtml}${pageDraft.content || ''}`) });
+    } else {
+      setPageDraft({ ...pageDraft, content: sanitizeCmsHtml(`${pageDraft.content || ''}${imagesHtml}`) });
+    }
+    setUploadStatus('Фото-блок добавлен в страницу');
   };
 
   const applyPageFormat = (command: string) => {
@@ -1886,7 +1911,17 @@ function AdminPage() {
             <button type="button" onClick={() => applyPageFormat('bold')}>Жирный</button>
             <button type="button" onClick={() => applyPageFormat('italic')}>Курсив</button>
             <button type="button" onClick={() => applyPageFormat('insertUnorderedList')}>Список</button>
-            <label>Фото<input type="file" accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadPageImage(files); e.currentTarget.value = ''; }} /></label>
+            <select value={imageInsertMode} onChange={(e) => setImageInsertMode(e.target.value as 'cursor' | 'start' | 'end')}>
+              <option value="cursor">Фото в позицию курсора</option>
+              <option value="start">Фото в начало страницы</option>
+              <option value="end">Фото в конец страницы</option>
+            </select>
+            <select value={imageLayout} onChange={(e) => setImageLayout(e.target.value as 'single' | 'grid2' | 'grid3')}>
+              <option value="single">Одиночные фото</option>
+              <option value="grid2">Сетка 2 колонки</option>
+              <option value="grid3">Сетка 3 колонки</option>
+            </select>
+            <label>Фото-блок<input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadPageImage(files); e.currentTarget.value = ''; }} /></label>
           </div>
           <div
             id="cms-page-editor"
