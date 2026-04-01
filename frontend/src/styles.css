@@ -418,3 +418,34 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .contact-card,.social-card{padding:10px;}
   .contact-card p{font-size:13px;}
 }
+
+.cms-toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cms-toolbar label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cms-editor {
+  min-height: 220px;
+  border: 1px solid #d9dee7;
+  border-radius: 10px;
+  padding: 12px;
+  background: #fff;
+}
+
+.cms-preview {
+  border-top: 1px dashed #cfd7e6;
+  padding-top: 10px;
+}
+
+.cms-content img {
+  max-width: 100%;
+  border-radius: 10px;
+  margin: 12px 0;
+}

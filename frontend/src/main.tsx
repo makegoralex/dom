@@ -34,6 +34,12 @@ type ContentPage = {
   content: string;
 };
 
+type ManagedPageLink = {
+  slug: string;
+  title: string;
+  sectionTitle: string;
+};
+
 type PortfolioItem = {
   id: string;
   title: string;
@@ -77,9 +83,14 @@ const CONTACTS = {
   telegram: 'https://t.me/evtenia_realty'
 };
 const PROJECT_GROUPS: ProjectGroupColumn[] = [
-  { title: 'Проекты домов', groups: [{ items: ['Модульные', 'Каркасные', 'Из газобетона'] }] }
+  {
+    title: 'Проекты домов',
+    groups: [
+      { label: 'Дома', items: ['Модульные', 'Каркасные', 'Из газобетона'] },
+      { label: 'Бани', items: ['Каркасные', 'Модульные'] }
+    ]
+  }
 ];
-const BATHS_MENU_ITEMS = ['Модульные', 'Каркасные'];
 const ADMIN_CONSTRUCTION_TYPES = ['Из газобетона', 'Каркасные', 'Модульные'];
 const ADMIN_STYLE_OPTIONS = ['Классический', 'Современный', 'Скандинавский', 'Барнхаус', 'Минимализм', 'Русский'];
 
@@ -88,9 +99,11 @@ const SERVICES_MENU = [
   { slug: 'besedki', title: 'Беседки', text: 'Строим беседки под ключ: от эскиза до финальной отделки.' },
   { slug: 'septik', title: 'Септик', text: 'Подбираем и монтируем септики с учетом объема стоков и участка.' },
   { slug: 'zabory', title: 'Заборы', text: 'Устанавливаем заборы разных типов: профлист, евроштакетник, дерево.' },
-  { slug: 'mebel', title: 'Мебель', text: 'Делаем встроенную и корпусную мебель под размеры вашего дома.' },
-  { slug: 'podbor-uchastka', title: 'Подбор участка', text: 'Помогаем выбрать участок с проверкой рельефа, подъезда и коммуникаций.' },
   { slug: 'skvazhiny', title: 'Скважины', text: 'Бурим и обустраиваем скважины под дом и баню с подбором оборудования.' },
+  { slug: 'vyvoz-musora', title: 'Вывоз мусора', text: 'Организуем оперативный вывоз строительного и бытового мусора с объекта.' },
+  { slug: 'styazhka-pola', title: 'Стяжка пола', text: 'Делаем полусухую и бетонную стяжку с соблюдением уровня и сроков набора прочности.' },
+  { slug: 'konditsionery', title: 'Кондиционеры', text: 'Подбираем, устанавливаем и обслуживаем кондиционеры для дома и бани.' },
+  { slug: 'interernoe-ozelenenie', title: 'Интерьерное озеленение', text: 'Создаем проекты озеленения интерьера и подбираем растения под условия помещения.' },
   { slug: 'plastikovye-okna', title: 'Пластиковые окна', text: 'Подбираем и устанавливаем ПВХ-окна с учетом теплопотерь и дизайна.' },
   { slug: 'dveri', title: 'Двери', text: 'Входные и межкомнатные двери с монтажом и фурнитурой.' },
   { slug: 'remont', title: 'Ремонт', text: 'Выполняем внутренний ремонт и отделку домов под ключ.' },
@@ -140,14 +153,15 @@ function HeaderNav({
       {
         label: 'ПРОЕКТЫ ДОМОВ',
         href: '/projects',
-        active: currentPath === '/projects',
-        children: PROJECT_GROUPS.flatMap((column) => column.groups.flatMap((group) => group.items.map((item) => ({ label: item, href: `/projects?type=${encodeURIComponent(item)}` }))))
-      },
-      {
-        label: 'БАНИ',
-        href: '/baths',
-        active: currentPath === '/baths',
-        children: BATHS_MENU_ITEMS.map((item) => ({ label: item, href: `/baths?type=${encodeURIComponent(item)}` }))
+        active: currentPath === '/projects' || currentPath === '/baths',
+        children: PROJECT_GROUPS.flatMap((column) =>
+          column.groups.flatMap((group) =>
+            group.items.map((item) => ({
+              label: group.label ? `${group.label}: ${item}` : item,
+              href: group.label === 'Бани' ? `/baths?type=${encodeURIComponent(item)}` : `/projects?type=${encodeURIComponent(item)}`
+            }))
+          )
+        )
       },
       {
         label: 'УСЛУГИ',
@@ -156,6 +170,7 @@ function HeaderNav({
       },
       { label: 'ПРОЕКТИРОВАНИЕ', href: '/design', active: currentPath === '/design' },
       { label: 'ПОРТФОЛИО', href: '/portfolio', active: currentPath === '/portfolio' },
+      { label: 'МЕБЕЛЬ', href: '/furniture', active: currentPath === '/furniture' },
       {
         label: 'СКИДКИ И АКЦИИ',
         active: currentPath.startsWith('/discounts/'),
@@ -359,7 +374,9 @@ const FALLBACK_PROJECTS: HouseProject[] = [
 function normalizePrice(price: unknown) {
   const value = String(price ?? '').trim();
   if (!value) return 'Цена по запросу';
-  return value.toLowerCase().startsWith('от') ? value : `от ${value}`;
+  const withPrefix = value.toLowerCase().startsWith('от') ? value : `от ${value}`;
+  const hasRuble = /₽|руб\.?/i.test(withPrefix);
+  return hasRuble ? withPrefix : `${withPrefix} ₽`;
 }
 
 function resolveMediaUrl(url?: string) {
@@ -1341,7 +1358,7 @@ function DesignPage() {
   );
 }
 
-function SubsectionPage({ sectionTitle, pageTitle, text }: { sectionTitle: string; pageTitle: string; text: string }) {
+function SubsectionPage({ sectionTitle, pageTitle, text, isHtml = false }: { sectionTitle: string; pageTitle: string; text: string; isHtml?: boolean }) {
   useEffect(() => {
     document.title = `${pageTitle} — Evtenia`;
   }, [pageTitle]);
@@ -1354,14 +1371,27 @@ function SubsectionPage({ sectionTitle, pageTitle, text }: { sectionTitle: strin
           <Breadcrumbs items={["Главная", sectionTitle, pageTitle]} />
           <h1>{pageTitle}</h1>
           <div className="internal-text-box">
-            <p>{text}</p>
-            <p>Скоро добавим подробное описание услуги и примеры выполненных работ.</p>
+            {isHtml ? <div className="cms-content" dangerouslySetInnerHTML={{ __html: text }} /> : <><p>{text}</p><p>Скоро добавим подробное описание услуги и примеры выполненных работ.</p></>}
           </div>
         </div>
       </section>
       <SiteFooter />
     </div>
   );
+}
+
+
+function ManagedTextPage({ slug, fallbackTitle, fallbackContent, sectionTitle }: { slug: string; fallbackTitle: string; fallbackContent: string; sectionTitle: string }) {
+  const [page, setPage] = useState<ContentPage>({ slug, title: fallbackTitle, content: fallbackContent });
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/pages/${slug}`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('nf'))))
+      .then((payload: ContentPage) => setPage(payload))
+      .catch(() => setPage({ slug, title: fallbackTitle, content: fallbackContent }));
+  }, [slug, fallbackTitle, fallbackContent]);
+
+  return <SubsectionPage sectionTitle={sectionTitle} pageTitle={page.title} text={page.content} isHtml />;
 }
 
 function AdminPage() {
@@ -1541,6 +1571,37 @@ function AdminPage() {
     }
 
     await loadAdminData(token);
+  };
+
+  const uploadPageImage = async (files: File[]) => {
+    if (!files.length || !pageDraft) return;
+    setUploadStatus('Загрузка изображения для страницы...');
+    const formData = new FormData();
+    files.forEach((file) => formData.append('images', file));
+    const response = await fetch(`${API_BASE}/api/admin/upload/page-image`, {
+      method: 'POST',
+      headers: { 'x-admin-token': token },
+      body: formData
+    });
+    if (!response.ok) {
+      setUploadStatus('');
+      setError('Не удалось загрузить фото для страницы');
+      return;
+    }
+    const payload = (await response.json()) as { urls: string[] };
+    const imageUrl = payload.urls?.[0];
+    if (!imageUrl) return;
+    const html = `${pageDraft.content || ''}<p><img src="${imageUrl}" alt="Изображение страницы" /></p>`;
+    setPageDraft({ ...pageDraft, content: html });
+    setUploadStatus('Изображение добавлено в текст страницы');
+  };
+
+  const applyPageFormat = (command: string) => {
+    document.execCommand(command);
+    const editor = document.getElementById('cms-page-editor');
+    if (editor && pageDraft) {
+      setPageDraft({ ...pageDraft, content: editor.innerHTML });
+    }
   };
 
   const savePortfolio = async () => {
@@ -1763,13 +1824,25 @@ function AdminPage() {
             value={pageDraft?.title || ''}
             onChange={(e) => setPageDraft(pageDraft ? { ...pageDraft, title: e.target.value } : null)}
           />
-          <textarea
-            rows={6}
-            placeholder="Контент"
-            value={pageDraft?.content || ''}
-            onChange={(e) => setPageDraft(pageDraft ? { ...pageDraft, content: e.target.value } : null)}
+          <div className="cms-toolbar">
+            <button type="button" onClick={() => applyPageFormat('bold')}>Жирный</button>
+            <button type="button" onClick={() => applyPageFormat('italic')}>Курсив</button>
+            <button type="button" onClick={() => applyPageFormat('insertUnorderedList')}>Список</button>
+            <label>Фото<input type="file" accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadPageImage(files); e.currentTarget.value = ''; }} /></label>
+          </div>
+          <div
+            id="cms-page-editor"
+            className="cms-editor"
+            contentEditable
+            suppressContentEditableWarning
+            onInput={(e) => setPageDraft(pageDraft ? { ...pageDraft, content: (e.target as HTMLDivElement).innerHTML } : null)}
+            dangerouslySetInnerHTML={{ __html: pageDraft?.content || '' }}
           />
           <button onClick={savePage}>Сохранить страницу</button>
+          <div className="cms-preview">
+            <p>Предпросмотр</p>
+            <div className="cms-content" dangerouslySetInnerHTML={{ __html: pageDraft?.content || '' }} />
+          </div>
         </div>
       </section> : null}
 
@@ -1862,8 +1935,9 @@ function App() {
   if (pathname.startsWith('/project/')) return <ProjectDetailPage />;
   if (pathname === '/design') return <DesignPage />;
   if (pathname === '/search') return <SearchPage />;
-  if (servicePage) return <SubsectionPage sectionTitle="Услуги" pageTitle={servicePage.title} text={servicePage.text} />;
-  if (discountPage) return <SubsectionPage sectionTitle="Скидки и акции" pageTitle={discountPage.title} text={discountPage.text} />;
+  if (servicePage) return <ManagedTextPage slug={`services-${servicePage.slug}`} fallbackTitle={servicePage.title} fallbackContent={servicePage.text} sectionTitle="Услуги" />;
+  if (discountPage) return <ManagedTextPage slug={`discounts-${discountPage.slug}`} fallbackTitle={discountPage.title} fallbackContent={discountPage.text} sectionTitle="Скидки и акции" />;
+  if (pathname === '/furniture') return <ManagedTextPage slug="furniture" fallbackTitle="Мебель" fallbackContent="Изготавливаем корпусную и встроенную мебель под ваши размеры и стиль интерьера." sectionTitle="Каталог" />;
   if (pathname === '/portfolio') return <PortfolioPage />;
   if (pathname === '/contacts') return <ContactsPage />;
   return <PublicPage />;
