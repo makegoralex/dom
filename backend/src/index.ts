@@ -207,6 +207,7 @@ const seedPages: Record<string, ContentPage> = {
   'services-styazhka-pola': { slug: 'services-styazhka-pola', title: 'Стяжка пола', content: '<p>Делаем полусухую и бетонную стяжку с соблюдением уровня и сроков набора прочности.</p>' },
   'services-konditsionery': { slug: 'services-konditsionery', title: 'Кондиционеры', content: '<p>Подбираем, устанавливаем и обслуживаем кондиционеры для дома и бани.</p>' },
   'services-interernoe-ozelenenie': { slug: 'services-interernoe-ozelenenie', title: 'Интерьерное озеленение', content: '<p>Создаем проекты озеленения интерьера и подбираем растения под условия помещения.</p>' },
+  'services-otsenka-nedvizhimosti': { slug: 'services-otsenka-nedvizhimosti', title: 'Оценка недвижимости', content: '<p>Проводим профессиональную оценку недвижимости для продажи, ипотеки и юридических задач.</p>' },
   'services-plastikovye-okna': { slug: 'services-plastikovye-okna', title: 'Пластиковые окна', content: '<p>Подбираем и устанавливаем ПВХ-окна с учетом теплопотерь и дизайна.</p>' },
   'services-dveri': { slug: 'services-dveri', title: 'Двери', content: '<p>Входные и межкомнатные двери с монтажом и фурнитурой.</p>' },
   'services-remont': { slug: 'services-remont', title: 'Ремонт', content: '<p>Выполняем внутренний ремонт и отделку домов под ключ.</p>' },

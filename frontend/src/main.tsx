@@ -104,6 +104,7 @@ const SERVICES_MENU = [
   { slug: 'styazhka-pola', title: 'Стяжка пола', text: 'Делаем полусухую и бетонную стяжку с соблюдением уровня и сроков набора прочности.' },
   { slug: 'konditsionery', title: 'Кондиционеры', text: 'Подбираем, устанавливаем и обслуживаем кондиционеры для дома и бани.' },
   { slug: 'interernoe-ozelenenie', title: 'Интерьерное озеленение', text: 'Создаем проекты озеленения интерьера и подбираем растения под условия помещения.' },
+  { slug: 'otsenka-nedvizhimosti', title: 'Оценка недвижимости', text: 'Проводим профессиональную оценку недвижимости для продажи, ипотеки и юридических задач.' },
   { slug: 'plastikovye-okna', title: 'Пластиковые окна', text: 'Подбираем и устанавливаем ПВХ-окна с учетом теплопотерь и дизайна.' },
   { slug: 'dveri', title: 'Двери', text: 'Входные и межкомнатные двери с монтажом и фурнитурой.' },
   { slug: 'remont', title: 'Ремонт', text: 'Выполняем внутренний ремонт и отделку домов под ключ.' },
@@ -1434,6 +1435,7 @@ function AdminPage() {
   const [activeTab, setActiveTab] = useState<AdminTab>('projects');
   const [uploadStatus, setUploadStatus] = useState('');
   const [menuOrderDraft, setMenuOrderDraft] = useState<NavMenuKey[]>([...NAV_MENU_DEFAULT_ORDER]);
+  const [menuSaveStatus, setMenuSaveStatus] = useState('');
 
   const adminHeaders = useMemo(
     () => ({
@@ -1644,6 +1646,7 @@ function AdminPage() {
   };
 
   const saveMenuOrder = async () => {
+    setMenuSaveStatus('Сохраняем порядок меню...');
     const response = await fetch(`${API_BASE}/api/admin/menu-order`, {
       method: 'PUT',
       headers: adminHeaders,
@@ -1651,9 +1654,11 @@ function AdminPage() {
     });
     if (!response.ok) {
       setError('Не удалось сохранить порядок меню');
+      setMenuSaveStatus('');
       return;
     }
-    setUploadStatus('Порядок меню сохранен');
+    setMenuSaveStatus('Порядок меню сохранен');
+    await loadAdminData(token);
   };
 
   const savePortfolio = async () => {
@@ -1910,6 +1915,7 @@ function AdminPage() {
               ))}
             </div>
             <button type="button" onClick={saveMenuOrder}>Сохранить порядок меню</button>
+            {menuSaveStatus ? <p>{menuSaveStatus}</p> : null}
           </div>
           <div className="cms-preview">
             <p>Предпросмотр</p>

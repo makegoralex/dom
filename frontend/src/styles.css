@@ -460,6 +460,16 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   color: #253247;
 }
 
+.cms-content p,
+.cms-content li,
+.cms-content span,
+.cms-content div {
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.65 !important;
+  color: #253247 !important;
+}
+
 .cms-content h1,
 .cms-content h2,
 .cms-content h3,
