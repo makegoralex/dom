@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect, useMemo, useState } from 'react';
+import React, { FormEvent, ReactNode, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles.css';
 
@@ -460,23 +460,6 @@ function resolveMediaUrl(url?: string) {
   return value;
 }
 
-function SearchBox() {
-  const params = new URLSearchParams(window.location.search);
-  const [query, setQuery] = useState(params.get('q') || '');
-
-  const onSubmit = (event: FormEvent) => {
-    event.preventDefault();
-    window.location.href = `/search?q=${encodeURIComponent(query.trim())}`;
-  };
-
-  return (
-    <form className="search-box" onSubmit={onSubmit}>
-      <input placeholder="Поиск по сайту..." value={query} onChange={(e) => setQuery(e.target.value)} />
-      <button type="submit">Найти</button>
-    </form>
-  );
-}
-
 function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -625,19 +608,8 @@ function PublicPage() {
       <header className="hero hero-exact">
         <div className="promo-strip">
           <div className="container promo-inner">
-            <strong><a href="/discounts/ipoteka-i-kredit">СТРОИТЕЛЬСТВО ДОМОВ В КРЕДИТ И ИПОТЕКУ ОТ 9.5% ГОДОВЫХ!</a></strong>
-            <a className="promo-btn" href="/discounts/ipoteka-i-kredit">Узнать условия <span>»</span></a>
-          </div>
-        </div>
-
-        <div className="top-search-row">
-          <div className="container top-search-inner">
-            <SearchBox />
-            <div className="top-contacts">
-              <a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a>
-              <a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a>
-              <a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a>
-            </div>
+            <strong><a href="/discounts/vse-akcii">10 соток земли в подарок при строительстве дома.</a></strong>
+            <div className="promo-right"><a className="promo-btn" href="/discounts/vse-akcii">Все акции <span>»</span></a><div className="top-contacts"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a></div></div>
           </div>
         </div>
 
@@ -742,43 +714,43 @@ function PublicPage() {
           <h2 className="steps-title">Этапы работы</h2>
           <div className="steps-grid">
             <article className="step-card">
-              <div className="step-number">1</div>
+              <div className="step-number">01</div>
               <div>
                 <h3>Подбор проекта</h3>
-                <small>1-3 дня</small>
-                <p>Подбираем подходящий проект, согласовываем планировку и бюджет.</p>
+                <small>1–3 дня</small>
+                <p>Подбираем архитектуру, посадку дома и бюджет с учётом участка и задач семьи.</p>
               </div>
             </article>
             <article className="step-card">
-              <div className="step-number">2</div>
+              <div className="step-number">02</div>
               <div>
                 <h3>Проектирование</h3>
-                <small>10-15 дней</small>
-                <p>Готовим архитектурные и инженерные решения под ваш участок.</p>
+                <small>10–15 дней</small>
+                <p>Готовим рабочую документацию и инженерные решения для точной сметы и без переделок.</p>
+              </div>
+            </article>
+            <article className="step-card">
+              <div className="step-number">03</div>
+              <div>
+                <h3>Договор и поставки</h3>
+                <small>1 день</small>
+                <p>Фиксируем стоимость и сроки в договоре, организуем логистику материалов на объект.</p>
+              </div>
+            </article>
+            <article className="step-card">
+              <div className="step-number">04</div>
+              <div>
+                <h3>Строительство</h3>
+                <small>10–20 дней</small>
+                <p>Выполняем фундамент, коробку и кровлю по графику с поэтапным контролем качества.</p>
               </div>
             </article>
             <article className="step-card wide">
-              <div className="step-number">3</div>
+              <div className="step-number">05</div>
               <div>
-                <h3>Доставка материалов и оплата</h3>
-                <small>1 день</small>
-                <p>Подписываем договор и организуем поставку материалов в назначенную дату.</p>
-              </div>
-            </article>
-            <article className="step-card">
-              <div className="step-number">4</div>
-              <div>
-                <h3>Строительство коробки</h3>
-                <small>10-20 дней</small>
-                <p>Выполняем фундамент, стены и кровлю по согласованному графику.</p>
-              </div>
-            </article>
-            <article className="step-card">
-              <div className="step-number">5</div>
-              <div>
-                <h3>Сдача дома</h3>
+                <h3>Сдача и гарантия</h3>
                 <small>2 дня</small>
-                <p>Проверяем качество, подписываем акты и передаем ключи.</p>
+                <p>Проводим финальную приёмку, передаём документы и сопровождаем дом по гарантийным обязательствам.</p>
               </div>
             </article>
           </div>
@@ -790,36 +762,19 @@ function PublicPage() {
         <div className="container">
           <h2 className="why-title">Почему выбирают нас</h2>
           <div className="why-grid">
-            <article className="why-card">
-              <div className="why-icon">🛠</div>
-              <div><h3>Ответственное строительство</h3><p>Опытные инженеры и прорабы с большим практическим опытом.</p></div>
-            </article>
-            <article className="why-card">
-              <div className="why-icon">🧾</div>
-              <div><h3>Понятная смета</h3><p>Под каждый проект готовим прозрачную смету без скрытых пунктов.</p></div>
-            </article>
-            <article className="why-card">
-              <div className="why-icon">📌</div>
-              <div><h3>Фиксированная стоимость работ</h3><p>Цена фиксируется в договоре и не меняется в ходе строительства.</p></div>
-            </article>
-            <article className="why-card">
-              <div className="why-icon">🤝</div>
-              <div><h3>Человеческое отношение</h3><p>Всегда готовы обсудить пожелания и предложить лучший вариант.</p></div>
-            </article>
-            <article className="why-card">
-              <div className="why-icon">🏦</div>
-              <div><h3>Помощь с ипотекой</h3><p>Подбираем оптимальные программы кредитования под ваш бюджет.</p></div>
-            </article>
-            <article className="why-card">
-              <div className="why-icon">✅</div>
-              <div><h3>Гарантия по договору</h3><p>Закрепляем сроки и качество работ в официальных документах.</p></div>
-            </article>
-          </div>
-          <div className="why-badges">
-            <span>✔ Работаем с материнским капиталом</span>
-            <span>✔ Помогаем экономить на строительстве</span>
-            <span>✔ Строим в кредит и ипотеку</span>
-            <span>✔ Даем скидки на страхование дома</span>
+            {[
+              ['01', 'Фиксируем бюджет', 'Смета и стоимость работ закрепляются в договоре без скрытых пунктов.'],
+              ['02', 'Понятные сроки', 'Согласовываем календарный план и ведём объект поэтапно с отчётностью.'],
+              ['03', 'Технадзор на объекте', 'Прораб и инженер контролируют качество на каждом этапе строительства.'],
+              ['04', 'Комплексный подход', 'От проекта и фундамента до отделки и ввода дома в эксплуатацию.'],
+              ['05', 'Ипотека и господдержка', 'Помогаем подобрать оптимальную программу финансирования под бюджет семьи.'],
+              ['06', 'Гарантия по договору', 'Официально закрепляем ответственность компании за результат и сроки.']
+            ].map(([num, title, text]) => (
+              <article className="why-card" key={title}>
+                <div className="why-icon">{num}</div>
+                <div><h3>{title}</h3><p>{text}</p></div>
+              </article>
+            ))}
           </div>
         </div>
       </section>
@@ -933,14 +888,8 @@ function InternalHeader() {
     <header className="hero hero-exact internal-header">
       <div className="promo-strip">
         <div className="container promo-inner">
-          <strong><a href="/discounts/ipoteka-i-kredit">СТРОИТЕЛЬСТВО ДОМОВ В КРЕДИТ И ИПОТЕКУ ОТ 9.5% ГОДОВЫХ!</a></strong>
-          <a className="promo-btn" href="/discounts/ipoteka-i-kredit">Узнать условия <span>»</span></a>
-        </div>
-      </div>
-      <div className="top-search-row">
-        <div className="container top-search-inner">
-          <SearchBox />
-          <div className="top-contacts"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a></div>
+          <strong><a href="/discounts/vse-akcii">10 соток земли в подарок при строительстве дома.</a></strong>
+          <div className="promo-right"><a className="promo-btn" href="/discounts/vse-akcii">Все акции <span>»</span></a><div className="top-contacts"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a></div></div>
         </div>
       </div>
       <div className="container hero-main">
@@ -952,29 +901,6 @@ function InternalHeader() {
       </div>
       <CallbackModal open={openCallback} onClose={() => setOpenCallback(false)} />
     </header>
-  );
-}
-
-function SearchPage() {
-  const query = new URLSearchParams(window.location.search).get('q')?.trim() || '';
-  const [projects, setProjects] = useState<HouseProject[]>([]);
-  useEffect(() => {
-    document.title = `Поиск: ${query || 'запрос пуст'} — Evtenia`;
-    fetch(`${API_BASE}/api/projects`).then((r) => (r.ok ? r.json() : Promise.reject(new Error('no api')))).then(setProjects).catch(() => setProjects(FALLBACK_PROJECTS));
-  }, [query]);
-  const q = query.toLowerCase();
-  const results = projects.filter((p) => `${p.title} ${p.shortDescription} ${p.constructionType}`.toLowerCase().includes(q));
-  return (
-    <div>
-      <InternalHeader />
-      <section className="internal-body"><div className="container">
-        <Breadcrumbs items={["Главная", "Поиск"]} />
-        <h1>Результаты поиска</h1>
-        {query ? <p>Запрос: <b>{query}</b></p> : <p>Введите запрос в строке поиска.</p>}
-        <div className="catalog-grid">{results.map((p) => <ProjectTile key={p.id} project={p} />)}</div>
-      </div></section>
-      <SiteFooter />
-    </div>
   );
 }
 
@@ -2155,6 +2081,41 @@ function AdminPage() {
   );
 }
 
+
+function CookieNotice() {
+  const [accepted, setAccepted] = useState(false);
+
+  useEffect(() => {
+    setAccepted(localStorage.getItem('cookie-consent-v1') === 'accepted');
+  }, []);
+
+  if (accepted) return null;
+
+  return (
+    <div className="cookie-notice" role="dialog" aria-live="polite">
+      <p>Мы используем cookie для корректной работы сайта и аналитики. Продолжая пользоваться сайтом, вы соглашаетесь с их использованием.</p>
+      <button
+        type="button"
+        onClick={() => {
+          localStorage.setItem('cookie-consent-v1', 'accepted');
+          setAccepted(true);
+        }}
+      >
+        Принять
+      </button>
+    </div>
+  );
+}
+
+function AppLayout({ children }: { children: ReactNode }) {
+  return (
+    <>
+      {children}
+      <CookieNotice />
+    </>
+  );
+}
+
 function App() {
   const url = new URL(window.location.href);
   const pathname = window.location.pathname;
@@ -2168,18 +2129,17 @@ function App() {
     url.searchParams.get('admin') === ADMIN_KEY;
 
   if (isAdminRoute) return <AdminPage />;
-  if (pathname === '/about') return <AboutPage />;
-  if (pathname === '/projects') return <ProjectTypePage />;
-  if (pathname === '/baths') return <BathsPage />;
-  if (pathname.startsWith('/project/')) return <ProjectDetailPage />;
-  if (pathname === '/design') return <DesignPage />;
-  if (pathname === '/search') return <SearchPage />;
-  if (servicePage) return <ManagedTextPage slug={`services-${servicePage.slug}`} fallbackTitle={servicePage.title} fallbackContent={servicePage.text} sectionTitle="Услуги" />;
-  if (discountPage) return <ManagedTextPage slug={`discounts-${discountPage.slug}`} fallbackTitle={discountPage.title} fallbackContent={discountPage.text} sectionTitle="Скидки и акции" />;
-  if (pathname === '/furniture') return <ManagedTextPage slug="furniture" fallbackTitle="Мебель" fallbackContent="Изготавливаем корпусную и встроенную мебель под ваши размеры и стиль интерьера." sectionTitle="Каталог" />;
-  if (pathname === '/portfolio') return <PortfolioPage />;
-  if (pathname === '/contacts') return <ContactsPage />;
-  return <PublicPage />;
+  if (pathname === '/about') return <AppLayout><AboutPage /></AppLayout>;
+  if (pathname === '/projects') return <AppLayout><ProjectTypePage /></AppLayout>;
+  if (pathname === '/baths') return <AppLayout><BathsPage /></AppLayout>;
+  if (pathname.startsWith('/project/')) return <AppLayout><ProjectDetailPage /></AppLayout>;
+  if (pathname === '/design') return <AppLayout><DesignPage /></AppLayout>;
+  if (servicePage) return <AppLayout><ManagedTextPage slug={`services-${servicePage.slug}`} fallbackTitle={servicePage.title} fallbackContent={servicePage.text} sectionTitle="Услуги" /></AppLayout>;
+  if (discountPage) return <AppLayout><ManagedTextPage slug={`discounts-${discountPage.slug}`} fallbackTitle={discountPage.title} fallbackContent={discountPage.text} sectionTitle="Скидки и акции" /></AppLayout>;
+  if (pathname === '/furniture') return <AppLayout><ManagedTextPage slug="furniture" fallbackTitle="Мебель" fallbackContent="Изготавливаем корпусную и встроенную мебель под ваши размеры и стиль интерьера." sectionTitle="Каталог" /></AppLayout>;
+  if (pathname === '/portfolio') return <AppLayout><PortfolioPage /></AppLayout>;
+  if (pathname === '/contacts') return <AppLayout><ContactsPage /></AppLayout>;
+  return <AppLayout><PublicPage /></AppLayout>;
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
