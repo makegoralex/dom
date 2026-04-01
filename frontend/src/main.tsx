@@ -50,6 +50,9 @@ type PortfolioItem = {
   clientName: string;
   review: string;
 };
+type SiteSettings = {
+  logoUrl: string;
+};
 
 type ProjectGroupColumn = {
   title: string;
@@ -65,7 +68,7 @@ type MenuItem = {
   children?: MenuChildItem[];
   active?: boolean;
 };
-type AdminTab = 'projects' | 'pages' | 'portfolio' | 'leads';
+type AdminTab = 'projects' | 'pages' | 'portfolio' | 'leads' | 'settings';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 const API_ORIGIN = API_BASE ? new URL(API_BASE, window.location.origin).origin : '';
@@ -93,6 +96,7 @@ const PROJECT_GROUPS: ProjectGroupColumn[] = [
 ];
 const ADMIN_CONSTRUCTION_TYPES = ['Из газобетона', 'Каркасные', 'Модульные'];
 const ADMIN_STYLE_OPTIONS = ['Классический', 'Современный', 'Скандинавский', 'Барнхаус', 'Минимализм', 'Русский'];
+const DEFAULT_LOGO_URL = '/assets/logo_small.png';
 
 const SERVICES_MENU = [
   { slug: 'fundament', title: 'Фундамент', text: 'Проектируем и устраиваем фундаменты под тип грунта и нагрузку дома.' },
@@ -136,7 +140,7 @@ function sanitizeCmsHtml(html: string) {
   doc.body.querySelectorAll('*').forEach((node) => {
     ['style', 'id', 'width', 'height'].forEach((attr) => node.removeAttribute(attr));
     const className = node.getAttribute('class') || '';
-    const allowedClasses = ['cms-image-grid', 'grid2', 'grid3'];
+    const allowedClasses = ['cms-gallery', 'single', 'cols-2', 'cols-3', 'align-left', 'align-center', 'align-right', 'size-sm', 'size-md', 'cms-image-grid', 'grid2', 'grid3'];
     const normalized = className
       .split(' ')
       .filter((item) => allowedClasses.includes(item))
@@ -146,6 +150,47 @@ function sanitizeCmsHtml(html: string) {
     else node.removeAttribute('class');
   });
   return doc.body.innerHTML;
+}
+
+function CmsHtmlContent({ html }: { html: string }) {
+  const [sliderImages, setSliderImages] = useState<string[]>([]);
+  const [activeImage, setActiveImage] = useState(0);
+
+  const closeSlider = () => setSliderImages([]);
+  const prevImage = () => setActiveImage((prev) => (prev - 1 + sliderImages.length) % sliderImages.length);
+  const nextImage = () => setActiveImage((prev) => (prev + 1) % sliderImages.length);
+
+  return (
+    <>
+      <div
+        className="cms-content"
+        onClick={(event) => {
+          const target = event.target as HTMLElement | null;
+          if (!target || target.tagName !== 'IMG') return;
+          const img = target as HTMLImageElement;
+          const galleryRoot = img.closest('.cms-gallery, .cms-image-grid');
+          const images = galleryRoot
+            ? Array.from(galleryRoot.querySelectorAll('img')).map((node) => (node as HTMLImageElement).src).filter(Boolean)
+            : [img.src];
+          const clickedIndex = Math.max(images.indexOf(img.src), 0);
+          setSliderImages(images);
+          setActiveImage(clickedIndex);
+        }}
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+      {sliderImages.length ? (
+        <div className="cms-lightbox" onClick={closeSlider}>
+          <div className="cms-lightbox-inner" onClick={(e) => e.stopPropagation()}>
+            <button className="cms-lightbox-close" onClick={closeSlider}>✕</button>
+            {sliderImages.length > 1 ? <button className="cms-lightbox-nav prev" onClick={prevImage}>‹</button> : null}
+            <img src={sliderImages[activeImage]} alt={`Изображение ${activeImage + 1}`} />
+            {sliderImages.length > 1 ? <button className="cms-lightbox-nav next" onClick={nextImage}>›</button> : null}
+            {sliderImages.length > 1 ? <div className="cms-lightbox-count">{activeImage + 1} / {sliderImages.length}</div> : null}
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
 }
 
 function HeaderNav({
@@ -512,6 +557,7 @@ function PublicPage() {
   const [selectedType, setSelectedType] = useState('Все типы');
   const [openCallback, setOpenCallback] = useState(false);
   const [menuOrder, setMenuOrder] = useState<NavMenuKey[]>([...NAV_MENU_DEFAULT_ORDER]);
+  const [logoUrl, setLogoUrl] = useState(DEFAULT_LOGO_URL);
   const serviceColumns = useMemo(() => chunkBy(SERVICES_MENU, 6), []);
 
   useEffect(() => {
@@ -537,6 +583,10 @@ function PublicPage() {
         if (Array.isArray(payload.order) && payload.order.length) setMenuOrder(payload.order);
       })
       .catch(() => setMenuOrder([...NAV_MENU_DEFAULT_ORDER]));
+    fetch(`${API_BASE}/api/site-settings`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no site settings'))))
+      .then((payload: SiteSettings) => setLogoUrl(resolveMediaUrl(payload.logoUrl || DEFAULT_LOGO_URL)))
+      .catch(() => setLogoUrl(DEFAULT_LOGO_URL));
   }, []);
 
 
@@ -594,7 +644,7 @@ function PublicPage() {
         <div className="container hero-main">
           <div className="hero-upper-row">
             <a href="/" className="brand-line">
-              <div className="logo-badge"><img src="/assets/logo_small.png" alt="Evtenia" /></div>
+              <div className="logo-badge"><img src={logoUrl} alt="Evtenia" /></div>
               <div className="brand-text">
                 <div className="brand-logo">Evtenia</div>
                 <p>Строительная компания</p>
@@ -864,6 +914,7 @@ function InternalTextBlock({ title, content }: { title: string; content: string 
 function InternalHeader() {
   const serviceColumns = chunkBy(SERVICES_MENU, 6);
   const [menuOrder, setMenuOrder] = useState<NavMenuKey[]>([...NAV_MENU_DEFAULT_ORDER]);
+  const [logoUrl, setLogoUrl] = useState(DEFAULT_LOGO_URL);
 
   useEffect(() => {
     fetch(`${API_BASE}/api/menu-order`)
@@ -872,6 +923,10 @@ function InternalHeader() {
         if (Array.isArray(payload.order) && payload.order.length) setMenuOrder(payload.order);
       })
       .catch(() => setMenuOrder([...NAV_MENU_DEFAULT_ORDER]));
+    fetch(`${API_BASE}/api/site-settings`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no site settings'))))
+      .then((payload: SiteSettings) => setLogoUrl(resolveMediaUrl(payload.logoUrl || DEFAULT_LOGO_URL)))
+      .catch(() => setLogoUrl(DEFAULT_LOGO_URL));
   }, []);
   const [openCallback, setOpenCallback] = useState(false);
   return (
@@ -890,7 +945,7 @@ function InternalHeader() {
       </div>
       <div className="container hero-main">
         <div className="hero-upper-row">
-          <a href="/" className="brand-line"><div className="logo-badge"><img src="/assets/logo_small.png" alt="Evtenia" /></div><div className="brand-text"><div className="brand-logo">Evtenia</div><p>Строительная компания</p></div></a>
+          <a href="/" className="brand-line"><div className="logo-badge"><img src={logoUrl} alt="Evtenia" /></div><div className="brand-text"><div className="brand-logo">Evtenia</div><p>Строительная компания</p></div></a>
           <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? Поможем по телефону за 5 минут.</span><div className="phone-block"><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><small>с 9:00 до 19:00</small></div><button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button></div>
         </div>
         <HeaderNav serviceColumns={serviceColumns} currentPath={window.location.pathname} menuOrder={menuOrder} />
@@ -1407,7 +1462,7 @@ function SubsectionPage({ sectionTitle, pageTitle, text, isHtml = false }: { sec
           <Breadcrumbs items={["Главная", sectionTitle, pageTitle]} />
           <h1>{pageTitle}</h1>
           <div className="internal-text-box">
-            {isHtml ? <div className="cms-content" dangerouslySetInnerHTML={{ __html: text }} /> : <><p>{text}</p><p>Скоро добавим подробное описание услуги и примеры выполненных работ.</p></>}
+            {isHtml ? <CmsHtmlContent html={text} /> : <><p>{text}</p><p>Скоро добавим подробное описание услуги и примеры выполненных работ.</p></>}
           </div>
         </div>
       </section>
@@ -1448,6 +1503,9 @@ function AdminPage() {
   const [menuSaveStatus, setMenuSaveStatus] = useState('');
   const [imageInsertMode, setImageInsertMode] = useState<'cursor' | 'start' | 'end'>('cursor');
   const [imageLayout, setImageLayout] = useState<'single' | 'grid2' | 'grid3'>('single');
+  const [imageAlign, setImageAlign] = useState<'left' | 'center' | 'right'>('center');
+  const [imageSize, setImageSize] = useState<'sm' | 'md'>('sm');
+  const [siteSettingsDraft, setSiteSettingsDraft] = useState<SiteSettings>({ logoUrl: DEFAULT_LOGO_URL });
 
   const adminHeaders = useMemo(
     () => ({
@@ -1458,15 +1516,16 @@ function AdminPage() {
   );
 
   const loadAdminData = async (currentToken: string) => {
-    const [projectsRes, leadsRes, pagesRes, portfolioRes, menuOrderRes] = await Promise.all([
+    const [projectsRes, leadsRes, pagesRes, portfolioRes, menuOrderRes, siteSettingsRes] = await Promise.all([
       fetch(`${API_BASE}/api/admin/projects`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/leads`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/pages`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/portfolio`, { headers: { 'x-admin-token': currentToken } }),
-      fetch(`${API_BASE}/api/admin/menu-order`, { headers: { 'x-admin-token': currentToken } })
+      fetch(`${API_BASE}/api/admin/menu-order`, { headers: { 'x-admin-token': currentToken } }),
+      fetch(`${API_BASE}/api/admin/site-settings`, { headers: { 'x-admin-token': currentToken } })
     ]);
 
-    if (!projectsRes.ok || !leadsRes.ok || !pagesRes.ok || !portfolioRes.ok || !menuOrderRes.ok) {
+    if (!projectsRes.ok || !leadsRes.ok || !pagesRes.ok || !portfolioRes.ok || !menuOrderRes.ok || !siteSettingsRes.ok) {
       setError('Не удалось загрузить данные админки');
       return;
     }
@@ -1476,6 +1535,7 @@ function AdminPage() {
     setLeads(await leadsRes.json());
     setPages(pagesPayload);
     setPortfolio(await portfolioRes.json());
+    setSiteSettingsDraft(await siteSettingsRes.json());
     const orderPayload = (await menuOrderRes.json()) as { order?: NavMenuKey[] };
     if (Array.isArray(orderPayload.order) && orderPayload.order.length) setMenuOrderDraft(orderPayload.order);
     if (!pageDraft && pagesPayload[0]) {
@@ -1636,8 +1696,8 @@ function AdminPage() {
     const imageUrls = payload.urls || [];
     if (!imageUrls.length) return;
     const imagesHtml = imageLayout === 'single'
-      ? imageUrls.map((url) => `<p><img src="${url}" alt="Изображение страницы" /></p>`).join('')
-      : `<div class="cms-image-grid ${imageLayout}">${imageUrls.map((url) => `<figure><img src="${url}" alt="Изображение страницы" /></figure>`).join('')}</div>`;
+      ? `<div class="cms-gallery single align-${imageAlign} size-${imageSize}">${imageUrls.map((url) => `<figure><img src="${url}" alt="Изображение страницы" /></figure>`).join('')}</div>`
+      : `<div class="cms-gallery ${imageLayout === 'grid2' ? 'cols-2' : 'cols-3'} align-${imageAlign} size-${imageSize}">${imageUrls.map((url) => `<figure><img src="${url}" alt="Изображение страницы" /></figure>`).join('')}</div>`;
 
     if (imageInsertMode === 'cursor') {
       const editor = document.getElementById('cms-page-editor');
@@ -1685,6 +1745,40 @@ function AdminPage() {
     }
     setMenuSaveStatus('Порядок меню сохранен');
     await loadAdminData(token);
+  };
+
+  const saveSiteSettings = async () => {
+    const response = await fetch(`${API_BASE}/api/admin/site-settings`, {
+      method: 'PUT',
+      headers: adminHeaders,
+      body: JSON.stringify(siteSettingsDraft)
+    });
+    if (!response.ok) {
+      setError('Не удалось сохранить настройки сайта');
+      return;
+    }
+    setUploadStatus('Настройки сайта сохранены');
+    await loadAdminData(token);
+  };
+
+  const uploadLogo = async (file: File) => {
+    setError('');
+    setUploadStatus('Загрузка логотипа...');
+    const formData = new FormData();
+    formData.append('logo', file);
+    const response = await fetch(`${API_BASE}/api/admin/upload/logo`, {
+      method: 'POST',
+      headers: { 'x-admin-token': token },
+      body: formData
+    });
+    if (!response.ok) {
+      setUploadStatus('');
+      setError('Не удалось загрузить логотип');
+      return;
+    }
+    const payload = (await response.json()) as { url: string };
+    setSiteSettingsDraft((prev) => ({ ...prev, logoUrl: payload.url || prev.logoUrl }));
+    setUploadStatus('Логотип загружен');
   };
 
   const savePortfolio = async () => {
@@ -1778,6 +1872,7 @@ function AdminPage() {
       <div className="admin-tabs">
         <button className={activeTab === 'projects' ? 'active' : ''} onClick={() => setActiveTab('projects')}>Проекты</button>
         <button className={activeTab === 'pages' ? 'active' : ''} onClick={() => setActiveTab('pages')}>Страницы</button>
+        <button className={activeTab === 'settings' ? 'active' : ''} onClick={() => setActiveTab('settings')}>Настройки</button>
         <button className={activeTab === 'portfolio' ? 'active' : ''} onClick={() => setActiveTab('portfolio')}>Портфолио</button>
         <button className={activeTab === 'leads' ? 'active' : ''} onClick={() => setActiveTab('leads')}>Заявки</button>
       </div>
@@ -1921,6 +2016,15 @@ function AdminPage() {
               <option value="grid2">Сетка 2 колонки</option>
               <option value="grid3">Сетка 3 колонки</option>
             </select>
+            <select value={imageAlign} onChange={(e) => setImageAlign(e.target.value as 'left' | 'center' | 'right')}>
+              <option value="left">Блок слева</option>
+              <option value="center">Блок по центру</option>
+              <option value="right">Блок справа</option>
+            </select>
+            <select value={imageSize} onChange={(e) => setImageSize(e.target.value as 'sm' | 'md')}>
+              <option value="sm">Компактный размер</option>
+              <option value="md">Стандартный размер</option>
+            </select>
             <label>Фото-блок<input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadPageImage(files); e.currentTarget.value = ''; }} /></label>
           </div>
           <div
@@ -1955,8 +2059,29 @@ function AdminPage() {
           </div>
           <div className="cms-preview">
             <p>Предпросмотр</p>
-            <div className="cms-content" dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(pageDraft?.content || '') }} />
+            <CmsHtmlContent html={sanitizeCmsHtml(pageDraft?.content || '')} />
           </div>
+        </div>
+      </section> : null}
+
+      {activeTab === 'settings' ? <section>
+        <h2>Настройки сайта</h2>
+        <div className="admin-form">
+          <input
+            placeholder="URL логотипа"
+            value={siteSettingsDraft.logoUrl || ''}
+            onChange={(e) => setSiteSettingsDraft({ ...siteSettingsDraft, logoUrl: e.target.value })}
+          />
+          <label>Загрузить логотип<input type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) uploadLogo(file); e.currentTarget.value = ''; }} /></label>
+          {siteSettingsDraft.logoUrl ? (
+            <div className="admin-media-preview">
+              <p>Предпросмотр логотипа</p>
+              <div className="admin-image-card logo-preview-card">
+                <img src={resolveMediaUrl(siteSettingsDraft.logoUrl)} alt="Логотип сайта" />
+              </div>
+            </div>
+          ) : null}
+          <button type="button" onClick={saveSiteSettings}>Сохранить настройки</button>
         </div>
       </section> : null}
 
