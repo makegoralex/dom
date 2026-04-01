@@ -96,7 +96,7 @@ const PROJECT_GROUPS: ProjectGroupColumn[] = [
 ];
 const ADMIN_CONSTRUCTION_TYPES = ['Из газобетона', 'Каркасные', 'Модульные'];
 const ADMIN_STYLE_OPTIONS = ['Классический', 'Современный', 'Сканди', 'Барнхаус', 'Минимализм', 'Русский'];
-const DEFAULT_LOGO_URL = '/assets/logo_small.png';
+const DEFAULT_LOGO_URL = `${API_ORIGIN || window.location.origin}/api/assets/logo_small.png`;
 
 const SERVICES_MENU = [
   { slug: 'fundament', title: 'Фундамент', text: 'Проектируем и устраиваем фундаменты под тип грунта и нагрузку дома.' },
@@ -301,6 +301,12 @@ function HeaderNav({
                   )
                 ))}
             </div>
+            {!activeMobileLevel ? (
+              <div className="mobile-menu-contact">
+                <a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a>
+                <small>Ежедневно с 9:00 до 19:00</small>
+              </div>
+            ) : null}
           </div>
         </div>
       ) : null}
@@ -2156,8 +2162,7 @@ function AppLayout({ children }: { children: ReactNode }) {
         {showToTop ? <button className="to-top-btn" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Наверх">↑</button> : null}
         <button className="floating-call-fixed" onClick={() => setOpenCallback(true)} aria-label="Заказать звонок">
           <svg className="floating-call-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <rect x="7" y="2.5" width="10" height="19" rx="2.5" stroke="currentColor" strokeWidth="1.8" />
-            <path d="M11 18.5h2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            <path d="M7.8 5.2c-.5.4-1.1 1.1-1.3 2.1-.5 2.5 1 6.1 4 9 2.9 3 6.5 4.5 9 4 1-.2 1.7-.8 2.1-1.3l-2.9-2.9c-.3-.3-.8-.4-1.2-.2l-1.7.8c-.4.2-.9.1-1.3-.2l-2.4-2.4c-.3-.3-.4-.8-.2-1.3l.8-1.7c.2-.4.1-.9-.2-1.2L10 6.5c-.6-.6-1.5-.7-2.2-.2Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
       </div>

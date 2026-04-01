@@ -365,6 +365,9 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .mobile-menu-list{display:grid; gap:8px;}
   .mobile-menu-item{display:block; width:100%; text-align:left; border:1px solid #d9deea; border-radius:8px; padding:10px 12px; text-decoration:none; color:#1f2631; background:#f7f8fb; font-size:14px;}
   .mobile-menu-item-btn{cursor:pointer;}
+  .mobile-menu-contact{margin-top:14px; padding-top:12px; border-top:1px solid #e2e6ef; display:grid; gap:4px;}
+  .mobile-menu-contact a{font-size:18px; color:#1d2430; text-decoration:none; font-weight:700;}
+  .mobile-menu-contact small{font-size:12px; color:#636c7b;}
   .internal-body h1{font-size:22px;}
   .internal-text-box p{font-size:12px;}
   .contacts-box{grid-template-columns:1fr; padding:16px;}
@@ -397,11 +400,10 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .offer-card,.offer-card.wide{grid-column:span 1; min-height:190px;}
   .offer-title{font-size:26px;}
   .hero-main{padding-top:8px}
-  .hero-upper-row{display:grid; grid-template-columns:1fr; gap:8px; padding-right:64px; padding-bottom:0; align-items:start;}
+  .hero-upper-row{display:flex; align-items:center; gap:8px; padding-right:64px; padding-bottom:0;}
   .brand-logo{font-size:34px}
   .logo-badge{width:34px;height:34px;font-size:16px}
-  .hero-contact-line strong{font-size:18px}
-  .hero-contact-line{position:static; margin-top:6px; margin-left:0; justify-content:flex-start;}
+  .hero-contact-line{display:none;}
   .floating-actions{right:12px; bottom:12px;}
   .floating-call-fixed{width:52px; height:52px;}
   .phone-block small{display:none;}
