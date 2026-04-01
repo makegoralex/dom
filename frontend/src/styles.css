@@ -354,7 +354,7 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .promo-inner strong{line-height:1.25;}
   .promo-btn{padding:6px 10px; font-size:11px;}
   .hero-main{position:relative;}
-  .mobile-nav-trigger-row{display:flex; justify-content:flex-end; position:absolute; right:0; top:8px; padding:0; z-index:5;}
+  .mobile-nav-trigger-row{display:flex; justify-content:flex-end; position:absolute; right:0; top:4px; padding:0; z-index:5;}
   .mobile-menu-trigger{border:1px solid rgba(255,255,255,.6); background:rgba(30,40,52,.55); color:#fff; font-size:23px; line-height:1; width:52px; height:44px; border-radius:8px; display:grid; place-items:center; padding:0;}
   .hero-nav{display:none;}
   .mobile-menu-overlay{position:fixed; inset:0; background:rgba(13,18,28,.56); z-index:130; display:grid; justify-items:end;}
