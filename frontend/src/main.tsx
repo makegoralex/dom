@@ -535,7 +535,7 @@ function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }
               </label>
               <button type="submit">Перезвоните мне</button>
             </form>
-            <a className="modal-policy" href="/about">Политика конфиденциальности</a>
+            <a className="modal-policy" href="/privacy-policy">Политика конфиденциальности</a>
             {status ? <p>{status}</p> : null}
           </>
         )}
@@ -872,7 +872,7 @@ function PublicPage() {
               <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={5} />
             </label>
             <button type="submit" className="lead-submit">✉ ОТПРАВИТЬ ДАННЫЕ</button>
-            <p className="lead-consent">Заполняя форму, вы даете согласие на обработку персональных данных.</p>
+            <p className="lead-consent">Заполняя форму, вы даете согласие на обработку персональных данных согласно <a href="/privacy-policy">политике конфиденциальности</a>.</p>
             {status ? <p className="status">{status}</p> : null}
           </form>
         </div>
@@ -970,6 +970,48 @@ function AboutPage() {
   );
 }
 
+function PrivacyPolicyPage() {
+  useEffect(() => {
+    document.title = 'Политика конфиденциальности — Evtenia';
+  }, []);
+
+  return (
+    <div>
+      <InternalHeader />
+      <section className="internal-body">
+        <div className="container">
+          <Breadcrumbs items={["Главная", "Политика конфиденциальности"]} />
+          <h1>Политика конфиденциальности</h1>
+          <div className="internal-text-box privacy-policy-box">
+            <p>
+              Настоящая политика определяет порядок обработки и защиты персональных данных пользователей сайта.
+              Оставляя заявку на сайте, вы соглашаетесь на обработку персональных данных в целях обратной связи,
+              консультации и подготовки коммерческого предложения.
+            </p>
+            <p>
+              Мы можем обрабатывать следующие данные: имя, номер телефона, электронную почту и иную информацию,
+              которую вы добровольно указываете в формах обратного звонка и заявок.
+            </p>
+            <p>
+              Обработка данных осуществляется законно, добросовестно и только в объеме, необходимом для достижения
+              указанных целей. Данные не передаются третьим лицам, за исключением случаев, предусмотренных
+              законодательством Российской Федерации.
+            </p>
+            <p>
+              Вы вправе запросить уточнение, блокировку или удаление ваших персональных данных, направив обращение
+              по контактам, указанным на странице «Контакты».
+            </p>
+            <p>
+              Оператор персональных данных: ООО «Евтения». ИНН: 5836696238. ОГРН: 1215800005442.
+            </p>
+          </div>
+        </div>
+      </section>
+      <SiteFooter />
+    </div>
+  );
+}
+
 
 function SiteFooter() {
   const currentYear = new Date().getFullYear();
@@ -984,6 +1026,7 @@ function SiteFooter() {
             <a href="/about">О компании</a>
             <a href="/contacts">Контакты</a>
             <a href="/portfolio">Портфолио</a>
+            <a href="/privacy-policy">Политика конфиденциальности</a>
           </div>
           <div className="footer-columns">
             <div><h4>Проекты домов</h4><a href="/projects?type=Модульные">Модульные</a><a href="/projects?type=Каркасные">Каркасные</a><a href="/projects?type=Из%20газобетона">Из газобетона</a></div>
@@ -1009,6 +1052,12 @@ function SiteFooter() {
               <a href="/services/skvazhiny">Скважины</a>
               <a href="/services/remont">Ремонт</a>
             </details>
+          </div>
+          <div className="footer-requisites">
+            <h4>Реквизиты</h4>
+            <p><strong>ООО «Евтения»</strong></p>
+            <p>ИНН: 5836696238</p>
+            <p>ОГРН: 1215800005442</p>
           </div>
         </div>
         <aside className="footer-side">
@@ -2184,8 +2233,27 @@ function App() {
     window.location.hash === `#${ADMIN_KEY}` ||
     url.searchParams.get('admin') === ADMIN_KEY;
 
+  useEffect(() => {
+    const applyFavicon = (href: string) => {
+      const iconHref = resolveMediaUrl(href || DEFAULT_LOGO_URL);
+      let icon = document.querySelector("link[rel='icon']") as HTMLLinkElement | null;
+      if (!icon) {
+        icon = document.createElement('link');
+        icon.rel = 'icon';
+        document.head.appendChild(icon);
+      }
+      icon.href = iconHref;
+    };
+
+    fetch(`${API_BASE}/api/site-settings`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no site settings'))))
+      .then((payload: SiteSettings) => applyFavicon(payload.logoUrl))
+      .catch(() => applyFavicon(DEFAULT_LOGO_URL));
+  }, []);
+
   if (isAdminRoute) return <AdminPage />;
   if (pathname === '/about') return <AppLayout><AboutPage /></AppLayout>;
+  if (pathname === '/privacy-policy') return <AppLayout><PrivacyPolicyPage /></AppLayout>;
   if (pathname === '/projects') return <AppLayout><ProjectTypePage /></AppLayout>;
   if (pathname === '/baths') return <AppLayout><BathsPage /></AppLayout>;
   if (pathname.startsWith('/project/')) return <AppLayout><ProjectDetailPage /></AppLayout>;
