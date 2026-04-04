@@ -636,6 +636,7 @@ function PromoLeadModal({
 
 function ProjectTile({ project, onRequest }: { project: HouseProject; onRequest?: (project: HouseProject) => void }) {
   const imageUrl = resolveMediaUrl(project.coverImage || project.images?.[0] || '');
+  const [openRequest, setOpenRequest] = useState(false);
   return (
     <article className="project-card">
       <a className="project-card-link" href={`/project/${project.id}`}>
