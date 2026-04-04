@@ -301,7 +301,7 @@ function HeaderNav({
           <React.Fragment key={item.label}>
             {item.children ? (
               <div className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : ''}`}>
-                <a href={item.href || '#'} className={`menu-link ${item.active ? 'active' : ''}`}>{item.label} ▾</a>
+                <button type="button" className={`menu-link menu-link-btn ${item.active ? 'active' : ''}`}>{item.label} ▾</button>
                 <div className={item.label === 'ПРОЕКТЫ ДОМОВ' ? 'projects-dropdown' : 'services-dropdown'}>
                   {item.children.map((child, idx) => (
                     child.heading
@@ -503,9 +503,11 @@ function resolveMediaUrl(url?: string) {
   if (value.startsWith('http://') || value.startsWith('https://')) {
     try {
       const parsed = new URL(value);
+      const safeProtocol = window.location.protocol === 'https:' && parsed.protocol === 'http:' ? 'https:' : parsed.protocol;
       if (parsed.pathname.startsWith('/assets/')) {
-        return `${parsed.origin}/api${parsed.pathname}`;
+        return `${safeProtocol}//${parsed.host}/api${parsed.pathname}`;
       }
+      if (safeProtocol !== parsed.protocol) return `${safeProtocol}//${parsed.host}${parsed.pathname}${parsed.search}${parsed.hash}`;
     } catch {
       return value;
     }
@@ -628,7 +630,7 @@ function PromoLeadModal({
   );
 }
 
-function ProjectTile({ project }: { project: HouseProject }) {
+function ProjectTile({ project, onRequest }: { project: HouseProject; onRequest?: (project: HouseProject) => void }) {
   const imageUrl = resolveMediaUrl(project.coverImage || project.images?.[0] || '');
   const [openRequest, setOpenRequest] = useState(false);
   return (
@@ -646,14 +648,7 @@ function ProjectTile({ project }: { project: HouseProject }) {
         <strong className="project-price">{normalizePrice(project.priceFrom)}</strong>
       </div>
       </a>
-      <button className="project-cta" onClick={() => setOpenRequest(true)}>Заявка на просчет дома</button>
-      <PromoLeadModal
-        open={openRequest}
-        onClose={() => setOpenRequest(false)}
-        title={`Заявка: ${project.title}`}
-        promoText="🎁 Проект дома в подарок"
-        messagePrefix={`Заявка на просчет дома: ${project.title}`}
-      />
+      <button className="project-cta" onClick={() => onRequest?.(project)}>Заявка на просчет дома</button>
     </article>
   );
 }
@@ -671,6 +666,7 @@ function PublicPage() {
   const [selectedType, setSelectedType] = useState('Все типы');
   const [openCallback, setOpenCallback] = useState(false);
   const [openGiftPromo, setOpenGiftPromo] = useState(false);
+  const [requestProject, setRequestProject] = useState<HouseProject | null>(null);
   const [menuOrder, setMenuOrder] = useState<NavMenuKey[]>([...NAV_MENU_DEFAULT_ORDER]);
   const [logoUrl, setLogoUrl] = useState(DEFAULT_LOGO_URL);
   const serviceColumns = useMemo(() => chunkBy(SERVICES_MENU, 6), []);
@@ -842,7 +838,7 @@ function PublicPage() {
             {constructionTypes.map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
           <div className="catalog-grid home-project-grid">
-            {catalogProjects.map((project) => <ProjectTile project={project} key={project.id} />)}
+            {catalogProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
           </div>
           <div className="show-all-wrap"><a href="/projects" className="show-all-link">Показать все проекты</a></div>
         </div>
@@ -988,6 +984,13 @@ function PublicPage() {
         title="Акция: 10 соток в подарок"
         promoText="10 соток в подарок и скидка на любой земельный участок у нас в базе."
         messagePrefix="Заявка по акции: 10 соток в подарок"
+      />
+      <PromoLeadModal
+        open={Boolean(requestProject)}
+        onClose={() => setRequestProject(null)}
+        title={requestProject ? `Заявка: ${requestProject.title}` : 'Заявка'}
+        promoText="🎁 Проект дома в подарок"
+        messagePrefix={requestProject ? `Заявка на просчет дома: ${requestProject.title}` : ''}
       />
     </div>
   );
@@ -1220,6 +1223,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const [maxArea, setMaxArea] = useState<number | null>(null);
   const [maxRooms, setMaxRooms] = useState<number | null>(null);
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
+  const [requestProject, setRequestProject] = useState<HouseProject | null>(null);
 
   useEffect(() => {
     document.title = `${sectionTitle} — Evtenia`;
@@ -1316,13 +1320,20 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                 ))}
               </div>
               <div className="catalog-grid">
-                {filtered.map((project) => <ProjectTile project={project} key={project.id} />)}
+                {filtered.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
               </div>
             </div>
           </div>
         </div>
       </section>
       <SiteFooter />
+      <PromoLeadModal
+        open={Boolean(requestProject)}
+        onClose={() => setRequestProject(null)}
+        title={requestProject ? `Заявка: ${requestProject.title}` : 'Заявка'}
+        promoText="🎁 Проект дома в подарок"
+        messagePrefix={requestProject ? `Заявка на просчет дома: ${requestProject.title}` : ''}
+      />
     </div>
   );
 }

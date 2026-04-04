@@ -50,6 +50,7 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 
 .hero-nav {display:flex; flex-wrap:nowrap; gap:10px; justify-content:center; padding:10px 0 10px; border-bottom:1px solid rgba(255,255,255,.35); overflow-x:auto;}
 .hero-nav a {font-weight:500; font-size:13px; color:#fff; text-decoration:none; opacity:.95; white-space:nowrap;}
+.menu-link-btn{border:none; background:transparent; color:#fff; font-weight:500; font-size:13px; cursor:pointer; padding:0; white-space:nowrap;}
 .menu-link.active{color:#f8cc52; font-weight:600;}
 
 .menu-projects,.menu-services,.menu-promotions{position:relative;}
