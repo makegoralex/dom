@@ -91,7 +91,7 @@ const CONSTRUCTION_TYPES = [
   'Каркасные',
   'Модульные'
 ];
-const NAV_MENU_DEFAULT_ORDER = ['about', 'projects', 'services', 'design', 'portfolio', 'furniture', 'promotions', 'contacts'];
+const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'lands', 'services', 'design', 'portfolio', 'furniture', 'promotions', 'contacts'];
 const DEFAULT_LOGO_URL = '/assets/logo_small.png';
 
 const seedProjects: HouseProject[] = [
@@ -219,7 +219,8 @@ const seedPages: Record<string, ContentPage> = {
   'services-svai': { slug: 'services-svai', title: 'Сваи', content: '<p>Монтаж винтовых и железобетонных свай под разные типы грунта.</p>' },
   'services-dizainer': { slug: 'services-dizainer', title: 'Дизайнер', content: '<p>Разрабатываем дизайн-концепцию интерьеров и экстерьеров.</p>' },
   'services-landshaftnyy-dizayn': { slug: 'services-landshaftnyy-dizayn', title: 'Ландшафтный дизайн', content: '<p>Проектируем благоустройство участка и озеленение территории.</p>' },
-  'services-mezhevanie': { slug: 'services-mezhevanie', title: 'Межевание', content: '<p>Готовим документы и выполняем межевание земельных участков.</p>' }
+  'services-mezhevanie': { slug: 'services-mezhevanie', title: 'Межевание', content: '<p>Готовим документы и выполняем межевание земельных участков.</p>' },
+  'services-ipoteka-oformlenie': { slug: 'services-ipoteka-oformlenie', title: 'Ипотека. Оформление', content: '<p>Помогаем с подбором банка, программой, пакетом документов и сопровождением сделки.</p>' }
 };
 
 const seedPortfolio: PortfolioItem[] = [

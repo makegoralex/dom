@@ -19,6 +19,14 @@ type HouseProject = {
   style?: string;
 };
 
+type LandPlot = {
+  id: string;
+  cadastralNumber: string;
+  area: string;
+  price: string;
+  district: string;
+};
+
 type Lead = {
   id: string;
   name: string;
@@ -77,8 +85,8 @@ const ADMIN_KEY = 'catalog-control-7f3a';
 const CONTACTS = {
   mainPhoneDisplay: '8-902-209-01-79',
   mainPhoneHref: 'tel:+79022090179',
-  extraPhoneDisplay: '8-841-419-01-79',
-  extraPhoneHref: 'tel:+78414190179',
+  extraPhoneDisplay: '8-8412-79-01-79',
+  extraPhoneHref: 'tel:+78412790179',
   email: '89022099279@mail.ru',
   emailHref: 'mailto:89022099279@mail.ru',
   vk: 'https://vk.ru/evtenia_house',
@@ -116,7 +124,8 @@ const SERVICES_MENU = [
   { slug: 'svai', title: 'Сваи', text: 'Монтаж винтовых и железобетонных свай под разные типы грунта.' },
   { slug: 'dizainer', title: 'Дизайнер', text: 'Разрабатываем дизайн-концепцию интерьеров и экстерьеров.' },
   { slug: 'landshaftnyy-dizayn', title: 'Ландшафтный дизайн', text: 'Проектируем благоустройство участка и озеленение территории.' },
-  { slug: 'mezhevanie', title: 'Межевание', text: 'Готовим документы и выполняем межевание земельных участков.' }
+  { slug: 'mezhevanie', title: 'Межевание', text: 'Готовим документы и выполняем межевание земельных участков.' },
+  { slug: 'ipoteka-oformlenie', title: 'Ипотека. Оформление', text: 'Помогаем с подбором банка, программой, пакетом документов и сопровождением сделки.' }
 ];
 
 const PROMOTIONS_MENU = [
@@ -130,8 +139,14 @@ function chunkBy<T>(items: T[], size: number) {
   return chunks;
 }
 
-const NAV_MENU_DEFAULT_ORDER = ['about', 'projects', 'services', 'design', 'portfolio', 'furniture', 'promotions', 'contacts'] as const;
+const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'lands', 'services', 'design', 'portfolio', 'furniture', 'promotions', 'contacts'] as const;
 type NavMenuKey = (typeof NAV_MENU_DEFAULT_ORDER)[number];
+
+function normalizeMenuOrder(order?: string[]) {
+  const incoming = Array.isArray(order) ? order.filter((item): item is NavMenuKey => NAV_MENU_DEFAULT_ORDER.includes(item as NavMenuKey)) : [];
+  if (incoming.length === NAV_MENU_DEFAULT_ORDER.length) return incoming;
+  return [...NAV_MENU_DEFAULT_ORDER];
+}
 
 function sanitizeCmsHtml(html: string) {
   if (!html) return '';
@@ -228,13 +243,15 @@ function HeaderNav({
       { label: 'Каркасные', href: `/baths?type=${encodeURIComponent('Каркасные')}` }
     ];
     const all: Record<NavMenuKey, MenuItem> = {
+      home: { label: 'ГЛАВНАЯ', href: '/', active: currentPath === '/' },
       about: { label: 'О КОМПАНИИ', href: '/about', active: currentPath === '/about' },
       projects: { label: 'ПРОЕКТЫ ДОМОВ', href: '/projects', active: currentPath === '/projects' || currentPath === '/baths', children: projectsChildren },
+      lands: { label: 'ЗЕМЛЯ', href: '/lands', active: currentPath === '/lands' },
       services: { label: 'УСЛУГИ', active: currentPath.startsWith('/services/'), children: serviceColumns.flatMap((column) => column.map((item) => ({ label: item.title, href: `/services/${item.slug}` }))) },
       design: { label: 'ПРОЕКТИРОВАНИЕ', href: '/design', active: currentPath === '/design' },
       portfolio: { label: 'ПОРТФОЛИО', href: '/portfolio', active: currentPath === '/portfolio' },
       furniture: { label: 'МЕБЕЛЬ', href: '/furniture', active: currentPath === '/furniture' },
-      promotions: { label: 'СКИДКИ И АКЦИИ', active: currentPath.startsWith('/discounts/'), children: PROMOTIONS_MENU.map((item) => ({ label: item.title, href: `/discounts/${item.slug}` })) },
+      promotions: { label: 'ИПОТЕКА И АКЦИИ', active: currentPath.startsWith('/discounts/'), children: PROMOTIONS_MENU.map((item) => ({ label: item.title, href: `/discounts/${item.slug}` })) },
       contacts: { label: 'КОНТАКТЫ', href: '/contacts', active: currentPath === '/contacts' }
     };
     return menuOrder.map((key) => all[key]).filter(Boolean);
@@ -253,13 +270,13 @@ function HeaderNav({
         {menuItems.map((item, index) => (
           <React.Fragment key={item.label}>
             {item.children ? (
-              <div className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'СКИДКИ И АКЦИИ' ? 'menu-promotions' : ''}`}>
+              <div className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : ''}`}>
                 <a href={item.href || '#'} className={`menu-link ${item.active ? 'active' : ''}`}>{item.label} ▾</a>
                 <div className={item.label === 'ПРОЕКТЫ ДОМОВ' ? 'projects-dropdown' : 'services-dropdown'}>
                   {item.children.map((child, idx) => (
                     child.heading
                       ? <span key={`${child.label}_${idx}`} className="dropdown-heading">{child.label}</span>
-                      : <a key={child.href || `${child.label}_${idx}`} href={child.href} className="dropdown-link">{child.label}</a>
+                      : <a key={child.href || `${child.label}_${idx}`} href={child.href} className={`dropdown-link ${child.href && window.location.pathname + window.location.search === child.href ? 'active' : ''}`}>{child.label}</a>
                   ))}
                 </div>
               </div>
@@ -285,7 +302,7 @@ function HeaderNav({
                 ? activeMobileLevel.items.map((item, idx) => (
                   item.heading
                     ? <strong key={`${item.label}_${idx}`} className="mobile-menu-item">{item.label}</strong>
-                    : <a key={item.href || `${item.label}_${idx}`} href={item.href} className="mobile-menu-item">{item.label}</a>
+                    : <a key={item.href || `${item.label}_${idx}`} href={item.href} className={`mobile-menu-item ${item.href && window.location.pathname + window.location.search === item.href ? 'active' : ''}`}>{item.label}</a>
                 ))
                 : menuItems.map((item) => (
                   item.children ? (
@@ -544,8 +561,60 @@ function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }
   );
 }
 
+function monthEndLabel() {
+  const now = new Date();
+  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  return end.toLocaleDateString('ru-RU');
+}
+
+function PromoLeadModal({
+  open,
+  onClose,
+  title,
+  promoText,
+  messagePrefix
+}: { open: boolean; onClose: () => void; title: string; promoText: string; messagePrefix: string }) {
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [status, setStatus] = useState('');
+  if (!open) return null;
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    setStatus('Отправка...');
+    const message = `${messagePrefix}\n${promoText}`;
+    try {
+      const res = await fetch(`${API_BASE}/api/leads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone, message })
+      });
+      if (!res.ok) throw new Error('bad');
+      setStatus('Спасибо! Заявка отправлена.');
+      setName('');
+      setPhone('');
+    } catch {
+      setStatus('Не удалось отправить заявку. Попробуйте позже.');
+    }
+  };
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+        <h3>{title}</h3>
+        <p>{promoText}</p>
+        <form onSubmit={submit}>
+          <label>Имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
+          <label>Телефон<input value={phone} onChange={(e) => setPhone(e.target.value)} required /></label>
+          <button type="submit">Отправить заявку</button>
+        </form>
+        {status ? <p>{status}</p> : null}
+      </div>
+    </div>
+  );
+}
+
 function ProjectTile({ project }: { project: HouseProject }) {
   const imageUrl = resolveMediaUrl(project.coverImage || project.images?.[0] || '');
+  const [openRequest, setOpenRequest] = useState(false);
   return (
     <article className="project-card">
       <a className="project-card-link" href={`/project/${project.id}`}>
@@ -561,6 +630,14 @@ function ProjectTile({ project }: { project: HouseProject }) {
         <strong className="project-price">{normalizePrice(project.priceFrom)}</strong>
       </div>
       </a>
+      <button className="project-cta" onClick={() => setOpenRequest(true)}>Заявка на просчет дома</button>
+      <PromoLeadModal
+        open={openRequest}
+        onClose={() => setOpenRequest(false)}
+        title={`Заявка: ${project.title}`}
+        promoText="🎁 Проект дома в подарок"
+        messagePrefix={`Заявка на просчет дома: ${project.title}`}
+      />
     </article>
   );
 }
@@ -577,6 +654,7 @@ function PublicPage() {
   const [constructionTypes, setConstructionTypes] = useState<string[]>([]);
   const [selectedType, setSelectedType] = useState('Все типы');
   const [openCallback, setOpenCallback] = useState(false);
+  const [openGiftPromo, setOpenGiftPromo] = useState(false);
   const [menuOrder, setMenuOrder] = useState<NavMenuKey[]>([...NAV_MENU_DEFAULT_ORDER]);
   const [logoUrl, setLogoUrl] = useState(DEFAULT_LOGO_URL);
   const serviceColumns = useMemo(() => chunkBy(SERVICES_MENU, 6), []);
@@ -601,9 +679,9 @@ function PublicPage() {
     fetch(`${API_BASE}/api/menu-order`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no menu order'))))
       .then((payload: { order?: NavMenuKey[] }) => {
-        if (Array.isArray(payload.order) && payload.order.length) setMenuOrder(payload.order);
+        setMenuOrder(normalizeMenuOrder(payload.order));
       })
-      .catch(() => setMenuOrder([...NAV_MENU_DEFAULT_ORDER]));
+      .catch(() => setMenuOrder(normalizeMenuOrder()));
     fetch(`${API_BASE}/api/site-settings`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no site settings'))))
       .then((payload: SiteSettings) => setLogoUrl(resolveMediaUrl(payload.logoUrl || DEFAULT_LOGO_URL)))
@@ -646,7 +724,7 @@ function PublicPage() {
       <header className="hero hero-exact">
         <div className="promo-strip">
           <div className="container promo-inner">
-            <strong><a href="/discounts/vse-akcii">10 соток земли в подарок при строительстве дома.</a></strong>
+            <strong><a href="/discounts/vse-akcii">🎁 10 СОТОК ЗЕМЛИ В ПОДАРОК ПРИ СТРОИТЕЛЬСТВЕ ДОМА</a></strong>
             <div className="promo-right"><a className="promo-btn" href="/discounts/vse-akcii">Все акции <span>»</span></a><div className="top-contacts"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a></div></div>
           </div>
         </div>
@@ -662,8 +740,15 @@ function PublicPage() {
             </a>
 
             <div className="hero-contact-line">
-              <span>Нужна примерная оценка стоимости строительства? Поможем по телефону за 5 минут.</span>
-              <div className="phone-block"><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><small>с 9:00 до 19:00</small></div>
+              <span className="hero-help-text">Нужен просчет дома? Поможем по телефону за 5 минут.</span>
+              <div className="phone-block">
+                <strong>
+                  <svg className="phone-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 4.5c-.6.2-1.4 1-1.8 2.1-.7 2.1.1 4.9 2.3 7.1 2.2 2.2 5 3 7.1 2.3 1.1-.4 1.9-1.2 2.1-1.8l-2.5-2.4c-.3-.3-.8-.4-1.2-.2l-1.2.6a1 1 0 0 1-1.1-.2L10 10.8a1 1 0 0 1-.2-1.1l.6-1.2c.2-.4.1-.9-.2-1.2L8 4.5Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  <a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a>
+                </strong>
+                <strong><a className="city-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a></strong>
+                <small>с 9:00 до 19:00</small>
+              </div>
               <button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button>
             </div>
           </div>
@@ -680,6 +765,7 @@ function PublicPage() {
             <div className="hero-buttons">
               <a href="#catalog" className="btn-green"><i>▣</i> ПОСМОТРЕТЬ ПРОЕКТЫ</a>
               <a href="#lead-form" className="btn-yellow"><i>⌂</i> ЗАКАЗАТЬ ДОМ</a>
+              <button className="btn-gift" onClick={() => setOpenGiftPromo(true)}><i>🎁</i> 10 СОТОК В ПОДАРОК</button>
             </div>
           </div>
         </div>
@@ -720,7 +806,7 @@ function PublicPage() {
             </article>
             <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?auto=format&fit=crop&w=1000&q=80')" }}>
               <div className="offer-overlay">
-                <h3><a href="/discounts/vse-akcii">Скидки и акции</a></h3>
+                <h3><a href="/discounts/vse-akcii">Ипотека и акции</a></h3>
               </div>
             </article>
             <article className="offer-card wide" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1000&q=80')" }}>
@@ -880,6 +966,13 @@ function PublicPage() {
 
       <SiteFooter />
       <CallbackModal open={openCallback} onClose={() => setOpenCallback(false)} />
+      <PromoLeadModal
+        open={openGiftPromo}
+        onClose={() => setOpenGiftPromo(false)}
+        title="Акция: 10 соток в подарок"
+        promoText="10 соток в подарок и скидка на любой земельный участок у нас в базе."
+        messagePrefix="Заявка по акции: 10 соток в подарок"
+      />
     </div>
   );
 }
@@ -912,9 +1005,9 @@ function InternalHeader() {
     fetch(`${API_BASE}/api/menu-order`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no menu order'))))
       .then((payload: { order?: NavMenuKey[] }) => {
-        if (Array.isArray(payload.order) && payload.order.length) setMenuOrder(payload.order);
+        setMenuOrder(normalizeMenuOrder(payload.order));
       })
-      .catch(() => setMenuOrder([...NAV_MENU_DEFAULT_ORDER]));
+      .catch(() => setMenuOrder(normalizeMenuOrder()));
     fetch(`${API_BASE}/api/site-settings`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no site settings'))))
       .then((payload: SiteSettings) => setLogoUrl(resolveMediaUrl(payload.logoUrl || DEFAULT_LOGO_URL)))
@@ -925,14 +1018,14 @@ function InternalHeader() {
     <header className="hero hero-exact internal-header">
       <div className="promo-strip">
         <div className="container promo-inner">
-          <strong><a href="/discounts/vse-akcii">10 соток земли в подарок при строительстве дома.</a></strong>
+          <strong><a href="/discounts/vse-akcii">🎁 10 СОТОК ЗЕМЛИ В ПОДАРОК ПРИ СТРОИТЕЛЬСТВЕ ДОМА</a></strong>
           <div className="promo-right"><a className="promo-btn" href="/discounts/vse-akcii">Все акции <span>»</span></a><div className="top-contacts"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a></div></div>
         </div>
       </div>
       <div className="container hero-main">
         <div className="hero-upper-row">
           <a href="/" className="brand-line"><div className="logo-badge"><img src={logoUrl} alt="Evtenia" /></div><div className="brand-text"><div className="brand-logo">Evtenia</div><p>Строительная компания</p></div></a>
-          <div className="hero-contact-line"><span>Нужна примерная оценка стоимости строительства? Поможем по телефону за 5 минут.</span><div className="phone-block"><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><small>с 9:00 до 19:00</small></div><button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button></div>
+          <div className="hero-contact-line"><span className="hero-help-text">Нужен просчет дома? Поможем по телефону за 5 минут.</span><div className="phone-block"><strong><svg className="phone-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 4.5c-.6.2-1.4 1-1.8 2.1-.7 2.1.1 4.9 2.3 7.1 2.2 2.2 5 3 7.1 2.3 1.1-.4 1.9-1.2 2.1-1.8l-2.5-2.4c-.3-.3-.8-.4-1.2-.2l-1.2.6a1 1 0 0 1-1.1-.2L10 10.8a1 1 0 0 1-.2-1.1l.6-1.2c.2-.4.1-.9-.2-1.2L8 4.5Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><strong><a className="city-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a></strong><small>с 9:00 до 19:00</small></div><button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button></div>
         </div>
         <HeaderNav serviceColumns={serviceColumns} currentPath={window.location.pathname} menuOrder={menuOrder} />
       </div>
@@ -964,7 +1057,37 @@ function AboutPage() {
   return (
     <div>
       <InternalHeader />
-      <InternalTextBlock title={page.title} content={page.content} />
+      <section className="internal-body">
+        <div className="container">
+          <Breadcrumbs items={["Главная", page.title]} />
+          <h1>{page.title}</h1>
+          <div className="about-anchor-menu">
+            <a href="#about-company">О компании</a>
+            <a href="#about-team">Наша команда</a>
+            <a href="#about-partners">Наши партнеры</a>
+            <a href="#about-agency">Наше агентство</a>
+          </div>
+          <div className="internal-text-box">
+            <p>{page.content}</p>
+          </div>
+          <div id="about-company" className="about-slider-block">
+            <h3>О компании</h3>
+            <div className="about-slider"><img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80" alt="О компании" /><img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1200&q=80" alt="О компании 2" /></div>
+          </div>
+          <div id="about-team" className="about-slider-block">
+            <h3>Наша команда</h3>
+            <div className="about-slider"><img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80" alt="Команда" /><img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80" alt="Команда 2" /></div>
+          </div>
+          <div id="about-partners" className="about-slider-block">
+            <h3>Наши партнеры</h3>
+            <div className="about-slider"><img src="https://images.unsplash.com/photo-1556155092-490a1ba16284?auto=format&fit=crop&w=1200&q=80" alt="Партнеры" /><img src="https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1200&q=80" alt="Партнеры 2" /></div>
+          </div>
+          <div id="about-agency" className="about-slider-block">
+            <h3>Наше агентство</h3>
+            <p><a href="https://evtenia.ru/" target="_blank" rel="noreferrer">Перейти на сайт агентства evtenia.ru</a></p>
+          </div>
+        </div>
+      </section>
       <SiteFooter />
     </div>
   );
@@ -1032,7 +1155,7 @@ function SiteFooter() {
             <div><h4>Проекты домов</h4><a href="/projects?type=Модульные">Модульные</a><a href="/projects?type=Каркасные">Каркасные</a><a href="/projects?type=Из%20газобетона">Из газобетона</a></div>
             <div><h4>Бани</h4><a href="/baths?type=Модульные">Модульные</a><a href="/baths?type=Каркасные">Каркасные</a></div>
             <div><h4>Услуги</h4><a href="/services/fundament">Фундамент</a><a href="/services/skvazhiny">Скважины</a><a href="/services/remont">Ремонт</a><a href="/services/dizainer">Дизайнер</a></div>
-            <div><h4>Разделы сайта</h4><a href="/design">Проектирование</a><a href="/portfolio">Портфолио</a><a href="/discounts/vse-akcii">Скидки и акции</a><a href="/contacts">Контакты</a></div>
+            <div><h4>Разделы сайта</h4><a href="/design">Проектирование</a><a href="/portfolio">Портфолио</a><a href="/discounts/vse-akcii">Ипотека и акции</a><a href="/contacts">Контакты</a></div>
           </div>
           <div className="footer-mobile-accordion">
             <details>
@@ -1062,7 +1185,7 @@ function SiteFooter() {
         </div>
         <aside className="footer-side">
           <div className="contact-card"><h4>Контакты</h4><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><a className="extra-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a><button onClick={() => setOpenCallback(true)}>Заказать звонок</button><a href={CONTACTS.emailHref}>{CONTACTS.email}</a></div>
-          <div className="social-card"><h4>Мы в соцсетях</h4><div className="social-row"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a></div></div>
+          <div className="social-card"><h4>Мы в соцсетях</h4><div className="social-row"><a href={CONTACTS.vk} target="_blank" rel="noreferrer"><img src="https://cdn.simpleicons.org/vk/FFFFFF" alt="" />VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer"><img src="https://cdn.simpleicons.org/telegram/FFFFFF" alt="" />Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer"><img src="https://max.ru/favicon.ico" alt="" />MAX</a></div></div>
         </aside>
       </div>
       <CallbackModal open={openCallback} onClose={() => setOpenCallback(false)} />
@@ -1079,7 +1202,8 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const [selectedFloors, setSelectedFloors] = useState<string[]>([]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [maxArea, setMaxArea] = useState(300);
-  const [maxBedrooms, setMaxBedrooms] = useState(6);
+  const [maxRooms, setMaxRooms] = useState(6);
+  const [maxPrice, setMaxPrice] = useState(15000000);
 
   useEffect(() => {
     document.title = `${sectionTitle} — Evtenia`;
@@ -1095,20 +1219,32 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const styleOptions = Array.from(new Set(byCategory.map((item) => (item.style || '').trim()).filter(Boolean)));
   const minArea = 20;
   const parseNum = (value: string) => Number((value.match(/\d+/) || ['0'])[0]);
+  const parsePrice = (value: string) => Number(String(value || '').replace(/[^\d]/g, '') || '0');
+  const areaValues = byCategory.map((item) => parseNum(item.area)).filter(Boolean);
+  const roomValues = byCategory.map((item) => parseNum(item.bedrooms)).filter(Boolean);
+  const priceValues = byCategory.map((item) => parsePrice(item.priceFrom)).filter(Boolean);
+  const maxAreaLimit = Math.max(...areaValues, 300);
+  const maxRoomsLimit = Math.max(...roomValues, 6);
+  const maxPriceLimit = Math.max(...priceValues, 15000000);
 
   useEffect(() => {
     setSelectedStyles((prev) => prev.filter((style) => styleOptions.includes(style)));
   }, [styleOptions]);
+  useEffect(() => {
+    setMaxArea((prev) => Math.min(prev, maxAreaLimit));
+    setMaxRooms((prev) => Math.min(prev, maxRoomsLimit));
+    setMaxPrice((prev) => Math.min(prev, maxPriceLimit));
+  }, [maxAreaLimit, maxRoomsLimit, maxPriceLimit]);
 
   const filtered = byCategory.filter((item) => {
     const byType = type === 'Все типы' || item.constructionType === type;
     const byFloor = !selectedFloors.length || selectedFloors.includes(item.floors);
     const byArea = parseNum(item.area) <= maxArea;
-    const byBedrooms = parseNum(item.bedrooms) <= maxBedrooms;
+    const byRooms = parseNum(item.bedrooms) <= maxRooms;
+    const byPrice = parsePrice(item.priceFrom) <= maxPrice;
     const byStyle = !selectedStyles.length || selectedStyles.includes(item.style || '');
-    return byType && byFloor && byStyle && byArea && byBedrooms;
+    return byType && byFloor && byStyle && byArea && byRooms && byPrice;
   });
-  const isTypeLocked = type !== 'Все типы';
 
   return (
     <div>
@@ -1136,7 +1272,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                           checked={selectedStyles.includes(style)}
                           onChange={(e) => setSelectedStyles(e.target.checked ? [...selectedStyles, style] : selectedStyles.filter((s) => s !== style))}
                         />
-                        {' '}{style}
+                        {' '}{style === 'Скандинавский' ? 'Сканди' : style}
                       </label>
                     ))}
                   </div>
@@ -1144,16 +1280,20 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
               ) : null}
               <div className="filter-block">
                 <h4>Площадь до {maxArea} м²</h4>
-                <input type="range" min={minArea} max={300} value={maxArea} onChange={(e) => setMaxArea(Number(e.target.value))} />
+                <input type="range" min={minArea} max={maxAreaLimit} value={maxArea} onChange={(e) => setMaxArea(Number(e.target.value))} />
               </div>
               <div className="filter-block">
-                <h4>Спальни до {maxBedrooms}</h4>
-                <input type="range" min={1} max={8} value={maxBedrooms} onChange={(e) => setMaxBedrooms(Number(e.target.value))} />
+                <h4>Комнаты до {maxRooms}</h4>
+                <input type="range" min={1} max={maxRoomsLimit} value={maxRooms} onChange={(e) => setMaxRooms(Number(e.target.value))} />
+              </div>
+              <div className="filter-block">
+                <h4>Цена до {maxPrice.toLocaleString('ru-RU')} ₽</h4>
+                <input type="range" min={Math.max(100000, Math.floor(maxPriceLimit / 30))} max={maxPriceLimit} step={100000} value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))} />
               </div>
             </aside>
 
             <div>
-              <div className={`type-chips ${isTypeLocked ? 'hidden-type-chips' : ''}`}>
+              <div className="type-chips">
                 <button className={type === 'Все типы' ? 'active' : ''} onClick={() => { window.location.href = `${window.location.pathname}?type=${encodeURIComponent('Все типы')}`; }}>Все типы</button>
                 {typeOptions.map((option) => (
                   <button key={option} className={type === option ? 'active' : ''} onClick={() => { window.location.href = `${window.location.pathname}?type=${encodeURIComponent(option)}`; }}>{option}</button>
@@ -1179,10 +1319,76 @@ function BathsPage() {
   return <CatalogPage category="bath" sectionTitle="Бани" />;
 }
 
+const LAND_FALLBACK: LandPlot[] = [
+  { id: 'land1', cadastralNumber: '58:29:1003001:254', area: '10 соток', price: '1 250 000 ₽', district: 'Пензенский район' },
+  { id: 'land2', cadastralNumber: '58:29:1003001:255', area: '12 соток', price: '1 480 000 ₽', district: 'Бессоновский район' },
+  { id: 'land3', cadastralNumber: '58:29:1003001:256', area: '8 соток', price: '980 000 ₽', district: 'Железнодорожный район' }
+];
+
+function LandsPage() {
+  const [lands, setLands] = useState<LandPlot[]>(LAND_FALLBACK);
+  const [district, setDistrict] = useState('Все районы');
+  const [maxPrice, setMaxPrice] = useState(5000000);
+  const [activeLand, setActiveLand] = useState<LandPlot | null>(null);
+  useEffect(() => {
+    document.title = 'Земля — Evtenia';
+  }, []);
+  const districts = ['Все районы', ...Array.from(new Set(lands.map((item) => item.district)))];
+  const parsePrice = (value: string) => Number(value.replace(/[^\d]/g, '') || '0');
+  const filtered = lands.filter((item) => (district === 'Все районы' || item.district === district) && parsePrice(item.price) <= maxPrice);
+  return (
+    <div>
+      <InternalHeader />
+      <section className="internal-body">
+        <div className="container">
+          <Breadcrumbs items={["Главная", "Земля"]} />
+          <h1>ЗЕМЛЯ</h1>
+          <div className="catalog-layout">
+            <aside className="catalog-filters">
+              <div className="filter-block">
+                <h4>Район</h4>
+                <select value={district} onChange={(e) => setDistrict(e.target.value)}>
+                  {districts.map((item) => <option key={item} value={item}>{item}</option>)}
+                </select>
+              </div>
+              <div className="filter-block">
+                <h4>Цена до {maxPrice.toLocaleString('ru-RU')} ₽</h4>
+                <input type="range" min={500000} max={7000000} step={100000} value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))} />
+              </div>
+            </aside>
+            <div className="catalog-grid">
+              {filtered.map((item) => (
+                <article className="project-card" key={item.id}>
+                  <div className="project-content">
+                    <h3>{item.cadastralNumber}</h3>
+                    <p className="project-desc">Площадь: {item.area}</p>
+                    <p className="project-desc">Район: {item.district}</p>
+                    <strong className="project-price">{item.price}</strong>
+                    <button className="project-cta" onClick={() => setActiveLand(item)}>Оставить заявку</button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+      <SiteFooter />
+      <PromoLeadModal
+        open={Boolean(activeLand)}
+        onClose={() => setActiveLand(null)}
+        title={activeLand ? `Заявка на участок ${activeLand.cadastralNumber}` : 'Заявка'}
+        promoText={activeLand ? `Участок ${activeLand.area}, ${activeLand.district}, ${activeLand.price}` : ''}
+        messagePrefix={activeLand ? `Заявка на участок ${activeLand.cadastralNumber}` : ''}
+      />
+    </div>
+  );
+}
+
 function ProjectDetailPage() {
   const projectId = window.location.pathname.replace('/project/', '');
   const [projects, setProjects] = useState<HouseProject[]>(FALLBACK_PROJECTS);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [openRequest, setOpenRequest] = useState(false);
 
   useEffect(() => {
     fetch(`${API_BASE}/api/projects`)
@@ -1257,12 +1463,19 @@ function ProjectDetailPage() {
               <div className="detail-row"><span>Тип строительства</span><b>{project.constructionType}</b></div>
               <div className="detail-row"><span>Стиль</span><b>{project.style || 'Современный'}</b></div>
               <strong className="detail-price">{normalizePrice(project.priceFrom)}</strong>
-              <button className="detail-btn">Задать вопрос эксперту</button>
+              <button className="detail-btn" onClick={() => setOpenRequest(true)}>Заявка на просчет дома</button>
             </aside>
           </div>
         </div>
       </section>
       <SiteFooter />
+      <PromoLeadModal
+        open={openRequest}
+        onClose={() => setOpenRequest(false)}
+        title={`Заявка: ${project.title}`}
+        promoText="🎁 Проект дома в подарок"
+        messagePrefix={`Заявка на просчет дома: ${project.title}`}
+      />
     </div>
   );
 }
@@ -1292,9 +1505,17 @@ function ContactsPage() {
               <p><a href={CONTACTS.emailHref}>{CONTACTS.email}</a></p>
 
               <div className="contacts-socials">
-                <a href={CONTACTS.vk} target="_blank" rel="noreferrer" aria-label="VK">VK</a>
-                <a href={CONTACTS.telegram} target="_blank" rel="noreferrer" aria-label="Telegram">TG</a>
-                <a href={CONTACTS.max} target="_blank" rel="noreferrer" aria-label="MAX">MAX</a>
+                <a href={CONTACTS.vk} target="_blank" rel="noreferrer" aria-label="VK"><img src="https://cdn.simpleicons.org/vk/FFFFFF" alt="" /> VK</a>
+                <a href={CONTACTS.telegram} target="_blank" rel="noreferrer" aria-label="Telegram"><img src="https://cdn.simpleicons.org/telegram/FFFFFF" alt="" /> Telegram</a>
+                <a href={CONTACTS.max} target="_blank" rel="noreferrer" aria-label="MAX"><img src="https://max.ru/favicon.ico" alt="" /> MAX</a>
+              </div>
+              <div className="contacts-person">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=80" alt="Менеджер" />
+                <div>
+                  <strong>Евгения Смирнова</strong>
+                  <small>Руководитель отдела продаж</small>
+                  <p><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></p>
+                </div>
               </div>
             </div>
             <div className="contacts-map-wrap">
@@ -1462,9 +1683,35 @@ function DesignPage() {
 }
 
 function SubsectionPage({ sectionTitle, pageTitle, text, isHtml = false }: { sectionTitle: string; pageTitle: string; text: string; isHtml?: boolean }) {
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [serviceStatus, setServiceStatus] = useState('');
   useEffect(() => {
     document.title = `${pageTitle} — Evtenia`;
   }, [pageTitle]);
+  const isService = sectionTitle === 'Услуги';
+
+  const submitServiceLead = async (event: FormEvent) => {
+    event.preventDefault();
+    setServiceStatus('Отправка...');
+    try {
+      const res = await fetch(`${API_BASE}/api/leads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          phone,
+          message: `Заявка на услугу со скидкой 10%: ${pageTitle}. Действует до ${monthEndLabel()}.`
+        })
+      });
+      if (!res.ok) throw new Error('bad');
+      setServiceStatus('Заявка отправлена.');
+      setName('');
+      setPhone('');
+    } catch {
+      setServiceStatus('Не удалось отправить заявку.');
+    }
+  };
 
   return (
     <div>
@@ -1475,6 +1722,15 @@ function SubsectionPage({ sectionTitle, pageTitle, text, isHtml = false }: { sec
           <h1>{pageTitle}</h1>
           <div className="internal-text-box">
             {isHtml ? <CmsHtmlContent html={text} /> : <><p>{text}</p><p>Скоро добавим подробное описание услуги и примеры выполненных работ.</p></>}
+            {isService ? (
+              <form className="service-discount-form" onSubmit={submitServiceLead}>
+                <button type="submit">Заказать услугу со скидкой 10%</button>
+                <small>Скидка действует до {monthEndLabel()}.</small>
+                <label>Имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
+                <label>Телефон<input value={phone} onChange={(e) => setPhone(e.target.value)} required /></label>
+                {serviceStatus ? <p>{serviceStatus}</p> : null}
+              </form>
+            ) : null}
           </div>
         </div>
       </section>
@@ -2256,10 +2512,11 @@ function App() {
   if (pathname === '/privacy-policy') return <AppLayout><PrivacyPolicyPage /></AppLayout>;
   if (pathname === '/projects') return <AppLayout><ProjectTypePage /></AppLayout>;
   if (pathname === '/baths') return <AppLayout><BathsPage /></AppLayout>;
+  if (pathname === '/lands') return <AppLayout><LandsPage /></AppLayout>;
   if (pathname.startsWith('/project/')) return <AppLayout><ProjectDetailPage /></AppLayout>;
   if (pathname === '/design') return <AppLayout><DesignPage /></AppLayout>;
   if (servicePage) return <AppLayout><ManagedTextPage slug={`services-${servicePage.slug}`} fallbackTitle={servicePage.title} fallbackContent={servicePage.text} sectionTitle="Услуги" /></AppLayout>;
-  if (discountPage) return <AppLayout><ManagedTextPage slug={`discounts-${discountPage.slug}`} fallbackTitle={discountPage.title} fallbackContent={discountPage.text} sectionTitle="Скидки и акции" /></AppLayout>;
+  if (discountPage) return <AppLayout><ManagedTextPage slug={`discounts-${discountPage.slug}`} fallbackTitle={discountPage.title} fallbackContent={discountPage.text} sectionTitle="Ипотека и акции" /></AppLayout>;
   if (pathname === '/furniture') return <AppLayout><ManagedTextPage slug="furniture" fallbackTitle="Мебель" fallbackContent="Изготавливаем корпусную и встроенную мебель под ваши размеры и стиль интерьера." sectionTitle="Каталог" /></AppLayout>;
   if (pathname === '/portfolio') return <AppLayout><PortfolioPage /></AppLayout>;
   if (pathname === '/contacts') return <AppLayout><ContactsPage /></AppLayout>;
