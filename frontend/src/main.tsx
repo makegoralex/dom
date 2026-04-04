@@ -1290,6 +1290,10 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                 <h4>Цена до {maxPrice.toLocaleString('ru-RU')} ₽</h4>
                 <input type="range" min={Math.max(100000, Math.floor(maxPriceLimit / 30))} max={maxPriceLimit} step={100000} value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))} />
               </div>
+              <div className="filter-block">
+                <h4>Цена до {maxPrice.toLocaleString('ru-RU')} ₽</h4>
+                <input type="range" min={1000000} max={25000000} step={100000} value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))} />
+              </div>
             </aside>
 
             <div>
