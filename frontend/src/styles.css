@@ -40,10 +40,12 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .hero-contact-line u{color:#ffcc55; text-decoration-thickness:1px;}
 .hero-contact-line strong {font-size:22px; color:#ffdd4d; line-height:1.1;}
 .hero-contact-line strong a{color:inherit; text-decoration:none;}
-.phone-block{display:flex; flex-direction:column; align-items:flex-start; line-height:1.1;}
-.phone-icon{width:16px; height:16px; color:#fff; margin-right:6px; vertical-align:-2px;}
+.phone-block{display:grid; grid-template-columns:auto 1fr; grid-template-areas:"icon nums" ". time"; align-items:start; column-gap:8px; row-gap:2px; line-height:1.1;}
+.phone-icon-wrap{grid-area:icon; display:flex; align-items:flex-start; padding-top:2px;}
+.phone-lines{grid-area:nums; display:flex; flex-direction:column; gap:2px;}
+.phone-icon{width:22px; height:22px; color:#fff;}
 .city-phone-link{color:#ffdd4d; text-decoration:none;}
-.phone-block small{color:#d9ecff; font-size:12px; margin-top:3px;}
+.phone-block small{grid-area:time; color:#d9ecff; font-size:12px; margin-top:3px;}
 .call-btn {background:#5dad2f; border:none; color:#fff; padding:10px 14px; font-size:14px; cursor:pointer;}
 
 .hero-nav {display:flex; flex-wrap:wrap; gap:12px; justify-content:center; padding:10px 0 10px; border-bottom:1px solid rgba(255,255,255,.35);}
@@ -185,6 +187,9 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .project-meta strong{font-size:16px; color:#1d222c; line-height:1.1;}
 .project-price {display:block; margin:16px auto 0; width:max-content; padding:12px 28px; border:1px solid #2d2f33; border-radius:8px; font-size:20px; font-weight:700; color:#232832;}
 .project-cta{width:calc(100% - 24px); margin:0 12px 12px; border:none; background:#eb7b17; color:#fff; padding:10px 12px; font-weight:700; cursor:pointer;}
+.land-card .project-content{display:grid; gap:8px;}
+.land-card-actions{display:grid; grid-template-columns:1fr 1fr; gap:8px; align-items:center;}
+.land-card .project-price,.land-card .project-cta{margin:0; width:100%; text-align:center; padding:10px 12px;}
 
 .project-detail-layout{display:grid; grid-template-columns:1fr 340px; gap:22px; align-items:start;}
 .project-detail-layout > *{min-width:0;}
@@ -286,6 +291,17 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .service-discount-form button{justify-self:start; border:none; background:#eb7b17; color:#fff; padding:10px 14px; font-weight:700; border-radius:8px;}
 .service-discount-form small{font-weight:600; color:#8a4a0f;}
 .service-discount-form label{display:grid; gap:4px; font-size:14px;}
+.service-page-layout{display:block;}
+.service-page-layout.is-service{display:grid; grid-template-columns:minmax(0,1fr) minmax(260px,30%); gap:16px; align-items:start;}
+.service-side{position:sticky; top:16px;}
+.lands-top-cta{display:grid; grid-template-columns:1fr minmax(280px,340px); gap:16px; margin-bottom:14px; background:#f7f7f8; border:1px solid #d8dce3; padding:14px;}
+.lands-top-cta p{margin:0; font-size:14px; line-height:1.4;}
+.sell-land-form{display:grid; gap:8px;}
+.sell-land-form h3{margin:0; font-size:18px;}
+.sell-land-form label{display:grid; gap:4px; font-size:13px;}
+.sell-land-form input,.sell-land-form textarea{width:100%; border:1px solid #cfd5e2; padding:8px 10px; font-size:14px;}
+.sell-land-form button{border:none; background:#eb7b17; color:#fff; padding:9px 12px; font-weight:700; cursor:pointer;}
+.sell-land-form small{color:#3c4658;}
 .cookie-notice{position:fixed; right:16px; bottom:16px; z-index:140; width:min(420px,calc(100vw - 24px)); background:#1f2733; color:#fff; border-radius:14px; padding:14px; border:1px solid #3b4556; box-shadow:0 16px 32px rgba(0,0,0,.3);}
 .cookie-notice p{margin:0 0 10px; font-size:13px; line-height:1.35;}
 .cookie-notice button{border:none; background:#eb7b17; color:#fff; padding:8px 12px; border-radius:8px; font-weight:600; cursor:pointer;}
@@ -374,6 +390,9 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .project-detail-slider{min-width:0; overflow:hidden;}
   .project-detail-thumbs{overflow-x:auto; padding-bottom:4px; max-width:100%;}
   .project-thumb{flex:0 0 auto;}
+  .service-page-layout.is-service{grid-template-columns:1fr;}
+  .service-side{position:static;}
+  .lands-top-cta{grid-template-columns:1fr;}
   .adv-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width: 720px) {

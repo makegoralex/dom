@@ -25,6 +25,7 @@ type LandPlot = {
   area: string;
   price: string;
   district: string;
+  image?: string;
 };
 
 type Lead = {
@@ -76,7 +77,7 @@ type MenuItem = {
   children?: MenuChildItem[];
   active?: boolean;
 };
-type AdminTab = 'projects' | 'pages' | 'portfolio' | 'leads' | 'settings';
+type AdminTab = 'projects' | 'lands' | 'pages' | 'portfolio' | 'leads' | 'settings';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 const API_ORIGIN = API_BASE ? new URL(API_BASE, window.location.origin).origin : '';
@@ -742,11 +743,11 @@ function PublicPage() {
             <div className="hero-contact-line">
               <span className="hero-help-text">Нужен просчет дома? Поможем по телефону за 5 минут.</span>
               <div className="phone-block">
-                <strong>
-                  <svg className="phone-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 4.5c-.6.2-1.4 1-1.8 2.1-.7 2.1.1 4.9 2.3 7.1 2.2 2.2 5 3 7.1 2.3 1.1-.4 1.9-1.2 2.1-1.8l-2.5-2.4c-.3-.3-.8-.4-1.2-.2l-1.2.6a1 1 0 0 1-1.1-.2L10 10.8a1 1 0 0 1-.2-1.1l.6-1.2c.2-.4.1-.9-.2-1.2L8 4.5Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  <a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a>
-                </strong>
-                <strong><a className="city-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a></strong>
+                <span className="phone-icon-wrap"><svg className="phone-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 4.5c-.6.2-1.4 1-1.8 2.1-.7 2.1.1 4.9 2.3 7.1 2.2 2.2 5 3 7.1 2.3 1.1-.4 1.9-1.2 2.1-1.8l-2.5-2.4c-.3-.3-.8-.4-1.2-.2l-1.2.6a1 1 0 0 1-1.1-.2L10 10.8a1 1 0 0 1-.2-1.1l.6-1.2c.2-.4.1-.9-.2-1.2L8 4.5Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg></span>
+                <div className="phone-lines">
+                  <strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong>
+                  <strong><a className="city-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a></strong>
+                </div>
                 <small>с 9:00 до 19:00</small>
               </div>
               <button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button>
@@ -1025,7 +1026,7 @@ function InternalHeader() {
       <div className="container hero-main">
         <div className="hero-upper-row">
           <a href="/" className="brand-line"><div className="logo-badge"><img src={logoUrl} alt="Evtenia" /></div><div className="brand-text"><div className="brand-logo">Evtenia</div><p>Строительная компания</p></div></a>
-          <div className="hero-contact-line"><span className="hero-help-text">Нужен просчет дома? Поможем по телефону за 5 минут.</span><div className="phone-block"><strong><svg className="phone-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 4.5c-.6.2-1.4 1-1.8 2.1-.7 2.1.1 4.9 2.3 7.1 2.2 2.2 5 3 7.1 2.3 1.1-.4 1.9-1.2 2.1-1.8l-2.5-2.4c-.3-.3-.8-.4-1.2-.2l-1.2.6a1 1 0 0 1-1.1-.2L10 10.8a1 1 0 0 1-.2-1.1l.6-1.2c.2-.4.1-.9-.2-1.2L8 4.5Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><strong><a className="city-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a></strong><small>с 9:00 до 19:00</small></div><button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button></div>
+          <div className="hero-contact-line"><span className="hero-help-text">Нужен просчет дома? Поможем по телефону за 5 минут.</span><div className="phone-block"><span className="phone-icon-wrap"><svg className="phone-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 4.5c-.6.2-1.4 1-1.8 2.1-.7 2.1.1 4.9 2.3 7.1 2.2 2.2 5 3 7.1 2.3 1.1-.4 1.9-1.2 2.1-1.8l-2.5-2.4c-.3-.3-.8-.4-1.2-.2l-1.2.6a1 1 0 0 1-1.1-.2L10 10.8a1 1 0 0 1-.2-1.1l.6-1.2c.2-.4.1-.9-.2-1.2L8 4.5Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg></span><div className="phone-lines"><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><strong><a className="city-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a></strong></div><small>с 9:00 до 19:00</small></div><button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button></div>
         </div>
         <HeaderNav serviceColumns={serviceColumns} currentPath={window.location.pathname} menuOrder={menuOrder} />
       </div>
@@ -1290,10 +1291,6 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                 <h4>Цена до {maxPrice.toLocaleString('ru-RU')} ₽</h4>
                 <input type="range" min={Math.max(100000, Math.floor(maxPriceLimit / 30))} max={maxPriceLimit} step={100000} value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))} />
               </div>
-              <div className="filter-block">
-                <h4>Цена до {maxPrice.toLocaleString('ru-RU')} ₽</h4>
-                <input type="range" min={1000000} max={25000000} step={100000} value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))} />
-              </div>
             </aside>
 
             <div>
@@ -1324,9 +1321,9 @@ function BathsPage() {
 }
 
 const LAND_FALLBACK: LandPlot[] = [
-  { id: 'land1', cadastralNumber: '58:29:1003001:254', area: '10 соток', price: '1 250 000 ₽', district: 'Пензенский район' },
-  { id: 'land2', cadastralNumber: '58:29:1003001:255', area: '12 соток', price: '1 480 000 ₽', district: 'Бессоновский район' },
-  { id: 'land3', cadastralNumber: '58:29:1003001:256', area: '8 соток', price: '980 000 ₽', district: 'Железнодорожный район' }
+  { id: 'land1', cadastralNumber: '58:29:1003001:254', area: '10 соток', price: '1 250 000 ₽', district: 'Пензенский район', image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80' },
+  { id: 'land2', cadastralNumber: '58:29:1003001:255', area: '12 соток', price: '1 480 000 ₽', district: 'Бессоновский район', image: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1200&q=80' },
+  { id: 'land3', cadastralNumber: '58:29:1003001:256', area: '8 соток', price: '980 000 ₽', district: 'Железнодорожный район', image: 'https://images.unsplash.com/photo-1493815793585-d94ccbc86df8?auto=format&fit=crop&w=1200&q=80' }
 ];
 
 function LandsPage() {
@@ -1334,12 +1331,44 @@ function LandsPage() {
   const [district, setDistrict] = useState('Все районы');
   const [maxPrice, setMaxPrice] = useState(5000000);
   const [activeLand, setActiveLand] = useState<LandPlot | null>(null);
+  const [sellerName, setSellerName] = useState('');
+  const [sellerPhone, setSellerPhone] = useState('');
+  const [sellerAddress, setSellerAddress] = useState('');
+  const [sellerComment, setSellerComment] = useState('');
+  const [sellerStatus, setSellerStatus] = useState('');
   useEffect(() => {
     document.title = 'Земля — Evtenia';
+    fetch(`${API_BASE}/api/lands`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no lands'))))
+      .then((data: LandPlot[]) => Array.isArray(data) && data.length ? setLands(data) : setLands(LAND_FALLBACK))
+      .catch(() => setLands(LAND_FALLBACK));
   }, []);
   const districts = ['Все районы', ...Array.from(new Set(lands.map((item) => item.district)))];
   const parsePrice = (value: string) => Number(value.replace(/[^\d]/g, '') || '0');
   const filtered = lands.filter((item) => (district === 'Все районы' || item.district === district) && parsePrice(item.price) <= maxPrice);
+  const submitSellLand = async (event: FormEvent) => {
+    event.preventDefault();
+    setSellerStatus('Отправка...');
+    try {
+      const response = await fetch(`${API_BASE}/api/leads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: sellerName,
+          phone: sellerPhone,
+          message: `Продать свою землю. Адрес: ${sellerAddress}. Комментарий: ${sellerComment}`
+        })
+      });
+      if (!response.ok) throw new Error('bad');
+      setSellerStatus('Спасибо! Свяжемся с вами.');
+      setSellerName('');
+      setSellerPhone('');
+      setSellerAddress('');
+      setSellerComment('');
+    } catch {
+      setSellerStatus('Не удалось отправить заявку.');
+    }
+  };
   return (
     <div>
       <InternalHeader />
@@ -1347,6 +1376,18 @@ function LandsPage() {
         <div className="container">
           <Breadcrumbs items={["Главная", "Земля"]} />
           <h1>ЗЕМЛЯ</h1>
+          <div className="lands-top-cta">
+            <p>Подберем участок под строительство дома или поможем выгодно реализовать вашу землю через нашу базу покупателей.</p>
+            <form className="sell-land-form" onSubmit={submitSellLand}>
+              <h3>Продать свою землю</h3>
+              <label>Контактное лицо<input value={sellerName} onChange={(e) => setSellerName(e.target.value)} required /></label>
+              <label>Телефон<input value={sellerPhone} onChange={(e) => setSellerPhone(e.target.value)} required /></label>
+              <label>Адрес участка<input value={sellerAddress} onChange={(e) => setSellerAddress(e.target.value)} required /></label>
+              <label>Комментарий<textarea value={sellerComment} onChange={(e) => setSellerComment(e.target.value)} rows={3} /></label>
+              <button type="submit">Отправить заявку</button>
+              {sellerStatus ? <small>{sellerStatus}</small> : null}
+            </form>
+          </div>
           <div className="catalog-layout">
             <aside className="catalog-filters">
               <div className="filter-block">
@@ -1362,13 +1403,16 @@ function LandsPage() {
             </aside>
             <div className="catalog-grid">
               {filtered.map((item) => (
-                <article className="project-card" key={item.id}>
+                <article className="project-card land-card" key={item.id}>
+                  <div className="project-image" style={{ backgroundImage: `url(${resolveMediaUrl(item.image || '') || 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80'})` }} />
                   <div className="project-content">
                     <h3>{item.cadastralNumber}</h3>
                     <p className="project-desc">Площадь: {item.area}</p>
                     <p className="project-desc">Район: {item.district}</p>
-                    <strong className="project-price">{item.price}</strong>
-                    <button className="project-cta" onClick={() => setActiveLand(item)}>Оставить заявку</button>
+                    <div className="land-card-actions">
+                      <strong className="project-price">{item.price}</strong>
+                      <button className="project-cta" onClick={() => setActiveLand(item)}>Оставить заявку</button>
+                    </div>
                   </div>
                 </article>
               ))}
@@ -1498,6 +1542,13 @@ function ContactsPage() {
           <h1>КОНТАКТЫ</h1>
           <div className="contacts-box">
             <div className="contacts-info">
+              <div className="contacts-person">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=80" alt="Менеджер" />
+                <div>
+                  <strong>Евгения Смирнова</strong>
+                  <small>Руководитель отдела продаж</small>
+                </div>
+              </div>
               <h3>Телефоны:</h3>
               <p><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></p>
               <p><a href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a></p>
@@ -1512,14 +1563,6 @@ function ContactsPage() {
                 <a href={CONTACTS.vk} target="_blank" rel="noreferrer" aria-label="VK"><img src="https://cdn.simpleicons.org/vk/FFFFFF" alt="" /> VK</a>
                 <a href={CONTACTS.telegram} target="_blank" rel="noreferrer" aria-label="Telegram"><img src="https://cdn.simpleicons.org/telegram/FFFFFF" alt="" /> Telegram</a>
                 <a href={CONTACTS.max} target="_blank" rel="noreferrer" aria-label="MAX"><img src="https://max.ru/favicon.ico" alt="" /> MAX</a>
-              </div>
-              <div className="contacts-person">
-                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=80" alt="Менеджер" />
-                <div>
-                  <strong>Евгения Смирнова</strong>
-                  <small>Руководитель отдела продаж</small>
-                  <p><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></p>
-                </div>
               </div>
             </div>
             <div className="contacts-map-wrap">
@@ -1724,16 +1767,20 @@ function SubsectionPage({ sectionTitle, pageTitle, text, isHtml = false }: { sec
         <div className="container">
           <Breadcrumbs items={["Главная", sectionTitle, pageTitle]} />
           <h1>{pageTitle}</h1>
-          <div className="internal-text-box">
-            {isHtml ? <CmsHtmlContent html={text} /> : <><p>{text}</p><p>Скоро добавим подробное описание услуги и примеры выполненных работ.</p></>}
+          <div className={`service-page-layout ${isService ? 'is-service' : ''}`}>
+            <div className="internal-text-box">
+              {isHtml ? <CmsHtmlContent html={text} /> : <><p>{text}</p><p>Скоро добавим подробное описание услуги и примеры выполненных работ.</p></>}
+            </div>
             {isService ? (
-              <form className="service-discount-form" onSubmit={submitServiceLead}>
-                <button type="submit">Заказать услугу со скидкой 10%</button>
-                <small>Скидка действует до {monthEndLabel()}.</small>
-                <label>Имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
-                <label>Телефон<input value={phone} onChange={(e) => setPhone(e.target.value)} required /></label>
-                {serviceStatus ? <p>{serviceStatus}</p> : null}
-              </form>
+              <aside className="service-side">
+                <form className="service-discount-form" onSubmit={submitServiceLead}>
+                  <button type="submit">Заказать услугу со скидкой 10%</button>
+                  <small>Скидка действует до {monthEndLabel()}.</small>
+                  <label>Имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
+                  <label>Телефон<input value={phone} onChange={(e) => setPhone(e.target.value)} required /></label>
+                  {serviceStatus ? <p>{serviceStatus}</p> : null}
+                </form>
+              </aside>
             ) : null}
           </div>
         </div>
@@ -1762,11 +1809,13 @@ function AdminPage() {
   const [password, setPassword] = useState('');
   const [token, setToken] = useState('');
   const [projects, setProjects] = useState<HouseProject[]>([]);
+  const [lands, setLands] = useState<LandPlot[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [pages, setPages] = useState<ContentPage[]>([]);
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [pageDraft, setPageDraft] = useState<ContentPage | null>(null);
   const [draft, setDraft] = useState<Partial<HouseProject>>({});
+  const [landDraft, setLandDraft] = useState<Partial<LandPlot>>({});
   const [portfolioDraft, setPortfolioDraft] = useState<Partial<PortfolioItem>>({});
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<AdminTab>('projects');
@@ -1788,8 +1837,9 @@ function AdminPage() {
   );
 
   const loadAdminData = async (currentToken: string) => {
-    const [projectsRes, leadsRes, pagesRes, portfolioRes, menuOrderRes, siteSettingsRes] = await Promise.all([
+    const [projectsRes, landsRes, leadsRes, pagesRes, portfolioRes, menuOrderRes, siteSettingsRes] = await Promise.all([
       fetch(`${API_BASE}/api/admin/projects`, { headers: { 'x-admin-token': currentToken } }),
+      fetch(`${API_BASE}/api/admin/lands`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/leads`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/pages`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/portfolio`, { headers: { 'x-admin-token': currentToken } }),
@@ -1797,13 +1847,14 @@ function AdminPage() {
       fetch(`${API_BASE}/api/admin/site-settings`, { headers: { 'x-admin-token': currentToken } })
     ]);
 
-    if (!projectsRes.ok || !leadsRes.ok || !pagesRes.ok || !portfolioRes.ok || !menuOrderRes.ok || !siteSettingsRes.ok) {
+    if (!projectsRes.ok || !landsRes.ok || !leadsRes.ok || !pagesRes.ok || !portfolioRes.ok || !menuOrderRes.ok || !siteSettingsRes.ok) {
       setError('Не удалось загрузить данные админки');
       return;
     }
 
     const pagesPayload = (await pagesRes.json()) as ContentPage[];
     setProjects(await projectsRes.json());
+    setLands(await landsRes.json());
     setLeads(await leadsRes.json());
     setPages(pagesPayload);
     setPortfolio(await portfolioRes.json());
@@ -1859,6 +1910,26 @@ function AdminPage() {
     await loadAdminData(token);
   };
 
+  const saveLand = async () => {
+    if (!landDraft.cadastralNumber) {
+      setError('Кадастровый номер обязателен');
+      return;
+    }
+    const method = landDraft.id ? 'PUT' : 'POST';
+    const url = landDraft.id ? `${API_BASE}/api/admin/lands/${landDraft.id}` : `${API_BASE}/api/admin/lands`;
+    const response = await fetch(url, {
+      method,
+      headers: adminHeaders,
+      body: JSON.stringify(landDraft)
+    });
+    if (!response.ok) {
+      setError('Не удалось сохранить участок');
+      return;
+    }
+    setLandDraft({});
+    await loadAdminData(token);
+  };
+
   const removeProject = async (id: string) => {
     const currentProject = projects.find((item) => item.id === id);
     const projectImages = [currentProject?.coverImage, ...(currentProject?.images || [])].filter(Boolean) as string[];
@@ -1866,6 +1937,14 @@ function AdminPage() {
       await deleteProjectImage(imageUrl);
     }
     await fetch(`${API_BASE}/api/admin/projects/${id}`, {
+      method: 'DELETE',
+      headers: adminHeaders
+    });
+    await loadAdminData(token);
+  };
+
+  const removeLand = async (id: string) => {
+    await fetch(`${API_BASE}/api/admin/lands/${id}`, {
       method: 'DELETE',
       headers: adminHeaders
     });
@@ -2143,6 +2222,7 @@ function AdminPage() {
       <h1>Админка каталога</h1>
       <div className="admin-tabs">
         <button className={activeTab === 'projects' ? 'active' : ''} onClick={() => setActiveTab('projects')}>Проекты</button>
+        <button className={activeTab === 'lands' ? 'active' : ''} onClick={() => setActiveTab('lands')}>Земля</button>
         <button className={activeTab === 'pages' ? 'active' : ''} onClick={() => setActiveTab('pages')}>Страницы</button>
         <button className={activeTab === 'settings' ? 'active' : ''} onClick={() => setActiveTab('settings')}>Настройки</button>
         <button className={activeTab === 'portfolio' ? 'active' : ''} onClick={() => setActiveTab('portfolio')}>Портфолио</button>
@@ -2254,6 +2334,36 @@ function AdminPage() {
           </div>
         </section>
       </div> : null}
+
+      {activeTab === 'lands' ? <div className="admin-grid"><section>
+        <h2>{landDraft.id ? 'Редактирование участка' : 'Новый участок'}</h2>
+        <div className="admin-form">
+          <input placeholder="Кадастровый номер" value={landDraft.cadastralNumber || ''} onChange={(e) => setLandDraft({ ...landDraft, cadastralNumber: e.target.value })} />
+          <input placeholder="Площадь" value={landDraft.area || ''} onChange={(e) => setLandDraft({ ...landDraft, area: e.target.value })} />
+          <input placeholder="Цена" value={landDraft.price || ''} onChange={(e) => setLandDraft({ ...landDraft, price: e.target.value })} />
+          <input placeholder="Район" value={landDraft.district || ''} onChange={(e) => setLandDraft({ ...landDraft, district: e.target.value })} />
+          <input placeholder="Ссылка на фото" value={landDraft.image || ''} onChange={(e) => setLandDraft({ ...landDraft, image: e.target.value })} />
+          <button onClick={saveLand}>{landDraft.id ? 'Сохранить изменения' : 'Добавить участок'}</button>
+          {landDraft.id ? <button onClick={() => setLandDraft({})}>Отменить</button> : null}
+        </div>
+      </section>
+      <section>
+        <h2>Участки ({lands.length})</h2>
+        <div className="list">
+          {lands.map((item) => (
+            <div key={item.id} className="list-item">
+              <div>
+                <strong>{item.cadastralNumber}</strong>
+                <p>{item.area} • {item.district} • {item.price}</p>
+              </div>
+              <div className="actions">
+                <button onClick={() => setLandDraft(item)}>Изменить</button>
+                <button onClick={() => removeLand(item.id)}>Удалить</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section></div> : null}
 
       {activeTab === 'pages' ? <section>
         <h2>Внутренние страницы</h2>
