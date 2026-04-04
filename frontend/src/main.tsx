@@ -142,6 +142,12 @@ function chunkBy<T>(items: T[], size: number) {
 const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'lands', 'services', 'design', 'portfolio', 'furniture', 'promotions', 'contacts'] as const;
 type NavMenuKey = (typeof NAV_MENU_DEFAULT_ORDER)[number];
 
+function normalizeMenuOrder(order?: string[]) {
+  const incoming = Array.isArray(order) ? order.filter((item): item is NavMenuKey => NAV_MENU_DEFAULT_ORDER.includes(item as NavMenuKey)) : [];
+  if (incoming.length === NAV_MENU_DEFAULT_ORDER.length) return incoming;
+  return [...NAV_MENU_DEFAULT_ORDER];
+}
+
 function sanitizeCmsHtml(html: string) {
   if (!html) return '';
   const parser = new DOMParser();
@@ -673,9 +679,9 @@ function PublicPage() {
     fetch(`${API_BASE}/api/menu-order`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no menu order'))))
       .then((payload: { order?: NavMenuKey[] }) => {
-        if (Array.isArray(payload.order) && payload.order.length) setMenuOrder(payload.order);
+        setMenuOrder(normalizeMenuOrder(payload.order));
       })
-      .catch(() => setMenuOrder([...NAV_MENU_DEFAULT_ORDER]));
+      .catch(() => setMenuOrder(normalizeMenuOrder()));
     fetch(`${API_BASE}/api/site-settings`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no site settings'))))
       .then((payload: SiteSettings) => setLogoUrl(resolveMediaUrl(payload.logoUrl || DEFAULT_LOGO_URL)))
@@ -735,7 +741,14 @@ function PublicPage() {
 
             <div className="hero-contact-line">
               <span className="hero-help-text">Нужен просчет дома? Поможем по телефону за 5 минут.</span>
-              <div className="phone-block"><strong>📞 <a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><a className="extra-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a><small>с 9:00 до 19:00</small></div>
+              <div className="phone-block">
+                <strong>
+                  <svg className="phone-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 4.5c-.6.2-1.4 1-1.8 2.1-.7 2.1.1 4.9 2.3 7.1 2.2 2.2 5 3 7.1 2.3 1.1-.4 1.9-1.2 2.1-1.8l-2.5-2.4c-.3-.3-.8-.4-1.2-.2l-1.2.6a1 1 0 0 1-1.1-.2L10 10.8a1 1 0 0 1-.2-1.1l.6-1.2c.2-.4.1-.9-.2-1.2L8 4.5Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  <a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a>
+                </strong>
+                <strong><a className="city-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a></strong>
+                <small>с 9:00 до 19:00</small>
+              </div>
               <button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button>
             </div>
           </div>
@@ -992,9 +1005,9 @@ function InternalHeader() {
     fetch(`${API_BASE}/api/menu-order`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no menu order'))))
       .then((payload: { order?: NavMenuKey[] }) => {
-        if (Array.isArray(payload.order) && payload.order.length) setMenuOrder(payload.order);
+        setMenuOrder(normalizeMenuOrder(payload.order));
       })
-      .catch(() => setMenuOrder([...NAV_MENU_DEFAULT_ORDER]));
+      .catch(() => setMenuOrder(normalizeMenuOrder()));
     fetch(`${API_BASE}/api/site-settings`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no site settings'))))
       .then((payload: SiteSettings) => setLogoUrl(resolveMediaUrl(payload.logoUrl || DEFAULT_LOGO_URL)))
@@ -1012,7 +1025,7 @@ function InternalHeader() {
       <div className="container hero-main">
         <div className="hero-upper-row">
           <a href="/" className="brand-line"><div className="logo-badge"><img src={logoUrl} alt="Evtenia" /></div><div className="brand-text"><div className="brand-logo">Evtenia</div><p>Строительная компания</p></div></a>
-          <div className="hero-contact-line"><span className="hero-help-text">Нужен просчет дома? Поможем по телефону за 5 минут.</span><div className="phone-block"><strong>📞 <a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><a className="extra-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a><small>с 9:00 до 19:00</small></div><button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button></div>
+          <div className="hero-contact-line"><span className="hero-help-text">Нужен просчет дома? Поможем по телефону за 5 минут.</span><div className="phone-block"><strong><svg className="phone-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 4.5c-.6.2-1.4 1-1.8 2.1-.7 2.1.1 4.9 2.3 7.1 2.2 2.2 5 3 7.1 2.3 1.1-.4 1.9-1.2 2.1-1.8l-2.5-2.4c-.3-.3-.8-.4-1.2-.2l-1.2.6a1 1 0 0 1-1.1-.2L10 10.8a1 1 0 0 1-.2-1.1l.6-1.2c.2-.4.1-.9-.2-1.2L8 4.5Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><strong><a className="city-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a></strong><small>с 9:00 до 19:00</small></div><button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button></div>
         </div>
         <HeaderNav serviceColumns={serviceColumns} currentPath={window.location.pathname} menuOrder={menuOrder} />
       </div>
@@ -1172,7 +1185,7 @@ function SiteFooter() {
         </div>
         <aside className="footer-side">
           <div className="contact-card"><h4>Контакты</h4><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><a className="extra-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a><button onClick={() => setOpenCallback(true)}>Заказать звонок</button><a href={CONTACTS.emailHref}>{CONTACTS.email}</a></div>
-          <div className="social-card"><h4>Мы в соцсетях</h4><div className="social-row"><a href={CONTACTS.vk} target="_blank" rel="noreferrer"><span>🟦</span>VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer"><span>✈️</span>Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer"><span>💬</span>MAX</a></div></div>
+          <div className="social-card"><h4>Мы в соцсетях</h4><div className="social-row"><a href={CONTACTS.vk} target="_blank" rel="noreferrer"><img src="https://cdn.simpleicons.org/vk/FFFFFF" alt="" />VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer"><img src="https://cdn.simpleicons.org/telegram/FFFFFF" alt="" />Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer"><img src="https://max.ru/favicon.ico" alt="" />MAX</a></div></div>
         </aside>
       </div>
       <CallbackModal open={openCallback} onClose={() => setOpenCallback(false)} />
@@ -1189,7 +1202,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const [selectedFloors, setSelectedFloors] = useState<string[]>([]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [maxArea, setMaxArea] = useState(300);
-  const [maxBedrooms, setMaxBedrooms] = useState(6);
+  const [maxRooms, setMaxRooms] = useState(6);
   const [maxPrice, setMaxPrice] = useState(15000000);
 
   useEffect(() => {
@@ -1207,19 +1220,30 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const minArea = 20;
   const parseNum = (value: string) => Number((value.match(/\d+/) || ['0'])[0]);
   const parsePrice = (value: string) => Number(String(value || '').replace(/[^\d]/g, '') || '0');
+  const areaValues = byCategory.map((item) => parseNum(item.area)).filter(Boolean);
+  const roomValues = byCategory.map((item) => parseNum(item.bedrooms)).filter(Boolean);
+  const priceValues = byCategory.map((item) => parsePrice(item.priceFrom)).filter(Boolean);
+  const maxAreaLimit = Math.max(...areaValues, 300);
+  const maxRoomsLimit = Math.max(...roomValues, 6);
+  const maxPriceLimit = Math.max(...priceValues, 15000000);
 
   useEffect(() => {
     setSelectedStyles((prev) => prev.filter((style) => styleOptions.includes(style)));
   }, [styleOptions]);
+  useEffect(() => {
+    setMaxArea((prev) => Math.min(prev, maxAreaLimit));
+    setMaxRooms((prev) => Math.min(prev, maxRoomsLimit));
+    setMaxPrice((prev) => Math.min(prev, maxPriceLimit));
+  }, [maxAreaLimit, maxRoomsLimit, maxPriceLimit]);
 
   const filtered = byCategory.filter((item) => {
     const byType = type === 'Все типы' || item.constructionType === type;
     const byFloor = !selectedFloors.length || selectedFloors.includes(item.floors);
     const byArea = parseNum(item.area) <= maxArea;
-    const byBedrooms = parseNum(item.bedrooms) <= maxBedrooms;
+    const byRooms = parseNum(item.bedrooms) <= maxRooms;
     const byPrice = parsePrice(item.priceFrom) <= maxPrice;
     const byStyle = !selectedStyles.length || selectedStyles.includes(item.style || '');
-    return byType && byFloor && byStyle && byArea && byBedrooms && byPrice;
+    return byType && byFloor && byStyle && byArea && byRooms && byPrice;
   });
 
   return (
@@ -1248,7 +1272,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                           checked={selectedStyles.includes(style)}
                           onChange={(e) => setSelectedStyles(e.target.checked ? [...selectedStyles, style] : selectedStyles.filter((s) => s !== style))}
                         />
-                        {' '}{style}
+                        {' '}{style === 'Скандинавский' ? 'Сканди' : style}
                       </label>
                     ))}
                   </div>
@@ -1256,11 +1280,15 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
               ) : null}
               <div className="filter-block">
                 <h4>Площадь до {maxArea} м²</h4>
-                <input type="range" min={minArea} max={300} value={maxArea} onChange={(e) => setMaxArea(Number(e.target.value))} />
+                <input type="range" min={minArea} max={maxAreaLimit} value={maxArea} onChange={(e) => setMaxArea(Number(e.target.value))} />
               </div>
               <div className="filter-block">
-                <h4>Спальни до {maxBedrooms}</h4>
-                <input type="range" min={1} max={8} value={maxBedrooms} onChange={(e) => setMaxBedrooms(Number(e.target.value))} />
+                <h4>Комнаты до {maxRooms}</h4>
+                <input type="range" min={1} max={maxRoomsLimit} value={maxRooms} onChange={(e) => setMaxRooms(Number(e.target.value))} />
+              </div>
+              <div className="filter-block">
+                <h4>Цена до {maxPrice.toLocaleString('ru-RU')} ₽</h4>
+                <input type="range" min={Math.max(100000, Math.floor(maxPriceLimit / 30))} max={maxPriceLimit} step={100000} value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))} />
               </div>
               <div className="filter-block">
                 <h4>Цена до {maxPrice.toLocaleString('ru-RU')} ₽</h4>
@@ -1364,6 +1392,7 @@ function ProjectDetailPage() {
   const projectId = window.location.pathname.replace('/project/', '');
   const [projects, setProjects] = useState<HouseProject[]>(FALLBACK_PROJECTS);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [openRequest, setOpenRequest] = useState(false);
 
   useEffect(() => {
     fetch(`${API_BASE}/api/projects`)
@@ -1438,12 +1467,19 @@ function ProjectDetailPage() {
               <div className="detail-row"><span>Тип строительства</span><b>{project.constructionType}</b></div>
               <div className="detail-row"><span>Стиль</span><b>{project.style || 'Современный'}</b></div>
               <strong className="detail-price">{normalizePrice(project.priceFrom)}</strong>
-              <button className="detail-btn">Задать вопрос эксперту</button>
+              <button className="detail-btn" onClick={() => setOpenRequest(true)}>Заявка на просчет дома</button>
             </aside>
           </div>
         </div>
       </section>
       <SiteFooter />
+      <PromoLeadModal
+        open={openRequest}
+        onClose={() => setOpenRequest(false)}
+        title={`Заявка: ${project.title}`}
+        promoText="🎁 Проект дома в подарок"
+        messagePrefix={`Заявка на просчет дома: ${project.title}`}
+      />
     </div>
   );
 }
@@ -1473,14 +1509,15 @@ function ContactsPage() {
               <p><a href={CONTACTS.emailHref}>{CONTACTS.email}</a></p>
 
               <div className="contacts-socials">
-                <a href={CONTACTS.vk} target="_blank" rel="noreferrer" aria-label="VK"><span>🟦</span> VK</a>
-                <a href={CONTACTS.telegram} target="_blank" rel="noreferrer" aria-label="Telegram"><span>✈️</span> Telegram</a>
-                <a href={CONTACTS.max} target="_blank" rel="noreferrer" aria-label="MAX"><span>💬</span> MAX</a>
+                <a href={CONTACTS.vk} target="_blank" rel="noreferrer" aria-label="VK"><img src="https://cdn.simpleicons.org/vk/FFFFFF" alt="" /> VK</a>
+                <a href={CONTACTS.telegram} target="_blank" rel="noreferrer" aria-label="Telegram"><img src="https://cdn.simpleicons.org/telegram/FFFFFF" alt="" /> Telegram</a>
+                <a href={CONTACTS.max} target="_blank" rel="noreferrer" aria-label="MAX"><img src="https://max.ru/favicon.ico" alt="" /> MAX</a>
               </div>
               <div className="contacts-person">
-                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=240&q=80" alt="Менеджер" />
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=80" alt="Менеджер" />
                 <div>
-                  <strong>Евгения, менеджер</strong>
+                  <strong>Евгения Смирнова</strong>
+                  <small>Руководитель отдела продаж</small>
                   <p><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></p>
                 </div>
               </div>

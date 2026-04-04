@@ -41,6 +41,8 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .hero-contact-line strong {font-size:22px; color:#ffdd4d; line-height:1.1;}
 .hero-contact-line strong a{color:inherit; text-decoration:none;}
 .phone-block{display:flex; flex-direction:column; align-items:flex-start; line-height:1.1;}
+.phone-icon{width:16px; height:16px; color:#fff; margin-right:6px; vertical-align:-2px;}
+.city-phone-link{color:#ffdd4d; text-decoration:none;}
 .phone-block small{color:#d9ecff; font-size:12px; margin-top:3px;}
 .call-btn {background:#5dad2f; border:none; color:#fff; padding:10px 14px; font-size:14px; cursor:pointer;}
 
@@ -59,7 +61,7 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .dropdown-col{min-width:0;}
 .dropdown-link{display:block; margin:3px 0; color:#2d313a !important; text-decoration:none !important; font-size:13px !important; padding:6px 8px; border-radius:6px; transition:background .15s ease,color .15s ease;}
 .dropdown-link:hover{background:#e8edf6; color:#1c365b !important;}
-.dropdown-link.active,.mobile-menu-item.active{background:#e3ebf8; color:#173d6c !important; font-weight:700;}
+.dropdown-link.active,.mobile-menu-item.active{background:#fff3df; color:#eb7b17 !important; font-weight:700;}
 .mobile-nav-trigger-row{display:none;}
 .mobile-menu-overlay{display:none;}
 
@@ -97,11 +99,13 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .contacts-map-wrap iframe{border:0; width:100%; height:100%; min-height:380px;}
 .contacts-socials{display:flex; gap:8px; margin-top:10px;}
 .contacts-socials a{display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:0 10px; height:38px; color:#fff; text-decoration:none; font-size:13px; font-weight:700;}
+.contacts-socials a img{width:16px; height:16px; object-fit:contain;}
 .contacts-socials a:nth-child(1){background:#2f79a8;}
 .contacts-socials a:nth-child(2){background:#2899e6;}
 .contacts-socials a:nth-child(3){background:#c43a31;}
-.contacts-person{display:flex; align-items:center; gap:10px; margin-top:14px;}
-.contacts-person img{width:64px; height:64px; object-fit:cover; border-radius:50%;}
+.contacts-person{display:grid; grid-template-columns:1fr; gap:10px; margin-top:14px; max-width:360px;}
+.contacts-person img{width:100%; height:180px; object-fit:cover; border-radius:8px;}
+.contacts-person small{display:block; margin:4px 0 6px; color:#566070;}
 
 .portfolio-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:24px;}
 .portfolio-card{background:#f7f7f8; border:1px solid #d8dce3;}
@@ -272,13 +276,16 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .contact-card p{margin:0; color:#313844; font-size:14px;}
 .social-row{display:flex; gap:8px;}
 .social-row a{background:#2e4f7a; color:#fff !important; padding:6px 8px; font-size:13px; text-decoration:none; display:inline-flex; align-items:center; gap:4px;}
+.social-row a img{width:14px; height:14px; object-fit:contain;}
 .about-anchor-menu{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px;}
 .about-anchor-menu a{padding:8px 10px; border:1px solid #c8cfdb; background:#f7f7f8; text-decoration:none;}
 .about-slider-block{margin-top:16px; background:#f7f7f8; border:1px solid #d8dce3; padding:14px;}
 .about-slider{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
 .about-slider img{width:100%; height:220px; object-fit:cover;}
-.service-discount-form{display:grid; gap:8px; margin-top:14px; border-top:1px solid #d8dce3; padding-top:12px;}
-.service-discount-form button{justify-self:start;}
+.service-discount-form{display:grid; gap:10px; margin-top:14px; border:1px solid #d8dce3; background:#fff7ef; padding:14px; border-radius:10px;}
+.service-discount-form button{justify-self:start; border:none; background:#eb7b17; color:#fff; padding:10px 14px; font-weight:700; border-radius:8px;}
+.service-discount-form small{font-weight:600; color:#8a4a0f;}
+.service-discount-form label{display:grid; gap:4px; font-size:14px;}
 .cookie-notice{position:fixed; right:16px; bottom:16px; z-index:140; width:min(420px,calc(100vw - 24px)); background:#1f2733; color:#fff; border-radius:14px; padding:14px; border:1px solid #3b4556; box-shadow:0 16px 32px rgba(0,0,0,.3);}
 .cookie-notice p{margin:0 0 10px; font-size:13px; line-height:1.35;}
 .cookie-notice button{border:none; background:#eb7b17; color:#fff; padding:8px 12px; border-radius:8px; font-weight:600; cursor:pointer;}
