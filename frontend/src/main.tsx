@@ -625,7 +625,16 @@ function PromoLeadModal({
         <p>{promoText}</p>
         <form onSubmit={submit}>
           <label>Имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
-          <label>Телефон<input value={phone} onChange={(e) => setPhone(formatPhoneMask(e.target.value))} required /></label>
+          <label>
+            Телефон
+            <input
+              type="tel"
+              placeholder="+7 (___) ___-__-__"
+              value={phone}
+              onChange={(e) => setPhone(formatPhoneMask(e.target.value))}
+              required
+            />
+          </label>
           <button type="submit">Отправить заявку</button>
         </form>
         {status ? <p>{status}</p> : null}
@@ -1237,7 +1246,20 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
       .catch(() => setProjects(FALLBACK_PROJECTS));
   }, [sectionTitle]);
 
-  const byCategory = projects.filter((item) => (item.category || 'house') === category);
+  const normalizeCategory = (item: HouseProject): 'house' | 'bath' => {
+    const rawCategory = String(item.category || '').trim().toLowerCase();
+    if (rawCategory === 'bath' || rawCategory === 'baths' || rawCategory === 'баня' || rawCategory === 'бани') {
+      return 'bath';
+    }
+    if (rawCategory === 'house' || rawCategory === 'home' || rawCategory === 'дом' || rawCategory === 'дома') {
+      return 'house';
+    }
+    const titleHint = `${item.title} ${item.shortDescription}`.toLowerCase();
+    if (titleHint.includes('бан')) return 'bath';
+    return 'house';
+  };
+
+  const byCategory = projects.filter((item) => normalizeCategory(item) === category);
   const floorOptions = Array.from(new Set(byCategory.map((item) => item.floors))).filter(Boolean);
   const typeOptions = Array.from(new Set(byCategory.map((item) => item.constructionType))).filter(Boolean);
   const effectiveType = typeOptions.includes(type) || type === 'Все типы' ? type : 'Все типы';
@@ -1458,7 +1480,16 @@ function LandsPage() {
             <h3>Продать свою землю</h3>
             <form className="sell-land-form" onSubmit={submitSellLand}>
               <label>Контактное лицо<input value={sellerName} onChange={(e) => setSellerName(e.target.value)} required /></label>
-              <label>Телефон<input value={sellerPhone} onChange={(e) => setSellerPhone(formatPhoneMask(e.target.value))} required /></label>
+              <label>
+                Телефон
+                <input
+                  type="tel"
+                  placeholder="+7 (___) ___-__-__"
+                  value={sellerPhone}
+                  onChange={(e) => setSellerPhone(formatPhoneMask(e.target.value))}
+                  required
+                />
+              </label>
               <label>Адрес участка<input value={sellerAddress} onChange={(e) => setSellerAddress(e.target.value)} required /></label>
               <label>Комментарий<textarea value={sellerComment} onChange={(e) => setSellerComment(e.target.value)} rows={3} /></label>
               <button type="submit">Отправить заявку</button>
@@ -1824,7 +1855,16 @@ function SubsectionPage({ sectionTitle, pageTitle, text, isHtml = false }: { sec
                   <button type="submit">Заказать услугу со скидкой 10%</button>
                   <small>Скидка действует до {monthEndLabel()}.</small>
                   <label>Имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
-                  <label>Телефон<input value={phone} onChange={(e) => setPhone(formatPhoneMask(e.target.value))} required /></label>
+                  <label>
+                    Телефон
+                    <input
+                      type="tel"
+                      placeholder="+7 (___) ___-__-__"
+                      value={phone}
+                      onChange={(e) => setPhone(formatPhoneMask(e.target.value))}
+                      required
+                    />
+                  </label>
                   {serviceStatus ? <p>{serviceStatus}</p> : null}
                 </form>
               </aside>
