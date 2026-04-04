@@ -6,7 +6,9 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .hero-exact {
   color: #fff;
   background: linear-gradient(rgba(17, 30, 39, .45), rgba(10, 18, 24, .65)),
-    url('https://images.unsplash.com/photo-1605146769289-440113cc3d00?auto=format&fit=crop&w=1900&q=80') center/cover;
+    url('https://images.unsplash.com/photo-1605146769289-440113cc3d00?auto=format&fit=crop&w=1900&q=80') center/cover no-repeat,
+    url('/assets/logo_small.png') center/cover no-repeat;
+  background-color:#202938;
   position: relative;
   min-height: 540px;
 }

@@ -625,7 +625,16 @@ function PromoLeadModal({
         <p>{promoText}</p>
         <form onSubmit={submit}>
           <label>Имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
-          <label>Телефон<input value={phone} onChange={(e) => setPhone(formatPhoneMask(e.target.value))} required /></label>
+          <label>
+            Телефон
+            <input
+              type="tel"
+              placeholder="+7 (___) ___-__-__"
+              value={phone}
+              onChange={(e) => setPhone(formatPhoneMask(e.target.value))}
+              required
+            />
+          </label>
           <button type="submit">Отправить заявку</button>
         </form>
         {status ? <p>{status}</p> : null}
@@ -655,6 +664,12 @@ function ProjectTile({ project, onRequest }: { project: HouseProject; onRequest?
       <button className="project-cta" onClick={() => onRequest?.(project)}>Заявка на просчет дома</button>
     </article>
   );
+}
+
+function buildCardBackground(imageUrl: string) {
+  return {
+    backgroundImage: `url('${imageUrl}'), url('/assets/logo_small.png')`
+  };
 }
 
 function PublicPage() {
@@ -792,7 +807,7 @@ function PublicPage() {
         <div className="container">
           <h2 className="offer-title">Мы предлагаем</h2>
           <div className="offer-grid">
-            <article className="offer-card wide" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1600585152915-d208bec867a1?auto=format&fit=crop&w=1000&q=80')" }}>
+            <article className="offer-card wide" style={buildCardBackground('https://images.unsplash.com/photo-1600585152915-d208bec867a1?auto=format&fit=crop&w=1000&q=80')}>
               <div className="offer-overlay">
                 <h3>Проекты домов</h3>
                 <a href="/projects?type=Из%20газобетона">Из газобетона</a>
@@ -800,19 +815,19 @@ function PublicPage() {
                 <a href="/projects?type=Модульные">Модульные</a>
               </div>
             </article>
-            <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1572120360610-d971b9d7767c?auto=format&fit=crop&w=1000&q=80')" }}>
+            <article className="offer-card" style={buildCardBackground('https://images.unsplash.com/photo-1572120360610-d971b9d7767c?auto=format&fit=crop&w=1000&q=80')}>
               <div className="offer-overlay">
                 <h3>Бани</h3>
                 <a href="/baths?type=Модульные">Модульные</a>
                 <a href="/baths?type=Каркасные">Каркасные</a>
               </div>
             </article>
-            <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1000&q=80')" }}>
+            <article className="offer-card" style={buildCardBackground('https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1000&q=80')}>
               <div className="offer-overlay">
                 <h3><a href="/design">Проектирование</a></h3>
               </div>
             </article>
-            <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1464146072230-91cabc968266?auto=format&fit=crop&w=1000&q=80')" }}>
+            <article className="offer-card" style={buildCardBackground('https://images.unsplash.com/photo-1464146072230-91cabc968266?auto=format&fit=crop&w=1000&q=80')}>
               <div className="offer-overlay">
                 <h3>Услуги</h3>
                 <a href="/services/fundament">Фундамент</a>
@@ -820,12 +835,12 @@ function PublicPage() {
                 <a href="/services/remont">Ремонт</a>
               </div>
             </article>
-            <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?auto=format&fit=crop&w=1000&q=80')" }}>
+            <article className="offer-card" style={buildCardBackground('https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?auto=format&fit=crop&w=1000&q=80')}>
               <div className="offer-overlay">
                 <h3><a href="/discounts/vse-akcii">Ипотека и акции</a></h3>
               </div>
             </article>
-            <article className="offer-card wide" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1000&q=80')" }}>
+            <article className="offer-card wide" style={buildCardBackground('https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1000&q=80')}>
               <div className="offer-overlay">
                 <h3><a href="/portfolio">Портфолио проектов</a></h3>
                 <a href="/projects">Смотреть все проекты домов</a>
@@ -1237,7 +1252,23 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
       .catch(() => setProjects(FALLBACK_PROJECTS));
   }, [sectionTitle]);
 
-  const byCategory = projects.filter((item) => (item.category || 'house') === category);
+  const normalizeCategory = (item: HouseProject): 'house' | 'bath' => {
+    const rawCategory = String(item.category || '').trim().toLowerCase();
+    if (rawCategory === 'bath' || rawCategory === 'baths' || rawCategory === 'баня' || rawCategory === 'бани') {
+      return 'bath';
+    }
+    if (rawCategory === 'house' || rawCategory === 'home' || rawCategory === 'дом' || rawCategory === 'дома') {
+      return 'house';
+    }
+    const titleHint = `${item.title} ${item.shortDescription}`.toLowerCase();
+    if (titleHint.includes('бан')) return 'bath';
+    return 'house';
+  };
+
+  const matchedByCategory = projects.filter((item) => normalizeCategory(item) === category);
+  const byCategory = category === 'house'
+    ? (matchedByCategory.length ? matchedByCategory : projects)
+    : matchedByCategory;
   const floorOptions = Array.from(new Set(byCategory.map((item) => item.floors))).filter(Boolean);
   const typeOptions = Array.from(new Set(byCategory.map((item) => item.constructionType))).filter(Boolean);
   const effectiveType = typeOptions.includes(type) || type === 'Все типы' ? type : 'Все типы';
@@ -1458,7 +1489,16 @@ function LandsPage() {
             <h3>Продать свою землю</h3>
             <form className="sell-land-form" onSubmit={submitSellLand}>
               <label>Контактное лицо<input value={sellerName} onChange={(e) => setSellerName(e.target.value)} required /></label>
-              <label>Телефон<input value={sellerPhone} onChange={(e) => setSellerPhone(formatPhoneMask(e.target.value))} required /></label>
+              <label>
+                Телефон
+                <input
+                  type="tel"
+                  placeholder="+7 (___) ___-__-__"
+                  value={sellerPhone}
+                  onChange={(e) => setSellerPhone(formatPhoneMask(e.target.value))}
+                  required
+                />
+              </label>
               <label>Адрес участка<input value={sellerAddress} onChange={(e) => setSellerAddress(e.target.value)} required /></label>
               <label>Комментарий<textarea value={sellerComment} onChange={(e) => setSellerComment(e.target.value)} rows={3} /></label>
               <button type="submit">Отправить заявку</button>
@@ -1824,7 +1864,16 @@ function SubsectionPage({ sectionTitle, pageTitle, text, isHtml = false }: { sec
                   <button type="submit">Заказать услугу со скидкой 10%</button>
                   <small>Скидка действует до {monthEndLabel()}.</small>
                   <label>Имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
-                  <label>Телефон<input value={phone} onChange={(e) => setPhone(formatPhoneMask(e.target.value))} required /></label>
+                  <label>
+                    Телефон
+                    <input
+                      type="tel"
+                      placeholder="+7 (___) ___-__-__"
+                      value={phone}
+                      onChange={(e) => setPhone(formatPhoneMask(e.target.value))}
+                      required
+                    />
+                  </label>
                   {serviceStatus ? <p>{serviceStatus}</p> : null}
                 </form>
               </aside>
