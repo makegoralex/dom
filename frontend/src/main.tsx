@@ -313,7 +313,7 @@ function HeaderNav({
             ) : (
               <a href={item.href} className={`menu-link ${item.active ? 'active' : ''}`}>{item.label}</a>
             )}
-            {index < menuItems.length - 1 ? <a>/</a> : null}
+            {index < menuItems.length - 1 ? <span>/</span> : null}
           </React.Fragment>
         ))}
       </nav>
@@ -1228,8 +1228,8 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   useEffect(() => {
     document.title = `${sectionTitle} — Evtenia`;
     fetch(`${API_BASE}/api/projects`)
-      .then((res) => res.json())
-      .then((data: HouseProject[]) => setProjects(data))
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no api'))))
+      .then((data: HouseProject[]) => setProjects(Array.isArray(data) && data.length ? data : FALLBACK_PROJECTS))
       .catch(() => setProjects(FALLBACK_PROJECTS));
   }, [sectionTitle]);
 
