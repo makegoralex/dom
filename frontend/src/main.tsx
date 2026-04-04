@@ -301,7 +301,11 @@ function HeaderNav({
           <React.Fragment key={item.label}>
             {item.children ? (
               <div className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : ''}`}>
-                <button type="button" className={`menu-link menu-link-btn ${item.active ? 'active' : ''}`}>{item.label} ▾</button>
+                {item.href ? (
+                  <a href={item.href} className={`menu-link ${item.active ? 'active' : ''}`}>{item.label} ▾</a>
+                ) : (
+                  <button type="button" className={`menu-link menu-link-btn ${item.active ? 'active' : ''}`}>{item.label} ▾</button>
+                )}
                 <div className={item.label === 'ПРОЕКТЫ ДОМОВ' ? 'projects-dropdown' : 'services-dropdown'}>
                   {item.children.map((child, idx) => (
                     child.heading
@@ -1236,6 +1240,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const byCategory = projects.filter((item) => (item.category || 'house') === category);
   const floorOptions = Array.from(new Set(byCategory.map((item) => item.floors))).filter(Boolean);
   const typeOptions = Array.from(new Set(byCategory.map((item) => item.constructionType))).filter(Boolean);
+  const effectiveType = typeOptions.includes(type) || type === 'Все типы' ? type : 'Все типы';
   const styleOptions = Array.from(new Set(byCategory.map((item) => (item.style || '').trim()).filter(Boolean)));
   const minArea = 20;
   const parseNum = (value: string) => Number((value.match(/\d+/) || ['0'])[0]);
@@ -1257,7 +1262,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   }, [maxAreaLimit, maxRoomsLimit, maxPriceLimit]);
 
   const filtered = byCategory.filter((item) => {
-    const byType = type === 'Все типы' || item.constructionType === type;
+    const byType = effectiveType === 'Все типы' || item.constructionType === effectiveType;
     const byFloor = !selectedFloors.length || selectedFloors.includes(item.floors);
     const byArea = parseNum(item.area) <= (maxArea ?? maxAreaLimit);
     const byRooms = parseNum(item.bedrooms) <= (maxRooms ?? maxRoomsLimit);
@@ -1271,7 +1276,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
       <InternalHeader />
       <section className="internal-body">
         <div className="container">
-          <Breadcrumbs items={["Главная", sectionTitle, type]} />
+          <Breadcrumbs items={["Главная", sectionTitle, effectiveType]} />
           <h1>{sectionTitle}</h1>
           <div className="catalog-layout">
             <aside className="catalog-filters">
@@ -1314,9 +1319,9 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
 
             <div>
               <div className="type-chips">
-                <button className={type === 'Все типы' ? 'active' : ''} onClick={() => { window.location.href = `${window.location.pathname}?type=${encodeURIComponent('Все типы')}`; }}>Все типы</button>
+                <button className={effectiveType === 'Все типы' ? 'active' : ''} onClick={() => { window.location.href = `${window.location.pathname}?type=${encodeURIComponent('Все типы')}`; }}>Все типы</button>
                 {typeOptions.map((option) => (
-                  <button key={option} className={type === option ? 'active' : ''} onClick={() => { window.location.href = `${window.location.pathname}?type=${encodeURIComponent(option)}`; }}>{option}</button>
+                  <button key={option} className={effectiveType === option ? 'active' : ''} onClick={() => { window.location.href = `${window.location.pathname}?type=${encodeURIComponent(option)}`; }}>{option}</button>
                 ))}
               </div>
               <div className="catalog-grid">
