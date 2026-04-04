@@ -61,6 +61,12 @@ type PortfolioItem = {
 };
 type SiteSettings = {
   logoUrl: string;
+  contactPhotoUrl?: string;
+  contactName?: string;
+  contactPosition?: string;
+  contactPhone?: string;
+  contactCityPhone?: string;
+  contactEmail?: string;
 };
 
 type ProjectGroupColumn = {
@@ -106,6 +112,14 @@ const PROJECT_GROUPS: ProjectGroupColumn[] = [
 const ADMIN_CONSTRUCTION_TYPES = ['Из газобетона', 'Каркасные', 'Модульные'];
 const ADMIN_STYLE_OPTIONS = ['Классический', 'Современный', 'Сканди', 'Барнхаус', 'Минимализм', 'Русский'];
 const DEFAULT_LOGO_URL = `${API_ORIGIN || window.location.origin}/api/assets/logo_small.png`;
+const DEFAULT_CONTACT_PROFILE = {
+  contactPhotoUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=80',
+  contactName: 'Евгения Смирнова',
+  contactPosition: 'Руководитель отдела продаж',
+  contactPhone: CONTACTS.mainPhoneDisplay,
+  contactCityPhone: CONTACTS.extraPhoneDisplay,
+  contactEmail: CONTACTS.email
+};
 
 const SERVICES_MENU = [
   { slug: 'fundament', title: 'Фундамент', text: 'Проектируем и устраиваем фундаменты под тип грунта и нагрузку дома.' },
@@ -147,6 +161,20 @@ function normalizeMenuOrder(order?: string[]) {
   const incoming = Array.isArray(order) ? order.filter((item): item is NavMenuKey => NAV_MENU_DEFAULT_ORDER.includes(item as NavMenuKey)) : [];
   if (incoming.length === NAV_MENU_DEFAULT_ORDER.length) return incoming;
   return [...NAV_MENU_DEFAULT_ORDER];
+}
+
+function formatPhoneMask(value: string) {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+  const normalized = digits.startsWith('8') ? `7${digits.slice(1)}` : digits;
+  const withCountry = normalized.startsWith('7') ? normalized : `7${normalized}`;
+  const d = withCountry.slice(0, 11);
+  let result = '+7';
+  if (d.length > 1) result += ` (${d.slice(1, 4)}`;
+  if (d.length >= 4) result += ')';
+  if (d.length > 4) result += ` ${d.slice(4, 7)}`;
+  if (d.length > 7) result += `-${d.slice(7, 9)}`;
+  if (d.length > 9) result += `-${d.slice(9, 11)}`;
+  return result;
 }
 
 function sanitizeCmsHtml(html: string) {
@@ -491,20 +519,6 @@ function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }
 
   if (!open) return null;
 
-  const formatPhone = (value: string) => {
-    const digits = value.replace(/\D/g, '').slice(0, 11);
-    const normalized = digits.startsWith('8') ? `7${digits.slice(1)}` : digits;
-    const withCountry = normalized.startsWith('7') ? normalized : `7${normalized}`;
-    const d = withCountry.slice(0, 11);
-    let result = '+7';
-    if (d.length > 1) result += ` (${d.slice(1, 4)}`;
-    if (d.length >= 4) result += ')';
-    if (d.length > 4) result += ` ${d.slice(4, 7)}`;
-    if (d.length > 7) result += `-${d.slice(7, 9)}`;
-    if (d.length > 9) result += `-${d.slice(9, 11)}`;
-    return result;
-  };
-
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     setStatus('Отправка...');
@@ -547,7 +561,7 @@ function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }
                   type="tel"
                   placeholder="+7 (___) ___-__-__"
                   value={phone}
-                  onChange={(e) => setPhone(formatPhone(e.target.value))}
+                  onChange={(e) => setPhone(formatPhoneMask(e.target.value))}
                   required
                 />
               </label>
@@ -604,7 +618,7 @@ function PromoLeadModal({
         <p>{promoText}</p>
         <form onSubmit={submit}>
           <label>Имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
-          <label>Телефон<input value={phone} onChange={(e) => setPhone(e.target.value)} required /></label>
+          <label>Телефон<input value={phone} onChange={(e) => setPhone(formatPhoneMask(e.target.value))} required /></label>
           <button type="submit">Отправить заявку</button>
         </form>
         {status ? <p>{status}</p> : null}
@@ -947,7 +961,7 @@ function PublicPage() {
               </label>
               <label>
                 Телефон*
-                <input value={phone} onChange={(e) => setPhone(e.target.value)} required />
+                <input value={phone} onChange={(e) => setPhone(formatPhoneMask(e.target.value))} required />
               </label>
               <label>
                 E-mail
@@ -1202,9 +1216,9 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const [projects, setProjects] = useState<HouseProject[]>([]);
   const [selectedFloors, setSelectedFloors] = useState<string[]>([]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
-  const [maxArea, setMaxArea] = useState(300);
-  const [maxRooms, setMaxRooms] = useState(6);
-  const [maxPrice, setMaxPrice] = useState(15000000);
+  const [maxArea, setMaxArea] = useState<number | null>(null);
+  const [maxRooms, setMaxRooms] = useState<number | null>(null);
+  const [maxPrice, setMaxPrice] = useState<number | null>(null);
 
   useEffect(() => {
     document.title = `${sectionTitle} — Evtenia`;
@@ -1224,25 +1238,25 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const areaValues = byCategory.map((item) => parseNum(item.area)).filter(Boolean);
   const roomValues = byCategory.map((item) => parseNum(item.bedrooms)).filter(Boolean);
   const priceValues = byCategory.map((item) => parsePrice(item.priceFrom)).filter(Boolean);
-  const maxAreaLimit = Math.max(...areaValues, 300);
-  const maxRoomsLimit = Math.max(...roomValues, 6);
-  const maxPriceLimit = Math.max(...priceValues, 15000000);
+  const maxAreaLimit = Math.max(...areaValues, minArea);
+  const maxRoomsLimit = Math.max(...roomValues, 1);
+  const maxPriceLimit = Math.max(...priceValues, 100000);
 
   useEffect(() => {
     setSelectedStyles((prev) => prev.filter((style) => styleOptions.includes(style)));
   }, [styleOptions]);
   useEffect(() => {
-    setMaxArea((prev) => Math.min(prev, maxAreaLimit));
-    setMaxRooms((prev) => Math.min(prev, maxRoomsLimit));
-    setMaxPrice((prev) => Math.min(prev, maxPriceLimit));
+    setMaxArea((prev) => prev === null ? maxAreaLimit : Math.min(prev, maxAreaLimit));
+    setMaxRooms((prev) => prev === null ? maxRoomsLimit : Math.min(prev, maxRoomsLimit));
+    setMaxPrice((prev) => prev === null ? maxPriceLimit : Math.min(prev, maxPriceLimit));
   }, [maxAreaLimit, maxRoomsLimit, maxPriceLimit]);
 
   const filtered = byCategory.filter((item) => {
     const byType = type === 'Все типы' || item.constructionType === type;
     const byFloor = !selectedFloors.length || selectedFloors.includes(item.floors);
-    const byArea = parseNum(item.area) <= maxArea;
-    const byRooms = parseNum(item.bedrooms) <= maxRooms;
-    const byPrice = parsePrice(item.priceFrom) <= maxPrice;
+    const byArea = parseNum(item.area) <= (maxArea ?? maxAreaLimit);
+    const byRooms = parseNum(item.bedrooms) <= (maxRooms ?? maxRoomsLimit);
+    const byPrice = parsePrice(item.priceFrom) <= (maxPrice ?? maxPriceLimit);
     const byStyle = !selectedStyles.length || selectedStyles.includes(item.style || '');
     return byType && byFloor && byStyle && byArea && byRooms && byPrice;
   });
@@ -1280,16 +1294,16 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                 </div>
               ) : null}
               <div className="filter-block">
-                <h4>Площадь до {maxArea} м²</h4>
-                <input type="range" min={minArea} max={maxAreaLimit} value={maxArea} onChange={(e) => setMaxArea(Number(e.target.value))} />
+                <h4>Площадь до {(maxArea ?? maxAreaLimit)} м²</h4>
+                <input type="range" min={minArea} max={maxAreaLimit} value={maxArea ?? maxAreaLimit} onChange={(e) => setMaxArea(Number(e.target.value))} />
               </div>
               <div className="filter-block">
-                <h4>Комнаты до {maxRooms}</h4>
-                <input type="range" min={1} max={maxRoomsLimit} value={maxRooms} onChange={(e) => setMaxRooms(Number(e.target.value))} />
+                <h4>Комнаты до {(maxRooms ?? maxRoomsLimit)}</h4>
+                <input type="range" min={1} max={maxRoomsLimit} value={maxRooms ?? maxRoomsLimit} onChange={(e) => setMaxRooms(Number(e.target.value))} />
               </div>
               <div className="filter-block">
-                <h4>Цена до {maxPrice.toLocaleString('ru-RU')} ₽</h4>
-                <input type="range" min={Math.max(100000, Math.floor(maxPriceLimit / 30))} max={maxPriceLimit} step={100000} value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))} />
+                <h4>Цена до {(maxPrice ?? maxPriceLimit).toLocaleString('ru-RU')} ₽</h4>
+                <input type="range" min={Math.min(...priceValues, 100000)} max={maxPriceLimit} step={100000} value={maxPrice ?? maxPriceLimit} onChange={(e) => setMaxPrice(Number(e.target.value))} />
               </div>
             </aside>
 
@@ -1336,6 +1350,7 @@ function LandsPage() {
   const [sellerAddress, setSellerAddress] = useState('');
   const [sellerComment, setSellerComment] = useState('');
   const [sellerStatus, setSellerStatus] = useState('');
+  const [openSellLand, setOpenSellLand] = useState(false);
   useEffect(() => {
     document.title = 'Земля — Evtenia';
     fetch(`${API_BASE}/api/lands`)
@@ -1378,15 +1393,7 @@ function LandsPage() {
           <h1>ЗЕМЛЯ</h1>
           <div className="lands-top-cta">
             <p>Подберем участок под строительство дома или поможем выгодно реализовать вашу землю через нашу базу покупателей.</p>
-            <form className="sell-land-form" onSubmit={submitSellLand}>
-              <h3>Продать свою землю</h3>
-              <label>Контактное лицо<input value={sellerName} onChange={(e) => setSellerName(e.target.value)} required /></label>
-              <label>Телефон<input value={sellerPhone} onChange={(e) => setSellerPhone(e.target.value)} required /></label>
-              <label>Адрес участка<input value={sellerAddress} onChange={(e) => setSellerAddress(e.target.value)} required /></label>
-              <label>Комментарий<textarea value={sellerComment} onChange={(e) => setSellerComment(e.target.value)} rows={3} /></label>
-              <button type="submit">Отправить заявку</button>
-              {sellerStatus ? <small>{sellerStatus}</small> : null}
-            </form>
+            <button className="sell-land-link" onClick={() => setOpenSellLand(true)}>Продать свою землю</button>
           </div>
           <div className="catalog-layout">
             <aside className="catalog-filters">
@@ -1428,6 +1435,21 @@ function LandsPage() {
         promoText={activeLand ? `Участок ${activeLand.area}, ${activeLand.district}, ${activeLand.price}` : ''}
         messagePrefix={activeLand ? `Заявка на участок ${activeLand.cadastralNumber}` : ''}
       />
+      {openSellLand ? (
+        <div className="modal-backdrop" onClick={() => setOpenSellLand(false)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <h3>Продать свою землю</h3>
+            <form className="sell-land-form" onSubmit={submitSellLand}>
+              <label>Контактное лицо<input value={sellerName} onChange={(e) => setSellerName(e.target.value)} required /></label>
+              <label>Телефон<input value={sellerPhone} onChange={(e) => setSellerPhone(formatPhoneMask(e.target.value))} required /></label>
+              <label>Адрес участка<input value={sellerAddress} onChange={(e) => setSellerAddress(e.target.value)} required /></label>
+              <label>Комментарий<textarea value={sellerComment} onChange={(e) => setSellerComment(e.target.value)} rows={3} /></label>
+              <button type="submit">Отправить заявку</button>
+              {sellerStatus ? <small>{sellerStatus}</small> : null}
+            </form>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -1529,8 +1551,13 @@ function ProjectDetailPage() {
 }
 
 function ContactsPage() {
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>({ logoUrl: DEFAULT_LOGO_URL, ...DEFAULT_CONTACT_PROFILE });
   useEffect(() => {
     document.title = 'Контакты — Evtenia';
+    fetch(`${API_BASE}/api/site-settings`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no site settings'))))
+      .then((payload: SiteSettings) => setSiteSettings({ ...DEFAULT_CONTACT_PROFILE, ...payload }))
+      .catch(() => setSiteSettings({ logoUrl: DEFAULT_LOGO_URL, ...DEFAULT_CONTACT_PROFILE }));
   }, []);
 
   return (
@@ -1543,21 +1570,21 @@ function ContactsPage() {
           <div className="contacts-box">
             <div className="contacts-info">
               <div className="contacts-person">
-                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=80" alt="Менеджер" />
+                <img src={resolveMediaUrl(siteSettings.contactPhotoUrl || DEFAULT_CONTACT_PROFILE.contactPhotoUrl)} alt="Менеджер" />
                 <div>
-                  <strong>Евгения Смирнова</strong>
-                  <small>Руководитель отдела продаж</small>
+                  <strong>{siteSettings.contactName || DEFAULT_CONTACT_PROFILE.contactName}</strong>
+                  <small>{siteSettings.contactPosition || DEFAULT_CONTACT_PROFILE.contactPosition}</small>
                 </div>
               </div>
               <h3>Телефоны:</h3>
-              <p><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></p>
-              <p><a href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a></p>
+              <p><a href={CONTACTS.mainPhoneHref}>{siteSettings.contactPhone || DEFAULT_CONTACT_PROFILE.contactPhone}</a></p>
+              <p><a href={CONTACTS.extraPhoneHref}>{siteSettings.contactCityPhone || DEFAULT_CONTACT_PROFILE.contactCityPhone}</a></p>
 
               <h3>Время работы:</h3>
               <p>🕘 Без выходных: 9:00–18:00</p>
 
               <h3>Почта:</h3>
-              <p><a href={CONTACTS.emailHref}>{CONTACTS.email}</a></p>
+              <p><a href={CONTACTS.emailHref}>{siteSettings.contactEmail || DEFAULT_CONTACT_PROFILE.contactEmail}</a></p>
 
               <div className="contacts-socials">
                 <a href={CONTACTS.vk} target="_blank" rel="noreferrer" aria-label="VK"><img src="https://cdn.simpleicons.org/vk/FFFFFF" alt="" /> VK</a>
@@ -1714,7 +1741,7 @@ function DesignPage() {
             <form className="lead-form" onSubmit={submitLead}>
               <div className="lead-top-row">
                 <label>Имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
-                <label>Телефон*<input value={phone} onChange={(e) => setPhone(e.target.value)} required /></label>
+                <label>Телефон*<input value={phone} onChange={(e) => setPhone(formatPhoneMask(e.target.value))} required /></label>
                 <label>E-mail<input value={email} onChange={(e) => setEmail(e.target.value)} /></label>
               </div>
               <label>Сообщение<textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={5} /></label>
@@ -1774,10 +1801,11 @@ function SubsectionPage({ sectionTitle, pageTitle, text, isHtml = false }: { sec
             {isService ? (
               <aside className="service-side">
                 <form className="service-discount-form" onSubmit={submitServiceLead}>
+                  <h3>Скидка 10%</h3>
                   <button type="submit">Заказать услугу со скидкой 10%</button>
                   <small>Скидка действует до {monthEndLabel()}.</small>
                   <label>Имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
-                  <label>Телефон<input value={phone} onChange={(e) => setPhone(e.target.value)} required /></label>
+                  <label>Телефон<input value={phone} onChange={(e) => setPhone(formatPhoneMask(e.target.value))} required /></label>
                   {serviceStatus ? <p>{serviceStatus}</p> : null}
                 </form>
               </aside>
@@ -1826,7 +1854,7 @@ function AdminPage() {
   const [imageLayout, setImageLayout] = useState<'single' | 'grid2' | 'grid3'>('single');
   const [imageAlign, setImageAlign] = useState<'left' | 'center' | 'right'>('center');
   const [imageSize, setImageSize] = useState<'sm' | 'md'>('sm');
-  const [siteSettingsDraft, setSiteSettingsDraft] = useState<SiteSettings>({ logoUrl: DEFAULT_LOGO_URL });
+  const [siteSettingsDraft, setSiteSettingsDraft] = useState<SiteSettings>({ logoUrl: DEFAULT_LOGO_URL, ...DEFAULT_CONTACT_PROFILE });
 
   const adminHeaders = useMemo(
     () => ({
@@ -2130,6 +2158,28 @@ function AdminPage() {
     const payload = (await response.json()) as { url: string };
     setSiteSettingsDraft((prev) => ({ ...prev, logoUrl: payload.url || prev.logoUrl }));
     setUploadStatus('Логотип загружен');
+  };
+
+  const uploadContactPhoto = async (file: File) => {
+    setError('');
+    setUploadStatus('Загрузка фото контакта...');
+    const formData = new FormData();
+    formData.append('images', file);
+    const response = await fetch(`${API_BASE}/api/admin/upload/project-image?target=cover`, {
+      method: 'POST',
+      headers: { 'x-admin-token': token },
+      body: formData
+    });
+    if (!response.ok) {
+      setUploadStatus('');
+      setError('Не удалось загрузить фото контакта');
+      return;
+    }
+    const payload = (await response.json()) as { urls: string[] };
+    const url = payload.urls?.[0];
+    if (!url) return;
+    setSiteSettingsDraft((prev) => ({ ...prev, contactPhotoUrl: url }));
+    setUploadStatus('Фото контакта загружено');
   };
 
   const savePortfolio = async () => {
@@ -2455,11 +2505,26 @@ function AdminPage() {
             onChange={(e) => setSiteSettingsDraft({ ...siteSettingsDraft, logoUrl: e.target.value })}
           />
           <label>Загрузить логотип<input type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) uploadLogo(file); e.currentTarget.value = ''; }} /></label>
+          <input placeholder="ФИО контакта" value={siteSettingsDraft.contactName || ''} onChange={(e) => setSiteSettingsDraft({ ...siteSettingsDraft, contactName: e.target.value })} />
+          <input placeholder="Должность" value={siteSettingsDraft.contactPosition || ''} onChange={(e) => setSiteSettingsDraft({ ...siteSettingsDraft, contactPosition: e.target.value })} />
+          <input placeholder="Основной телефон" value={siteSettingsDraft.contactPhone || ''} onChange={(e) => setSiteSettingsDraft({ ...siteSettingsDraft, contactPhone: formatPhoneMask(e.target.value) })} />
+          <input placeholder="Городской телефон" value={siteSettingsDraft.contactCityPhone || ''} onChange={(e) => setSiteSettingsDraft({ ...siteSettingsDraft, contactCityPhone: formatPhoneMask(e.target.value) })} />
+          <input placeholder="Email контакта" value={siteSettingsDraft.contactEmail || ''} onChange={(e) => setSiteSettingsDraft({ ...siteSettingsDraft, contactEmail: e.target.value })} />
+          <input placeholder="URL фото контакта" value={siteSettingsDraft.contactPhotoUrl || ''} onChange={(e) => setSiteSettingsDraft({ ...siteSettingsDraft, contactPhotoUrl: e.target.value })} />
+          <label>Загрузить фото контакта<input type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) uploadContactPhoto(file); e.currentTarget.value = ''; }} /></label>
           {siteSettingsDraft.logoUrl ? (
             <div className="admin-media-preview">
               <p>Предпросмотр логотипа</p>
               <div className="admin-image-card logo-preview-card">
                 <img src={resolveMediaUrl(siteSettingsDraft.logoUrl)} alt="Логотип сайта" />
+              </div>
+            </div>
+          ) : null}
+          {siteSettingsDraft.contactPhotoUrl ? (
+            <div className="admin-media-preview">
+              <p>Фото контакта</p>
+              <div className="admin-image-card logo-preview-card">
+                <img src={resolveMediaUrl(siteSettingsDraft.contactPhotoUrl)} alt="Контакт" />
               </div>
             </div>
           ) : null}

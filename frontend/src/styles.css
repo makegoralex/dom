@@ -168,7 +168,7 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .type-chips{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;}
 .hidden-type-chips{display:none;}
 .type-chips button{border:none; background:transparent; text-decoration:underline; cursor:pointer; font-size:14px; color:#222;}
-.type-chips button.active{color:#4f8a37; font-weight:700;}
+.type-chips button.active{color:#eb7b17; font-weight:700;}
 .catalog-grid {display:grid; grid-template-columns:repeat(2,1fr); gap:22px;}
 .home-project-grid{grid-template-columns:repeat(3,1fr);}
 .project-card {overflow:hidden; border:1px solid #d6d8dd; border-radius:0; background:#f4f4f5; box-shadow:none;}
@@ -287,15 +287,18 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .about-slider-block{margin-top:16px; background:#f7f7f8; border:1px solid #d8dce3; padding:14px;}
 .about-slider{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
 .about-slider img{width:100%; height:220px; object-fit:cover;}
-.service-discount-form{display:grid; gap:10px; margin-top:14px; border:1px solid #d8dce3; background:#fff7ef; padding:14px; border-radius:10px;}
+.service-discount-form{display:grid; gap:10px; margin-top:14px; border:1px solid #ffc48e; background:linear-gradient(180deg,#fff7ef,#fff2e2); padding:16px; border-radius:12px; box-shadow:0 10px 24px rgba(235,123,23,.12);}
+.service-discount-form h3{margin:0; font-size:22px; color:#c65c05; text-transform:uppercase;}
 .service-discount-form button{justify-self:start; border:none; background:#eb7b17; color:#fff; padding:10px 14px; font-weight:700; border-radius:8px;}
 .service-discount-form small{font-weight:600; color:#8a4a0f;}
-.service-discount-form label{display:grid; gap:4px; font-size:14px;}
+.service-discount-form label{display:grid; gap:4px; font-size:14px; color:#29303c;}
+.service-discount-form input{border:1px solid #e0b489; border-radius:8px; padding:10px 12px;}
 .service-page-layout{display:block;}
 .service-page-layout.is-service{display:grid; grid-template-columns:minmax(0,1fr) minmax(260px,30%); gap:16px; align-items:start;}
 .service-side{position:sticky; top:16px;}
-.lands-top-cta{display:grid; grid-template-columns:1fr minmax(280px,340px); gap:16px; margin-bottom:14px; background:#f7f7f8; border:1px solid #d8dce3; padding:14px;}
+.lands-top-cta{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:14px; background:#f7f7f8; border:1px solid #d8dce3; padding:14px;}
 .lands-top-cta p{margin:0; font-size:14px; line-height:1.4;}
+.sell-land-link{border:none; background:#eb7b17; color:#fff; padding:10px 14px; font-weight:700; cursor:pointer; white-space:nowrap;}
 .sell-land-form{display:grid; gap:8px;}
 .sell-land-form h3{margin:0; font-size:18px;}
 .sell-land-form label{display:grid; gap:4px; font-size:13px;}
@@ -392,7 +395,7 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .project-thumb{flex:0 0 auto;}
   .service-page-layout.is-service{grid-template-columns:1fr;}
   .service-side{position:static;}
-  .lands-top-cta{grid-template-columns:1fr;}
+  .lands-top-cta{flex-direction:column; align-items:flex-start;}
   .adv-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width: 720px) {
