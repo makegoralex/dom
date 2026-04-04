@@ -100,6 +100,7 @@ const CONTACTS = {
   max: 'https://max.ru/join/1zjkiv7Ex8ofTgGHuB212RBgUa_GcPjKokLeHSRDj0w',
   telegram: 'https://t.me/evtenia_realty'
 };
+const OFFICE_ADDRESS = 'г. Пенза, ул. Гоголя, 41';
 const PROJECT_GROUPS: ProjectGroupColumn[] = [
   {
     title: 'Проекты домов',
@@ -1199,8 +1200,8 @@ function SiteFooter() {
           </div>
         </div>
         <aside className="footer-side">
-          <div className="contact-card"><h4>Контакты</h4><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><a className="extra-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a><button onClick={() => setOpenCallback(true)}>Заказать звонок</button><a href={CONTACTS.emailHref}>{CONTACTS.email}</a></div>
-          <div className="social-card"><h4>Мы в соцсетях</h4><div className="social-row"><a href={CONTACTS.vk} target="_blank" rel="noreferrer"><img src="https://cdn.simpleicons.org/vk/FFFFFF" alt="" />VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer"><img src="https://cdn.simpleicons.org/telegram/FFFFFF" alt="" />Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer"><img src="https://max.ru/favicon.ico" alt="" />MAX</a></div></div>
+          <div className="contact-card"><h4>Контакты</h4><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><a className="extra-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a><p>{OFFICE_ADDRESS}</p><button onClick={() => setOpenCallback(true)}>Заказать звонок</button><a href={CONTACTS.emailHref}>{CONTACTS.email}</a></div>
+          <div className="social-card"><h4>Мы в соцсетях</h4><div className="contacts-socials footer-socials"><a href={CONTACTS.vk} target="_blank" rel="noreferrer"><img src="https://cdn.simpleicons.org/vk/FFFFFF" alt="" /> VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer"><img src="https://cdn.simpleicons.org/telegram/FFFFFF" alt="" /> Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer"><img src="https://max.ru/favicon.ico" alt="" /> MAX</a></div></div>
         </aside>
       </div>
       <CallbackModal open={openCallback} onClose={() => setOpenCallback(false)} />
@@ -1582,6 +1583,8 @@ function ContactsPage() {
 
               <h3>Время работы:</h3>
               <p>🕘 Без выходных: 9:00–18:00</p>
+              <h3>Адрес:</h3>
+              <p>{OFFICE_ADDRESS}</p>
 
               <h3>Почта:</h3>
               <p><a href={CONTACTS.emailHref}>{siteSettings.contactEmail || DEFAULT_CONTACT_PROFILE.contactEmail}</a></p>
@@ -1595,7 +1598,7 @@ function ContactsPage() {
             <div className="contacts-map-wrap">
               <iframe
                 title="Карта офиса Evtenia"
-                src="https://yandex.ru/map-widget/v1/?um=constructor%3A7f4b7ddad4534e0dbf4fc7174bc0f99384f0186b76310673b5628e6f03ec9552&amp;source=constructor"
+                src="https://yandex.ru/map-widget/v1/?text=%D0%9F%D0%B5%D0%BD%D0%B7%D0%B0%2C%20%D0%93%D0%BE%D0%B3%D0%BE%D0%BB%D1%8F%2041"
                 loading="lazy"
                 allowFullScreen
               />

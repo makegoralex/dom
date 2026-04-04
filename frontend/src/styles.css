@@ -48,8 +48,8 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .phone-block small{grid-area:time; color:#d9ecff; font-size:12px; margin-top:3px;}
 .call-btn {background:#5dad2f; border:none; color:#fff; padding:10px 14px; font-size:14px; cursor:pointer;}
 
-.hero-nav {display:flex; flex-wrap:wrap; gap:12px; justify-content:center; padding:10px 0 10px; border-bottom:1px solid rgba(255,255,255,.35);}
-.hero-nav a {font-weight:500; font-size:15px; color:#fff; text-decoration:none; opacity:.95;}
+.hero-nav {display:flex; flex-wrap:nowrap; gap:10px; justify-content:center; padding:10px 0 10px; border-bottom:1px solid rgba(255,255,255,.35); overflow-x:auto;}
+.hero-nav a {font-weight:500; font-size:13px; color:#fff; text-decoration:none; opacity:.95; white-space:nowrap;}
 .menu-link.active{color:#f8cc52; font-weight:600;}
 
 .menu-projects,.menu-services,.menu-promotions{position:relative;}
@@ -104,7 +104,7 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .contacts-socials a img{width:16px; height:16px; object-fit:contain;}
 .contacts-socials a:nth-child(1){background:#2f79a8;}
 .contacts-socials a:nth-child(2){background:#2899e6;}
-.contacts-socials a:nth-child(3){background:#c43a31;}
+.contacts-socials a:nth-child(3){background:#7b4bd6;}
 .contacts-person{display:grid; grid-template-columns:1fr; gap:10px; margin-top:14px; max-width:360px;}
 .contacts-person img{width:100%; height:180px; object-fit:cover; border-radius:8px;}
 .contacts-person small{display:block; margin:4px 0 6px; color:#566070;}
@@ -279,9 +279,7 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .contact-card button{border:none; background:#4faa2c; color:#fff; padding:10px 12px; margin-bottom:10px; cursor:pointer;}
 .contact-card a{display:block; margin-bottom:6px; text-decoration:underline;}
 .contact-card p{margin:0; color:#313844; font-size:14px;}
-.social-row{display:flex; gap:8px;}
-.social-row a{background:#2e4f7a; color:#fff !important; padding:6px 8px; font-size:13px; text-decoration:none; display:inline-flex; align-items:center; gap:4px;}
-.social-row a img{width:14px; height:14px; object-fit:contain;}
+.footer-socials{margin-top:0;}
 .about-anchor-menu{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px;}
 .about-anchor-menu a{padding:8px 10px; border:1px solid #c8cfdb; background:#f7f7f8; text-decoration:none;}
 .about-slider-block{margin-top:16px; background:#f7f7f8; border:1px solid #d8dce3; padding:14px;}
