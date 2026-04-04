@@ -33,6 +33,15 @@ interface Lead {
   createdAt: string;
 }
 
+interface LandPlot {
+  id: string;
+  cadastralNumber: string;
+  area: string;
+  price: string;
+  district: string;
+  image: string;
+}
+
 interface ContentPage {
   slug: string;
   title: string;
@@ -52,6 +61,7 @@ interface PortfolioItem {
 
 interface DataStore {
   projects: HouseProject[];
+  lands: LandPlot[];
   portfolio: PortfolioItem[];
   leads: Lead[];
   pages: Record<string, ContentPage>;
@@ -91,7 +101,7 @@ const CONSTRUCTION_TYPES = [
   'Каркасные',
   'Модульные'
 ];
-const NAV_MENU_DEFAULT_ORDER = ['about', 'projects', 'services', 'design', 'portfolio', 'furniture', 'promotions', 'contacts'];
+const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'lands', 'services', 'design', 'portfolio', 'furniture', 'promotions', 'contacts'];
 const DEFAULT_LOGO_URL = '/assets/logo_small.png';
 
 const seedProjects: HouseProject[] = [
@@ -219,7 +229,8 @@ const seedPages: Record<string, ContentPage> = {
   'services-svai': { slug: 'services-svai', title: 'Сваи', content: '<p>Монтаж винтовых и железобетонных свай под разные типы грунта.</p>' },
   'services-dizainer': { slug: 'services-dizainer', title: 'Дизайнер', content: '<p>Разрабатываем дизайн-концепцию интерьеров и экстерьеров.</p>' },
   'services-landshaftnyy-dizayn': { slug: 'services-landshaftnyy-dizayn', title: 'Ландшафтный дизайн', content: '<p>Проектируем благоустройство участка и озеленение территории.</p>' },
-  'services-mezhevanie': { slug: 'services-mezhevanie', title: 'Межевание', content: '<p>Готовим документы и выполняем межевание земельных участков.</p>' }
+  'services-mezhevanie': { slug: 'services-mezhevanie', title: 'Межевание', content: '<p>Готовим документы и выполняем межевание земельных участков.</p>' },
+  'services-ipoteka-oformlenie': { slug: 'services-ipoteka-oformlenie', title: 'Ипотека. Оформление', content: '<p>Помогаем с подбором банка, программой, пакетом документов и сопровождением сделки.</p>' }
 };
 
 const seedPortfolio: PortfolioItem[] = [
@@ -285,10 +296,17 @@ const seedPortfolio: PortfolioItem[] = [
   }
 ];
 
+const seedLands: LandPlot[] = [
+  { id: 'land1', cadastralNumber: '58:29:1003001:254', area: '10 соток', price: '1 250 000 ₽', district: 'Пензенский район', image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80' },
+  { id: 'land2', cadastralNumber: '58:29:1003001:255', area: '12 соток', price: '1 480 000 ₽', district: 'Бессоновский район', image: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1200&q=80' },
+  { id: 'land3', cadastralNumber: '58:29:1003001:256', area: '8 соток', price: '980 000 ₽', district: 'Железнодорожный район', image: 'https://images.unsplash.com/photo-1493815793585-d94ccbc86df8?auto=format&fit=crop&w=1200&q=80' }
+];
+
 const ensureDataFile = (): void => {
   if (!fs.existsSync(DATA_FILE)) {
     const initial: DataStore = {
       projects: seedProjects,
+      lands: seedLands,
       portfolio: seedPortfolio,
       leads: [],
       pages: seedPages,
@@ -305,6 +323,7 @@ const readData = (): DataStore => {
   const parsed = JSON.parse(content) as Partial<DataStore>;
   return {
     projects: parsed.projects || seedProjects,
+    lands: parsed.lands || seedLands,
     portfolio: parsed.portfolio || seedPortfolio,
     leads: parsed.leads || [],
     pages: { ...seedPages, ...(parsed.pages || {}) },
@@ -377,6 +396,7 @@ app.get('/api/projects', (_req, res) => {
   const data = readData();
   res.json(data.projects);
 });
+app.get('/api/lands', (_req, res) => res.json(readData().lands || seedLands));
 app.get('/api/portfolio', (_req, res) => res.json(readData().portfolio));
 
 app.get('/api/pages/:slug', (req, res) => {
@@ -418,6 +438,7 @@ app.post('/api/admin/login', (req, res) => {
 });
 
 app.get('/api/admin/projects', authMiddleware, (_req, res) => res.json(readData().projects));
+app.get('/api/admin/lands', authMiddleware, (_req, res) => res.json(readData().lands || []));
 app.post('/api/admin/projects', authMiddleware, (req, res) => {
   const incoming = req.body as Partial<HouseProject>;
   const data = readData();
@@ -442,6 +463,22 @@ app.post('/api/admin/projects', authMiddleware, (req, res) => {
   res.status(201).json(project);
 });
 
+app.post('/api/admin/lands', authMiddleware, (req, res) => {
+  const incoming = req.body as Partial<LandPlot>;
+  const data = readData();
+  const land: LandPlot = {
+    id: `land_${Date.now()}`,
+    cadastralNumber: incoming.cadastralNumber || '',
+    area: incoming.area || '',
+    price: incoming.price || '',
+    district: incoming.district || '',
+    image: incoming.image || ''
+  };
+  data.lands.unshift(land);
+  writeData(data);
+  res.status(201).json(land);
+});
+
 app.put('/api/admin/projects/:id', authMiddleware, (req, res) => {
   const id = String(req.params.id);
   const data = readData();
@@ -452,10 +489,28 @@ app.put('/api/admin/projects/:id', authMiddleware, (req, res) => {
   res.json(data.projects[idx]);
 });
 
+app.put('/api/admin/lands/:id', authMiddleware, (req, res) => {
+  const id = String(req.params.id);
+  const data = readData();
+  const idx = data.lands.findIndex((i) => i.id === id);
+  if (idx === -1) return res.status(404).json({ message: 'Участок не найден' });
+  data.lands[idx] = { ...data.lands[idx], ...(req.body as Partial<LandPlot>), id };
+  writeData(data);
+  res.json(data.lands[idx]);
+});
+
 app.delete('/api/admin/projects/:id', authMiddleware, (req, res) => {
   const id = String(req.params.id);
   const data = readData();
   data.projects = data.projects.filter((i) => i.id !== id);
+  writeData(data);
+  res.json({ ok: true });
+});
+
+app.delete('/api/admin/lands/:id', authMiddleware, (req, res) => {
+  const id = String(req.params.id);
+  const data = readData();
+  data.lands = data.lands.filter((i) => i.id !== id);
   writeData(data);
   res.json({ ok: true });
 });
