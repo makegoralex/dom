@@ -1281,7 +1281,6 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const typeOptions = Array.from(new Set(categoryScopedProjects.map((item) => item.constructionType))).filter(Boolean);
   const effectiveType = typeOptions.includes(type) || type === 'Все типы' ? type : 'Все типы';
   const styleOptions = Array.from(new Set(categoryScopedProjects.map((item) => (item.style || '').trim()).filter(Boolean)));
-  const minArea = 20;
   const parseNum = (value: unknown) => {
     const digits = String(value ?? '').match(/\d+/);
     const parsed = Number(digits?.[0] || '0');
@@ -1294,9 +1293,12 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const areaValues = categoryScopedProjects.map((item) => parseNum(item.area)).filter((value) => value > 0);
   const roomValues = categoryScopedProjects.map((item) => parseNum(item.bedrooms)).filter((value) => value > 0);
   const priceValues = categoryScopedProjects.map((item) => parsePrice(item.priceFrom)).filter((value) => value > 0);
-  const maxAreaLimit = Math.max(...areaValues, minArea);
-  const maxRoomsLimit = Math.max(...roomValues, 1);
-  const maxPriceLimit = Math.max(...priceValues, 100000);
+  const minAreaLimit = areaValues.length ? Math.min(...areaValues) : 0;
+  const maxAreaLimit = areaValues.length ? Math.max(...areaValues) : 0;
+  const minRoomsLimit = roomValues.length ? Math.min(...roomValues) : 0;
+  const maxRoomsLimit = roomValues.length ? Math.max(...roomValues) : 0;
+  const minPriceLimit = priceValues.length ? Math.min(...priceValues) : 0;
+  const maxPriceLimit = priceValues.length ? Math.max(...priceValues) : 0;
 
   useEffect(() => {
     setSelectedStyles((prev) => prev.filter((style) => styleOptions.includes(style)));
@@ -1308,14 +1310,14 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   }, [maxAreaLimit, maxRoomsLimit, maxPriceLimit]);
 
   const byTypeProjects = categoryScopedProjects.filter((item) => effectiveType === 'Все типы' || item.constructionType === effectiveType);
-  const filteredStrict = byTypeProjects.filter((item) => {
+  const filtered = byTypeProjects.filter((item) => {
     const byFloor = !selectedFloors.length || selectedFloors.includes(item.floors);
     const areaValue = parseNum(item.area);
     const roomsValue = parseNum(item.bedrooms);
     const priceValue = parsePrice(item.priceFrom);
-    const byArea = areaValue === 0 || areaValue <= (maxArea ?? maxAreaLimit);
-    const byRooms = roomsValue === 0 || roomsValue <= (maxRooms ?? maxRoomsLimit);
-    const byPrice = priceValue === 0 || priceValue <= (maxPrice ?? maxPriceLimit);
+    const byArea = !maxAreaLimit || areaValue === 0 || areaValue <= (maxArea ?? maxAreaLimit);
+    const byRooms = !maxRoomsLimit || roomsValue === 0 || roomsValue <= (maxRooms ?? maxRoomsLimit);
+    const byPrice = !maxPriceLimit || priceValue === 0 || priceValue <= (maxPrice ?? maxPriceLimit);
     const byStyle = !selectedStyles.length || selectedStyles.includes(item.style || '');
     return byFloor && byStyle && byArea && byRooms && byPrice;
   });
@@ -1355,15 +1357,15 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
               ) : null}
               <div className="filter-block">
                 <h4>Площадь до {(maxArea ?? maxAreaLimit)} м²</h4>
-                <input type="range" min={minArea} max={maxAreaLimit} value={maxArea ?? maxAreaLimit} onChange={(e) => setMaxArea(Number(e.target.value))} />
+                <input type="range" min={minAreaLimit || 0} max={maxAreaLimit || 0} value={maxArea ?? maxAreaLimit} onChange={(e) => setMaxArea(Number(e.target.value))} disabled={!maxAreaLimit} />
               </div>
               <div className="filter-block">
                 <h4>Комнаты до {(maxRooms ?? maxRoomsLimit)}</h4>
-                <input type="range" min={1} max={maxRoomsLimit} value={maxRooms ?? maxRoomsLimit} onChange={(e) => setMaxRooms(Number(e.target.value))} />
+                <input type="range" min={minRoomsLimit || 0} max={maxRoomsLimit || 0} value={maxRooms ?? maxRoomsLimit} onChange={(e) => setMaxRooms(Number(e.target.value))} disabled={!maxRoomsLimit} />
               </div>
               <div className="filter-block">
                 <h4>Цена до {(maxPrice ?? maxPriceLimit).toLocaleString('ru-RU')} ₽</h4>
-                <input type="range" min={Math.min(...priceValues, 100000)} max={maxPriceLimit} step={100000} value={maxPrice ?? maxPriceLimit} onChange={(e) => setMaxPrice(Number(e.target.value))} />
+                <input type="range" min={minPriceLimit || 0} max={maxPriceLimit || 0} step={100000} value={maxPrice ?? maxPriceLimit} onChange={(e) => setMaxPrice(Number(e.target.value))} disabled={!maxPriceLimit} />
               </div>
             </aside>
 
