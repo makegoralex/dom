@@ -1,4 +1,4 @@
-import React, { FormEvent, ReactNode, useEffect, useMemo, useState } from 'react';
+import React, { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles.css';
 
@@ -1492,6 +1492,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
               <div className="catalog-grid">
                 {visibleProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
               </div>
+              <div ref={loadMoreRef} style={{ height: 1 }} />
             </div>
           </div>
         </div>
