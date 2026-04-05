@@ -1,4 +1,4 @@
-import React, { FormEvent, ReactNode, useEffect, useMemo, useState } from 'react';
+import React, { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles.css';
 
@@ -1483,6 +1483,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                 <span>{page} / {totalPages}</span>
                 <button onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))} disabled={page >= totalPages}>Вперёд →</button>
               </div>
+              <div ref={loadMoreRef} style={{ display: 'none' }} />
             </div>
           </div>
         </div>
