@@ -5,8 +5,7 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 
 .hero-exact {
   color: #fff;
-  background: linear-gradient(rgba(17, 30, 39, .45), rgba(10, 18, 24, .65)),
-    url('https://images.unsplash.com/photo-1605146769289-440113cc3d00?auto=format&fit=crop&w=1900&q=80') center/cover;
+  background: linear-gradient(rgba(17, 30, 39, .62), rgba(10, 18, 24, .78));
   position: relative;
   min-height: 540px;
 }
@@ -178,12 +177,12 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .double-range-input::-webkit-slider-runnable-track{height:4px; background:transparent;}
 .double-range-input::-moz-range-track{height:4px; background:transparent;}
 .double-range.disabled{opacity:.5;}
-.catalog-pagination{display:flex; align-items:center; justify-content:center; gap:12px; margin-top:18px; position:relative; z-index:2; pointer-events:auto;}
+.catalog-pagination{display:flex; align-items:center; justify-content:center; gap:12px; margin-top:18px; position:relative; z-index:20; pointer-events:auto;}
 .catalog-pagination + .catalog-pagination{display:none;}
-.catalog-pagination button{border:1px solid #cfd3db; background:#fff; padding:8px 12px; cursor:pointer; font-weight:600; min-width:38px;}
-.catalog-pagination button:disabled{opacity:.45; cursor:not-allowed;}
+.catalog-pagination button,.catalog-pagination a{border:1px solid #cfd3db; background:#fff; padding:8px 12px; cursor:pointer; font-weight:600; min-width:38px; text-decoration:none; color:#1f2430; text-align:center;}
+.catalog-pagination button:disabled,.catalog-pagination a.disabled{opacity:.45; cursor:not-allowed; pointer-events:none;}
 .catalog-pagination span{font-weight:700; color:#273041;}
-.catalog-pagination button.active{background:#eb7b17; border-color:#eb7b17; color:#fff;}
+.catalog-pagination button.active,.catalog-pagination a.active{background:#eb7b17; border-color:#eb7b17; color:#fff;}
 .type-chips{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;}
 .hidden-type-chips{display:none;}
 .type-chips button{border:none; background:transparent; text-decoration:underline; cursor:pointer; font-size:14px; color:#222;}
