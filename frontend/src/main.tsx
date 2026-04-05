@@ -1272,7 +1272,10 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
     return 'house';
   };
 
-  const byCategory = projects.filter((item) => normalizeCategory(item) === category);
+  const isBathCatalog = category === 'bath';
+  const byCategory = isBathCatalog
+    ? projects.filter((item) => normalizeCategory(item) === 'bath')
+    : projects;
   const categoryScopedProjects = byCategory.length ? byCategory : projects;
   const floorOptions = Array.from(new Set(categoryScopedProjects.map((item) => item.floors))).filter(Boolean);
   const typeOptions = Array.from(new Set(categoryScopedProjects.map((item) => item.constructionType))).filter(Boolean);
