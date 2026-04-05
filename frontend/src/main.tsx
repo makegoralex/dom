@@ -1392,6 +1392,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const PAGE_SIZE = 6;
   const totalPages = Math.max(1, Math.ceil(filteredProjects.length / PAGE_SIZE));
   const pagedProjects = filteredProjects.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const pageNumbers = Array.from({ length: totalPages }, (_, idx) => idx + 1);
 
   useEffect(() => {
     setPage(1);
@@ -1479,9 +1480,18 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                 {pagedProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
               </div>
               <div className="catalog-pagination">
-                <button onClick={() => setPage((prev) => Math.max(prev - 1, 1))} disabled={page <= 1}>← Назад</button>
-                <span>{page} / {totalPages}</span>
-                <button onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))} disabled={page >= totalPages}>Вперёд →</button>
+                <button type="button" onClick={() => setPage((prev) => Math.max(prev - 1, 1))} disabled={page <= 1}>←</button>
+                {pageNumbers.map((num) => (
+                  <button
+                    type="button"
+                    key={num}
+                    className={num === page ? 'active' : ''}
+                    onClick={() => setPage(num)}
+                  >
+                    {num}
+                  </button>
+                ))}
+                <button type="button" onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))} disabled={page >= totalPages}>→</button>
               </div>
               <div ref={loadMoreRef} style={{ display: 'none' }} />
             </div>
@@ -1517,7 +1527,8 @@ const LAND_FALLBACK: LandPlot[] = [
 function LandsPage() {
   const [lands, setLands] = useState<LandPlot[]>(LAND_FALLBACK);
   const [district, setDistrict] = useState('Все районы');
-  const [maxPrice, setMaxPrice] = useState(5000000);
+  const [minPrice, setMinPrice] = useState<number>(0);
+  const [maxPrice, setMaxPrice] = useState<number>(0);
   const [activeLand, setActiveLand] = useState<LandPlot | null>(null);
   const [sellerName, setSellerName] = useState('');
   const [sellerPhone, setSellerPhone] = useState('');
@@ -1534,7 +1545,21 @@ function LandsPage() {
   }, []);
   const districts = ['Все районы', ...Array.from(new Set(lands.map((item) => item.district)))];
   const parsePrice = (value: string) => Number(value.replace(/[^\d]/g, '') || '0');
-  const filtered = lands.filter((item) => (district === 'Все районы' || item.district === district) && parsePrice(item.price) <= maxPrice);
+  const landPriceValues = lands.map((item) => parsePrice(item.price)).filter((value) => value > 0);
+  const minPriceLimit = landPriceValues.length ? Math.min(...landPriceValues) : 0;
+  const maxPriceLimit = landPriceValues.length ? Math.max(...landPriceValues) : 0;
+
+  useEffect(() => {
+    setMinPrice(minPriceLimit);
+    setMaxPrice(maxPriceLimit);
+  }, [minPriceLimit, maxPriceLimit]);
+
+  const filtered = lands.filter((item) => {
+    const price = parsePrice(item.price);
+    const byDistrict = district === 'Все районы' || item.district === district;
+    const byPrice = !maxPriceLimit || (price >= minPrice && price <= maxPrice);
+    return byDistrict && byPrice;
+  });
   const submitSellLand = async (event: FormEvent) => {
     event.preventDefault();
     setSellerStatus('Отправка...');
@@ -1578,8 +1603,17 @@ function LandsPage() {
                 </select>
               </div>
               <div className="filter-block">
-                <h4>Цена до {maxPrice.toLocaleString('ru-RU')} ₽</h4>
-                <input type="range" min={500000} max={7000000} step={100000} value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))} />
+                <h4>Цена: {minPrice.toLocaleString('ru-RU')} — {maxPrice.toLocaleString('ru-RU')} ₽</h4>
+                <DualRangeSlider
+                  min={minPriceLimit || 0}
+                  max={maxPriceLimit || 0}
+                  step={100000}
+                  valueMin={minPrice}
+                  valueMax={maxPrice}
+                  onChangeMin={(value) => setMinPrice(Math.min(value, maxPrice))}
+                  onChangeMax={(value) => setMaxPrice(Math.max(value, minPrice))}
+                  disabled={!maxPriceLimit}
+                />
               </div>
             </aside>
             <div className="catalog-grid">
