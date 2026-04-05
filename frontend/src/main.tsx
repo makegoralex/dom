@@ -1307,8 +1307,8 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
     setMaxPrice((prev) => prev === null ? maxPriceLimit : Math.min(prev, maxPriceLimit));
   }, [maxAreaLimit, maxRoomsLimit, maxPriceLimit]);
 
-  const filtered = categoryScopedProjects.filter((item) => {
-    const byType = effectiveType === 'Все типы' || item.constructionType === effectiveType;
+  const byTypeProjects = categoryScopedProjects.filter((item) => effectiveType === 'Все типы' || item.constructionType === effectiveType);
+  const filteredStrict = byTypeProjects.filter((item) => {
     const byFloor = !selectedFloors.length || selectedFloors.includes(item.floors);
     const areaValue = parseNum(item.area);
     const roomsValue = parseNum(item.bedrooms);
@@ -1317,8 +1317,9 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
     const byRooms = roomsValue === 0 || roomsValue <= (maxRooms ?? maxRoomsLimit);
     const byPrice = priceValue === 0 || priceValue <= (maxPrice ?? maxPriceLimit);
     const byStyle = !selectedStyles.length || selectedStyles.includes(item.style || '');
-    return byType && byFloor && byStyle && byArea && byRooms && byPrice;
+    return byFloor && byStyle && byArea && byRooms && byPrice;
   });
+  const filtered = filteredStrict.length ? filteredStrict : byTypeProjects.length ? byTypeProjects : categoryScopedProjects;
 
   return (
     <div>
