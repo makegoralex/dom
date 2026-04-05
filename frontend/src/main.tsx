@@ -1310,7 +1310,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   }, [maxAreaLimit, maxRoomsLimit, maxPriceLimit]);
 
   const byTypeProjects = categoryScopedProjects.filter((item) => effectiveType === 'Все типы' || item.constructionType === effectiveType);
-  const filteredProjects = byTypeProjects.filter((item) => {
+  const filteredStrict = byTypeProjects.filter((item) => {
     const byFloor = !selectedFloors.length || selectedFloors.includes(item.floors);
     const areaValue = parseNum(item.area);
     const roomsValue = parseNum(item.bedrooms);
@@ -1321,7 +1321,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
     const byStyle = !selectedStyles.length || selectedStyles.includes(item.style || '');
     return byFloor && byStyle && byArea && byRooms && byPrice;
   });
-  const filtered = filteredStrict.length ? filteredStrict : byTypeProjects.length ? byTypeProjects : categoryScopedProjects;
+  const filteredProjects = filteredStrict;
 
   return (
     <div>
