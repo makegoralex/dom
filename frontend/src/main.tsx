@@ -89,6 +89,7 @@ const API_BASE = import.meta.env.VITE_API_BASE || '';
 const API_ORIGIN = API_BASE ? new URL(API_BASE, window.location.origin).origin : '';
 const loadMoreRef: { current: HTMLDivElement | null } = { current: null };
 const pageNumbers: number[] = [];
+const totalPages = 1;
 const ADMIN_PATH = '/catalog-control-7f3a';
 const ADMIN_KEY = 'catalog-control-7f3a';
 const CONTACTS = {
