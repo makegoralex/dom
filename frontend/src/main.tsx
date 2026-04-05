@@ -1248,28 +1248,42 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
 
   const normalizeCategory = (item: HouseProject): 'house' | 'bath' => {
     const rawCategory = String(item.category || '').trim().toLowerCase();
-    if (rawCategory === 'bath' || rawCategory === 'baths' || rawCategory === 'баня' || rawCategory === 'бани') {
+    if (
+      rawCategory === 'bath' ||
+      rawCategory === 'baths' ||
+      rawCategory === 'баня' ||
+      rawCategory === 'бани' ||
+      rawCategory.includes('бан') ||
+      rawCategory.includes('саун')
+    ) {
       return 'bath';
     }
-    if (rawCategory === 'house' || rawCategory === 'home' || rawCategory === 'дом' || rawCategory === 'дома') {
+    if (
+      rawCategory === 'house' ||
+      rawCategory === 'home' ||
+      rawCategory === 'дом' ||
+      rawCategory === 'дома' ||
+      rawCategory.includes('дом')
+    ) {
       return 'house';
     }
-    const titleHint = `${item.title} ${item.shortDescription}`.toLowerCase();
-    if (titleHint.includes('бан')) return 'bath';
+    const titleHint = `${item.title} ${item.shortDescription} ${item.fullDescription}`.toLowerCase();
+    if (titleHint.includes('бан') || titleHint.includes('саун')) return 'bath';
     return 'house';
   };
 
   const byCategory = projects.filter((item) => normalizeCategory(item) === category);
-  const floorOptions = Array.from(new Set(byCategory.map((item) => item.floors))).filter(Boolean);
-  const typeOptions = Array.from(new Set(byCategory.map((item) => item.constructionType))).filter(Boolean);
+  const categoryScopedProjects = byCategory.length ? byCategory : projects;
+  const floorOptions = Array.from(new Set(categoryScopedProjects.map((item) => item.floors))).filter(Boolean);
+  const typeOptions = Array.from(new Set(categoryScopedProjects.map((item) => item.constructionType))).filter(Boolean);
   const effectiveType = typeOptions.includes(type) || type === 'Все типы' ? type : 'Все типы';
-  const styleOptions = Array.from(new Set(byCategory.map((item) => (item.style || '').trim()).filter(Boolean)));
+  const styleOptions = Array.from(new Set(categoryScopedProjects.map((item) => (item.style || '').trim()).filter(Boolean)));
   const minArea = 20;
   const parseNum = (value: string) => Number((value.match(/\d+/) || ['0'])[0]);
   const parsePrice = (value: string) => Number(String(value || '').replace(/[^\d]/g, '') || '0');
-  const areaValues = byCategory.map((item) => parseNum(item.area)).filter(Boolean);
-  const roomValues = byCategory.map((item) => parseNum(item.bedrooms)).filter(Boolean);
-  const priceValues = byCategory.map((item) => parsePrice(item.priceFrom)).filter(Boolean);
+  const areaValues = categoryScopedProjects.map((item) => parseNum(item.area)).filter(Boolean);
+  const roomValues = categoryScopedProjects.map((item) => parseNum(item.bedrooms)).filter(Boolean);
+  const priceValues = categoryScopedProjects.map((item) => parsePrice(item.priceFrom)).filter(Boolean);
   const maxAreaLimit = Math.max(...areaValues, minArea);
   const maxRoomsLimit = Math.max(...roomValues, 1);
   const maxPriceLimit = Math.max(...priceValues, 100000);
@@ -1283,7 +1297,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
     setMaxPrice((prev) => prev === null ? maxPriceLimit : Math.min(prev, maxPriceLimit));
   }, [maxAreaLimit, maxRoomsLimit, maxPriceLimit]);
 
-  const filtered = byCategory.filter((item) => {
+  const filtered = categoryScopedProjects.filter((item) => {
     const byType = effectiveType === 'Все типы' || item.constructionType === effectiveType;
     const byFloor = !selectedFloors.length || selectedFloors.includes(item.floors);
     const byArea = parseNum(item.area) <= (maxArea ?? maxAreaLimit);
