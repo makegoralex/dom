@@ -1414,18 +1414,6 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
     return byFloor && byStyle && byArea && byRooms && byPrice;
   });
   const filteredProjects = filteredStrict;
-  const PAGE_SIZE = 6;
-  const totalPages = Math.max(1, Math.ceil(filteredProjects.length / PAGE_SIZE));
-  const pagedProjects = filteredProjects.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const pageNumbers = Array.from({ length: totalPages }, (_, idx) => idx + 1);
-
-  useEffect(() => {
-    if (isFirstPageSync.current) {
-      isFirstPageSync.current = false;
-      return;
-    }
-    setPage(1);
-  }, [effectiveType, selectedFloors, selectedStyles, minArea, maxArea, minRooms, maxRooms, minPrice, maxPrice, categoryScopedProjects.length]);
 
   return (
     <div>
@@ -1506,7 +1494,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                 ))}
               </div>
               <div className="catalog-grid">
-                {pagedProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
+                {filteredProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
               </div>
               <div className="catalog-pagination">
                 {page <= 1 ? <span className="disabled">←</span> : <a href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${Math.max(page - 1, 1)}`}>←</a>}
