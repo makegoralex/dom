@@ -1,4 +1,4 @@
-import React, { FormEvent, ReactNode, useEffect, useMemo, useState } from 'react';
+import React, { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles.css';
 
@@ -1233,10 +1233,15 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const [projects, setProjects] = useState<HouseProject[]>([]);
   const [selectedFloors, setSelectedFloors] = useState<string[]>([]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
+  const [minArea, setMinArea] = useState<number | null>(null);
   const [maxArea, setMaxArea] = useState<number | null>(null);
+  const [minRooms, setMinRooms] = useState<number | null>(null);
   const [maxRooms, setMaxRooms] = useState<number | null>(null);
+  const [minPrice, setMinPrice] = useState<number | null>(null);
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [requestProject, setRequestProject] = useState<HouseProject | null>(null);
+  const [visibleCount, setVisibleCount] = useState(9);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     document.title = `${sectionTitle} — Evtenia`;
@@ -1304,10 +1309,13 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
     setSelectedStyles((prev) => prev.filter((style) => styleOptions.includes(style)));
   }, [styleOptions]);
   useEffect(() => {
+    setMinArea((prev) => prev === null ? minAreaLimit : Math.max(prev, minAreaLimit));
     setMaxArea((prev) => prev === null ? maxAreaLimit : Math.min(prev, maxAreaLimit));
+    setMinRooms((prev) => prev === null ? minRoomsLimit : Math.max(prev, minRoomsLimit));
     setMaxRooms((prev) => prev === null ? maxRoomsLimit : Math.min(prev, maxRoomsLimit));
+    setMinPrice((prev) => prev === null ? minPriceLimit : Math.max(prev, minPriceLimit));
     setMaxPrice((prev) => prev === null ? maxPriceLimit : Math.min(prev, maxPriceLimit));
-  }, [maxAreaLimit, maxRoomsLimit, maxPriceLimit]);
+  }, [minAreaLimit, maxAreaLimit, minRoomsLimit, maxRoomsLimit, minPriceLimit, maxPriceLimit]);
 
   const byTypeProjects = categoryScopedProjects.filter((item) => effectiveType === 'Все типы' || item.constructionType === effectiveType);
   const filteredStrict = byTypeProjects.filter((item) => {
@@ -1315,13 +1323,36 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
     const areaValue = parseNum(item.area);
     const roomsValue = parseNum(item.bedrooms);
     const priceValue = parsePrice(item.priceFrom);
-    const byArea = !maxAreaLimit || areaValue === 0 || areaValue <= (maxArea ?? maxAreaLimit);
-    const byRooms = !maxRoomsLimit || roomsValue === 0 || roomsValue <= (maxRooms ?? maxRoomsLimit);
-    const byPrice = !maxPriceLimit || priceValue === 0 || priceValue <= (maxPrice ?? maxPriceLimit);
+    const areaMin = minArea ?? minAreaLimit;
+    const areaMax = maxArea ?? maxAreaLimit;
+    const roomsMin = minRooms ?? minRoomsLimit;
+    const roomsMax = maxRooms ?? maxRoomsLimit;
+    const priceMin = minPrice ?? minPriceLimit;
+    const priceMax = maxPrice ?? maxPriceLimit;
+    const byArea = !maxAreaLimit || areaValue === 0 || (areaValue >= areaMin && areaValue <= areaMax);
+    const byRooms = !maxRoomsLimit || roomsValue === 0 || (roomsValue >= roomsMin && roomsValue <= roomsMax);
+    const byPrice = !maxPriceLimit || priceValue === 0 || (priceValue >= priceMin && priceValue <= priceMax);
     const byStyle = !selectedStyles.length || selectedStyles.includes(item.style || '');
     return byFloor && byStyle && byArea && byRooms && byPrice;
   });
   const filteredProjects = filteredStrict;
+  const visibleProjects = filteredProjects.slice(0, visibleCount);
+
+  useEffect(() => {
+    setVisibleCount(9);
+  }, [effectiveType, selectedFloors, selectedStyles, minArea, maxArea, minRooms, maxRooms, minPrice, maxPrice, categoryScopedProjects.length]);
+
+  useEffect(() => {
+    const node = loadMoreRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver((entries) => {
+      const [entry] = entries;
+      if (!entry?.isIntersecting) return;
+      setVisibleCount((prev) => Math.min(prev + 9, filteredProjects.length));
+    }, { rootMargin: '400px 0px' });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [filteredProjects.length]);
 
   return (
     <div>
@@ -1356,16 +1387,19 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                 </div>
               ) : null}
               <div className="filter-block">
-                <h4>Площадь до {(maxArea ?? maxAreaLimit)} м²</h4>
-                <input type="range" min={minAreaLimit || 0} max={maxAreaLimit || 0} value={maxArea ?? maxAreaLimit} onChange={(e) => setMaxArea(Number(e.target.value))} disabled={!maxAreaLimit} />
+                <h4>Площадь: {(minArea ?? minAreaLimit)} — {(maxArea ?? maxAreaLimit)} м²</h4>
+                <input type="range" min={minAreaLimit || 0} max={maxAreaLimit || 0} value={minArea ?? minAreaLimit} onChange={(e) => setMinArea(Math.min(Number(e.target.value), maxArea ?? maxAreaLimit))} disabled={!maxAreaLimit} />
+                <input type="range" min={minAreaLimit || 0} max={maxAreaLimit || 0} value={maxArea ?? maxAreaLimit} onChange={(e) => setMaxArea(Math.max(Number(e.target.value), minArea ?? minAreaLimit))} disabled={!maxAreaLimit} />
               </div>
               <div className="filter-block">
-                <h4>Комнаты до {(maxRooms ?? maxRoomsLimit)}</h4>
-                <input type="range" min={minRoomsLimit || 0} max={maxRoomsLimit || 0} value={maxRooms ?? maxRoomsLimit} onChange={(e) => setMaxRooms(Number(e.target.value))} disabled={!maxRoomsLimit} />
+                <h4>Комнаты: {(minRooms ?? minRoomsLimit)} — {(maxRooms ?? maxRoomsLimit)}</h4>
+                <input type="range" min={minRoomsLimit || 0} max={maxRoomsLimit || 0} value={minRooms ?? minRoomsLimit} onChange={(e) => setMinRooms(Math.min(Number(e.target.value), maxRooms ?? maxRoomsLimit))} disabled={!maxRoomsLimit} />
+                <input type="range" min={minRoomsLimit || 0} max={maxRoomsLimit || 0} value={maxRooms ?? maxRoomsLimit} onChange={(e) => setMaxRooms(Math.max(Number(e.target.value), minRooms ?? minRoomsLimit))} disabled={!maxRoomsLimit} />
               </div>
               <div className="filter-block">
-                <h4>Цена до {(maxPrice ?? maxPriceLimit).toLocaleString('ru-RU')} ₽</h4>
-                <input type="range" min={minPriceLimit || 0} max={maxPriceLimit || 0} step={100000} value={maxPrice ?? maxPriceLimit} onChange={(e) => setMaxPrice(Number(e.target.value))} disabled={!maxPriceLimit} />
+                <h4>Цена: {(minPrice ?? minPriceLimit).toLocaleString('ru-RU')} — {(maxPrice ?? maxPriceLimit).toLocaleString('ru-RU')} ₽</h4>
+                <input type="range" min={minPriceLimit || 0} max={maxPriceLimit || 0} step={100000} value={minPrice ?? minPriceLimit} onChange={(e) => setMinPrice(Math.min(Number(e.target.value), maxPrice ?? maxPriceLimit))} disabled={!maxPriceLimit} />
+                <input type="range" min={minPriceLimit || 0} max={maxPriceLimit || 0} step={100000} value={maxPrice ?? maxPriceLimit} onChange={(e) => setMaxPrice(Math.max(Number(e.target.value), minPrice ?? minPriceLimit))} disabled={!maxPriceLimit} />
               </div>
             </aside>
 
@@ -1377,8 +1411,9 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                 ))}
               </div>
               <div className="catalog-grid">
-                {filteredProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
+                {visibleProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
               </div>
+              <div ref={loadMoreRef} style={{ height: 1 }} />
             </div>
           </div>
         </div>
