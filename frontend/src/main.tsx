@@ -1227,6 +1227,59 @@ function SiteFooter() {
 }
 
 
+function DualRangeSlider({
+  min,
+  max,
+  step = 1,
+  valueMin,
+  valueMax,
+  onChangeMin,
+  onChangeMax,
+  disabled
+}: {
+  min: number;
+  max: number;
+  step?: number;
+  valueMin: number;
+  valueMax: number;
+  onChangeMin: (value: number) => void;
+  onChangeMax: (value: number) => void;
+  disabled?: boolean;
+}) {
+  const safeMin = Math.min(valueMin, valueMax);
+  const safeMax = Math.max(valueMin, valueMax);
+  const range = Math.max(max - min, 1);
+  const leftPercent = ((safeMin - min) / range) * 100;
+  const rightPercent = ((safeMax - min) / range) * 100;
+
+  return (
+    <div className={`double-range ${disabled ? 'disabled' : ''}`}>
+      <div className="double-range-track" />
+      <div className="double-range-fill" style={{ left: `${leftPercent}%`, width: `${Math.max(rightPercent - leftPercent, 0)}%` }} />
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={safeMin}
+        onChange={(e) => onChangeMin(Number(e.target.value))}
+        disabled={disabled}
+        className="double-range-input"
+      />
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={safeMax}
+        onChange={(e) => onChangeMax(Number(e.target.value))}
+        disabled={disabled}
+        className="double-range-input"
+      />
+    </div>
+  );
+}
+
 function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; sectionTitle: string }) {
   const params = new URLSearchParams(window.location.search);
   const type = params.get('type') || 'Все типы';
@@ -1241,7 +1294,6 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [requestProject, setRequestProject] = useState<HouseProject | null>(null);
   const [visibleCount, setVisibleCount] = useState(9);
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     document.title = `${sectionTitle} — Evtenia`;
@@ -1343,16 +1395,21 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   }, [effectiveType, selectedFloors, selectedStyles, minArea, maxArea, minRooms, maxRooms, minPrice, maxPrice, categoryScopedProjects.length]);
 
   useEffect(() => {
-    const node = loadMoreRef.current;
-    if (!node) return;
-    const observer = new IntersectionObserver((entries) => {
-      const [entry] = entries;
-      if (!entry?.isIntersecting) return;
-      setVisibleCount((prev) => Math.min(prev + 9, filteredProjects.length));
-    }, { rootMargin: '400px 0px' });
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [filteredProjects.length]);
+    const loadMore = () => {
+      if (visibleCount >= filteredProjects.length) return;
+      const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 320;
+      if (nearBottom) {
+        setVisibleCount((prev) => Math.min(prev + 9, filteredProjects.length));
+      }
+    };
+    loadMore();
+    window.addEventListener('scroll', loadMore, { passive: true });
+    window.addEventListener('resize', loadMore);
+    return () => {
+      window.removeEventListener('scroll', loadMore);
+      window.removeEventListener('resize', loadMore);
+    };
+  }, [visibleCount, filteredProjects.length]);
 
   return (
     <div>
@@ -1388,18 +1445,40 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
               ) : null}
               <div className="filter-block">
                 <h4>Площадь: {(minArea ?? minAreaLimit)} — {(maxArea ?? maxAreaLimit)} м²</h4>
-                <input type="range" min={minAreaLimit || 0} max={maxAreaLimit || 0} value={minArea ?? minAreaLimit} onChange={(e) => setMinArea(Math.min(Number(e.target.value), maxArea ?? maxAreaLimit))} disabled={!maxAreaLimit} />
-                <input type="range" min={minAreaLimit || 0} max={maxAreaLimit || 0} value={maxArea ?? maxAreaLimit} onChange={(e) => setMaxArea(Math.max(Number(e.target.value), minArea ?? minAreaLimit))} disabled={!maxAreaLimit} />
+                <DualRangeSlider
+                  min={minAreaLimit || 0}
+                  max={maxAreaLimit || 0}
+                  valueMin={minArea ?? minAreaLimit}
+                  valueMax={maxArea ?? maxAreaLimit}
+                  onChangeMin={(value) => setMinArea(Math.min(value, maxArea ?? maxAreaLimit))}
+                  onChangeMax={(value) => setMaxArea(Math.max(value, minArea ?? minAreaLimit))}
+                  disabled={!maxAreaLimit}
+                />
               </div>
               <div className="filter-block">
                 <h4>Комнаты: {(minRooms ?? minRoomsLimit)} — {(maxRooms ?? maxRoomsLimit)}</h4>
-                <input type="range" min={minRoomsLimit || 0} max={maxRoomsLimit || 0} value={minRooms ?? minRoomsLimit} onChange={(e) => setMinRooms(Math.min(Number(e.target.value), maxRooms ?? maxRoomsLimit))} disabled={!maxRoomsLimit} />
-                <input type="range" min={minRoomsLimit || 0} max={maxRoomsLimit || 0} value={maxRooms ?? maxRoomsLimit} onChange={(e) => setMaxRooms(Math.max(Number(e.target.value), minRooms ?? minRoomsLimit))} disabled={!maxRoomsLimit} />
+                <DualRangeSlider
+                  min={minRoomsLimit || 0}
+                  max={maxRoomsLimit || 0}
+                  valueMin={minRooms ?? minRoomsLimit}
+                  valueMax={maxRooms ?? maxRoomsLimit}
+                  onChangeMin={(value) => setMinRooms(Math.min(value, maxRooms ?? maxRoomsLimit))}
+                  onChangeMax={(value) => setMaxRooms(Math.max(value, minRooms ?? minRoomsLimit))}
+                  disabled={!maxRoomsLimit}
+                />
               </div>
               <div className="filter-block">
                 <h4>Цена: {(minPrice ?? minPriceLimit).toLocaleString('ru-RU')} — {(maxPrice ?? maxPriceLimit).toLocaleString('ru-RU')} ₽</h4>
-                <input type="range" min={minPriceLimit || 0} max={maxPriceLimit || 0} step={100000} value={minPrice ?? minPriceLimit} onChange={(e) => setMinPrice(Math.min(Number(e.target.value), maxPrice ?? maxPriceLimit))} disabled={!maxPriceLimit} />
-                <input type="range" min={minPriceLimit || 0} max={maxPriceLimit || 0} step={100000} value={maxPrice ?? maxPriceLimit} onChange={(e) => setMaxPrice(Math.max(Number(e.target.value), minPrice ?? minPriceLimit))} disabled={!maxPriceLimit} />
+                <DualRangeSlider
+                  min={minPriceLimit || 0}
+                  max={maxPriceLimit || 0}
+                  step={100000}
+                  valueMin={minPrice ?? minPriceLimit}
+                  valueMax={maxPrice ?? maxPriceLimit}
+                  onChangeMin={(value) => setMinPrice(Math.min(value, maxPrice ?? maxPriceLimit))}
+                  onChangeMax={(value) => setMaxPrice(Math.max(value, minPrice ?? minPriceLimit))}
+                  disabled={!maxPriceLimit}
+                />
               </div>
             </aside>
 
