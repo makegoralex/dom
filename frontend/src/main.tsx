@@ -1045,6 +1045,7 @@ function InternalHeader() {
   const serviceColumns = chunkBy(SERVICES_MENU, 6);
   const [menuOrder, setMenuOrder] = useState<NavMenuKey[]>([...NAV_MENU_DEFAULT_ORDER]);
   const [logoUrl, setLogoUrl] = useState(DEFAULT_LOGO_URL);
+  const [headerImage, setHeaderImage] = useState('');
 
   useEffect(() => {
     fetch(`${API_BASE}/api/menu-order`)
@@ -1057,10 +1058,20 @@ function InternalHeader() {
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no site settings'))))
       .then((payload: SiteSettings) => setLogoUrl(resolveMediaUrl(payload.logoUrl || DEFAULT_LOGO_URL)))
       .catch(() => setLogoUrl(DEFAULT_LOGO_URL));
+    fetch(`${API_BASE}/api/projects`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no projects'))))
+      .then((items: HouseProject[]) => {
+        const first = Array.isArray(items) && items.length ? items[0] : FALLBACK_PROJECTS[0];
+        setHeaderImage(resolveMediaUrl(first?.coverImage || first?.images?.[0] || ''));
+      })
+      .catch(() => setHeaderImage(resolveMediaUrl(FALLBACK_PROJECTS[0].coverImage)));
   }, []);
   const [openCallback, setOpenCallback] = useState(false);
   return (
-    <header className="hero hero-exact internal-header">
+    <header
+      className="hero hero-exact internal-header"
+      style={headerImage ? { backgroundImage: `linear-gradient(rgba(17, 30, 39, .58), rgba(10, 18, 24, .74)), url('${headerImage}')` } : undefined}
+    >
       <div className="promo-strip">
         <div className="container promo-inner">
           <strong><a href="/discounts/vse-akcii">🎁 10 СОТОК ЗЕМЛИ В ПОДАРОК ПРИ СТРОИТЕЛЬСТВЕ ДОМА</a></strong>
@@ -1491,6 +1502,19 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
               </div>
               <div className="catalog-grid">
                 {pagedProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
+              </div>
+              <div className="catalog-pagination">
+                {page <= 1 ? <span className="disabled">←</span> : <a href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${Math.max(page - 1, 1)}`}>←</a>}
+                {pageNumbers.map((num) => (
+                  <a
+                    key={num}
+                    className={num === page ? 'active' : ''}
+                    href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${num}`}
+                  >
+                    {num}
+                  </a>
+                ))}
+                {page >= totalPages ? <span className="disabled">→</span> : <a href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${Math.min(page + 1, totalPages)}`}>→</a>}
               </div>
               <div className="catalog-pagination">
                 <a
