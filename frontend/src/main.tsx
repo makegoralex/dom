@@ -1294,6 +1294,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [requestProject, setRequestProject] = useState<HouseProject | null>(null);
   const [visibleCount, setVisibleCount] = useState(9);
+  const loadMoreRef = useMemo(() => ({ current: null as HTMLDivElement | null }), []);
 
   useEffect(() => {
     document.title = `${sectionTitle} — Evtenia`;
@@ -1492,7 +1493,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
               <div className="catalog-grid">
                 {visibleProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
               </div>
-              <div ref={loadMoreRef} style={{ height: 1 }} />
+              <div ref={loadMoreRef} style={{ display: 'none' }} />
             </div>
           </div>
         </div>
