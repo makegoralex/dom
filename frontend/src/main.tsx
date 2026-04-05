@@ -1248,31 +1248,57 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
 
   const normalizeCategory = (item: HouseProject): 'house' | 'bath' => {
     const rawCategory = String(item.category || '').trim().toLowerCase();
-    if (rawCategory === 'bath' || rawCategory === 'baths' || rawCategory === 'баня' || rawCategory === 'бани') {
+    if (
+      rawCategory === 'bath' ||
+      rawCategory === 'baths' ||
+      rawCategory === 'баня' ||
+      rawCategory === 'бани' ||
+      rawCategory.includes('бан') ||
+      rawCategory.includes('саун')
+    ) {
       return 'bath';
     }
-    if (rawCategory === 'house' || rawCategory === 'home' || rawCategory === 'дом' || rawCategory === 'дома') {
+    if (
+      rawCategory === 'house' ||
+      rawCategory === 'home' ||
+      rawCategory === 'дом' ||
+      rawCategory === 'дома' ||
+      rawCategory.includes('дом')
+    ) {
       return 'house';
     }
-    const titleHint = `${item.title} ${item.shortDescription}`.toLowerCase();
-    if (titleHint.includes('бан')) return 'bath';
+    const titleHint = `${item.title} ${item.shortDescription} ${item.fullDescription}`.toLowerCase();
+    if (titleHint.includes('бан') || titleHint.includes('саун')) return 'bath';
     return 'house';
   };
 
-  const byCategory = projects.filter((item) => normalizeCategory(item) === category);
-  const floorOptions = Array.from(new Set(byCategory.map((item) => item.floors))).filter(Boolean);
-  const typeOptions = Array.from(new Set(byCategory.map((item) => item.constructionType))).filter(Boolean);
+  const isBathCatalog = category === 'bath';
+  const byCategory = isBathCatalog
+    ? projects.filter((item) => normalizeCategory(item) === 'bath')
+    : projects;
+  const categoryScopedProjects = byCategory.length ? byCategory : projects;
+  const floorOptions = Array.from(new Set(categoryScopedProjects.map((item) => item.floors))).filter(Boolean);
+  const typeOptions = Array.from(new Set(categoryScopedProjects.map((item) => item.constructionType))).filter(Boolean);
   const effectiveType = typeOptions.includes(type) || type === 'Все типы' ? type : 'Все типы';
-  const styleOptions = Array.from(new Set(byCategory.map((item) => (item.style || '').trim()).filter(Boolean)));
-  const minArea = 20;
-  const parseNum = (value: string) => Number((value.match(/\d+/) || ['0'])[0]);
-  const parsePrice = (value: string) => Number(String(value || '').replace(/[^\d]/g, '') || '0');
-  const areaValues = byCategory.map((item) => parseNum(item.area)).filter(Boolean);
-  const roomValues = byCategory.map((item) => parseNum(item.bedrooms)).filter(Boolean);
-  const priceValues = byCategory.map((item) => parsePrice(item.priceFrom)).filter(Boolean);
-  const maxAreaLimit = Math.max(...areaValues, minArea);
-  const maxRoomsLimit = Math.max(...roomValues, 1);
-  const maxPriceLimit = Math.max(...priceValues, 100000);
+  const styleOptions = Array.from(new Set(categoryScopedProjects.map((item) => (item.style || '').trim()).filter(Boolean)));
+  const parseNum = (value: unknown) => {
+    const digits = String(value ?? '').match(/\d+/);
+    const parsed = Number(digits?.[0] || '0');
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+  const parsePrice = (value: unknown) => {
+    const parsed = Number(String(value ?? '').replace(/[^\d]/g, '') || '0');
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+  const areaValues = categoryScopedProjects.map((item) => parseNum(item.area)).filter((value) => value > 0);
+  const roomValues = categoryScopedProjects.map((item) => parseNum(item.bedrooms)).filter((value) => value > 0);
+  const priceValues = categoryScopedProjects.map((item) => parsePrice(item.priceFrom)).filter((value) => value > 0);
+  const minAreaLimit = areaValues.length ? Math.min(...areaValues) : 0;
+  const maxAreaLimit = areaValues.length ? Math.max(...areaValues) : 0;
+  const minRoomsLimit = roomValues.length ? Math.min(...roomValues) : 0;
+  const maxRoomsLimit = roomValues.length ? Math.max(...roomValues) : 0;
+  const minPriceLimit = priceValues.length ? Math.min(...priceValues) : 0;
+  const maxPriceLimit = priceValues.length ? Math.max(...priceValues) : 0;
 
   useEffect(() => {
     setSelectedStyles((prev) => prev.filter((style) => styleOptions.includes(style)));
@@ -1283,14 +1309,17 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
     setMaxPrice((prev) => prev === null ? maxPriceLimit : Math.min(prev, maxPriceLimit));
   }, [maxAreaLimit, maxRoomsLimit, maxPriceLimit]);
 
-  const filtered = byCategory.filter((item) => {
-    const byType = effectiveType === 'Все типы' || item.constructionType === effectiveType;
+  const byTypeProjects = categoryScopedProjects.filter((item) => effectiveType === 'Все типы' || item.constructionType === effectiveType);
+  const filteredProjects = byTypeProjects.filter((item) => {
     const byFloor = !selectedFloors.length || selectedFloors.includes(item.floors);
-    const byArea = parseNum(item.area) <= (maxArea ?? maxAreaLimit);
-    const byRooms = parseNum(item.bedrooms) <= (maxRooms ?? maxRoomsLimit);
-    const byPrice = parsePrice(item.priceFrom) <= (maxPrice ?? maxPriceLimit);
+    const areaValue = parseNum(item.area);
+    const roomsValue = parseNum(item.bedrooms);
+    const priceValue = parsePrice(item.priceFrom);
+    const byArea = !maxAreaLimit || areaValue === 0 || areaValue <= (maxArea ?? maxAreaLimit);
+    const byRooms = !maxRoomsLimit || roomsValue === 0 || roomsValue <= (maxRooms ?? maxRoomsLimit);
+    const byPrice = !maxPriceLimit || priceValue === 0 || priceValue <= (maxPrice ?? maxPriceLimit);
     const byStyle = !selectedStyles.length || selectedStyles.includes(item.style || '');
-    return byType && byFloor && byStyle && byArea && byRooms && byPrice;
+    return byFloor && byStyle && byArea && byRooms && byPrice;
   });
 
   return (
@@ -1327,15 +1356,15 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
               ) : null}
               <div className="filter-block">
                 <h4>Площадь до {(maxArea ?? maxAreaLimit)} м²</h4>
-                <input type="range" min={minArea} max={maxAreaLimit} value={maxArea ?? maxAreaLimit} onChange={(e) => setMaxArea(Number(e.target.value))} />
+                <input type="range" min={minAreaLimit || 0} max={maxAreaLimit || 0} value={maxArea ?? maxAreaLimit} onChange={(e) => setMaxArea(Number(e.target.value))} disabled={!maxAreaLimit} />
               </div>
               <div className="filter-block">
                 <h4>Комнаты до {(maxRooms ?? maxRoomsLimit)}</h4>
-                <input type="range" min={1} max={maxRoomsLimit} value={maxRooms ?? maxRoomsLimit} onChange={(e) => setMaxRooms(Number(e.target.value))} />
+                <input type="range" min={minRoomsLimit || 0} max={maxRoomsLimit || 0} value={maxRooms ?? maxRoomsLimit} onChange={(e) => setMaxRooms(Number(e.target.value))} disabled={!maxRoomsLimit} />
               </div>
               <div className="filter-block">
                 <h4>Цена до {(maxPrice ?? maxPriceLimit).toLocaleString('ru-RU')} ₽</h4>
-                <input type="range" min={Math.min(...priceValues, 100000)} max={maxPriceLimit} step={100000} value={maxPrice ?? maxPriceLimit} onChange={(e) => setMaxPrice(Number(e.target.value))} />
+                <input type="range" min={minPriceLimit || 0} max={maxPriceLimit || 0} step={100000} value={maxPrice ?? maxPriceLimit} onChange={(e) => setMaxPrice(Number(e.target.value))} disabled={!maxPriceLimit} />
               </div>
             </aside>
 
@@ -1347,7 +1376,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                 ))}
               </div>
               <div className="catalog-grid">
-                {filtered.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
+                {filteredProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
               </div>
             </div>
           </div>
