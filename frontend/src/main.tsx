@@ -1321,6 +1321,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
     const byStyle = !selectedStyles.length || selectedStyles.includes(item.style || '');
     return byFloor && byStyle && byArea && byRooms && byPrice;
   });
+  const filtered = filteredStrict.length ? filteredStrict : byTypeProjects.length ? byTypeProjects : categoryScopedProjects;
 
   return (
     <div>
