@@ -1310,7 +1310,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   }, [maxAreaLimit, maxRoomsLimit, maxPriceLimit]);
 
   const byTypeProjects = categoryScopedProjects.filter((item) => effectiveType === 'Все типы' || item.constructionType === effectiveType);
-  const filtered = byTypeProjects.filter((item) => {
+  const filteredProjects = byTypeProjects.filter((item) => {
     const byFloor = !selectedFloors.length || selectedFloors.includes(item.floors);
     const areaValue = parseNum(item.area);
     const roomsValue = parseNum(item.bedrooms);
@@ -1377,7 +1377,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                 ))}
               </div>
               <div className="catalog-grid">
-                {filtered.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
+                {filteredProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
               </div>
             </div>
           </div>
