@@ -1,4 +1,4 @@
-import React, { FormEvent, ReactNode, useEffect, useMemo, useState } from 'react';
+import React, { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles.css';
 
@@ -1309,6 +1309,7 @@ function DualRangeSlider({
 function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; sectionTitle: string }) {
   const params = new URLSearchParams(window.location.search);
   const type = params.get('type') || 'Все типы';
+  const initialPage = Math.max(1, Number(params.get('page') || '1') || 1);
   const [projects, setProjects] = useState<HouseProject[]>([]);
   const [selectedFloors, setSelectedFloors] = useState<string[]>([]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
@@ -1319,6 +1320,8 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const [minPrice, setMinPrice] = useState<number | null>(null);
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [requestProject, setRequestProject] = useState<HouseProject | null>(null);
+  const [page, setPage] = useState(initialPage);
+  const isFirstPageSync = useRef(true);
 
   useEffect(() => {
     document.title = `${sectionTitle} — Evtenia`;
@@ -1495,6 +1498,97 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
               <div className="catalog-grid">
                 {filteredProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
               </div>
+              <div className="catalog-pagination">
+                {page <= 1 ? <span className="disabled">←</span> : <a href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${Math.max(page - 1, 1)}`}>←</a>}
+                {pageNumbers.map((num) => (
+                  <a
+                    key={num}
+                    className={num === page ? 'active' : ''}
+                    href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${num}`}
+                  >
+                    {num}
+                  </a>
+                ))}
+                {page >= totalPages ? <span className="disabled">→</span> : <a href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${Math.min(page + 1, totalPages)}`}>→</a>}
+              </div>
+              <div className="catalog-pagination">
+                {page <= 1 ? <span className="disabled">←</span> : <a href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${Math.max(page - 1, 1)}`}>←</a>}
+                {pageNumbers.map((num) => (
+                  <a
+                    key={num}
+                    className={num === page ? 'active' : ''}
+                    href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${num}`}
+                  >
+                    {num}
+                  </a>
+                ))}
+                {page >= totalPages ? <span className="disabled">→</span> : <a href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${Math.min(page + 1, totalPages)}`}>→</a>}
+              </div>
+              <div className="catalog-pagination">
+                <a
+                  className={page <= 1 ? 'disabled' : ''}
+                  href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${Math.max(page - 1, 1)}`}
+                  onClick={(e) => { if (page <= 1) { e.preventDefault(); return; } e.preventDefault(); setPage((prev) => Math.max(prev - 1, 1)); }}
+                >←</a>
+                {pageNumbers.map((num) => (
+                  <a
+                    key={num}
+                    className={num === page ? 'active' : ''}
+                    href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${num}`}
+                    onClick={(e) => { e.preventDefault(); setPage(num); }}
+                  >
+                    {num}
+                  </a>
+                ))}
+                <a
+                  className={page >= totalPages ? 'disabled' : ''}
+                  href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${Math.min(page + 1, totalPages)}`}
+                  onClick={(e) => { if (page >= totalPages) { e.preventDefault(); return; } e.preventDefault(); setPage((prev) => Math.min(prev + 1, totalPages)); }}
+                >→</a>
+              </div>
+              <div className="catalog-pagination">
+                <button type="button" onClick={() => setPage((prev) => Math.max(prev - 1, 1))} disabled={page <= 1}>←</button>
+                {pageNumbers.map((num) => (
+                  <button
+                    type="button"
+                    key={num}
+                    className={num === page ? 'active' : ''}
+                    onClick={() => setPage(num)}
+                  >
+                    {num}
+                  </button>
+                ))}
+                <button type="button" onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))} disabled={page >= totalPages}>→</button>
+              </div>
+              <div className="catalog-pagination">
+                <button type="button" onClick={() => setPage((prev) => Math.max(prev - 1, 1))} disabled={page <= 1}>←</button>
+                {pageNumbers.map((num) => (
+                  <button
+                    type="button"
+                    key={num}
+                    className={num === page ? 'active' : ''}
+                    onClick={() => setPage(num)}
+                  >
+                    {num}
+                  </button>
+                ))}
+                <button type="button" onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))} disabled={page >= totalPages}>→</button>
+              </div>
+              <div className="catalog-pagination">
+                <button type="button" onClick={() => setPage((prev) => Math.max(prev - 1, 1))} disabled={page <= 1}>←</button>
+                {pageNumbers.map((num) => (
+                  <button
+                    type="button"
+                    key={num}
+                    className={num === page ? 'active' : ''}
+                    onClick={() => setPage(num)}
+                  >
+                    {num}
+                  </button>
+                ))}
+                <button type="button" onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))} disabled={page >= totalPages}>→</button>
+              </div>
+              <div ref={loadMoreRef} style={{ display: 'none' }} />
             </div>
           </div>
         </div>
