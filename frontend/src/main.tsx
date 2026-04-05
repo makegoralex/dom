@@ -1319,6 +1319,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [requestProject, setRequestProject] = useState<HouseProject | null>(null);
   const [page, setPage] = useState(initialPage);
+  const isFirstPageSync = useRef(true);
 
   useEffect(() => {
     document.title = `${sectionTitle} — Evtenia`;
@@ -1419,6 +1420,10 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const pageNumbers = Array.from({ length: totalPages }, (_, idx) => idx + 1);
 
   useEffect(() => {
+    if (isFirstPageSync.current) {
+      isFirstPageSync.current = false;
+      return;
+    }
     setPage(1);
   }, [effectiveType, selectedFloors, selectedStyles, minArea, maxArea, minRooms, maxRooms, minPrice, maxPrice, categoryScopedProjects.length]);
 
@@ -1502,6 +1507,19 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
               </div>
               <div className="catalog-grid">
                 {pagedProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
+              </div>
+              <div className="catalog-pagination">
+                {page <= 1 ? <span className="disabled">←</span> : <a href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${Math.max(page - 1, 1)}`}>←</a>}
+                {pageNumbers.map((num) => (
+                  <a
+                    key={num}
+                    className={num === page ? 'active' : ''}
+                    href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${num}`}
+                  >
+                    {num}
+                  </a>
+                ))}
+                {page >= totalPages ? <span className="disabled">→</span> : <a href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${Math.min(page + 1, totalPages)}`}>→</a>}
               </div>
               <div className="catalog-pagination">
                 {page <= 1 ? <span className="disabled">←</span> : <a href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${Math.max(page - 1, 1)}`}>←</a>}
