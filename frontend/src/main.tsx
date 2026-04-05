@@ -718,6 +718,13 @@ function PublicPage() {
   const filteredProjects = useMemo(() => selectedType === 'Все типы' ? projects : projects.filter((p) => p.constructionType === selectedType), [projects, selectedType]);
 
   const catalogProjects = useMemo(() => filteredProjects.slice(0, 9), [filteredProjects]);
+  const homepageProjects = projects.length ? projects : FALLBACK_PROJECTS;
+  const heroImage = resolveMediaUrl(homepageProjects[0]?.coverImage || homepageProjects[0]?.images?.[0] || '');
+  const offerImage = (index: number) => resolveMediaUrl(
+    homepageProjects[index % homepageProjects.length]?.coverImage ||
+    homepageProjects[index % homepageProjects.length]?.images?.[0] ||
+    ''
+  );
 
   const submitLead = async (event: FormEvent) => {
     event.preventDefault();
@@ -747,7 +754,12 @@ function PublicPage() {
 
   return (
     <div>
-      <header className="hero hero-exact">
+      <header
+        className="hero hero-exact"
+        style={heroImage ? {
+          backgroundImage: `linear-gradient(rgba(17, 30, 39, .45), rgba(10, 18, 24, .65)), url('${heroImage}')`
+        } : undefined}
+      >
         <div className="promo-strip">
           <div className="container promo-inner">
             <strong><a href="/discounts/vse-akcii">🎁 10 СОТОК ЗЕМЛИ В ПОДАРОК ПРИ СТРОИТЕЛЬСТВЕ ДОМА</a></strong>
@@ -802,7 +814,7 @@ function PublicPage() {
         <div className="container">
           <h2 className="offer-title">Мы предлагаем</h2>
           <div className="offer-grid">
-            <article className="offer-card wide" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1600585152915-d208bec867a1?auto=format&fit=crop&w=1000&q=80')" }}>
+            <article className="offer-card wide" style={offerImage(0) ? { backgroundImage: `url('${offerImage(0)}')` } : undefined}>
               <div className="offer-overlay">
                 <h3>Проекты домов</h3>
                 <a href="/projects?type=Из%20газобетона">Из газобетона</a>
@@ -810,19 +822,19 @@ function PublicPage() {
                 <a href="/projects?type=Модульные">Модульные</a>
               </div>
             </article>
-            <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1572120360610-d971b9d7767c?auto=format&fit=crop&w=1000&q=80')" }}>
+            <article className="offer-card" style={offerImage(1) ? { backgroundImage: `url('${offerImage(1)}')` } : undefined}>
               <div className="offer-overlay">
                 <h3>Бани</h3>
                 <a href="/baths?type=Модульные">Модульные</a>
                 <a href="/baths?type=Каркасные">Каркасные</a>
               </div>
             </article>
-            <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1000&q=80')" }}>
+            <article className="offer-card" style={offerImage(2) ? { backgroundImage: `url('${offerImage(2)}')` } : undefined}>
               <div className="offer-overlay">
                 <h3><a href="/design">Проектирование</a></h3>
               </div>
             </article>
-            <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1464146072230-91cabc968266?auto=format&fit=crop&w=1000&q=80')" }}>
+            <article className="offer-card" style={offerImage(3) ? { backgroundImage: `url('${offerImage(3)}')` } : undefined}>
               <div className="offer-overlay">
                 <h3>Услуги</h3>
                 <a href="/services/fundament">Фундамент</a>
@@ -830,12 +842,12 @@ function PublicPage() {
                 <a href="/services/remont">Ремонт</a>
               </div>
             </article>
-            <article className="offer-card" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?auto=format&fit=crop&w=1000&q=80')" }}>
+            <article className="offer-card" style={offerImage(4) ? { backgroundImage: `url('${offerImage(4)}')` } : undefined}>
               <div className="offer-overlay">
                 <h3><a href="/discounts/vse-akcii">Ипотека и акции</a></h3>
               </div>
             </article>
-            <article className="offer-card wide" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1000&q=80')" }}>
+            <article className="offer-card wide" style={offerImage(5) ? { backgroundImage: `url('${offerImage(5)}')` } : undefined}>
               <div className="offer-overlay">
                 <h3><a href="/portfolio">Портфолио проектов</a></h3>
                 <a href="/projects">Смотреть все проекты домов</a>
@@ -1478,6 +1490,20 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
               </div>
               <div className="catalog-grid">
                 {pagedProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
+              </div>
+              <div className="catalog-pagination">
+                <button type="button" onClick={() => setPage((prev) => Math.max(prev - 1, 1))} disabled={page <= 1}>←</button>
+                {pageNumbers.map((num) => (
+                  <button
+                    type="button"
+                    key={num}
+                    className={num === page ? 'active' : ''}
+                    onClick={() => setPage(num)}
+                  >
+                    {num}
+                  </button>
+                ))}
+                <button type="button" onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))} disabled={page >= totalPages}>→</button>
               </div>
               <div className="catalog-pagination">
                 <button type="button" onClick={() => setPage((prev) => Math.max(prev - 1, 1))} disabled={page <= 1}>←</button>
