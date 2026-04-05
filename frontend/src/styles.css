@@ -177,12 +177,7 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .double-range-input::-webkit-slider-runnable-track{height:4px; background:transparent;}
 .double-range-input::-moz-range-track{height:4px; background:transparent;}
 .double-range.disabled{opacity:.5;}
-.catalog-pagination{display:flex; align-items:center; justify-content:center; gap:12px; margin-top:18px; position:relative; z-index:20; pointer-events:auto;}
-.catalog-pagination + .catalog-pagination{display:none;}
-.catalog-pagination button,.catalog-pagination a,.catalog-pagination span{border:1px solid #cfd3db; background:#fff; padding:8px 12px; cursor:pointer; font-weight:600; min-width:38px; text-decoration:none; color:#1f2430; text-align:center;}
-.catalog-pagination button:disabled,.catalog-pagination a.disabled,.catalog-pagination span.disabled{opacity:.45; cursor:not-allowed; pointer-events:none;}
-.catalog-pagination span{font-weight:700; color:#273041;}
-.catalog-pagination button.active,.catalog-pagination a.active{background:#eb7b17; border-color:#eb7b17; color:#fff;}
+.catalog-pagination{display:none !important;}
 .type-chips{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;}
 .hidden-type-chips{display:none;}
 .type-chips button{border:none; background:transparent; text-decoration:underline; cursor:pointer; font-size:14px; color:#222;}
@@ -211,7 +206,7 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 
 .project-detail-layout{display:grid; grid-template-columns:1fr 340px; gap:22px; align-items:start;}
 .project-detail-layout > *{min-width:0;}
-.project-detail-main-image{height:460px; background-size:cover; background-position:center; border:1px solid #d8dce3; width:100%; max-width:100%;}
+.project-detail-main-image{height:460px; background-size:contain; background-position:center; background-repeat:no-repeat; background-color:#eef1f6; border:1px solid #d8dce3; width:100%; max-width:100%;}
 .project-detail-slider{display:grid; gap:8px;}
 .project-slider-controls{display:flex; align-items:center; justify-content:center; gap:10px; width:100%; max-width:100%;}
 .project-slider-controls button{border:1px solid #c8ced9; background:#fff; width:34px; height:30px; cursor:pointer; font-size:20px; line-height:1;}
