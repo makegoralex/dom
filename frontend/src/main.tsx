@@ -1293,8 +1293,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const [minPrice, setMinPrice] = useState<number | null>(null);
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [requestProject, setRequestProject] = useState<HouseProject | null>(null);
-  const [visibleCount, setVisibleCount] = useState(9);
-  const loadMoreRef = useMemo(() => ({ current: null as HTMLDivElement | null }), []);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     document.title = `${sectionTitle} — Evtenia`;
@@ -1362,12 +1361,12 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
     setSelectedStyles((prev) => prev.filter((style) => styleOptions.includes(style)));
   }, [styleOptions]);
   useEffect(() => {
-    setMinArea((prev) => prev === null ? minAreaLimit : Math.max(prev, minAreaLimit));
-    setMaxArea((prev) => prev === null ? maxAreaLimit : Math.min(prev, maxAreaLimit));
-    setMinRooms((prev) => prev === null ? minRoomsLimit : Math.max(prev, minRoomsLimit));
-    setMaxRooms((prev) => prev === null ? maxRoomsLimit : Math.min(prev, maxRoomsLimit));
-    setMinPrice((prev) => prev === null ? minPriceLimit : Math.max(prev, minPriceLimit));
-    setMaxPrice((prev) => prev === null ? maxPriceLimit : Math.min(prev, maxPriceLimit));
+    setMinArea(minAreaLimit);
+    setMaxArea(maxAreaLimit);
+    setMinRooms(minRoomsLimit);
+    setMaxRooms(maxRoomsLimit);
+    setMinPrice(minPriceLimit);
+    setMaxPrice(maxPriceLimit);
   }, [minAreaLimit, maxAreaLimit, minRoomsLimit, maxRoomsLimit, minPriceLimit, maxPriceLimit]);
 
   const byTypeProjects = categoryScopedProjects.filter((item) => effectiveType === 'Все типы' || item.constructionType === effectiveType);
@@ -1389,28 +1388,13 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
     return byFloor && byStyle && byArea && byRooms && byPrice;
   });
   const filteredProjects = filteredStrict;
-  const visibleProjects = filteredProjects.slice(0, visibleCount);
+  const PAGE_SIZE = 6;
+  const totalPages = Math.max(1, Math.ceil(filteredProjects.length / PAGE_SIZE));
+  const pagedProjects = filteredProjects.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   useEffect(() => {
-    setVisibleCount(9);
+    setPage(1);
   }, [effectiveType, selectedFloors, selectedStyles, minArea, maxArea, minRooms, maxRooms, minPrice, maxPrice, categoryScopedProjects.length]);
-
-  useEffect(() => {
-    const loadMore = () => {
-      if (visibleCount >= filteredProjects.length) return;
-      const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 320;
-      if (nearBottom) {
-        setVisibleCount((prev) => Math.min(prev + 9, filteredProjects.length));
-      }
-    };
-    loadMore();
-    window.addEventListener('scroll', loadMore, { passive: true });
-    window.addEventListener('resize', loadMore);
-    return () => {
-      window.removeEventListener('scroll', loadMore);
-      window.removeEventListener('resize', loadMore);
-    };
-  }, [visibleCount, filteredProjects.length]);
 
   return (
     <div>
@@ -1491,7 +1475,12 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                 ))}
               </div>
               <div className="catalog-grid">
-                {visibleProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
+                {pagedProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
+              </div>
+              <div className="catalog-pagination">
+                <button onClick={() => setPage((prev) => Math.max(prev - 1, 1))} disabled={page <= 1}>← Назад</button>
+                <span>{page} / {totalPages}</span>
+                <button onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))} disabled={page >= totalPages}>Вперёд →</button>
               </div>
               <div ref={loadMoreRef} style={{ display: 'none' }} />
             </div>
