@@ -114,6 +114,11 @@ const PROJECT_GROUPS: ProjectGroupColumn[] = [
   }
 ];
 const ADMIN_CONSTRUCTION_TYPES = ['Из газобетона', 'Каркасные', 'Модульные'];
+const HOME_PROJECT_CATEGORY_TABS: Array<{ label: string; value: string }> = [
+  { label: 'Каркасные', value: 'Каркасные' },
+  { label: 'Модульные', value: 'Модульные' },
+  { label: 'Газобетонные', value: 'Из газобетона' }
+];
 const ADMIN_STYLE_OPTIONS = ['Классический', 'Современный', 'Сканди', 'Барнхаус', 'Минимализм', 'Русский'];
 const DEFAULT_LOGO_URL = `${API_ORIGIN || window.location.origin}/api/assets/logo_small.png`;
 const DEFAULT_CONTACT_PROFILE = {
@@ -678,8 +683,7 @@ function PublicPage() {
   const [projectId, setProjectId] = useState('');
   const [status, setStatus] = useState('');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [constructionTypes, setConstructionTypes] = useState<string[]>([]);
-  const [selectedType, setSelectedType] = useState('Все типы');
+  const [selectedType, setSelectedType] = useState(HOME_PROJECT_CATEGORY_TABS[0].value);
   const [openCallback, setOpenCallback] = useState(false);
   const [openGiftPromo, setOpenGiftPromo] = useState(false);
   const [requestProject, setRequestProject] = useState<HouseProject | null>(null);
@@ -689,8 +693,6 @@ function PublicPage() {
 
   useEffect(() => {
     document.title = "Evtenia — строительство домов";
-    fetch(`${API_BASE}/api/construction-types`).then((r) => r.ok ? r.json() : []).then((t:string[]) => setConstructionTypes(['Все типы', ...t])).catch(() => setConstructionTypes(['Все типы']));
-
     fetch(`${API_BASE}/api/projects`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no api'))))
       .then((data: HouseProject[]) => {
@@ -717,7 +719,7 @@ function PublicPage() {
   }, []);
 
 
-  const filteredProjects = useMemo(() => selectedType === 'Все типы' ? projects : projects.filter((p) => p.constructionType === selectedType), [projects, selectedType]);
+  const filteredProjects = useMemo(() => projects.filter((p) => p.constructionType === selectedType), [projects, selectedType]);
 
   const catalogProjects = useMemo(() => filteredProjects.slice(0, 9), [filteredProjects]);
   const homepageProjects = projects.length ? projects : FALLBACK_PROJECTS;
@@ -862,9 +864,20 @@ function PublicPage() {
       <section className="section alt" id="catalog">
         <div className="container">
           <h2>Популярные проекты</h2>
-          <select className="type-filter" value={selectedType} onChange={(e) => setSelectedType(e.target.value)}>
-            {constructionTypes.map((t) => <option key={t} value={t}>{t}</option>)}
-          </select>
+          <div className="home-category-tabs" role="tablist" aria-label="Категории домов">
+            {HOME_PROJECT_CATEGORY_TABS.map((tab) => (
+              <button
+                type="button"
+                key={tab.value}
+                role="tab"
+                aria-selected={selectedType === tab.value}
+                className={selectedType === tab.value ? 'active' : ''}
+                onClick={() => setSelectedType(tab.value)}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
           <div className="catalog-grid home-project-grid">
             {catalogProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
           </div>
