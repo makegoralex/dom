@@ -346,17 +346,19 @@ function HeaderNav({
                   <button type="button" className={`menu-link menu-link-btn ${item.active ? 'active' : ''}`}>{item.label} ▾</button>
                 )}
                 <div className={item.label === 'ПРОЕКТЫ ДОМОВ' ? 'projects-dropdown' : 'services-dropdown'}>
-                  {item.children.flatMap((child, idx) => (
-                    child.children
-                      ? [
-                        <span key={`${child.label}_${idx}_heading`} className="dropdown-heading">{child.label}</span>,
-                        ...child.children.map((nested, nestedIdx) => (
+                  {item.children.map((child, idx) => (
+                    child.children ? (
+                      <div className="dropdown-col" key={`${child.label}_${idx}`}>
+                        <span className="dropdown-heading">{child.label}</span>
+                        {child.children.map((nested, nestedIdx) => (
                           <a key={nested.href || `${nested.label}_${nestedIdx}`} href={nested.href} className={`dropdown-link ${nested.href && window.location.pathname === nested.href ? 'active' : ''}`}>{nested.label}</a>
-                        ))
-                      ]
-                      : child.heading
-                        ? <span key={`${child.label}_${idx}`} className="dropdown-heading">{child.label}</span>
-                        : <a key={child.href || `${child.label}_${idx}`} href={child.href} className={`dropdown-link ${child.href && window.location.pathname + window.location.search === child.href ? 'active' : ''}`}>{child.label}</a>
+                        ))}
+                      </div>
+                    ) : child.heading ? (
+                      <span key={`${child.label}_${idx}`} className="dropdown-heading">{child.label}</span>
+                    ) : (
+                      <a key={child.href || `${child.label}_${idx}`} href={child.href} className={`dropdown-link ${child.href && window.location.pathname + window.location.search === child.href ? 'active' : ''}`}>{child.label}</a>
+                    )
                   ))}
                 </div>
               </div>
