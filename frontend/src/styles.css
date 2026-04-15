@@ -378,6 +378,12 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .menu-projects:hover .projects-dropdown{display:grid;}
   .services-dropdown{position:static; transform:none; min-width:0; display:none; margin-top:6px;}
   .menu-services:hover .services-dropdown,.menu-promotions:hover .services-dropdown{display:grid;}
+  .furniture-dropdown{position:static; min-width:0; max-width:100%; display:none; margin-top:6px; grid-template-columns:1fr; background:#1d2938; border-color:#2b3c51;}
+  .menu-furniture:hover .furniture-dropdown{display:grid;}
+  .furniture-dropdown-col{border:none; border-top:1px solid rgba(255,255,255,.12); padding:10px 0 0;}
+  .furniture-dropdown-col:first-child{border-top:none; padding-top:0;}
+  .furniture-dropdown-title{font-size:16px; margin-bottom:8px;}
+  .furniture-dropdown .dropdown-link{font-size:13px !important; padding:4px 0;}
   .lead-layout{grid-template-columns:1fr;}
   .lead-side{max-width:620px;}
   .lead-top-row{grid-template-columns:1fr 1fr;}

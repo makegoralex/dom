@@ -339,7 +339,7 @@ function HeaderNav({
         {menuItems.map((item, index) => (
           <React.Fragment key={item.label}>
             {item.children ? (
-              <div className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : ''}`}>
+              <div className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : item.label === 'МЕБЕЛЬ' ? 'menu-furniture' : ''}`}>
                 {item.href ? (
                   <a href={item.href} className={`menu-link ${item.active ? 'active' : ''}`}>{item.label} ▾</a>
                 ) : (
