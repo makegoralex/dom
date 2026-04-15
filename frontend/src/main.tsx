@@ -345,32 +345,20 @@ function HeaderNav({
                 ) : (
                   <button type="button" className={`menu-link menu-link-btn ${item.active ? 'active' : ''}`}>{item.label} ▾</button>
                 )}
-                {item.label === 'МЕБЕЛЬ' ? (
-                  <div className="furniture-dropdown">
-                    {item.children.map((category, idx) => (
-                      <div className="furniture-dropdown-col" key={`${category.label}_${idx}`}>
-                        <span className="furniture-dropdown-title">{category.label}</span>
-                        {(category.children || []).map((brand, brandIndex) => (
-                          <a
-                            key={brand.href || `${brand.label}_${brandIndex}`}
-                            href={brand.href}
-                            className={`dropdown-link ${brand.href === window.location.pathname ? 'active' : ''}`}
-                          >
-                            {brand.label}
-                          </a>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className={item.label === 'ПРОЕКТЫ ДОМОВ' ? 'projects-dropdown' : 'services-dropdown'}>
-                    {item.children.map((child, idx) => (
-                      child.heading
+                <div className={item.label === 'ПРОЕКТЫ ДОМОВ' ? 'projects-dropdown' : 'services-dropdown'}>
+                  {item.children.flatMap((child, idx) => (
+                    child.children
+                      ? [
+                        <span key={`${child.label}_${idx}_heading`} className="dropdown-heading">{child.label}</span>,
+                        ...child.children.map((nested, nestedIdx) => (
+                          <a key={nested.href || `${nested.label}_${nestedIdx}`} href={nested.href} className={`dropdown-link ${nested.href && window.location.pathname === nested.href ? 'active' : ''}`}>{nested.label}</a>
+                        ))
+                      ]
+                      : child.heading
                         ? <span key={`${child.label}_${idx}`} className="dropdown-heading">{child.label}</span>
                         : <a key={child.href || `${child.label}_${idx}`} href={child.href} className={`dropdown-link ${child.href && window.location.pathname + window.location.search === child.href ? 'active' : ''}`}>{child.label}</a>
-                    ))}
-                  </div>
-                )}
+                  ))}
+                </div>
               </div>
             ) : (
               <a href={item.href} className={`menu-link ${item.active ? 'active' : ''}`}>{item.label}</a>
