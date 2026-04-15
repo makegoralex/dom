@@ -125,16 +125,17 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 
 .design-intro p{font-size:17px !important; margin:0 0 16px !important;}
 .design-intro h3{font-size:34px; margin:0 0 10px; font-family:inherit;}
-.design-preview-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:12px;}
-.design-preview-grid img{width:100%; height:150px; object-fit:cover; border:1px solid #d6d8df;}
-.design-preview-grid h4{margin:6px 0 0; font-size:17px;}
 .design-tariffs{margin-top:20px;}
 .design-tariffs h2,.design-order h2{font-size:38px; margin:0 0 14px; font-family:inherit;}
-.design-tariff-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
-.design-tariff-card{background:#f7f7f8; border:1px solid #d8dce3; padding:12px;}
+.design-tariff-grid{display:grid; grid-template-columns:repeat(2,minmax(280px,1fr)); gap:16px;}
+.design-tariff-card{background:linear-gradient(180deg,#fbfcff 0%,#f4f6fa 100%); border:1px solid #d8dce3; border-radius:14px; padding:18px; box-shadow:0 12px 28px rgba(34,45,71,.08);}
+.design-tariff-head{display:grid; gap:6px; margin-bottom:12px;}
 .design-tariff-card h4{margin:0 0 8px; font-size:17px;}
-.design-tariff-card strong{display:block; color:#3d8c53; margin-bottom:8px; font-size:16px;}
-.design-tariff-card p{margin:0; font-size:14px; line-height:1.4;}
+.design-tariff-head span{display:inline-flex; align-self:flex-start; background:#eaf8ef; color:#2f7d47; border:1px solid #cfead8; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:.02em; padding:4px 10px;}
+.design-tariff-card ul{margin:0 0 14px; padding:0; list-style:none; display:grid; gap:8px;}
+.design-tariff-card li{position:relative; padding-left:22px; font-size:14px; line-height:1.45;}
+.design-tariff-card li::before{content:"✓"; position:absolute; left:0; top:0; color:#2f7d47; font-weight:800;}
+.design-tariff-card p{margin:0; font-size:14px; line-height:1.5; color:#2d3340;}
 .design-order{margin-top:22px; background:#f7f7f8; border:1px solid #d8dce3; padding:14px;}
 .design-order .lead-form{max-width:none;}
 .design-order .lead-form label{display:grid; gap:6px; font-size:14px;}
@@ -440,8 +441,8 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .contacts-info p{font-size:15px;}
   .design-intro h3{font-size:24px;}
   .design-intro p{font-size:15px !important;}
-  .design-preview-grid{grid-template-columns:1fr 1fr;}
   .design-tariff-grid{grid-template-columns:1fr;}
+  .design-tariff-card{padding:14px;}
   .design-tariffs h2,.design-order h2{font-size:26px;}
   .portfolio-grid{grid-template-columns:1fr;}
   .portfolio-image{height:220px;}
