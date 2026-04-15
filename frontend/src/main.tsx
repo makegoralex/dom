@@ -76,7 +76,7 @@ type ProjectGroupColumn = {
     items: string[];
   }>;
 };
-type MenuChildItem = { label: string; href?: string; heading?: boolean };
+type MenuChildItem = { label: string; href?: string; heading?: boolean; children?: MenuChildItem[] };
 type MenuItem = {
   label: string;
   href?: string;
@@ -156,6 +156,37 @@ const PROMOTIONS_MENU = [
   { slug: 'ipoteka-i-kredit', title: 'Ипотека и кредит', text: 'Подберем комфортную программу ипотеки или кредита на строительство.' },
   { slug: 'vse-akcii', title: 'Все акции', text: 'Здесь публикуем актуальные скидки, акции и специальные предложения.' }
 ];
+
+const FURNITURE_STRUCTURE = [
+  { title: 'КУХНИ', brands: ['NOBILIA', 'HAECKER'] },
+  { title: 'ОБЕДЕННЫЕ ГРУППЫ', brands: ['DRESSY', 'MOBILBERICA', 'FURMAN', 'CAMEL GROUP', 'DRAENERT'] },
+  { title: 'СПАЛЬНИ', brands: ['ALF DAFRE', 'CAMEL GROUP', 'FRATELLI BARI', 'RUF BETTEN', 'THIELEMEYER', 'EVANTY'] },
+  { title: 'ГОСТИНЫЕ И СТЕНКИ', brands: ['HARTMANN', 'ALF DAFRE', 'CAMEL GROUP', 'FRATELLI BARI', 'EVANTY'] },
+  { title: 'МЯГКАЯ МЕБЕЛЬ', brands: ['FURMAN', 'RELOTTI', 'ROLF BENZ', 'FAMA', 'HIMOLLA', 'CAMEL GROUP', 'EVANTY'] },
+  { title: 'ДЕТСКИЕ', brands: ['MOLL'] },
+  { title: 'КАБИНЕТЫ', brands: ['CAMEL GROUP', 'PROFOFFICE'] },
+  { title: 'МАТРАСЫ', brands: ['HUKLA'] }
+];
+
+function slugify(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-+|-+$/g, '');
+}
+
+const FURNITURE_MENU_CHILDREN: MenuChildItem[] = FURNITURE_STRUCTURE.map((category) => ({
+  label: category.title,
+  children: category.brands.map((brand) => ({
+    label: brand,
+    href: `/furniture/${slugify(category.title)}/${slugify(brand)}`
+  }))
+}));
+
+const FURNITURE_LEAF_PAGES = FURNITURE_STRUCTURE.flatMap((category) =>
+  category.brands.map((brand) => ({
+    categoryTitle: category.title,
+    brandTitle: brand,
+    href: `/furniture/${slugify(category.title)}/${slugify(brand)}`
+  }))
+);
 
 function chunkBy<T>(items: T[], size: number) {
   const chunks: T[][] = [];
@@ -288,7 +319,7 @@ function HeaderNav({
       services: { label: 'УСЛУГИ', active: currentPath.startsWith('/services/'), children: serviceColumns.flatMap((column) => column.map((item) => ({ label: item.title, href: `/services/${item.slug}` }))) },
       design: { label: 'ПРОЕКТИРОВАНИЕ', href: '/design', active: currentPath === '/design' },
       portfolio: { label: 'ПОРТФОЛИО', href: '/portfolio', active: currentPath === '/portfolio' },
-      furniture: { label: 'МЕБЕЛЬ', href: '/furniture', active: currentPath === '/furniture' },
+      furniture: { label: 'МЕБЕЛЬ', href: '/furniture', active: currentPath === '/furniture' || currentPath.startsWith('/furniture/'), children: FURNITURE_MENU_CHILDREN },
       promotions: { label: 'ИПОТЕКА И АКЦИИ', active: currentPath.startsWith('/discounts/'), children: PROMOTIONS_MENU.map((item) => ({ label: item.title, href: `/discounts/${item.slug}` })) },
       contacts: { label: 'КОНТАКТЫ', href: '/contacts', active: currentPath === '/contacts' }
     };
@@ -308,19 +339,38 @@ function HeaderNav({
         {menuItems.map((item, index) => (
           <React.Fragment key={item.label}>
             {item.children ? (
-              <div className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : ''}`}>
+              <div className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : item.label === 'МЕБЕЛЬ' ? 'menu-furniture' : ''}`}>
                 {item.href ? (
                   <a href={item.href} className={`menu-link ${item.active ? 'active' : ''}`}>{item.label} ▾</a>
                 ) : (
                   <button type="button" className={`menu-link menu-link-btn ${item.active ? 'active' : ''}`}>{item.label} ▾</button>
                 )}
-                <div className={item.label === 'ПРОЕКТЫ ДОМОВ' ? 'projects-dropdown' : 'services-dropdown'}>
-                  {item.children.map((child, idx) => (
-                    child.heading
-                      ? <span key={`${child.label}_${idx}`} className="dropdown-heading">{child.label}</span>
-                      : <a key={child.href || `${child.label}_${idx}`} href={child.href} className={`dropdown-link ${child.href && window.location.pathname + window.location.search === child.href ? 'active' : ''}`}>{child.label}</a>
-                  ))}
-                </div>
+                {item.label === 'МЕБЕЛЬ' ? (
+                  <div className="furniture-dropdown">
+                    {item.children.map((category, idx) => (
+                      <div className="furniture-dropdown-col" key={`${category.label}_${idx}`}>
+                        <span className="furniture-dropdown-title">{category.label}</span>
+                        {(category.children || []).map((brand, brandIndex) => (
+                          <a
+                            key={brand.href || `${brand.label}_${brandIndex}`}
+                            href={brand.href}
+                            className={`dropdown-link ${brand.href === window.location.pathname ? 'active' : ''}`}
+                          >
+                            {brand.label}
+                          </a>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className={item.label === 'ПРОЕКТЫ ДОМОВ' ? 'projects-dropdown' : 'services-dropdown'}>
+                    {item.children.map((child, idx) => (
+                      child.heading
+                        ? <span key={`${child.label}_${idx}`} className="dropdown-heading">{child.label}</span>
+                        : <a key={child.href || `${child.label}_${idx}`} href={child.href} className={`dropdown-link ${child.href && window.location.pathname + window.location.search === child.href ? 'active' : ''}`}>{child.label}</a>
+                    ))}
+                  </div>
+                )}
               </div>
             ) : (
               <a href={item.href} className={`menu-link ${item.active ? 'active' : ''}`}>{item.label}</a>
@@ -342,9 +392,19 @@ function HeaderNav({
             <div className="mobile-menu-list">
               {activeMobileLevel
                 ? activeMobileLevel.items.map((item, idx) => (
-                  item.heading
-                    ? <strong key={`${item.label}_${idx}`} className="mobile-menu-item">{item.label}</strong>
-                    : <a key={item.href || `${item.label}_${idx}`} href={item.href} className={`mobile-menu-item ${item.href && window.location.pathname + window.location.search === item.href ? 'active' : ''}`}>{item.label}</a>
+                  item.children ? (
+                    <button
+                      key={`${item.label}_${idx}`}
+                      className="mobile-menu-item mobile-menu-item-btn"
+                      onClick={() => setMobileStack((prev) => [...prev, { title: item.label, items: item.children || [] }])}
+                    >
+                      {item.label} →
+                    </button>
+                  ) : item.heading ? (
+                    <strong key={`${item.label}_${idx}`} className="mobile-menu-item">{item.label}</strong>
+                  ) : (
+                    <a key={item.href || `${item.label}_${idx}`} href={item.href} className={`mobile-menu-item ${item.href && window.location.pathname + window.location.search === item.href ? 'active' : ''}`}>{item.label}</a>
+                  )
                 ))
                 : menuItems.map((item) => (
                   item.children ? (
@@ -3036,6 +3096,7 @@ function App() {
   const pathname = window.location.pathname;
   const serviceSlug = pathname.startsWith('/services/') ? pathname.replace('/services/', '') : '';
   const discountSlug = pathname.startsWith('/discounts/') ? pathname.replace('/discounts/', '') : '';
+  const furniturePage = FURNITURE_LEAF_PAGES.find((item) => item.href === pathname);
   const servicePage = SERVICES_MENU.find((item) => item.slug === serviceSlug);
   const discountPage = PROMOTIONS_MENU.find((item) => item.slug === discountSlug);
   const isAdminRoute =
@@ -3071,6 +3132,18 @@ function App() {
   if (pathname === '/design') return <AppLayout><DesignPage /></AppLayout>;
   if (servicePage) return <AppLayout><ManagedTextPage slug={`services-${servicePage.slug}`} fallbackTitle={servicePage.title} fallbackContent={servicePage.text} sectionTitle="Услуги" /></AppLayout>;
   if (discountPage) return <AppLayout><ManagedTextPage slug={`discounts-${discountPage.slug}`} fallbackTitle={discountPage.title} fallbackContent={discountPage.text} sectionTitle="Ипотека и акции" /></AppLayout>;
+  if (furniturePage) {
+    return (
+      <AppLayout>
+        <ManagedTextPage
+          slug={`furniture-${slugify(furniturePage.categoryTitle)}-${slugify(furniturePage.brandTitle)}`}
+          fallbackTitle={furniturePage.brandTitle}
+          fallbackContent={`Раздел мебели: ${furniturePage.categoryTitle}. Подберем решение под размер помещения, стиль интерьера и бюджет.`}
+          sectionTitle="Мебель"
+        />
+      </AppLayout>
+    );
+  }
   if (pathname === '/furniture') return <AppLayout><ManagedTextPage slug="furniture" fallbackTitle="Мебель" fallbackContent="Изготавливаем корпусную и встроенную мебель под ваши размеры и стиль интерьера." sectionTitle="Каталог" /></AppLayout>;
   if (pathname === '/portfolio') return <AppLayout><PortfolioPage /></AppLayout>;
   if (pathname === '/contacts') return <AppLayout><ContactsPage /></AppLayout>;
