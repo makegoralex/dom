@@ -54,11 +54,19 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .menu-link-btn{border:none; background:transparent; color:#fff; font-weight:500; font-size:13px; cursor:pointer; padding:0 8px; white-space:nowrap; min-height:34px; display:flex; align-items:center;}
 .menu-link.active{color:#f8cc52; font-weight:600;}
 
-.menu-projects,.menu-services,.menu-promotions{position:relative; display:flex; align-items:center;}
+.menu-projects,.menu-services,.menu-promotions,.menu-furniture{position:relative; display:flex; align-items:center;}
 .projects-dropdown{position:absolute; left:0; top:100%; min-width:320px; background:#f7f8fb; color:#1f2330; border:1px solid #d3d6de; border-radius:10px; padding:14px 16px; display:none; grid-template-columns:1fr; gap:10px; z-index:60; box-shadow:0 12px 28px rgba(18,32,52,.18);}
 .menu-projects:hover .projects-dropdown{display:grid;}
 .services-dropdown{position:absolute; left:0; top:100%; min-width:280px; max-width:620px; background:#f7f8fb; color:#1f2330; border:1px solid #d3d6de; border-radius:10px; padding:10px 12px; display:none; z-index:60; box-shadow:0 12px 28px rgba(18,32,52,.18); grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:2px 8px;}
 .menu-services:hover .services-dropdown,.menu-promotions:hover .services-dropdown{display:grid;}
+.furniture-dropdown{position:absolute; left:0; top:100%; min-width:min(1200px,92vw); max-width:92vw; background:#22950f; border:1px solid #1a7d0d; padding:16px 14px; display:none; z-index:65; box-shadow:0 16px 28px rgba(13,38,10,.38); grid-template-columns:repeat(8,minmax(130px,1fr)); gap:6px;}
+.menu-furniture:hover .furniture-dropdown{display:grid;}
+.furniture-dropdown-col{border-left:1px solid rgba(255,255,255,.2); padding:0 12px;}
+.furniture-dropdown-col:first-child{border-left:none;}
+.furniture-dropdown-title{display:block; color:#fff; font-size:28px; line-height:1.06; margin-bottom:12px; font-weight:800; text-transform:uppercase;}
+.furniture-dropdown .dropdown-link{color:#d8ffd3 !important; margin:0; padding:5px 0; border-radius:0; font-size:14px !important; letter-spacing:.01em;}
+.furniture-dropdown .dropdown-link:hover{background:transparent; color:#fff !important; text-decoration:underline !important; text-underline-offset:3px;}
+.furniture-dropdown .dropdown-link.active{background:transparent; color:#fffcc2 !important; font-weight:700;}
 .dropdown-heading{display:block; margin:6px 0 2px; font-size:12px !important; font-weight:800 !important; color:#1f2530 !important; text-transform:uppercase; letter-spacing:.04em;}
 .projects-dropdown h4{margin:0 0 8px; font-size:14px; color:#1f2530; padding-bottom:6px; border-bottom:1px solid #e2e5ed;}
 .projects-dropdown strong{display:block; margin:6px 0; font-size:13px;}
@@ -125,16 +133,17 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 
 .design-intro p{font-size:17px !important; margin:0 0 16px !important;}
 .design-intro h3{font-size:34px; margin:0 0 10px; font-family:inherit;}
-.design-preview-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:12px;}
-.design-preview-grid img{width:100%; height:150px; object-fit:cover; border:1px solid #d6d8df;}
-.design-preview-grid h4{margin:6px 0 0; font-size:17px;}
 .design-tariffs{margin-top:20px;}
 .design-tariffs h2,.design-order h2{font-size:38px; margin:0 0 14px; font-family:inherit;}
-.design-tariff-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
-.design-tariff-card{background:#f7f7f8; border:1px solid #d8dce3; padding:12px;}
+.design-tariff-grid{display:grid; grid-template-columns:repeat(2,minmax(280px,1fr)); gap:16px;}
+.design-tariff-card{background:linear-gradient(180deg,#fbfcff 0%,#f4f6fa 100%); border:1px solid #d8dce3; border-radius:14px; padding:18px; box-shadow:0 12px 28px rgba(34,45,71,.08);}
+.design-tariff-head{display:grid; gap:6px; margin-bottom:12px;}
 .design-tariff-card h4{margin:0 0 8px; font-size:17px;}
-.design-tariff-card strong{display:block; color:#3d8c53; margin-bottom:8px; font-size:16px;}
-.design-tariff-card p{margin:0; font-size:14px; line-height:1.4;}
+.design-tariff-head span{display:inline-flex; align-self:flex-start; background:#eaf8ef; color:#2f7d47; border:1px solid #cfead8; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:.02em; padding:4px 10px;}
+.design-tariff-card ul{margin:0 0 14px; padding:0; list-style:none; display:grid; gap:8px;}
+.design-tariff-card li{position:relative; padding-left:22px; font-size:14px; line-height:1.45;}
+.design-tariff-card li::before{content:"✓"; position:absolute; left:0; top:0; color:#2f7d47; font-weight:800;}
+.design-tariff-card p{margin:0; font-size:14px; line-height:1.5; color:#2d3340;}
 .design-order{margin-top:22px; background:#f7f7f8; border:1px solid #d8dce3; padding:14px;}
 .design-order .lead-form{max-width:none;}
 .design-order .lead-form label{display:grid; gap:6px; font-size:14px;}
@@ -377,6 +386,12 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .menu-projects:hover .projects-dropdown{display:grid;}
   .services-dropdown{position:static; min-width:0; display:none; margin-top:6px;}
   .menu-services:hover .services-dropdown,.menu-promotions:hover .services-dropdown{display:grid;}
+  .furniture-dropdown{position:static; min-width:0; max-width:100%; display:none; margin-top:6px; grid-template-columns:1fr; background:#1d2938; border-color:#2b3c51;}
+  .menu-furniture:hover .furniture-dropdown{display:grid;}
+  .furniture-dropdown-col{border:none; border-top:1px solid rgba(255,255,255,.12); padding:10px 0 0;}
+  .furniture-dropdown-col:first-child{border-top:none; padding-top:0;}
+  .furniture-dropdown-title{font-size:16px; margin-bottom:8px;}
+  .furniture-dropdown .dropdown-link{font-size:13px !important; padding:4px 0;}
   .lead-layout{grid-template-columns:1fr;}
   .lead-side{max-width:620px;}
   .lead-top-row{grid-template-columns:1fr 1fr;}
@@ -440,8 +455,8 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .contacts-info p{font-size:15px;}
   .design-intro h3{font-size:24px;}
   .design-intro p{font-size:15px !important;}
-  .design-preview-grid{grid-template-columns:1fr 1fr;}
   .design-tariff-grid{grid-template-columns:1fr;}
+  .design-tariff-card{padding:14px;}
   .design-tariffs h2,.design-order h2{font-size:26px;}
   .portfolio-grid{grid-template-columns:1fr;}
   .portfolio-image{height:220px;}

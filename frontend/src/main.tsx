@@ -76,7 +76,7 @@ type ProjectGroupColumn = {
     items: string[];
   }>;
 };
-type MenuChildItem = { label: string; href?: string; heading?: boolean };
+type MenuChildItem = { label: string; href?: string; heading?: boolean; children?: MenuChildItem[] };
 type MenuItem = {
   label: string;
   href?: string;
@@ -156,6 +156,37 @@ const PROMOTIONS_MENU = [
   { slug: 'ipoteka-i-kredit', title: 'Ипотека и кредит', text: 'Подберем комфортную программу ипотеки или кредита на строительство.' },
   { slug: 'vse-akcii', title: 'Все акции', text: 'Здесь публикуем актуальные скидки, акции и специальные предложения.' }
 ];
+
+const FURNITURE_STRUCTURE = [
+  { title: 'КУХНИ', brands: ['NOBILIA', 'HAECKER'] },
+  { title: 'ОБЕДЕННЫЕ ГРУППЫ', brands: ['DRESSY', 'MOBILBERICA', 'FURMAN', 'CAMEL GROUP', 'DRAENERT'] },
+  { title: 'СПАЛЬНИ', brands: ['ALF DAFRE', 'CAMEL GROUP', 'FRATELLI BARI', 'RUF BETTEN', 'THIELEMEYER', 'EVANTY'] },
+  { title: 'ГОСТИНЫЕ И СТЕНКИ', brands: ['HARTMANN', 'ALF DAFRE', 'CAMEL GROUP', 'FRATELLI BARI', 'EVANTY'] },
+  { title: 'МЯГКАЯ МЕБЕЛЬ', brands: ['FURMAN', 'RELOTTI', 'ROLF BENZ', 'FAMA', 'HIMOLLA', 'CAMEL GROUP', 'EVANTY'] },
+  { title: 'ДЕТСКИЕ', brands: ['MOLL'] },
+  { title: 'КАБИНЕТЫ', brands: ['CAMEL GROUP', 'PROFOFFICE'] },
+  { title: 'МАТРАСЫ', brands: ['HUKLA'] }
+];
+
+function slugify(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-+|-+$/g, '');
+}
+
+const FURNITURE_MENU_CHILDREN: MenuChildItem[] = FURNITURE_STRUCTURE.map((category) => ({
+  label: category.title,
+  children: category.brands.map((brand) => ({
+    label: brand,
+    href: `/furniture/${slugify(category.title)}/${slugify(brand)}`
+  }))
+}));
+
+const FURNITURE_LEAF_PAGES = FURNITURE_STRUCTURE.flatMap((category) =>
+  category.brands.map((brand) => ({
+    categoryTitle: category.title,
+    brandTitle: brand,
+    href: `/furniture/${slugify(category.title)}/${slugify(brand)}`
+  }))
+);
 
 function chunkBy<T>(items: T[], size: number) {
   const chunks: T[][] = [];
@@ -288,7 +319,7 @@ function HeaderNav({
       services: { label: 'УСЛУГИ', active: currentPath.startsWith('/services/'), children: serviceColumns.flatMap((column) => column.map((item) => ({ label: item.title, href: `/services/${item.slug}` }))) },
       design: { label: 'ПРОЕКТИРОВАНИЕ', href: '/design', active: currentPath === '/design' },
       portfolio: { label: 'ПОРТФОЛИО', href: '/portfolio', active: currentPath === '/portfolio' },
-      furniture: { label: 'МЕБЕЛЬ', href: '/furniture', active: currentPath === '/furniture' },
+      furniture: { label: 'МЕБЕЛЬ', href: '/furniture', active: currentPath === '/furniture' || currentPath.startsWith('/furniture/'), children: FURNITURE_MENU_CHILDREN },
       promotions: { label: 'ИПОТЕКА И АКЦИИ', active: currentPath.startsWith('/discounts/'), children: PROMOTIONS_MENU.map((item) => ({ label: item.title, href: `/discounts/${item.slug}` })) },
       contacts: { label: 'КОНТАКТЫ', href: '/contacts', active: currentPath === '/contacts' }
     };
@@ -308,19 +339,38 @@ function HeaderNav({
         {menuItems.map((item, index) => (
           <React.Fragment key={item.label}>
             {item.children ? (
-              <div className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : ''}`}>
+              <div className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : item.label === 'МЕБЕЛЬ' ? 'menu-furniture' : ''}`}>
                 {item.href ? (
                   <a href={item.href} className={`menu-link ${item.active ? 'active' : ''}`}>{item.label} ▾</a>
                 ) : (
                   <button type="button" className={`menu-link menu-link-btn ${item.active ? 'active' : ''}`}>{item.label} ▾</button>
                 )}
-                <div className={item.label === 'ПРОЕКТЫ ДОМОВ' ? 'projects-dropdown' : 'services-dropdown'}>
-                  {item.children.map((child, idx) => (
-                    child.heading
-                      ? <span key={`${child.label}_${idx}`} className="dropdown-heading">{child.label}</span>
-                      : <a key={child.href || `${child.label}_${idx}`} href={child.href} className={`dropdown-link ${child.href && window.location.pathname + window.location.search === child.href ? 'active' : ''}`}>{child.label}</a>
-                  ))}
-                </div>
+                {item.label === 'МЕБЕЛЬ' ? (
+                  <div className="furniture-dropdown">
+                    {item.children.map((category, idx) => (
+                      <div className="furniture-dropdown-col" key={`${category.label}_${idx}`}>
+                        <span className="furniture-dropdown-title">{category.label}</span>
+                        {(category.children || []).map((brand, brandIndex) => (
+                          <a
+                            key={brand.href || `${brand.label}_${brandIndex}`}
+                            href={brand.href}
+                            className={`dropdown-link ${brand.href === window.location.pathname ? 'active' : ''}`}
+                          >
+                            {brand.label}
+                          </a>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className={item.label === 'ПРОЕКТЫ ДОМОВ' ? 'projects-dropdown' : 'services-dropdown'}>
+                    {item.children.map((child, idx) => (
+                      child.heading
+                        ? <span key={`${child.label}_${idx}`} className="dropdown-heading">{child.label}</span>
+                        : <a key={child.href || `${child.label}_${idx}`} href={child.href} className={`dropdown-link ${child.href && window.location.pathname + window.location.search === child.href ? 'active' : ''}`}>{child.label}</a>
+                    ))}
+                  </div>
+                )}
               </div>
             ) : (
               <a href={item.href} className={`menu-link ${item.active ? 'active' : ''}`}>{item.label}</a>
@@ -342,9 +392,19 @@ function HeaderNav({
             <div className="mobile-menu-list">
               {activeMobileLevel
                 ? activeMobileLevel.items.map((item, idx) => (
-                  item.heading
-                    ? <strong key={`${item.label}_${idx}`} className="mobile-menu-item">{item.label}</strong>
-                    : <a key={item.href || `${item.label}_${idx}`} href={item.href} className={`mobile-menu-item ${item.href && window.location.pathname + window.location.search === item.href ? 'active' : ''}`}>{item.label}</a>
+                  item.children ? (
+                    <button
+                      key={`${item.label}_${idx}`}
+                      className="mobile-menu-item mobile-menu-item-btn"
+                      onClick={() => setMobileStack((prev) => [...prev, { title: item.label, items: item.children || [] }])}
+                    >
+                      {item.label} →
+                    </button>
+                  ) : item.heading ? (
+                    <strong key={`${item.label}_${idx}`} className="mobile-menu-item">{item.label}</strong>
+                  ) : (
+                    <a key={item.href || `${item.label}_${idx}`} href={item.href} className={`mobile-menu-item ${item.href && window.location.pathname + window.location.search === item.href ? 'active' : ''}`}>{item.label}</a>
+                  )
                 ))
                 : menuItems.map((item) => (
                   item.children ? (
@@ -1981,6 +2041,57 @@ function PortfolioPage() {
   );
 }
 
+const DESIGN_PROJECT_VARIANTS = [
+  {
+    title: 'Планировочное решение',
+    accent: 'Быстрый старт для планировки',
+    features: [
+      'обмерочный план с привязкой инженерных коммуникаций;',
+      'план демонтажа стен и перегородок;',
+      'план перепланировки;',
+      'план расстановки мебели и оборудования.'
+    ],
+    description:
+      'Подходит, если нужна помощь только с планировкой: при ограниченном бюджете, сжатых сроках или если вы планируете самостоятельно разрабатывать дизайн и чертежи. Также часто выбирают при покупке новой квартиры, чтобы понять, подходит ли пространство под задачи семьи.'
+  },
+  {
+    title: 'Технический проект',
+    accent: 'Для быстрого выхода в ремонт',
+    features: [
+      'планировочное решение;',
+      'полный пакет рабочих чертежей для строительно-отделочных работ;',
+      'консультация по подбору отделочных материалов.'
+    ],
+    description:
+      'Оптимальный вариант без 3D-визуализаций: если вы хорошо представляете будущий интерьер, хотите быстрее начать ремонт или планируете косметические работы без сложных конструктивных решений.'
+  },
+  {
+    title: 'Стандартный проект',
+    accent: 'Баланс визуализации и практики',
+    features: [
+      'планировочное решение;',
+      'полный пакет рабочих чертежей для строительно-отделочных работ;',
+      '3D-визуализация основных помещений;',
+      'подбор основных отделочных материалов (стены и пол) и ключевых предметов мебели.'
+    ],
+    description:
+      'Подходит тем, кому важно увидеть интерьер в объеме, но кто готов самостоятельно подбирать освещение, сантехнику, текстиль и декор.'
+  },
+  {
+    title: 'Полный проект',
+    accent: 'Комплексное сопровождение',
+    features: [
+      'планировочное решение;',
+      'полный пакет рабочих чертежей для строительно-отделочных работ;',
+      '3D-визуализация основных помещений;',
+      'подбор всех отделочных материалов, мебели, света, сантехники, текстиля и декора;',
+      'консультация строительной бригады.'
+    ],
+    description:
+      'Для тех, кому нужна полная поддержка в создании интерьера: от функциональной планировки до финальных деталей. Максимально комфортный формат сопровождения на каждом этапе.'
+  }
+];
+
 function DesignPage() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -2024,42 +2135,30 @@ function DesignPage() {
 
           <div className="internal-text-box design-intro">
             <p>
-              Наша компания занимается проектированием домов и коттеджей с продуманной планировкой и внешним видом.
-              Даже если у вас нет четкого представления — мы поможем создать идеальный проект будущего дома.
+              Разрабатываем дизайн-проекты интерьеров с учетом ваших привычек, ритма жизни и бюджета.
+              Мы собрали удобные форматы работы — от планировочного решения до полного сопровождения.
             </p>
-            <h3>Что вы получите, заказав проект дома у нас</h3>
-            <p>Полный комплекс услуг: разработка концепции дома, проект инженерных коммуникаций и авторский надзор.</p>
-            <div className="design-preview-grid">
-              <article><img src="https://images.unsplash.com/photo-1472220625704-91e1462799b2?auto=format&fit=crop&w=900&q=80" alt="Эскизный проект" /><h4>Эскизный проект</h4></article>
-              <article><img src="https://images.unsplash.com/photo-1513584684374-8bab748fbf90?auto=format&fit=crop&w=900&q=80" alt="Архитектурный проект" /><h4>Архитектурный проект</h4></article>
-              <article><img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=900&q=80" alt="Конструктивный проект" /><h4>Конструктивный проект</h4></article>
-              <article><img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=900&q=80" alt="Инженерный проект" /><h4>Инженерный проект</h4></article>
-            </div>
+            <h3>Варианты разработки дизайн-проекта</h3>
+            <p>Выберите подходящий тариф в зависимости от задач: скорости запуска ремонта, глубины проработки и уровня сопровождения.</p>
           </div>
 
           <section className="design-tariffs">
-            <h2>Тарифы</h2>
+            <h2>Тарифы и состав работ</h2>
             <div className="design-tariff-grid">
-              <article className="design-tariff-card">
-                <h4>Эскизный проект</h4>
-                <strong>от 100 руб/м²</strong>
-                <p>Общие данные, планы этажей, экспликация помещений и посадка дома на участке.</p>
-              </article>
-              <article className="design-tariff-card">
-                <h4>Архитектурный проект</h4>
-                <strong>от 450 руб/м²</strong>
-                <p>Фасады, планировочные решения, разрезы, спецификации материалов и визуализация.</p>
-              </article>
-              <article className="design-tariff-card">
-                <h4>Конструктивный проект</h4>
-                <strong>от 350 руб/м²</strong>
-                <p>Фундамент, схемы армирования, узлы и сечения, ведомости конструктивных элементов.</p>
-              </article>
-              <article className="design-tariff-card">
-                <h4>Инженерный проект</h4>
-                <strong>от 450 руб/м²</strong>
-                <p>Водоснабжение, канализация, отопление, вентиляция, кондиционирование и электрика.</p>
-              </article>
+              {DESIGN_PROJECT_VARIANTS.map((variant) => (
+                <article className="design-tariff-card" key={variant.title}>
+                  <div className="design-tariff-head">
+                    <h4>{variant.title}</h4>
+                    <span>{variant.accent}</span>
+                  </div>
+                  <ul>
+                    {variant.features.map((feature) => (
+                      <li key={feature}>{feature}</li>
+                    ))}
+                  </ul>
+                  <p>{variant.description}</p>
+                </article>
+              ))}
             </div>
           </section>
 
@@ -2997,6 +3096,7 @@ function App() {
   const pathname = window.location.pathname;
   const serviceSlug = pathname.startsWith('/services/') ? pathname.replace('/services/', '') : '';
   const discountSlug = pathname.startsWith('/discounts/') ? pathname.replace('/discounts/', '') : '';
+  const furniturePage = FURNITURE_LEAF_PAGES.find((item) => item.href === pathname);
   const servicePage = SERVICES_MENU.find((item) => item.slug === serviceSlug);
   const discountPage = PROMOTIONS_MENU.find((item) => item.slug === discountSlug);
   const isAdminRoute =
@@ -3032,6 +3132,18 @@ function App() {
   if (pathname === '/design') return <AppLayout><DesignPage /></AppLayout>;
   if (servicePage) return <AppLayout><ManagedTextPage slug={`services-${servicePage.slug}`} fallbackTitle={servicePage.title} fallbackContent={servicePage.text} sectionTitle="Услуги" /></AppLayout>;
   if (discountPage) return <AppLayout><ManagedTextPage slug={`discounts-${discountPage.slug}`} fallbackTitle={discountPage.title} fallbackContent={discountPage.text} sectionTitle="Ипотека и акции" /></AppLayout>;
+  if (furniturePage) {
+    return (
+      <AppLayout>
+        <ManagedTextPage
+          slug={`furniture-${slugify(furniturePage.categoryTitle)}-${slugify(furniturePage.brandTitle)}`}
+          fallbackTitle={furniturePage.brandTitle}
+          fallbackContent={`Раздел мебели: ${furniturePage.categoryTitle}. Подберем решение под размер помещения, стиль интерьера и бюджет.`}
+          sectionTitle="Мебель"
+        />
+      </AppLayout>
+    );
+  }
   if (pathname === '/furniture') return <AppLayout><ManagedTextPage slug="furniture" fallbackTitle="Мебель" fallbackContent="Изготавливаем корпусную и встроенную мебель под ваши размеры и стиль интерьера." sectionTitle="Каталог" /></AppLayout>;
   if (pathname === '/portfolio') return <AppLayout><PortfolioPage /></AppLayout>;
   if (pathname === '/contacts') return <AppLayout><ContactsPage /></AppLayout>;
