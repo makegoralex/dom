@@ -172,6 +172,14 @@ function slugify(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-+|-+$/g, '');
 }
 
+function normalizePathname(pathname: string) {
+  try {
+    return decodeURIComponent(pathname);
+  } catch {
+    return pathname;
+  }
+}
+
 const FURNITURE_MENU_CHILDREN: MenuChildItem[] = FURNITURE_STRUCTURE.map((category) => ({
   label: category.title,
   children: category.brands.map((brand) => ({
@@ -224,7 +232,7 @@ function sanitizeCmsHtml(html: string) {
   doc.body.querySelectorAll('*').forEach((node) => {
     ['style', 'id', 'width', 'height'].forEach((attr) => node.removeAttribute(attr));
     const className = node.getAttribute('class') || '';
-    const allowedClasses = ['cms-gallery', 'single', 'cols-2', 'cols-3', 'align-left', 'align-center', 'align-right', 'size-sm', 'size-md', 'cms-image-grid', 'grid2', 'grid3'];
+    const allowedClasses = ['cms-gallery', 'single', 'cols-2', 'cols-3', 'align-left', 'align-center', 'align-right', 'size-sm', 'size-md', 'cms-image-grid', 'grid2', 'grid3', 'cms-slider', 'cms-slider-track', 'cms-slider-btn', 'prev', 'next'];
     const normalized = className
       .split(' ')
       .filter((item) => allowedClasses.includes(item))
@@ -250,9 +258,24 @@ function CmsHtmlContent({ html }: { html: string }) {
         className="cms-content"
         onClick={(event) => {
           const target = event.target as HTMLElement | null;
+          const sliderButton = target?.closest('button.cms-slider-btn') as HTMLButtonElement | null;
+          if (sliderButton) {
+            event.preventDefault();
+            const sliderRoot = sliderButton.closest('.cms-slider');
+            const track = sliderRoot?.querySelector('.cms-slider-track') as HTMLElement | null;
+            if (!sliderRoot || !track) return;
+            const slides = track.querySelectorAll('figure');
+            if (!slides.length) return;
+            const current = Number(sliderRoot.getAttribute('data-active-index') || '0');
+            const direction = sliderButton.classList.contains('next') ? 1 : -1;
+            const next = (current + direction + slides.length) % slides.length;
+            sliderRoot.setAttribute('data-active-index', String(next));
+            track.style.transform = `translateX(-${next * 100}%)`;
+            return;
+          }
           if (!target || target.tagName !== 'IMG') return;
           const img = target as HTMLImageElement;
-          const galleryRoot = img.closest('.cms-gallery, .cms-image-grid');
+          const galleryRoot = img.closest('.cms-gallery, .cms-image-grid, .cms-slider-track');
           const images = galleryRoot
             ? Array.from(galleryRoot.querySelectorAll('img')).map((node) => (node as HTMLImageElement).src).filter(Boolean)
             : [img.src];
@@ -2518,6 +2541,41 @@ function AdminPage() {
     setUploadStatus('Фото-блок добавлен в страницу');
   };
 
+  const uploadPageSlider = async (files: File[]) => {
+    if (!files.length || !pageDraft) return;
+    setUploadStatus('Загрузка изображений для слайдера...');
+    const formData = new FormData();
+    files.forEach((file) => formData.append('images', file));
+    const response = await fetch(`${API_BASE}/api/admin/upload/page-image`, {
+      method: 'POST',
+      headers: { 'x-admin-token': token },
+      body: formData
+    });
+    if (!response.ok) {
+      setUploadStatus('');
+      setError('Не удалось загрузить фото для слайдера');
+      return;
+    }
+    const payload = (await response.json()) as { urls: string[] };
+    const imageUrls = payload.urls || [];
+    if (!imageUrls.length) return;
+    const sliderHtml = `<div class="cms-slider" data-active-index="0"><button class="cms-slider-btn prev" type="button" aria-label="Предыдущее фото">‹</button><div class="cms-slider-track">${imageUrls.map((url) => `<figure><img src="${url}" alt="Слайд страницы" /></figure>`).join('')}</div><button class="cms-slider-btn next" type="button" aria-label="Следующее фото">›</button></div>`;
+
+    if (imageInsertMode === 'cursor') {
+      const editor = document.getElementById('cms-page-editor');
+      if (editor) {
+        editor.focus();
+        document.execCommand('insertHTML', false, sliderHtml);
+        setPageDraft({ ...pageDraft, content: sanitizeCmsHtml(editor.innerHTML) });
+      }
+    } else if (imageInsertMode === 'start') {
+      setPageDraft({ ...pageDraft, content: sanitizeCmsHtml(`${sliderHtml}${pageDraft.content || ''}`) });
+    } else {
+      setPageDraft({ ...pageDraft, content: sanitizeCmsHtml(`${pageDraft.content || ''}${sliderHtml}`) });
+    }
+    setUploadStatus('Слайдер добавлен в страницу');
+  };
+
   const applyPageFormat = (command: string) => {
     document.execCommand(command);
     const editor = document.getElementById('cms-page-editor');
@@ -2883,6 +2941,7 @@ function AdminPage() {
               <option value="md">Стандартный размер</option>
             </select>
             <label>Фото-блок<input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadPageImage(files); e.currentTarget.value = ''; }} /></label>
+            <label>Слайдер<input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length > 1) uploadPageSlider(files); else setError('Для слайдера нужно минимум 2 изображения'); e.currentTarget.value = ''; }} /></label>
           </div>
           <div
             id="cms-page-editor"
@@ -3083,7 +3142,7 @@ function AppLayout({ children }: { children: ReactNode }) {
 
 function App() {
   const url = new URL(window.location.href);
-  const pathname = window.location.pathname;
+  const pathname = normalizePathname(window.location.pathname);
   const serviceSlug = pathname.startsWith('/services/') ? pathname.replace('/services/', '') : '';
   const discountSlug = pathname.startsWith('/discounts/') ? pathname.replace('/discounts/', '') : '';
   const furniturePage = FURNITURE_LEAF_PAGES.find((item) => item.href === pathname);
