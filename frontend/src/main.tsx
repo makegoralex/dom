@@ -172,6 +172,14 @@ function slugify(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-+|-+$/g, '');
 }
 
+function normalizePathname(pathname: string) {
+  try {
+    return decodeURIComponent(pathname);
+  } catch {
+    return pathname;
+  }
+}
+
 const FURNITURE_MENU_CHILDREN: MenuChildItem[] = FURNITURE_STRUCTURE.map((category) => ({
   label: category.title,
   children: category.brands.map((brand) => ({
@@ -3134,7 +3142,7 @@ function AppLayout({ children }: { children: ReactNode }) {
 
 function App() {
   const url = new URL(window.location.href);
-  const pathname = window.location.pathname;
+  const pathname = normalizePathname(window.location.pathname);
   const serviceSlug = pathname.startsWith('/services/') ? pathname.replace('/services/', '') : '';
   const discountSlug = pathname.startsWith('/discounts/') ? pathname.replace('/discounts/', '') : '';
   const furniturePage = FURNITURE_LEAF_PAGES.find((item) => item.href === pathname);
