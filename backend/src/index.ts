@@ -463,6 +463,13 @@ const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
     fileSize: 12 * 1024 * 1024
+  },
+  fileFilter: (_req, file, cb) => {
+    if (!file.mimetype?.startsWith('image/')) {
+      cb(new Error(`Недопустимый формат файла: ${file.originalname}. Разрешены только изображения.`));
+      return;
+    }
+    cb(null, true);
   }
 });
 
@@ -746,6 +753,24 @@ app.delete('/api/admin/upload/project-image', authMiddleware, (req, res) => {
   const deleted = deleteAssetByUrl(url);
   if (!deleted) return res.status(404).json({ message: 'Файл не найден' });
   return res.json({ ok: true });
+});
+
+app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
+  if (!req.path.startsWith('/api/admin/upload/')) return next(error);
+  if (res.headersSent) return next(error);
+
+  if (error instanceof multer.MulterError) {
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(413).json({ message: 'Файл слишком большой. Максимальный размер — 12 МБ.' });
+    }
+    return res.status(400).json({ message: `Ошибка загрузки файла (${error.code}).` });
+  }
+
+  if (error instanceof Error) {
+    return res.status(400).json({ message: error.message || 'Ошибка при загрузке файла.' });
+  }
+
+  return res.status(500).json({ message: 'Неизвестная ошибка загрузки файла.' });
 });
 
 app.use('/assets', express.static(ASSETS_DIR));

@@ -227,6 +227,20 @@ function formatPhoneMask(value: string) {
   return result;
 }
 
+async function getApiErrorMessage(response: Response, fallback: string) {
+  const contentType = response.headers.get('content-type') || '';
+  try {
+    if (contentType.includes('application/json')) {
+      const payload = (await response.json()) as { message?: string; error?: string };
+      return payload.message || payload.error || fallback;
+    }
+    const text = (await response.text()).trim();
+    return text || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 function sanitizeCmsHtml(html: string) {
   if (!html) return '';
   const parser = new DOMParser();
@@ -2443,7 +2457,7 @@ function AdminPage() {
     });
     if (!response.ok) {
       setUploadStatus('');
-      setError('Не удалось загрузить фото участка');
+      setError(await getApiErrorMessage(response, 'Не удалось загрузить фото участка'));
       return;
     }
     const payload = (await response.json()) as { urls: string[] };
@@ -2502,7 +2516,7 @@ function AdminPage() {
     });
     if (!response.ok) {
       setUploadStatus('');
-      setError('Не удалось загрузить изображение');
+      setError(await getApiErrorMessage(response, 'Не удалось загрузить изображение'));
       return;
     }
     const payload = (await response.json()) as { urls: string[] };
@@ -2578,7 +2592,7 @@ function AdminPage() {
     });
     if (!response.ok) {
       setUploadStatus('');
-      setError('Не удалось загрузить фото для страницы');
+      setError(await getApiErrorMessage(response, 'Не удалось загрузить фото для страницы'));
       return;
     }
     const payload = (await response.json()) as { urls: string[] };
@@ -2615,7 +2629,7 @@ function AdminPage() {
     });
     if (!response.ok) {
       setUploadStatus('');
-      setError('Не удалось загрузить фото для слайдера');
+      setError(await getApiErrorMessage(response, 'Не удалось загрузить фото для слайдера'));
       return;
     }
     const payload = (await response.json()) as { urls: string[] };
@@ -2697,7 +2711,7 @@ function AdminPage() {
     });
     if (!response.ok) {
       setUploadStatus('');
-      setError('Не удалось загрузить логотип');
+      setError(await getApiErrorMessage(response, 'Не удалось загрузить логотип'));
       return;
     }
     const payload = (await response.json()) as { url: string };
@@ -2717,7 +2731,7 @@ function AdminPage() {
     });
     if (!response.ok) {
       setUploadStatus('');
-      setError('Не удалось загрузить фото контакта');
+      setError(await getApiErrorMessage(response, 'Не удалось загрузить фото контакта'));
       return;
     }
     const payload = (await response.json()) as { urls: string[] };
@@ -2775,7 +2789,7 @@ function AdminPage() {
     });
     if (!response.ok) {
       setUploadStatus('');
-      setError('Не удалось загрузить изображение портфолио');
+      setError(await getApiErrorMessage(response, 'Не удалось загрузить изображение портфолио'));
       return;
     }
     const payload = (await response.json()) as { urls: string[] };
