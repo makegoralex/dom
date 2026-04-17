@@ -107,6 +107,16 @@ const CONSTRUCTION_TYPES = [
   'Каркасные',
   'Модульные'
 ];
+const FURNITURE_STRUCTURE = [
+  { title: 'КУХНИ', brands: ['NOBILIA', 'HAECKER'] },
+  { title: 'ОБЕДЕННЫЕ ГРУППЫ', brands: ['DRESSY', 'MOBILBERICA', 'FURMAN', 'CAMEL GROUP', 'DRAENERT'] },
+  { title: 'СПАЛЬНИ', brands: ['ALF DAFRE', 'CAMEL GROUP', 'FRATELLI BARI', 'RUF BETTEN', 'THIELEMEYER', 'EVANTY'] },
+  { title: 'ГОСТИНЫЕ И СТЕНКИ', brands: ['HARTMANN', 'ALF DAFRE', 'CAMEL GROUP', 'FRATELLI BARI', 'EVANTY'] },
+  { title: 'МЯГКАЯ МЕБЕЛЬ', brands: ['FURMAN', 'RELOTTI', 'ROLF BENZ', 'FAMA', 'HIMOLLA', 'CAMEL GROUP', 'EVANTY'] },
+  { title: 'ДЕТСКИЕ', brands: ['MOLL'] },
+  { title: 'КАБИНЕТЫ', brands: ['CAMEL GROUP', 'PROFOFFICE'] },
+  { title: 'МАТРАСЫ', brands: ['HUKLA'] }
+];
 const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'lands', 'services', 'design', 'portfolio', 'furniture', 'promotions', 'contacts'];
 const DEFAULT_LOGO_URL = '/assets/logo_small.png';
 const DEFAULT_CONTACTS = {
@@ -117,6 +127,21 @@ const DEFAULT_CONTACTS = {
   contactCityPhone: '8-8412-79-01-79',
   contactEmail: '89022099279@mail.ru'
 };
+
+function slugify(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-+|-+$/g, '');
+}
+
+const furnitureLeafPages = FURNITURE_STRUCTURE.flatMap((category) =>
+  category.brands.map((brand) => {
+    const slug = `furniture-${slugify(category.title)}-${slugify(brand)}`;
+    return {
+      slug,
+      title: brand,
+      content: `<p>Раздел мебели: ${category.title}. Подберем решение под размер помещения, стиль интерьера и бюджет.</p>`
+    } satisfies ContentPage;
+  })
+);
 
 const seedProjects: HouseProject[] = [
   {
@@ -244,7 +269,8 @@ const seedPages: Record<string, ContentPage> = {
   'services-dizainer': { slug: 'services-dizainer', title: 'Дизайнер', content: '<p>Разрабатываем дизайн-концепцию интерьеров и экстерьеров.</p>' },
   'services-landshaftnyy-dizayn': { slug: 'services-landshaftnyy-dizayn', title: 'Ландшафтный дизайн', content: '<p>Проектируем благоустройство участка и озеленение территории.</p>' },
   'services-mezhevanie': { slug: 'services-mezhevanie', title: 'Межевание', content: '<p>Готовим документы и выполняем межевание земельных участков.</p>' },
-  'services-ipoteka-oformlenie': { slug: 'services-ipoteka-oformlenie', title: 'Ипотека. Оформление', content: '<p>Помогаем с подбором банка, программой, пакетом документов и сопровождением сделки.</p>' }
+  'services-ipoteka-oformlenie': { slug: 'services-ipoteka-oformlenie', title: 'Ипотека. Оформление', content: '<p>Помогаем с подбором банка, программой, пакетом документов и сопровождением сделки.</p>' },
+  ...Object.fromEntries(furnitureLeafPages.map((page) => [page.slug, page]))
 };
 
 const seedPortfolio: PortfolioItem[] = [
