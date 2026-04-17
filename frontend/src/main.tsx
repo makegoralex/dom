@@ -25,7 +25,8 @@ type LandPlot = {
   area: string;
   price: string;
   district: string;
-  image?: string;
+  images?: string[];
+  mapUrl?: string;
 };
 
 type Lead = {
@@ -129,6 +130,7 @@ const DEFAULT_CONTACT_PROFILE = {
   contactCityPhone: CONTACTS.extraPhoneDisplay,
   contactEmail: CONTACTS.email
 };
+const LAND_IMAGE_FALLBACK = 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80';
 
 const SERVICES_MENU = [
   { slug: 'fundament', title: 'Фундамент', text: 'Проектируем и устраиваем фундаменты под тип грунта и нагрузку дома.' },
@@ -170,6 +172,14 @@ const FURNITURE_STRUCTURE = [
 
 function slugify(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-+|-+$/g, '');
+}
+
+function normalizePathname(pathname: string) {
+  try {
+    return decodeURIComponent(pathname);
+  } catch {
+    return pathname;
+  }
 }
 
 const FURNITURE_MENU_CHILDREN: MenuChildItem[] = FURNITURE_STRUCTURE.map((category) => ({
@@ -224,7 +234,7 @@ function sanitizeCmsHtml(html: string) {
   doc.body.querySelectorAll('*').forEach((node) => {
     ['style', 'id', 'width', 'height'].forEach((attr) => node.removeAttribute(attr));
     const className = node.getAttribute('class') || '';
-    const allowedClasses = ['cms-gallery', 'single', 'cols-2', 'cols-3', 'align-left', 'align-center', 'align-right', 'size-sm', 'size-md', 'cms-image-grid', 'grid2', 'grid3'];
+    const allowedClasses = ['cms-gallery', 'single', 'cols-2', 'cols-3', 'align-left', 'align-center', 'align-right', 'size-sm', 'size-md', 'cms-image-grid', 'grid2', 'grid3', 'cms-slider', 'cms-slider-track', 'cms-slider-btn', 'prev', 'next'];
     const normalized = className
       .split(' ')
       .filter((item) => allowedClasses.includes(item))
@@ -250,9 +260,24 @@ function CmsHtmlContent({ html }: { html: string }) {
         className="cms-content"
         onClick={(event) => {
           const target = event.target as HTMLElement | null;
+          const sliderButton = target?.closest('button.cms-slider-btn') as HTMLButtonElement | null;
+          if (sliderButton) {
+            event.preventDefault();
+            const sliderRoot = sliderButton.closest('.cms-slider');
+            const track = sliderRoot?.querySelector('.cms-slider-track') as HTMLElement | null;
+            if (!sliderRoot || !track) return;
+            const slides = track.querySelectorAll('figure');
+            if (!slides.length) return;
+            const current = Number(sliderRoot.getAttribute('data-active-index') || '0');
+            const direction = sliderButton.classList.contains('next') ? 1 : -1;
+            const next = (current + direction + slides.length) % slides.length;
+            sliderRoot.setAttribute('data-active-index', String(next));
+            track.style.transform = `translateX(-${next * 100}%)`;
+            return;
+          }
           if (!target || target.tagName !== 'IMG') return;
           const img = target as HTMLImageElement;
-          const galleryRoot = img.closest('.cms-gallery, .cms-image-grid');
+          const galleryRoot = img.closest('.cms-gallery, .cms-image-grid, .cms-slider-track');
           const images = galleryRoot
             ? Array.from(galleryRoot.querySelectorAll('img')).map((node) => (node as HTMLImageElement).src).filter(Boolean)
             : [img.src];
@@ -1677,10 +1702,29 @@ function BathsPage() {
 }
 
 const LAND_FALLBACK: LandPlot[] = [
-  { id: 'land1', cadastralNumber: '58:29:1003001:254', area: '10 соток', price: '1 250 000 ₽', district: 'Пензенский район', image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80' },
-  { id: 'land2', cadastralNumber: '58:29:1003001:255', area: '12 соток', price: '1 480 000 ₽', district: 'Бессоновский район', image: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1200&q=80' },
-  { id: 'land3', cadastralNumber: '58:29:1003001:256', area: '8 соток', price: '980 000 ₽', district: 'Железнодорожный район', image: 'https://images.unsplash.com/photo-1493815793585-d94ccbc86df8?auto=format&fit=crop&w=1200&q=80' }
+  { id: 'land1', cadastralNumber: '58:29:1003001:254', area: '10 соток', price: '1 250 000 ₽', district: 'Пензенский район', images: ['https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80'] },
+  { id: 'land2', cadastralNumber: '58:29:1003001:255', area: '12 соток', price: '1 480 000 ₽', district: 'Бессоновский район', images: ['https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1200&q=80'] },
+  { id: 'land3', cadastralNumber: '58:29:1003001:256', area: '8 соток', price: '980 000 ₽', district: 'Железнодорожный район', images: ['https://images.unsplash.com/photo-1493815793585-d94ccbc86df8?auto=format&fit=crop&w=1200&q=80'] }
 ];
+
+function LandCardImageSlider({ land }: { land: LandPlot }) {
+  const images = (land.images || []).length ? (land.images || []) : [LAND_IMAGE_FALLBACK];
+  const [activeIndex, setActiveIndex] = useState(0);
+  const safeImage = resolveMediaUrl(images[activeIndex] || LAND_IMAGE_FALLBACK);
+  const hasMultiple = images.length > 1;
+
+  return (
+    <div className="land-image-slider">
+      <div className="project-image" style={{ backgroundImage: `url(${safeImage})` }} />
+      {hasMultiple ? (
+        <div className="land-slider-controls">
+          <button type="button" onClick={() => setActiveIndex((prev) => (prev - 1 + images.length) % images.length)} aria-label="Предыдущее фото">←</button>
+          <button type="button" onClick={() => setActiveIndex((prev) => (prev + 1) % images.length)} aria-label="Следующее фото">→</button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 function LandsPage() {
   const [lands, setLands] = useState<LandPlot[]>(LAND_FALLBACK);
@@ -1777,11 +1821,14 @@ function LandsPage() {
             <div className="catalog-grid">
               {filtered.map((item) => (
                 <article className="project-card land-card" key={item.id}>
-                  <div className="project-image" style={{ backgroundImage: `url(${resolveMediaUrl(item.image || '') || 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80'})` }} />
+                  <LandCardImageSlider land={item} />
                   <div className="project-content">
                     <h3>{item.cadastralNumber}</h3>
                     <p className="project-desc">Площадь: {item.area}</p>
                     <p className="project-desc">Район: {item.district}</p>
+                    {item.mapUrl ? (
+                      <p className="project-desc">Карта: <a href={item.mapUrl} target="_blank" rel="noreferrer">Открыть</a></p>
+                    ) : null}
                     <div className="land-card-actions">
                       <strong className="project-price">{item.price}</strong>
                       <button className="project-cta" onClick={() => setActiveLand(item)}>Оставить заявку</button>
@@ -2383,6 +2430,44 @@ function AdminPage() {
     await loadAdminData(token);
   };
 
+  const uploadLandImages = async (files: File[]) => {
+    if (!files.length) return;
+    setError('');
+    setUploadStatus('Загрузка фото участка...');
+    const formData = new FormData();
+    files.forEach((file) => formData.append('images', file));
+    const response = await fetch(`${API_BASE}/api/admin/upload/project-image?target=gallery`, {
+      method: 'POST',
+      headers: { 'x-admin-token': token },
+      body: formData
+    });
+    if (!response.ok) {
+      setUploadStatus('');
+      setError('Не удалось загрузить фото участка');
+      return;
+    }
+    const payload = (await response.json()) as { urls: string[] };
+    setLandDraft((prev) => ({ ...prev, images: [...(prev.images || []), ...(payload.urls || [])] }));
+    setUploadStatus('Фото участка загружены');
+  };
+
+  const removeLandImageFromDraft = async (index: number) => {
+    const currentImages = landDraft.images || [];
+    const removed = currentImages[index];
+    if (!removed) return;
+    setLandDraft((prev) => ({ ...prev, images: (prev.images || []).filter((_, idx) => idx !== index) }));
+    await deleteProjectImage(removed);
+  };
+
+  const moveLandDraftImage = (index: number, direction: -1 | 1) => {
+    const current = [...(landDraft.images || [])];
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= current.length) return;
+    const [item] = current.splice(index, 1);
+    current.splice(targetIndex, 0, item);
+    setLandDraft((prev) => ({ ...prev, images: current }));
+  };
+
   const removeProject = async (id: string) => {
     const currentProject = projects.find((item) => item.id === id);
     const projectImages = [currentProject?.coverImage, ...(currentProject?.images || [])].filter(Boolean) as string[];
@@ -2516,6 +2601,41 @@ function AdminPage() {
       setPageDraft({ ...pageDraft, content: sanitizeCmsHtml(`${pageDraft.content || ''}${imagesHtml}`) });
     }
     setUploadStatus('Фото-блок добавлен в страницу');
+  };
+
+  const uploadPageSlider = async (files: File[]) => {
+    if (!files.length || !pageDraft) return;
+    setUploadStatus('Загрузка изображений для слайдера...');
+    const formData = new FormData();
+    files.forEach((file) => formData.append('images', file));
+    const response = await fetch(`${API_BASE}/api/admin/upload/page-image`, {
+      method: 'POST',
+      headers: { 'x-admin-token': token },
+      body: formData
+    });
+    if (!response.ok) {
+      setUploadStatus('');
+      setError('Не удалось загрузить фото для слайдера');
+      return;
+    }
+    const payload = (await response.json()) as { urls: string[] };
+    const imageUrls = payload.urls || [];
+    if (!imageUrls.length) return;
+    const sliderHtml = `<div class="cms-slider" data-active-index="0"><button class="cms-slider-btn prev" type="button" aria-label="Предыдущее фото">‹</button><div class="cms-slider-track">${imageUrls.map((url) => `<figure><img src="${url}" alt="Слайд страницы" /></figure>`).join('')}</div><button class="cms-slider-btn next" type="button" aria-label="Следующее фото">›</button></div>`;
+
+    if (imageInsertMode === 'cursor') {
+      const editor = document.getElementById('cms-page-editor');
+      if (editor) {
+        editor.focus();
+        document.execCommand('insertHTML', false, sliderHtml);
+        setPageDraft({ ...pageDraft, content: sanitizeCmsHtml(editor.innerHTML) });
+      }
+    } else if (imageInsertMode === 'start') {
+      setPageDraft({ ...pageDraft, content: sanitizeCmsHtml(`${sliderHtml}${pageDraft.content || ''}`) });
+    } else {
+      setPageDraft({ ...pageDraft, content: sanitizeCmsHtml(`${pageDraft.content || ''}${sliderHtml}`) });
+    }
+    setUploadStatus('Слайдер добавлен в страницу');
   };
 
   const applyPageFormat = (command: string) => {
@@ -2817,7 +2937,31 @@ function AdminPage() {
           <input placeholder="Площадь" value={landDraft.area || ''} onChange={(e) => setLandDraft({ ...landDraft, area: e.target.value })} />
           <input placeholder="Цена" value={landDraft.price || ''} onChange={(e) => setLandDraft({ ...landDraft, price: e.target.value })} />
           <input placeholder="Район" value={landDraft.district || ''} onChange={(e) => setLandDraft({ ...landDraft, district: e.target.value })} />
-          <input placeholder="Ссылка на фото" value={landDraft.image || ''} onChange={(e) => setLandDraft({ ...landDraft, image: e.target.value })} />
+          <input placeholder="Карта: ссылка" value={landDraft.mapUrl || ''} onChange={(e) => setLandDraft({ ...landDraft, mapUrl: e.target.value })} />
+          <textarea
+            rows={2}
+            placeholder="Ссылки на фото (через запятую)"
+            value={Array.isArray(landDraft.images) ? landDraft.images.join(', ') : ''}
+            onChange={(e) => setLandDraft({ ...landDraft, images: e.target.value.split(',').map((v) => v.trim()).filter(Boolean) })}
+          />
+          <label>Загрузить фото участка (можно несколько)<input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadLandImages(files); e.currentTarget.value = ''; }} /></label>
+          {(landDraft.images || []).length ? (
+            <div className="admin-media-preview">
+              <p>Фотографии участка</p>
+              <div className="admin-images-grid">
+                {(landDraft.images || []).map((img, index) => (
+                  <div key={`${img}_${index}`} className="admin-image-card">
+                    <img src={resolveMediaUrl(img)} alt={`Фото участка ${index + 1}`} />
+                    <div className="admin-image-actions">
+                      <button type="button" onClick={() => moveLandDraftImage(index, -1)}>←</button>
+                      <button type="button" onClick={() => moveLandDraftImage(index, 1)}>→</button>
+                      <button type="button" onClick={() => removeLandImageFromDraft(index)}>Удалить</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
           <button onClick={saveLand}>{landDraft.id ? 'Сохранить изменения' : 'Добавить участок'}</button>
           {landDraft.id ? <button onClick={() => setLandDraft({})}>Отменить</button> : null}
         </div>
@@ -2830,6 +2974,7 @@ function AdminPage() {
               <div>
                 <strong>{item.cadastralNumber}</strong>
                 <p>{item.area} • {item.district} • {item.price}</p>
+                {item.mapUrl ? <small>Карта: {item.mapUrl}</small> : null}
               </div>
               <div className="actions">
                 <button onClick={() => setLandDraft(item)}>Изменить</button>
@@ -2883,6 +3028,7 @@ function AdminPage() {
               <option value="md">Стандартный размер</option>
             </select>
             <label>Фото-блок<input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadPageImage(files); e.currentTarget.value = ''; }} /></label>
+            <label>Слайдер<input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length > 1) uploadPageSlider(files); else setError('Для слайдера нужно минимум 2 изображения'); e.currentTarget.value = ''; }} /></label>
           </div>
           <div
             id="cms-page-editor"
@@ -3083,7 +3229,7 @@ function AppLayout({ children }: { children: ReactNode }) {
 
 function App() {
   const url = new URL(window.location.href);
-  const pathname = window.location.pathname;
+  const pathname = normalizePathname(window.location.pathname);
   const serviceSlug = pathname.startsWith('/services/') ? pathname.replace('/services/', '') : '';
   const discountSlug = pathname.startsWith('/discounts/') ? pathname.replace('/discounts/', '') : '';
   const furniturePage = FURNITURE_LEAF_PAGES.find((item) => item.href === pathname);

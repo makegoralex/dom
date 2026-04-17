@@ -205,6 +205,9 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .project-price {display:block; margin:16px auto 0; width:max-content; padding:12px 28px; border:1px solid #2d2f33; border-radius:8px; font-size:20px; font-weight:700; color:#232832;}
 .project-cta{width:calc(100% - 24px); margin:0 12px 12px; border:none; background:#eb7b17; color:#fff; padding:10px 12px; font-weight:700; cursor:pointer;}
 .land-card .project-content{display:grid; gap:8px;}
+.land-image-slider{position:relative;}
+.land-slider-controls{position:absolute; inset:auto 10px 10px auto; display:flex; gap:6px;}
+.land-slider-controls button{border:1px solid rgba(255,255,255,.7); background:rgba(17,24,34,.62); color:#fff; width:34px; height:30px; cursor:pointer;}
 .land-card-actions{display:grid; grid-template-columns:1fr 1fr; gap:8px; align-items:center;}
 .land-card .project-price,.land-card .project-cta{margin:0; width:100%; text-align:center; padding:10px 12px;}
 
@@ -583,6 +586,13 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .cms-gallery.align-left { margin-right: auto; }
 .cms-gallery.align-center { margin-left: auto; margin-right: auto; }
 .cms-gallery.align-right { margin-left: auto; }
+.cms-slider{position:relative; overflow:hidden; border-radius:12px; margin:14px auto; max-width:980px; background:#f3f5f8;}
+.cms-slider-track{display:flex; transition:transform .35s ease;}
+.cms-slider-track figure{min-width:100%; margin:0;}
+.cms-slider-track img{width:100%; aspect-ratio:16/9; object-fit:cover; display:block; cursor:zoom-in;}
+.cms-slider-btn{position:absolute; top:50%; transform:translateY(-50%); border:none; width:40px; height:40px; border-radius:999px; background:rgba(0,0,0,.48); color:#fff; cursor:pointer; z-index:2; font-size:20px; line-height:1;}
+.cms-slider-btn.prev{left:12px;}
+.cms-slider-btn.next{right:12px;}
 
 .cms-lightbox{position:fixed; inset:0; background:rgba(13,20,30,.86); z-index:1200; display:flex; align-items:center; justify-content:center; padding:24px;}
 .cms-lightbox-inner{position:relative; max-width:min(1100px,96vw); max-height:90vh;}
@@ -599,6 +609,7 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .cms-gallery.cols-3,
   .cms-image-grid.grid2,
   .cms-image-grid.grid3 { grid-template-columns: 1fr; }
+  .cms-slider-btn{width:34px; height:34px;}
   .cms-lightbox-nav.prev{left:4px;}
   .cms-lightbox-nav.next{right:4px;}
 }
