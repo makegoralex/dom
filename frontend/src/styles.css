@@ -205,6 +205,9 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .project-price {display:block; margin:16px auto 0; width:max-content; padding:12px 28px; border:1px solid #2d2f33; border-radius:8px; font-size:20px; font-weight:700; color:#232832;}
 .project-cta{width:calc(100% - 24px); margin:0 12px 12px; border:none; background:#eb7b17; color:#fff; padding:10px 12px; font-weight:700; cursor:pointer;}
 .land-card .project-content{display:grid; gap:8px;}
+.land-image-slider{position:relative;}
+.land-slider-controls{position:absolute; inset:auto 10px 10px auto; display:flex; gap:6px;}
+.land-slider-controls button{border:1px solid rgba(255,255,255,.7); background:rgba(17,24,34,.62); color:#fff; width:34px; height:30px; cursor:pointer;}
 .land-card-actions{display:grid; grid-template-columns:1fr 1fr; gap:8px; align-items:center;}
 .land-card .project-price,.land-card .project-cta{margin:0; width:100%; text-align:center; padding:10px 12px;}
 
