@@ -813,11 +813,16 @@ function PublicPage() {
   const catalogProjects = useMemo(() => filteredProjects.slice(0, 9), [filteredProjects]);
   const homepageProjects = projects.length ? projects : FALLBACK_PROJECTS;
   const heroImage = resolveMediaUrl(homepageProjects[0]?.coverImage || homepageProjects[0]?.images?.[0] || '');
-  const offerImage = (index: number) => resolveMediaUrl(
-    homepageProjects[index % homepageProjects.length]?.coverImage ||
-    homepageProjects[index % homepageProjects.length]?.images?.[0] ||
-    ''
+  const offerTypes = ['Модульные', 'Каркасные', 'Из газобетона'] as const;
+  const offerProjects = useMemo(
+    () => offerTypes.map((type) => homepageProjects.find((project) => project.constructionType === type)).filter(Boolean) as HouseProject[],
+    [homepageProjects]
   );
+  const offerImage = (index: number) => {
+    const sourceProjects = offerProjects.length ? offerProjects : homepageProjects;
+    const project = sourceProjects[index % sourceProjects.length];
+    return resolveMediaUrl(project?.coverImage || project?.images?.[0] || '');
+  };
 
   const submitLead = async (event: FormEvent) => {
     event.preventDefault();
