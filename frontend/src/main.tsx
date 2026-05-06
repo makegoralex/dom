@@ -813,11 +813,51 @@ function PublicPage() {
   const catalogProjects = useMemo(() => filteredProjects.slice(0, 9), [filteredProjects]);
   const homepageProjects = projects.length ? projects : FALLBACK_PROJECTS;
   const heroImage = resolveMediaUrl(homepageProjects[0]?.coverImage || homepageProjects[0]?.images?.[0] || '');
-  const offerImage = (index: number) => resolveMediaUrl(
-    homepageProjects[index % homepageProjects.length]?.coverImage ||
-    homepageProjects[index % homepageProjects.length]?.images?.[0] ||
-    ''
-  );
+  const offerTypes = ['Модульные', 'Каркасные', 'Из газобетона'] as const;
+  const offerProjects = useMemo(() => {
+    const groupedByType = offerTypes.map((type) => homepageProjects.filter((project) => project.constructionType === type));
+    const selected: HouseProject[] = [];
+    const usedIds = new Set<number>();
+    let cursor = 0;
+
+    while (selected.length < 6) {
+      let added = false;
+      for (const group of groupedByType) {
+        const candidate = group[cursor];
+        if (candidate && !usedIds.has(candidate.id)) {
+          selected.push(candidate);
+          usedIds.add(candidate.id);
+          added = true;
+          if (selected.length === 6) {
+            break;
+          }
+        }
+      }
+      if (!added) {
+        break;
+      }
+      cursor += 1;
+    }
+
+    if (selected.length < 6) {
+      for (const project of homepageProjects) {
+        if (!usedIds.has(project.id)) {
+          selected.push(project);
+          usedIds.add(project.id);
+          if (selected.length === 6) {
+            break;
+          }
+        }
+      }
+    }
+
+    return selected;
+  }, [homepageProjects]);
+  const offerImage = (index: number) => {
+    const sourceProjects = offerProjects.length ? offerProjects : homepageProjects;
+    const project = sourceProjects[index % sourceProjects.length];
+    return resolveMediaUrl(project?.coverImage || project?.images?.[0] || '');
+  };
 
   const submitLead = async (event: FormEvent) => {
     event.preventDefault();
