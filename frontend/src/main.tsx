@@ -814,10 +814,45 @@ function PublicPage() {
   const homepageProjects = projects.length ? projects : FALLBACK_PROJECTS;
   const heroImage = resolveMediaUrl(homepageProjects[0]?.coverImage || homepageProjects[0]?.images?.[0] || '');
   const offerTypes = ['Модульные', 'Каркасные', 'Из газобетона'] as const;
-  const offerProjects = useMemo(
-    () => offerTypes.map((type) => homepageProjects.find((project) => project.constructionType === type)).filter(Boolean) as HouseProject[],
-    [homepageProjects]
-  );
+  const offerProjects = useMemo(() => {
+    const groupedByType = offerTypes.map((type) => homepageProjects.filter((project) => project.constructionType === type));
+    const selected: HouseProject[] = [];
+    const usedIds = new Set<number>();
+    let cursor = 0;
+
+    while (selected.length < 6) {
+      let added = false;
+      for (const group of groupedByType) {
+        const candidate = group[cursor];
+        if (candidate && !usedIds.has(candidate.id)) {
+          selected.push(candidate);
+          usedIds.add(candidate.id);
+          added = true;
+          if (selected.length === 6) {
+            break;
+          }
+        }
+      }
+      if (!added) {
+        break;
+      }
+      cursor += 1;
+    }
+
+    if (selected.length < 6) {
+      for (const project of homepageProjects) {
+        if (!usedIds.has(project.id)) {
+          selected.push(project);
+          usedIds.add(project.id);
+          if (selected.length === 6) {
+            break;
+          }
+        }
+      }
+    }
+
+    return selected;
+  }, [homepageProjects]);
   const offerImage = (index: number) => {
     const sourceProjects = offerProjects.length ? offerProjects : homepageProjects;
     const project = sourceProjects[index % sourceProjects.length];
