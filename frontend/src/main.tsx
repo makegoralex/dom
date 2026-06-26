@@ -25,8 +25,15 @@ type LandPlot = {
   area: string;
   price: string;
   district: string;
+  description?: string;
   images?: string[];
   mapUrl?: string;
+};
+
+type PendingLandPlot = LandPlot & {
+  sellerName: string;
+  sellerPhone: string;
+  createdAt: string;
 };
 
 type Lead = {
@@ -84,7 +91,7 @@ type MenuItem = {
   children?: MenuChildItem[];
   active?: boolean;
 };
-type AdminTab = 'projects' | 'lands' | 'pages' | 'portfolio' | 'leads' | 'settings';
+type AdminTab = 'projects' | 'lands' | 'landRequests' | 'pages' | 'portfolio' | 'leads' | 'settings';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 const API_ORIGIN = API_BASE ? new URL(API_BASE, window.location.origin).origin : '';
@@ -1788,8 +1795,13 @@ function LandsPage() {
   const [activeLand, setActiveLand] = useState<LandPlot | null>(null);
   const [sellerName, setSellerName] = useState('');
   const [sellerPhone, setSellerPhone] = useState('');
-  const [sellerAddress, setSellerAddress] = useState('');
-  const [sellerComment, setSellerComment] = useState('');
+  const [sellerCadastralNumber, setSellerCadastralNumber] = useState('');
+  const [sellerArea, setSellerArea] = useState('');
+  const [sellerPrice, setSellerPrice] = useState('');
+  const [sellerDistrict, setSellerDistrict] = useState('');
+  const [sellerDescription, setSellerDescription] = useState('');
+  const [sellerMapUrl, setSellerMapUrl] = useState('');
+  const [sellerPhotos, setSellerPhotos] = useState<File[]>([]);
   const [sellerStatus, setSellerStatus] = useState('');
   const [openSellLand, setOpenSellLand] = useState(false);
   useEffect(() => {
@@ -1820,21 +1832,33 @@ function LandsPage() {
     event.preventDefault();
     setSellerStatus('Отправка...');
     try {
-      const response = await fetch(`${API_BASE}/api/leads`, {
+      const response = await fetch(`${API_BASE}/api/land-submissions`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: sellerName,
-          phone: sellerPhone,
-          message: `Продать свою землю. Адрес: ${sellerAddress}. Комментарий: ${sellerComment}`
-        })
+        body: (() => {
+          const formData = new FormData();
+          formData.append('sellerName', sellerName);
+          formData.append('sellerPhone', sellerPhone);
+          formData.append('cadastralNumber', sellerCadastralNumber);
+          formData.append('area', sellerArea);
+          formData.append('price', sellerPrice);
+          formData.append('district', sellerDistrict);
+          formData.append('description', sellerDescription);
+          formData.append('mapUrl', sellerMapUrl);
+          sellerPhotos.forEach((file) => formData.append('images', file));
+          return formData;
+        })()
       });
       if (!response.ok) throw new Error('bad');
       setSellerStatus('Спасибо! Свяжемся с вами.');
       setSellerName('');
       setSellerPhone('');
-      setSellerAddress('');
-      setSellerComment('');
+      setSellerCadastralNumber('');
+      setSellerArea('');
+      setSellerPrice('');
+      setSellerDistrict('');
+      setSellerDescription('');
+      setSellerMapUrl('');
+      setSellerPhotos([]);
     } catch {
       setSellerStatus('Не удалось отправить заявку.');
     }
@@ -1880,6 +1904,7 @@ function LandsPage() {
                     <h3>{item.cadastralNumber}</h3>
                     <p className="project-desc">Площадь: {item.area}</p>
                     <p className="project-desc">Район: {item.district}</p>
+                    {item.description ? <p className="project-desc">Описание: {item.description}</p> : null}
                     {item.mapUrl ? (
                       <p className="project-desc">Карта: <a href={item.mapUrl} target="_blank" rel="noreferrer">Открыть</a></p>
                     ) : null}
@@ -1918,8 +1943,14 @@ function LandsPage() {
                   required
                 />
               </label>
-              <label>Адрес участка<input value={sellerAddress} onChange={(e) => setSellerAddress(e.target.value)} required /></label>
-              <label>Комментарий<textarea value={sellerComment} onChange={(e) => setSellerComment(e.target.value)} rows={3} /></label>
+              <label>Кадастровый номер<input value={sellerCadastralNumber} onChange={(e) => setSellerCadastralNumber(e.target.value)} required /></label>
+              <label>Площадь<input value={sellerArea} onChange={(e) => setSellerArea(e.target.value)} required /></label>
+              <label>Цена<input value={sellerPrice} onChange={(e) => setSellerPrice(e.target.value)} required /></label>
+              <label>Район<input value={sellerDistrict} onChange={(e) => setSellerDistrict(e.target.value)} required /></label>
+              <label>Описание<textarea value={sellerDescription} onChange={(e) => setSellerDescription(e.target.value)} rows={3} required /></label>
+              <label>Карта: ссылка<input value={sellerMapUrl} onChange={(e) => setSellerMapUrl(e.target.value)} /></label>
+              <label>Фото участка<input type="file" multiple accept="image/*" onChange={(e) => setSellerPhotos(Array.from(e.target.files || []))} required /></label>
+              {sellerPhotos.length ? <small>Выбрано фото: {sellerPhotos.length}</small> : null}
               <button type="submit">Отправить заявку</button>
               {sellerStatus ? <small>{sellerStatus}</small> : null}
             </form>
@@ -2364,6 +2395,7 @@ function AdminPage() {
   const [token, setToken] = useState('');
   const [projects, setProjects] = useState<HouseProject[]>([]);
   const [lands, setLands] = useState<LandPlot[]>([]);
+  const [pendingLands, setPendingLands] = useState<PendingLandPlot[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [pages, setPages] = useState<ContentPage[]>([]);
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
@@ -2391,9 +2423,10 @@ function AdminPage() {
   );
 
   const loadAdminData = async (currentToken: string) => {
-    const [projectsRes, landsRes, leadsRes, pagesRes, portfolioRes, menuOrderRes, siteSettingsRes] = await Promise.all([
+    const [projectsRes, landsRes, pendingLandsRes, leadsRes, pagesRes, portfolioRes, menuOrderRes, siteSettingsRes] = await Promise.all([
       fetch(`${API_BASE}/api/admin/projects`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/lands`, { headers: { 'x-admin-token': currentToken } }),
+      fetch(`${API_BASE}/api/admin/pending-lands`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/leads`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/pages`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/portfolio`, { headers: { 'x-admin-token': currentToken } }),
@@ -2401,7 +2434,7 @@ function AdminPage() {
       fetch(`${API_BASE}/api/admin/site-settings`, { headers: { 'x-admin-token': currentToken } })
     ]);
 
-    if (!projectsRes.ok || !landsRes.ok || !leadsRes.ok || !pagesRes.ok || !portfolioRes.ok || !menuOrderRes.ok || !siteSettingsRes.ok) {
+    if (!projectsRes.ok || !landsRes.ok || !pendingLandsRes.ok || !leadsRes.ok || !pagesRes.ok || !portfolioRes.ok || !menuOrderRes.ok || !siteSettingsRes.ok) {
       setError('Не удалось загрузить данные админки');
       return;
     }
@@ -2409,6 +2442,7 @@ function AdminPage() {
     const pagesPayload = (await pagesRes.json()) as ContentPage[];
     setProjects(await projectsRes.json());
     setLands(await landsRes.json());
+    setPendingLands(await pendingLandsRes.json());
     setLeads(await leadsRes.json());
     setPages(pagesPayload);
     setPortfolio(await portfolioRes.json());
@@ -2872,6 +2906,7 @@ function AdminPage() {
       <div className="admin-tabs">
         <button className={activeTab === 'projects' ? 'active' : ''} onClick={() => setActiveTab('projects')}>Проекты</button>
         <button className={activeTab === 'lands' ? 'active' : ''} onClick={() => setActiveTab('lands')}>Земля</button>
+        <button className={activeTab === 'landRequests' ? 'active' : ''} onClick={() => setActiveTab('landRequests')}>Заявки на землю ({pendingLands.length})</button>
         <button className={activeTab === 'pages' ? 'active' : ''} onClick={() => setActiveTab('pages')}>Страницы</button>
         <button className={activeTab === 'settings' ? 'active' : ''} onClick={() => setActiveTab('settings')}>Настройки</button>
         <button className={activeTab === 'portfolio' ? 'active' : ''} onClick={() => setActiveTab('portfolio')}>Портфолио</button>
@@ -2991,6 +3026,7 @@ function AdminPage() {
           <input placeholder="Площадь" value={landDraft.area || ''} onChange={(e) => setLandDraft({ ...landDraft, area: e.target.value })} />
           <input placeholder="Цена" value={landDraft.price || ''} onChange={(e) => setLandDraft({ ...landDraft, price: e.target.value })} />
           <input placeholder="Район" value={landDraft.district || ''} onChange={(e) => setLandDraft({ ...landDraft, district: e.target.value })} />
+          <textarea rows={3} placeholder="Описание" value={landDraft.description || ''} onChange={(e) => setLandDraft({ ...landDraft, description: e.target.value })} />
           <input placeholder="Карта: ссылка" value={landDraft.mapUrl || ''} onChange={(e) => setLandDraft({ ...landDraft, mapUrl: e.target.value })} />
           <textarea
             rows={2}
@@ -3028,6 +3064,7 @@ function AdminPage() {
               <div>
                 <strong>{item.cadastralNumber}</strong>
                 <p>{item.area} • {item.district} • {item.price}</p>
+                {item.description ? <small>{item.description}</small> : null}
                 {item.mapUrl ? <small>Карта: {item.mapUrl}</small> : null}
               </div>
               <div className="actions">
@@ -3038,6 +3075,28 @@ function AdminPage() {
           ))}
         </div>
       </section></div> : null}
+
+
+      {activeTab === 'landRequests' ? <section>
+        <h2>Заявки на публикацию земли ({pendingLands.length})</h2>
+        <div className="list">
+          {pendingLands.map((item) => (
+            <div key={item.id} className="list-item">
+              <div>
+                <strong>{item.cadastralNumber}</strong>
+                <p>{item.area} • {item.district} • {item.price}</p>
+                <p>Продавец: {item.sellerName}, {item.sellerPhone}</p>
+                {item.description ? <small>{item.description}</small> : null}
+                {(item.images || []).length ? <small>Фото: {(item.images || []).length}</small> : null}
+              </div>
+              <div className="actions">
+                <button onClick={async () => { await fetch(`${API_BASE}/api/admin/pending-lands/${item.id}/approve`, { method: 'POST', headers: adminHeaders }); await loadAdminData(token); }}>Одобрить</button>
+                <button onClick={async () => { await fetch(`${API_BASE}/api/admin/pending-lands/${item.id}`, { method: 'DELETE', headers: adminHeaders }); await loadAdminData(token); }}>Отклонить</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section> : null}
 
       {activeTab === 'pages' ? <section>
         <h2>Внутренние страницы</h2>
