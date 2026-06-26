@@ -2396,6 +2396,7 @@ function AdminPage() {
   const [projects, setProjects] = useState<HouseProject[]>([]);
   const [lands, setLands] = useState<LandPlot[]>([]);
   const [pendingLands, setPendingLands] = useState<PendingLandPlot[]>([]);
+  const [pendingLandDraft, setPendingLandDraft] = useState<PendingLandPlot | null>(null);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [pages, setPages] = useState<ContentPage[]>([]);
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
@@ -2554,6 +2555,97 @@ function AdminPage() {
     const [item] = current.splice(index, 1);
     current.splice(targetIndex, 0, item);
     setLandDraft((prev) => ({ ...prev, images: current }));
+  };
+
+
+  const savePendingLand = async () => {
+    if (!pendingLandDraft) return false;
+    if (!pendingLandDraft.cadastralNumber) {
+      setError('Кадастровый номер обязателен');
+      return false;
+    }
+    const response = await fetch(`${API_BASE}/api/admin/pending-lands/${pendingLandDraft.id}`, {
+      method: 'PUT',
+      headers: adminHeaders,
+      body: JSON.stringify(pendingLandDraft)
+    });
+    if (!response.ok) {
+      setError('Не удалось сохранить изменения в заявке');
+      return false;
+    }
+    const updated = (await response.json()) as PendingLandPlot;
+    setPendingLandDraft(updated);
+    setUploadStatus('Изменения в заявке сохранены');
+    await loadAdminData(token);
+    return true;
+  };
+
+  const approvePendingLand = async () => {
+    if (!pendingLandDraft) return;
+    const saved = await savePendingLand();
+    if (!saved) return;
+    const response = await fetch(`${API_BASE}/api/admin/pending-lands/${pendingLandDraft.id}/approve`, {
+      method: 'POST',
+      headers: adminHeaders
+    });
+    if (!response.ok) {
+      setError('Не удалось одобрить заявку');
+      return;
+    }
+    setPendingLandDraft(null);
+    setUploadStatus('Заявка одобрена и опубликована на странице «Земля»');
+    await loadAdminData(token);
+  };
+
+  const rejectPendingLand = async (id: string) => {
+    const response = await fetch(`${API_BASE}/api/admin/pending-lands/${id}`, {
+      method: 'DELETE',
+      headers: adminHeaders
+    });
+    if (!response.ok) {
+      setError('Не удалось отклонить заявку');
+      return;
+    }
+    if (pendingLandDraft?.id === id) setPendingLandDraft(null);
+    await loadAdminData(token);
+  };
+
+  const uploadPendingLandImages = async (files: File[]) => {
+    if (!files.length || !pendingLandDraft) return;
+    setError('');
+    setUploadStatus('Загрузка фото для заявки...');
+    const formData = new FormData();
+    files.forEach((file) => formData.append('images', file));
+    const response = await fetch(`${API_BASE}/api/admin/upload/project-image?target=gallery`, {
+      method: 'POST',
+      headers: { 'x-admin-token': token },
+      body: formData
+    });
+    if (!response.ok) {
+      setUploadStatus('');
+      setError(await getApiErrorMessage(response, 'Не удалось загрузить фото для заявки'));
+      return;
+    }
+    const payload = (await response.json()) as { urls: string[] };
+    setPendingLandDraft((prev) => prev ? { ...prev, images: [...(prev.images || []), ...(payload.urls || [])] } : prev);
+    setUploadStatus('Фото добавлены в заявку. Не забудьте сохранить изменения.');
+  };
+
+  const removePendingLandImage = async (index: number) => {
+    if (!pendingLandDraft) return;
+    const removed = pendingLandDraft.images?.[index];
+    setPendingLandDraft({ ...pendingLandDraft, images: (pendingLandDraft.images || []).filter((_, idx) => idx !== index) });
+    if (removed) await deleteProjectImage(removed);
+  };
+
+  const movePendingLandImage = (index: number, direction: -1 | 1) => {
+    if (!pendingLandDraft) return;
+    const current = [...(pendingLandDraft.images || [])];
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= current.length) return;
+    const [item] = current.splice(index, 1);
+    current.splice(targetIndex, 0, item);
+    setPendingLandDraft({ ...pendingLandDraft, images: current });
   };
 
   const removeProject = async (id: string) => {
@@ -3077,7 +3169,7 @@ function AdminPage() {
       </section></div> : null}
 
 
-      {activeTab === 'landRequests' ? <section>
+      {activeTab === 'landRequests' ? <div className="admin-grid"><section>
         <h2>Заявки на публикацию земли ({pendingLands.length})</h2>
         <div className="list">
           {pendingLands.map((item) => (
@@ -3090,13 +3182,56 @@ function AdminPage() {
                 {(item.images || []).length ? <small>Фото: {(item.images || []).length}</small> : null}
               </div>
               <div className="actions">
-                <button onClick={async () => { await fetch(`${API_BASE}/api/admin/pending-lands/${item.id}/approve`, { method: 'POST', headers: adminHeaders }); await loadAdminData(token); }}>Одобрить</button>
-                <button onClick={async () => { await fetch(`${API_BASE}/api/admin/pending-lands/${item.id}`, { method: 'DELETE', headers: adminHeaders }); await loadAdminData(token); }}>Отклонить</button>
+                <button onClick={() => setPendingLandDraft(item)}>Подробнее / изменить</button>
+                <button onClick={() => rejectPendingLand(item.id)}>Отклонить</button>
               </div>
             </div>
           ))}
         </div>
-      </section> : null}
+      </section>
+      <section>
+        <h2>{pendingLandDraft ? 'Просмотр и правка заявки' : 'Выберите заявку'}</h2>
+        {pendingLandDraft ? (
+          <div className="admin-form">
+            <input placeholder="Контактное лицо" value={pendingLandDraft.sellerName} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, sellerName: e.target.value })} />
+            <input placeholder="Телефон" value={pendingLandDraft.sellerPhone} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, sellerPhone: e.target.value })} />
+            <input placeholder="Кадастровый номер" value={pendingLandDraft.cadastralNumber} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, cadastralNumber: e.target.value })} />
+            <input placeholder="Площадь" value={pendingLandDraft.area} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, area: e.target.value })} />
+            <input placeholder="Цена" value={pendingLandDraft.price} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, price: e.target.value })} />
+            <input placeholder="Район" value={pendingLandDraft.district} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, district: e.target.value })} />
+            <textarea rows={4} placeholder="Описание" value={pendingLandDraft.description || ''} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, description: e.target.value })} />
+            <input placeholder="Карта: ссылка" value={pendingLandDraft.mapUrl || ''} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, mapUrl: e.target.value })} />
+            <textarea
+              rows={2}
+              placeholder="Ссылки на фото (через запятую)"
+              value={Array.isArray(pendingLandDraft.images) ? pendingLandDraft.images.join(', ') : ''}
+              onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, images: e.target.value.split(',').map((v) => v.trim()).filter(Boolean) })}
+            />
+            <label>Добавить фото<input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadPendingLandImages(files); e.currentTarget.value = ''; }} /></label>
+            {(pendingLandDraft.images || []).length ? (
+              <div className="admin-media-preview">
+                <p>Фотографии заявки</p>
+                <div className="admin-images-grid">
+                  {(pendingLandDraft.images || []).map((img, index) => (
+                    <div key={`${img}_${index}`} className="admin-image-card">
+                      <img src={resolveMediaUrl(img)} alt={`Фото заявки ${index + 1}`} />
+                      <div className="admin-image-actions">
+                        <button type="button" onClick={() => movePendingLandImage(index, -1)}>←</button>
+                        <button type="button" onClick={() => movePendingLandImage(index, 1)}>→</button>
+                        <button type="button" onClick={() => removePendingLandImage(index)}>Удалить</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            <button onClick={savePendingLand}>Сохранить изменения</button>
+            <button onClick={approvePendingLand}>Одобрить и опубликовать</button>
+            <button onClick={() => rejectPendingLand(pendingLandDraft.id)}>Отклонить</button>
+            <button onClick={() => setPendingLandDraft(null)}>Закрыть</button>
+          </div>
+        ) : <p>Нажмите «Подробнее / изменить» у нужной заявки, чтобы увидеть все поля и фотографии.</p>}
+      </section></div> : null}
 
       {activeTab === 'pages' ? <section>
         <h2>Внутренние страницы</h2>

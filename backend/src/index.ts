@@ -663,6 +663,24 @@ app.delete('/api/admin/lands/:id', authMiddleware, (req, res) => {
   res.json({ ok: true });
 });
 
+
+app.put('/api/admin/pending-lands/:id', authMiddleware, (req, res) => {
+  const id = String(req.params.id);
+  const data = readData();
+  const idx = data.pendingLands.findIndex((item) => item.id === id);
+  if (idx === -1) return res.status(404).json({ message: 'Заявка не найдена' });
+  const incoming = req.body as Partial<PendingLandPlot> & { image?: string };
+  const normalizedLand = normalizeLandPlot({ ...data.pendingLands[idx], ...incoming, id }, id);
+  data.pendingLands[idx] = {
+    ...normalizedLand,
+    sellerName: incoming.sellerName || data.pendingLands[idx].sellerName,
+    sellerPhone: incoming.sellerPhone || data.pendingLands[idx].sellerPhone,
+    createdAt: data.pendingLands[idx].createdAt
+  };
+  writeData(data);
+  res.json(data.pendingLands[idx]);
+});
+
 app.post('/api/admin/pending-lands/:id/approve', authMiddleware, (req, res) => {
   const id = String(req.params.id);
   const data = readData();
