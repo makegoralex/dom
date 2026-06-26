@@ -39,8 +39,15 @@ interface LandPlot {
   area: string;
   price: string;
   district: string;
+  description?: string;
   images: string[];
   mapUrl?: string;
+}
+
+interface PendingLandPlot extends LandPlot {
+  sellerName: string;
+  sellerPhone: string;
+  createdAt: string;
 }
 
 interface ContentPage {
@@ -63,6 +70,7 @@ interface PortfolioItem {
 interface DataStore {
   projects: HouseProject[];
   lands: LandPlot[];
+  pendingLands: PendingLandPlot[];
   portfolio: PortfolioItem[];
   leads: Lead[];
   pages: Record<string, ContentPage>;
@@ -354,6 +362,7 @@ function normalizeLandPlot(incoming: Partial<LandPlot> & { image?: string }, fal
     area: incoming.area || '',
     price: incoming.price || '',
     district: incoming.district || '',
+    description: incoming.description || '',
     images,
     mapUrl: incoming.mapUrl || ''
   };
@@ -364,6 +373,7 @@ const ensureDataFile = (): void => {
     const initial: DataStore = {
       projects: seedProjects,
       lands: seedLands,
+      pendingLands: [],
       portfolio: seedPortfolio,
       leads: [],
       pages: seedPages,
@@ -383,6 +393,14 @@ const readData = (): DataStore => {
     lands: Array.isArray(parsed.lands) && parsed.lands.length
       ? parsed.lands.map((land) => normalizeLandPlot(land as Partial<LandPlot> & { image?: string }, (land as Partial<LandPlot>)?.id || `land_${Date.now()}`))
       : seedLands,
+    pendingLands: Array.isArray(parsed.pendingLands)
+      ? parsed.pendingLands.map((land) => ({
+          ...normalizeLandPlot(land as Partial<LandPlot> & { image?: string }, (land as Partial<LandPlot>)?.id || `pending_land_${Date.now()}`),
+          sellerName: String((land as Partial<PendingLandPlot>)?.sellerName || ''),
+          sellerPhone: String((land as Partial<PendingLandPlot>)?.sellerPhone || ''),
+          createdAt: String((land as Partial<PendingLandPlot>)?.createdAt || new Date().toISOString())
+        }))
+      : [],
     portfolio: parsed.portfolio || seedPortfolio,
     leads: parsed.leads || [],
     pages: { ...seedPages, ...(parsed.pages || {}) },
@@ -481,6 +499,57 @@ app.get('/api/projects', (_req, res) => {
   res.json(data.projects);
 });
 app.get('/api/lands', (_req, res) => res.json(readData().lands || seedLands));
+app.post('/api/land-submissions', upload.array('images', 20), async (req, res) => {
+  const { sellerName, sellerPhone, cadastralNumber, area, price, district, description, mapUrl } = req.body as Record<string, string>;
+  if (!sellerName || !sellerPhone || !cadastralNumber || !area || !price || !district || !description) {
+    return res.status(400).json({ message: 'Заполните все обязательные поля участка' });
+  }
+
+  const files = req.files as Express.Multer.File[] | undefined;
+  if (!files?.length) return res.status(400).json({ message: 'Добавьте хотя бы одно фото участка' });
+
+  try {
+    const images: string[] = [];
+    for (const file of files) {
+      const filename = `land_submission_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.webp`;
+      const outputPath = path.join(PROJECTS_ASSETS_DIR, filename);
+      await sharp(file.buffer)
+        .rotate()
+        .resize(1200, 900, { fit: 'cover', position: 'attention' })
+        .webp({ lossless: true, nearLossless: true, quality: 100 })
+        .toFile(outputPath);
+      images.push(`${req.protocol}://${req.get('host')}/api/assets/projects/${filename}`);
+    }
+
+    const data = readData();
+    const pendingLand: PendingLandPlot = {
+      id: `pending_land_${Date.now()}`,
+      sellerName,
+      sellerPhone,
+      cadastralNumber,
+      area,
+      price,
+      district,
+      description,
+      images,
+      mapUrl: mapUrl || '',
+      createdAt: new Date().toISOString()
+    };
+    data.pendingLands.unshift(pendingLand);
+    data.leads.unshift({
+      id: `lead_${Date.now()}`,
+      name: sellerName,
+      phone: sellerPhone,
+      message: `Продать свою землю. Кадастровый номер: ${cadastralNumber}. Площадь: ${area}. Район: ${district}. Цена: ${price}. Описание: ${description}`,
+      createdAt: pendingLand.createdAt
+    });
+    writeData(data);
+    res.status(201).json({ ok: true });
+  } catch (error) {
+    console.error('Не удалось обработать заявку на землю', error);
+    return res.status(500).json({ message: 'Не удалось обработать заявку' });
+  }
+});
 app.get('/api/portfolio', (_req, res) => res.json(readData().portfolio));
 
 app.get('/api/pages/:slug', (req, res) => {
@@ -523,6 +592,7 @@ app.post('/api/admin/login', (req, res) => {
 
 app.get('/api/admin/projects', authMiddleware, (_req, res) => res.json(readData().projects));
 app.get('/api/admin/lands', authMiddleware, (_req, res) => res.json(readData().lands || []));
+app.get('/api/admin/pending-lands', authMiddleware, (_req, res) => res.json(readData().pendingLands || []));
 app.post('/api/admin/projects', authMiddleware, (req, res) => {
   const incoming = req.body as Partial<HouseProject>;
   const data = readData();
@@ -589,6 +659,44 @@ app.delete('/api/admin/lands/:id', authMiddleware, (req, res) => {
   const id = String(req.params.id);
   const data = readData();
   data.lands = data.lands.filter((i) => i.id !== id);
+  writeData(data);
+  res.json({ ok: true });
+});
+
+
+app.put('/api/admin/pending-lands/:id', authMiddleware, (req, res) => {
+  const id = String(req.params.id);
+  const data = readData();
+  const idx = data.pendingLands.findIndex((item) => item.id === id);
+  if (idx === -1) return res.status(404).json({ message: 'Заявка не найдена' });
+  const incoming = req.body as Partial<PendingLandPlot> & { image?: string };
+  const normalizedLand = normalizeLandPlot({ ...data.pendingLands[idx], ...incoming, id }, id);
+  data.pendingLands[idx] = {
+    ...normalizedLand,
+    sellerName: incoming.sellerName || data.pendingLands[idx].sellerName,
+    sellerPhone: incoming.sellerPhone || data.pendingLands[idx].sellerPhone,
+    createdAt: data.pendingLands[idx].createdAt
+  };
+  writeData(data);
+  res.json(data.pendingLands[idx]);
+});
+
+app.post('/api/admin/pending-lands/:id/approve', authMiddleware, (req, res) => {
+  const id = String(req.params.id);
+  const data = readData();
+  const pending = data.pendingLands.find((item) => item.id === id);
+  if (!pending) return res.status(404).json({ message: 'Заявка не найдена' });
+  const land = normalizeLandPlot({ ...pending, id: `land_${Date.now()}` });
+  data.lands.unshift(land);
+  data.pendingLands = data.pendingLands.filter((item) => item.id !== id);
+  writeData(data);
+  res.status(201).json(land);
+});
+
+app.delete('/api/admin/pending-lands/:id', authMiddleware, (req, res) => {
+  const id = String(req.params.id);
+  const data = readData();
+  data.pendingLands = data.pendingLands.filter((item) => item.id !== id);
   writeData(data);
   res.json({ ok: true });
 });
