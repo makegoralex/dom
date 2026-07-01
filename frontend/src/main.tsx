@@ -129,8 +129,9 @@ const HOME_PROJECT_CATEGORY_TABS: Array<{ label: string; value: string }> = [
 ];
 const ADMIN_STYLE_OPTIONS = ['Классический', 'Современный', 'Сканди', 'Барнхаус', 'Минимализм', 'Русский'];
 const DEFAULT_LOGO_URL = `${API_ORIGIN || window.location.origin}/api/assets/logo_small.png`;
+const CONTACT_PAGE_PHOTO_URL = 'https://s6.iimage.su/s/01/g1cKW9hxDJrMROPHFjBAYozo9BaKvKsjsH0luvHyJ.png';
 const DEFAULT_CONTACT_PROFILE = {
-  contactPhotoUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=80',
+  contactPhotoUrl: CONTACT_PAGE_PHOTO_URL,
   contactName: 'Евгения Смирнова',
   contactPosition: 'Руководитель отдела продаж',
   contactPhone: CONTACTS.mainPhoneDisplay,
@@ -2077,7 +2078,7 @@ function ContactsPage() {
           <div className="contacts-box">
             <div className="contacts-info">
               <div className="contacts-person">
-                <img src={resolveMediaUrl(siteSettings.contactPhotoUrl || DEFAULT_CONTACT_PROFILE.contactPhotoUrl)} alt="Менеджер" />
+                <img src={CONTACT_PAGE_PHOTO_URL} alt="Менеджер" />
                 <div>
                   <strong>{siteSettings.contactName || DEFAULT_CONTACT_PROFILE.contactName}</strong>
                   <small>{siteSettings.contactPosition || DEFAULT_CONTACT_PROFILE.contactPosition}</small>
