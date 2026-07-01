@@ -105,10 +105,10 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .contacts-socials a{display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:0 10px; height:38px; color:#fff !important; text-decoration:none; font-size:13px; font-weight:700;}
 .contacts-socials a img{width:16px; height:16px; object-fit:contain;}
 .contacts-socials a:nth-child(1){background:#2f79a8;}
-.contacts-socials a:nth-child(2){background:#2899e6;}
+.contacts-socials a:nth-child(2){background:#111111;}
 .contacts-socials a:nth-child(3){background:#7b4bd6;}
 .contacts-person{display:grid; grid-template-columns:1fr; gap:10px; margin-top:14px; max-width:360px;}
-.contacts-person img{width:100%; height:180px; object-fit:cover; border-radius:8px;}
+.contacts-person img{width:100%; height:auto; max-height:520px; object-fit:contain; border-radius:8px; display:block; background:#eef1f6;}
 .contacts-person small{display:block; margin:4px 0 6px; color:#566070;}
 
 .portfolio-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:24px;}
