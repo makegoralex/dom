@@ -109,7 +109,7 @@ const CONTACTS = {
   emailHref: 'mailto:89022099279@mail.ru',
   vk: 'https://vk.ru/evtenia_house',
   max: 'https://max.ru/join/1zjkiv7Ex8ofTgGHuB212RBgUa_GcPjKokLeHSRDj0w',
-  telegram: 'https://t.me/evtenia_realty'
+  rutube: 'https://rutube.ru/plst/1224190/'
 };
 const OFFICE_ADDRESS = 'г. Пенза, ул. Гоголя, 41';
 const PROJECT_GROUPS: ProjectGroupColumn[] = [
@@ -129,8 +129,9 @@ const HOME_PROJECT_CATEGORY_TABS: Array<{ label: string; value: string }> = [
 ];
 const ADMIN_STYLE_OPTIONS = ['Классический', 'Современный', 'Сканди', 'Барнхаус', 'Минимализм', 'Русский'];
 const DEFAULT_LOGO_URL = `${API_ORIGIN || window.location.origin}/api/assets/logo_small.png`;
+const CONTACT_PAGE_PHOTO_URL = 'https://s6.iimage.su/s/01/g1cKW9hxDJrMROPHFjBAYozo9BaKvKsjsH0luvHyJ.png';
 const DEFAULT_CONTACT_PROFILE = {
-  contactPhotoUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=80',
+  contactPhotoUrl: CONTACT_PAGE_PHOTO_URL,
   contactName: 'Евгения Смирнова',
   contactPosition: 'Руководитель отдела продаж',
   contactPhone: CONTACTS.mainPhoneDisplay,
@@ -903,7 +904,7 @@ function PublicPage() {
         <div className="promo-strip">
           <div className="container promo-inner">
             <strong><a href="/discounts/vse-akcii">🎁 10 СОТОК ЗЕМЛИ В ПОДАРОК ПРИ СТРОИТЕЛЬСТВЕ ДОМА</a></strong>
-            <div className="promo-right"><a className="promo-btn" href="/discounts/vse-akcii">Все акции <span>»</span></a><div className="top-contacts"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a></div></div>
+            <div className="promo-right"><a className="promo-btn" href="/discounts/vse-akcii">Все акции <span>»</span></a><div className="top-contacts"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.rutube} target="_blank" rel="noreferrer">Rutube</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a></div></div>
           </div>
         </div>
 
@@ -1226,7 +1227,7 @@ function InternalHeader() {
       <div className="promo-strip">
         <div className="container promo-inner">
           <strong><a href="/discounts/vse-akcii">🎁 10 СОТОК ЗЕМЛИ В ПОДАРОК ПРИ СТРОИТЕЛЬСТВЕ ДОМА</a></strong>
-          <div className="promo-right"><a className="promo-btn" href="/discounts/vse-akcii">Все акции <span>»</span></a><div className="top-contacts"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer">Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a></div></div>
+          <div className="promo-right"><a className="promo-btn" href="/discounts/vse-akcii">Все акции <span>»</span></a><div className="top-contacts"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.rutube} target="_blank" rel="noreferrer">Rutube</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a></div></div>
         </div>
       </div>
       <div className="container hero-main">
@@ -1392,7 +1393,7 @@ function SiteFooter() {
         </div>
         <aside className="footer-side">
           <div className="contact-card"><h4>Контакты</h4><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><a className="extra-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a><p>{OFFICE_ADDRESS}</p><button onClick={() => setOpenCallback(true)}>Заказать звонок</button><a href={CONTACTS.emailHref}>{CONTACTS.email}</a></div>
-          <div className="social-card"><h4>Мы в соцсетях</h4><div className="contacts-socials footer-socials"><a href={CONTACTS.vk} target="_blank" rel="noreferrer"><img src="https://cdn.simpleicons.org/vk/FFFFFF" alt="" /> VK</a><a href={CONTACTS.telegram} target="_blank" rel="noreferrer"><img src="https://cdn.simpleicons.org/telegram/FFFFFF" alt="" /> Telegram</a><a href={CONTACTS.max} target="_blank" rel="noreferrer"><img src="https://max.ru/favicon.ico" alt="" /> MAX</a></div></div>
+          <div className="social-card"><h4>Мы в соцсетях</h4><div className="contacts-socials footer-socials"><a href={CONTACTS.vk} target="_blank" rel="noreferrer"><img src="https://cdn.simpleicons.org/vk/FFFFFF" alt="" /> VK</a><a href={CONTACTS.rutube} target="_blank" rel="noreferrer"><img src="https://cdn.simpleicons.org/rutube/FFFFFF" alt="" /> Rutube</a><a href={CONTACTS.max} target="_blank" rel="noreferrer"><img src="https://max.ru/favicon.ico" alt="" /> MAX</a></div></div>
         </aside>
       </div>
       <CallbackModal open={openCallback} onClose={() => setOpenCallback(false)} />
@@ -2077,7 +2078,7 @@ function ContactsPage() {
           <div className="contacts-box">
             <div className="contacts-info">
               <div className="contacts-person">
-                <img src={resolveMediaUrl(siteSettings.contactPhotoUrl || DEFAULT_CONTACT_PROFILE.contactPhotoUrl)} alt="Менеджер" />
+                <img src={CONTACT_PAGE_PHOTO_URL} alt="Менеджер" />
                 <div>
                   <strong>{siteSettings.contactName || DEFAULT_CONTACT_PROFILE.contactName}</strong>
                   <small>{siteSettings.contactPosition || DEFAULT_CONTACT_PROFILE.contactPosition}</small>
@@ -2097,7 +2098,7 @@ function ContactsPage() {
 
               <div className="contacts-socials">
                 <a href={CONTACTS.vk} target="_blank" rel="noreferrer" aria-label="VK"><img src="https://cdn.simpleicons.org/vk/FFFFFF" alt="" /> VK</a>
-                <a href={CONTACTS.telegram} target="_blank" rel="noreferrer" aria-label="Telegram"><img src="https://cdn.simpleicons.org/telegram/FFFFFF" alt="" /> Telegram</a>
+                <a href={CONTACTS.rutube} target="_blank" rel="noreferrer" aria-label="Rutube"><img src="https://cdn.simpleicons.org/rutube/FFFFFF" alt="" /> Rutube</a>
                 <a href={CONTACTS.max} target="_blank" rel="noreferrer" aria-label="MAX"><img src="https://max.ru/favicon.ico" alt="" /> MAX</a>
               </div>
             </div>
