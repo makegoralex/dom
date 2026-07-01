@@ -132,8 +132,8 @@ const DEFAULT_LOGO_URL = `${API_ORIGIN || window.location.origin}/api/assets/log
 const CONTACT_PAGE_PHOTO_URL = 'https://s6.iimage.su/s/01/g1cKW9hxDJrMROPHFjBAYozo9BaKvKsjsH0luvHyJ.png';
 const DEFAULT_CONTACT_PROFILE = {
   contactPhotoUrl: CONTACT_PAGE_PHOTO_URL,
-  contactName: 'Евгения Смирнова',
-  contactPosition: 'Руководитель отдела продаж',
+  contactName: 'Кислякова Евгения Викторовна',
+  contactPosition: 'Генеральный директор',
   contactPhone: CONTACTS.mainPhoneDisplay,
   contactCityPhone: CONTACTS.extraPhoneDisplay,
   contactEmail: CONTACTS.email
@@ -2080,8 +2080,8 @@ function ContactsPage() {
               <div className="contacts-person">
                 <img src={CONTACT_PAGE_PHOTO_URL} alt="Менеджер" />
                 <div>
-                  <strong>{siteSettings.contactName || DEFAULT_CONTACT_PROFILE.contactName}</strong>
-                  <small>{siteSettings.contactPosition || DEFAULT_CONTACT_PROFILE.contactPosition}</small>
+                  <strong>{DEFAULT_CONTACT_PROFILE.contactName}</strong>
+                  <small>{DEFAULT_CONTACT_PROFILE.contactPosition}</small>
                 </div>
               </div>
               <h3>Телефоны:</h3>
