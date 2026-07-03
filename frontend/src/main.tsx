@@ -42,6 +42,7 @@ type Lead = {
   phone: string;
   message: string;
   projectId?: string;
+  sourceTitle?: string;
   createdAt: string;
 };
 
@@ -642,7 +643,8 @@ function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }
           name: 'Клиент',
           phone,
           email: CONTACTS.email,
-          message: 'Заказ звонка с сайта'
+          message: 'Заказ звонка из шапки сайта',
+          sourceTitle: 'Заказать звонок — шапка сайта'
         })
       });
       if (!res.ok) throw new Error('bad');
@@ -699,8 +701,9 @@ function PromoLeadModal({
   onClose,
   title,
   promoText,
-  messagePrefix
-}: { open: boolean; onClose: () => void; title: string; promoText: string; messagePrefix: string }) {
+  messagePrefix,
+  sourceTitle
+}: { open: boolean; onClose: () => void; title: string; promoText: string; messagePrefix: string; sourceTitle?: string }) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [status, setStatus] = useState('');
@@ -713,7 +716,7 @@ function PromoLeadModal({
       const res = await fetch(`${API_BASE}/api/leads`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, message })
+        body: JSON.stringify({ name, phone, message, sourceTitle: sourceTitle || title })
       });
       if (!res.ok) throw new Error('bad');
       setStatus('Спасибо! Заявка отправлена.');
@@ -875,7 +878,14 @@ function PublicPage() {
       const response = await fetch(`${API_BASE}/api/leads`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, email, message, projectId })
+        body: JSON.stringify({
+          name,
+          phone,
+          email,
+          message,
+          projectId,
+          sourceTitle: `Главная форма: ${homepageProjects.find((project) => project.id === projectId)?.title || 'строительство дома'}`
+        })
       });
 
       if (!response.ok) {
@@ -1162,6 +1172,7 @@ function PublicPage() {
         title="Акция: 10 соток в подарок"
         promoText="10 соток в подарок и скидка на любой земельный участок у нас в базе."
         messagePrefix="Заявка по акции: 10 соток в подарок"
+        sourceTitle="Акция: 10 соток в подарок"
       />
       <PromoLeadModal
         open={Boolean(requestProject)}
@@ -1169,6 +1180,7 @@ function PublicPage() {
         title={requestProject ? `Заявка: ${requestProject.title}` : 'Заявка'}
         promoText="🎁 Проект дома в подарок"
         messagePrefix={requestProject ? `Заявка на просчет дома: ${requestProject.title}` : ''}
+        sourceTitle={requestProject ? `Проект дома: ${requestProject.title}` : 'Заявка на просчет дома'}
       />
     </div>
   );
@@ -1750,6 +1762,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
         title={requestProject ? `Заявка: ${requestProject.title}` : 'Заявка'}
         promoText="🎁 Проект дома в подарок"
         messagePrefix={requestProject ? `Заявка на просчет дома: ${requestProject.title}` : ''}
+        sourceTitle={requestProject ? `Проект дома: ${requestProject.title}` : 'Заявка на просчет дома'}
       />
     </div>
   );
@@ -1927,6 +1940,7 @@ function LandsPage() {
         title={activeLand ? `Заявка на участок ${activeLand.cadastralNumber}` : 'Заявка'}
         promoText={activeLand ? `Участок ${activeLand.area}, ${activeLand.district}, ${activeLand.price}` : ''}
         messagePrefix={activeLand ? `Заявка на участок ${activeLand.cadastralNumber}` : ''}
+        sourceTitle={activeLand ? `Земельный участок: ${activeLand.cadastralNumber}` : 'Заявка на участок'}
       />
       {openSellLand ? (
         <div className="modal-backdrop" onClick={() => setOpenSellLand(false)}>
@@ -2053,6 +2067,7 @@ function ProjectDetailPage() {
         title={`Заявка: ${project.title}`}
         promoText="🎁 Проект дома в подарок"
         messagePrefix={`Заявка на просчет дома: ${project.title}`}
+        sourceTitle={`Проект дома: ${project.title}`}
       />
     </div>
   );
@@ -2233,7 +2248,7 @@ function DesignPage() {
       const response = await fetch(`${API_BASE}/api/leads`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, email, message })
+        body: JSON.stringify({ name, phone, email, message, sourceTitle: 'Проектирование' })
       });
       if (!response.ok) {
         throw new Error('bad response');
@@ -2324,7 +2339,8 @@ function SubsectionPage({ sectionTitle, pageTitle, text, isHtml = false }: { sec
         body: JSON.stringify({
           name,
           phone,
-          message: `Заявка на услугу со скидкой 10%: ${pageTitle}. Действует до ${monthEndLabel()}.`
+          message: `Заявка на услугу со скидкой 10%: ${pageTitle}. Действует до ${monthEndLabel()}.`,
+          sourceTitle: `Услуга: ${pageTitle}`
         })
       });
       if (!res.ok) throw new Error('bad');
