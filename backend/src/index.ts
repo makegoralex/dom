@@ -30,6 +30,7 @@ interface Lead {
   email?: string;
   message: string;
   projectId?: string;
+  sourceTitle?: string;
   createdAt: string;
 }
 
@@ -113,11 +114,11 @@ const mailTransport = SMTP_HOST && SMTP_USER && SMTP_PASS
     })
   : null;
 
-async function sendCallbackLeadToMax(lead: Lead) {
+async function sendLeadToMax(lead: Lead, sourceTitle: string) {
   if (!MAX_BOT_TOKEN || !MAX_CALLBACK_CHAT_ID) return;
 
   const text = [
-    '📬 **Новая заявка: заказать звонок**',
+    `📬 **Новая заявка: ${sourceTitle}**`,
     `👤 Имя: ${lead.name || '-'}`,
     `📞 Телефон: ${lead.phone}`,
     `✉️ Email: ${lead.email || '-'}`,
@@ -138,6 +139,15 @@ async function sendCallbackLeadToMax(lead: Lead) {
     const responseText = await response.text().catch(() => '');
     throw new Error(`Max API returned ${response.status}: ${responseText}`);
   }
+}
+
+function getLeadSourceTitle(lead: Lead, data: DataStore) {
+  if (lead.sourceTitle) return lead.sourceTitle;
+  if (lead.projectId) {
+    const project = [...(data.projects || []), ...seedProjects].find((item) => item.id === lead.projectId);
+    if (project) return `Проект дома: ${project.title}`;
+  }
+  return 'Форма заявки на сайте';
 }
 
 const CONSTRUCTION_TYPES = [
@@ -573,6 +583,11 @@ app.post('/api/land-submissions', upload.array('images', 20), async (req, res) =
       createdAt: pendingLand.createdAt
     });
     writeData(data);
+    try {
+      await sendLeadToMax(data.leads[0], `Продать землю: ${cadastralNumber}`);
+    } catch (error) {
+      console.error('Не удалось отправить заявку на землю в Max', error);
+    }
     res.status(201).json({ ok: true });
   } catch (error) {
     console.error('Не удалось обработать заявку на землю', error);
@@ -590,19 +605,18 @@ app.get('/api/menu-order', (_req, res) => res.json({ order: readData().menuOrder
 app.get('/api/site-settings', (_req, res) => res.json(readData().siteSettings));
 
 app.post('/api/leads', async (req, res) => {
-  const { name, phone, email, message, projectId } = req.body as Partial<Lead>;
+  const { name, phone, email, message, projectId, sourceTitle } = req.body as Partial<Lead>;
   if (!name || !phone) return res.status(400).json({ message: 'Укажите имя и телефон' });
   const data = readData();
-  const lead = { id: `lead_${Date.now()}`, name, phone, email: email || '', message: message || '', projectId, createdAt: new Date().toISOString() };
+  const lead: Lead = { id: `lead_${Date.now()}`, name, phone, email: email || '', message: message || '', projectId, sourceTitle: sourceTitle || '', createdAt: new Date().toISOString() };
+  const leadSourceTitle = getLeadSourceTitle(lead, data);
   data.leads.unshift(lead);
   writeData(data);
 
-  if (message === 'Заказ звонка из шапки сайта') {
-    try {
-      await sendCallbackLeadToMax(lead);
-    } catch (error) {
-      console.error('Не удалось отправить заявку в Max', error);
-    }
+  try {
+    await sendLeadToMax(lead, leadSourceTitle);
+  } catch (error) {
+    console.error('Не удалось отправить заявку в Max', error);
   }
 
   if (mailTransport) {
