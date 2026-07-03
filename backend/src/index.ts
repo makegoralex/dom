@@ -30,6 +30,7 @@ interface Lead {
   email?: string;
   message: string;
   projectId?: string;
+  sourceTitle?: string;
   createdAt: string;
 }
 
@@ -101,6 +102,8 @@ const SMTP_PORT = Number(process.env.SMTP_PORT || 587);
 const SMTP_USER = process.env.SMTP_USER || '';
 const SMTP_PASS = process.env.SMTP_PASS || '';
 const SMTP_FROM = process.env.SMTP_FROM || SMTP_USER || CALLBACK_RECEIVER;
+const MAX_BOT_TOKEN = process.env.MAX_BOT_TOKEN || 'f9LHodD0cOJgTouupLUHk-9x_6WPxh5mFpY61H_hXQAs90iZlxFbTTY874ImDgGp53fS9MCY9SRpOxQoqaQU';
+const MAX_CALLBACK_CHAT_ID = Number(process.env.MAX_CALLBACK_CHAT_ID || '-76263328333110');
 
 const mailTransport = SMTP_HOST && SMTP_USER && SMTP_PASS
   ? nodemailer.createTransport({
@@ -110,6 +113,60 @@ const mailTransport = SMTP_HOST && SMTP_USER && SMTP_PASS
       auth: { user: SMTP_USER, pass: SMTP_PASS }
     })
   : null;
+
+async function sendLeadToMax(lead: Lead, sourceTitle: string) {
+  if (!MAX_BOT_TOKEN || !MAX_CALLBACK_CHAT_ID) return;
+
+  const messageLines = [
+    `📬 Новая заявка: ${sourceTitle}`,
+    `👤 Имя: ${lead.name || '-'}`,
+    `📞 Телефон: ${lead.phone}`
+  ];
+
+  if (lead.email) {
+    messageLines.push(`✉️ Email: ${lead.email}`);
+  }
+
+  messageLines.push(
+    `💬 Сообщение: ${lead.message || '-'}`,
+    `🕒 Дата: ${new Date(lead.createdAt).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })}`
+  );
+
+  const text = messageLines.join('\n');
+
+  const response = await fetch(`https://platform-api.max.ru/messages?chat_id=${MAX_CALLBACK_CHAT_ID}`, {
+    method: 'POST',
+    headers: {
+      Authorization: MAX_BOT_TOKEN,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ text })
+  });
+
+  if (!response.ok) {
+    const responseText = await response.text().catch(() => '');
+    throw new Error(`Max API returned ${response.status}: ${responseText}`);
+  }
+}
+
+function getLeadSourceTitle(lead: Lead, data: DataStore) {
+  if (lead.sourceTitle) return lead.sourceTitle;
+  if (lead.projectId) {
+    const project = [...(data.projects || []), ...seedProjects].find((item) => item.id === lead.projectId);
+    if (project) return `Проект дома: ${project.title}`;
+  }
+
+  const message = lead.message || '';
+  const projectMatch = message.match(/Заявка на просчет дома:\s*([^\n.]+)/i);
+  if (projectMatch?.[1]) return `Проект дома: ${projectMatch[1].trim()}`;
+  const landMatch = message.match(/Заявка на участок\s*([^\n.]+)/i);
+  if (landMatch?.[1]) return `Земельный участок: ${landMatch[1].trim()}`;
+  const serviceMatch = message.match(/Заявка на услугу[^:]*:\s*([^\n.]+)/i);
+  if (serviceMatch?.[1]) return `Услуга: ${serviceMatch[1].trim()}`;
+  if (message.includes('Заказ звонка')) return 'Заказать звонок — шапка сайта';
+
+  return 'Форма заявки на сайте';
+}
 
 const CONSTRUCTION_TYPES = [
   'Из газобетона',
@@ -544,6 +601,11 @@ app.post('/api/land-submissions', upload.array('images', 20), async (req, res) =
       createdAt: pendingLand.createdAt
     });
     writeData(data);
+    try {
+      await sendLeadToMax(data.leads[0], `Продать землю: ${cadastralNumber}`);
+    } catch (error) {
+      console.error('Не удалось отправить заявку на землю в Max', error);
+    }
     res.status(201).json({ ok: true });
   } catch (error) {
     console.error('Не удалось обработать заявку на землю', error);
@@ -561,12 +623,19 @@ app.get('/api/menu-order', (_req, res) => res.json({ order: readData().menuOrder
 app.get('/api/site-settings', (_req, res) => res.json(readData().siteSettings));
 
 app.post('/api/leads', async (req, res) => {
-  const { name, phone, email, message, projectId } = req.body as Partial<Lead>;
+  const { name, phone, email, message, projectId, sourceTitle } = req.body as Partial<Lead>;
   if (!name || !phone) return res.status(400).json({ message: 'Укажите имя и телефон' });
   const data = readData();
-  const lead = { id: `lead_${Date.now()}`, name, phone, email: email || '', message: message || '', projectId, createdAt: new Date().toISOString() };
+  const lead: Lead = { id: `lead_${Date.now()}`, name, phone, email: email || '', message: message || '', projectId, sourceTitle: sourceTitle || '', createdAt: new Date().toISOString() };
+  const leadSourceTitle = getLeadSourceTitle(lead, data);
   data.leads.unshift(lead);
   writeData(data);
+
+  try {
+    await sendLeadToMax(lead, leadSourceTitle);
+  } catch (error) {
+    console.error('Не удалось отправить заявку в Max', error);
+  }
 
   if (mailTransport) {
     try {
