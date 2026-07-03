@@ -121,7 +121,7 @@ async function sendLeadToMax(lead: Lead, sourceTitle: string) {
     `📬 **Новая заявка: ${sourceTitle}**`,
     `👤 Имя: ${lead.name || '-'}`,
     `📞 Телефон: ${lead.phone}`,
-    `✉️ Email: ${lead.email || '-'}`,
+    `✉️ Email: ${lead.email || ''}`,
     `💬 Сообщение: ${lead.message || '-'}`,
     `🕒 Дата: ${new Date(lead.createdAt).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })}`
   ].join('\n');

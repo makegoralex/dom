@@ -642,7 +642,7 @@ function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }
         body: JSON.stringify({
           name: 'Клиент',
           phone,
-          email: CONTACTS.email,
+          email: '',
           message: 'Заказ звонка из шапки сайта',
           sourceTitle: 'Заказать звонок — шапка сайта'
         })
@@ -884,7 +884,7 @@ function PublicPage() {
           email,
           message,
           projectId,
-          sourceTitle: `Главная форма: ${homepageProjects.find((project) => project.id === projectId)?.title || 'строительство дома'}`
+          sourceTitle: 'Форма: стать клиентом'
         })
       });
 
