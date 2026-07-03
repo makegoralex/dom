@@ -642,7 +642,7 @@ function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }
           name: 'Клиент',
           phone,
           email: CONTACTS.email,
-          message: 'Заказ звонка с сайта'
+          message: 'Заказ звонка из шапки сайта'
         })
       });
       if (!res.ok) throw new Error('bad');

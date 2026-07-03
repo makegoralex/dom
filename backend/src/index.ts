@@ -101,6 +101,8 @@ const SMTP_PORT = Number(process.env.SMTP_PORT || 587);
 const SMTP_USER = process.env.SMTP_USER || '';
 const SMTP_PASS = process.env.SMTP_PASS || '';
 const SMTP_FROM = process.env.SMTP_FROM || SMTP_USER || CALLBACK_RECEIVER;
+const MAX_BOT_TOKEN = process.env.MAX_BOT_TOKEN || 'f9LHodD0cOJgTouupLUHk-9x_6WPxh5mFpY61H_hXQAs90iZlxFbTTY874ImDgGp53fS9MCY9SRpOxQoqaQU';
+const MAX_CALLBACK_CHAT_ID = Number(process.env.MAX_CALLBACK_CHAT_ID || '-76263328333110');
 
 const mailTransport = SMTP_HOST && SMTP_USER && SMTP_PASS
   ? nodemailer.createTransport({
@@ -110,6 +112,33 @@ const mailTransport = SMTP_HOST && SMTP_USER && SMTP_PASS
       auth: { user: SMTP_USER, pass: SMTP_PASS }
     })
   : null;
+
+async function sendCallbackLeadToMax(lead: Lead) {
+  if (!MAX_BOT_TOKEN || !MAX_CALLBACK_CHAT_ID) return;
+
+  const text = [
+    '📬 **Новая заявка: заказать звонок**',
+    `👤 Имя: ${lead.name || '-'}`,
+    `📞 Телефон: ${lead.phone}`,
+    `✉️ Email: ${lead.email || '-'}`,
+    `💬 Сообщение: ${lead.message || '-'}`,
+    `🕒 Дата: ${new Date(lead.createdAt).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })}`
+  ].join('\n');
+
+  const response = await fetch(`https://platform-api.max.ru/messages?chat_id=${MAX_CALLBACK_CHAT_ID}`, {
+    method: 'POST',
+    headers: {
+      Authorization: MAX_BOT_TOKEN,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ text, format: 'markdown' })
+  });
+
+  if (!response.ok) {
+    const responseText = await response.text().catch(() => '');
+    throw new Error(`Max API returned ${response.status}: ${responseText}`);
+  }
+}
 
 const CONSTRUCTION_TYPES = [
   'Из газобетона',
@@ -567,6 +596,14 @@ app.post('/api/leads', async (req, res) => {
   const lead = { id: `lead_${Date.now()}`, name, phone, email: email || '', message: message || '', projectId, createdAt: new Date().toISOString() };
   data.leads.unshift(lead);
   writeData(data);
+
+  if (message === 'Заказ звонка из шапки сайта') {
+    try {
+      await sendCallbackLeadToMax(lead);
+    } catch (error) {
+      console.error('Не удалось отправить заявку в Max', error);
+    }
+  }
 
   if (mailTransport) {
     try {
