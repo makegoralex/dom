@@ -613,3 +613,10 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .cms-lightbox-nav.prev{left:4px;}
   .cms-lightbox-nav.next{right:4px;}
 }
+
+.privacy-consent{display:flex !important; align-items:flex-start; gap:8px !important; font-size:13px !important; line-height:1.35; color:#3d4350;}
+.privacy-consent input[type="checkbox"]{width:18px !important; min-width:18px; height:18px; margin:0; padding:0; accent-color:#53ab28;}
+.privacy-consent span{display:block;}
+.privacy-consent a{color:inherit; text-decoration:underline;}
+.lead-bg-section .privacy-consent{color:#d7dbe1;}
+.service-discount-form .privacy-consent{color:#29303c;}
