@@ -625,6 +625,18 @@ function resolveMediaUrl(url?: string) {
   return value;
 }
 
+
+function PrivacyConsent() {
+  return (
+    <label className="privacy-consent">
+      <input type="checkbox" required />
+      <span>
+        Я ознакомлен(а) с <a href="/privacy-policy" target="_blank" rel="noreferrer">политикой конфиденциальности</a> и даю согласие на обработку персональных данных.
+      </span>
+    </label>
+  );
+}
+
 function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [phone, setPhone] = useState('');
   const [status, setStatus] = useState('');
@@ -679,9 +691,9 @@ function CallbackModal({ open, onClose }: { open: boolean; onClose: () => void }
                   required
                 />
               </label>
+              <PrivacyConsent />
               <button type="submit">Перезвоните мне</button>
             </form>
-            <a className="modal-policy" href="/privacy-policy">Политика конфиденциальности</a>
             {status ? <p>{status}</p> : null}
           </>
         )}
@@ -743,6 +755,7 @@ function PromoLeadModal({
               required
             />
           </label>
+          <PrivacyConsent />
           <button type="submit">Отправить заявку</button>
         </form>
         {status ? <p>{status}</p> : null}
@@ -1157,8 +1170,8 @@ function PublicPage() {
               Сообщение
               <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={5} />
             </label>
+            <PrivacyConsent />
             <button type="submit" className="lead-submit">✉ ОТПРАВИТЬ ДАННЫЕ</button>
-            <p className="lead-consent">Заполняя форму, вы даете согласие на обработку персональных данных согласно <a href="/privacy-policy">политике конфиденциальности</a>.</p>
             {status ? <p className="status">{status}</p> : null}
           </form>
         </div>
@@ -1966,6 +1979,7 @@ function LandsPage() {
               <label>Карта: ссылка<input value={sellerMapUrl} onChange={(e) => setSellerMapUrl(e.target.value)} /></label>
               <label>Фото участка<input type="file" multiple accept="image/*" onChange={(e) => setSellerPhotos(Array.from(e.target.files || []))} required /></label>
               {sellerPhotos.length ? <small>Выбрано фото: {sellerPhotos.length}</small> : null}
+              <PrivacyConsent />
               <button type="submit">Отправить заявку</button>
               {sellerStatus ? <small>{sellerStatus}</small> : null}
             </form>
@@ -2309,6 +2323,7 @@ function DesignPage() {
                 <label>E-mail<input value={email} onChange={(e) => setEmail(e.target.value)} /></label>
               </div>
               <label>Сообщение<textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={5} /></label>
+              <PrivacyConsent />
               <button type="submit">✉ ОТПРАВИТЬ ДАННЫЕ</button>
               {status ? <p className="status">{status}</p> : null}
             </form>
@@ -2367,7 +2382,6 @@ function SubsectionPage({ sectionTitle, pageTitle, text, isHtml = false }: { sec
               <aside className="service-side">
                 <form className="service-discount-form" onSubmit={submitServiceLead}>
                   <h3>Скидка 10%</h3>
-                  <button type="submit">Заказать услугу со скидкой 10%</button>
                   <small>Скидка действует до {monthEndLabel()}.</small>
                   <label>Имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
                   <label>
@@ -2380,6 +2394,8 @@ function SubsectionPage({ sectionTitle, pageTitle, text, isHtml = false }: { sec
                       required
                     />
                   </label>
+                  <PrivacyConsent />
+                  <button type="submit">Заказать услугу со скидкой 10%</button>
                   {serviceStatus ? <p>{serviceStatus}</p> : null}
                 </form>
               </aside>
