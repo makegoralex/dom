@@ -1,6 +1,7 @@
 import React, { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles.css';
+import { LesnoeOzeroPage } from './LesnoeOzeroPage';
 
 type HouseProject = {
   id: string;
@@ -363,7 +364,7 @@ function HeaderNav({
       home: { label: 'ГЛАВНАЯ', href: '/', active: currentPath === '/' },
       about: { label: 'О КОМПАНИИ', href: '/about', active: currentPath === '/about' },
       projects: { label: 'ПРОЕКТЫ ДОМОВ', href: '/projects', active: currentPath === '/projects' || currentPath === '/baths', children: projectsChildren },
-      lands: { label: 'ЗЕМЛЯ', href: '/lands', active: currentPath === '/lands' },
+      lands: { label: 'ЗЕМЛЯ', href: '/lands', active: currentPath === '/lands' || currentPath.startsWith('/lands/') },
       services: { label: 'УСЛУГИ', active: currentPath.startsWith('/services/'), children: serviceColumns.flatMap((column) => column.map((item) => ({ label: item.title, href: `/services/${item.slug}` }))) },
       design: { label: 'ПРОЕКТИРОВАНИЕ', href: '/design', active: currentPath === '/design' },
       portfolio: { label: 'ПОРТФОЛИО', href: '/portfolio', active: currentPath === '/portfolio' },
@@ -841,7 +842,7 @@ function PublicPage() {
   const offerProjects = useMemo(() => {
     const groupedByType = offerTypes.map((type) => homepageProjects.filter((project) => project.constructionType === type));
     const selected: HouseProject[] = [];
-    const usedIds = new Set<number>();
+    const usedIds = new Set<string>();
     let cursor = 0;
 
     while (selected.length < 6) {
@@ -1897,6 +1898,13 @@ function LandsPage() {
         <div className="container">
           <Breadcrumbs items={["Главная", "Земля"]} />
           <h1>ЗЕМЛЯ</h1>
+          <section className="lo-lands-feature" aria-labelledby="lesnoe-ozero-feature-title">
+            <div>
+              <h2 id="lesnoe-ozero-feature-title">ЖК «Лесное озеро»</h2>
+              <p>Эксклюзивные участки ИЖС у соснового леса и озера — с интерактивной схемой выбора.</p>
+            </div>
+            <a href="/lands/lesnoe-ozero">Открыть спецпроект</a>
+          </section>
           <div className="lands-top-cta">
             <p>Подберем участок под строительство дома или поможем выгодно реализовать вашу землю через нашу базу покупателей.</p>
             <button className="sell-land-link" onClick={() => setOpenSellLand(true)}>Продать свою землю</button>
@@ -3544,6 +3552,19 @@ function App() {
   if (pathname === '/privacy-policy') return <AppLayout><PrivacyPolicyPage /></AppLayout>;
   if (pathname === '/projects') return <AppLayout><ProjectTypePage /></AppLayout>;
   if (pathname === '/baths') return <AppLayout><BathsPage /></AppLayout>;
+  if (pathname === '/lands/lesnoe-ozero') {
+    return (
+      <AppLayout>
+        <LesnoeOzeroPage
+          Header={InternalHeader}
+          Footer={SiteFooter}
+          PrivacyConsent={PrivacyConsent}
+          apiBase={API_BASE}
+          formatPhone={formatPhoneMask}
+        />
+      </AppLayout>
+    );
+  }
   if (pathname === '/lands') return <AppLayout><LandsPage /></AppLayout>;
   if (pathname.startsWith('/project/')) return <AppLayout><ProjectDetailPage /></AppLayout>;
   if (pathname === '/design') return <AppLayout><DesignPage /></AppLayout>;
