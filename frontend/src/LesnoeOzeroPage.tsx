@@ -289,7 +289,7 @@ export function LesnoeOzeroPage({ Header, Footer, PrivacyConsent, apiBase, forma
                 <article><span>♧</span><h3>Сосновый лес</h3><p>Чистый воздух, естественная тень и природное окружение.</p></article>
                 <article><span>≈</span><h3>Озеро рядом</h3><p>Вода и живописные маршруты в шаговой доступности.</p></article>
                 <article><span>⌁</span><h3>Подъезд к участкам</h3><p>Щебёночные дороги и круглогодичный подъезд.</p></article>
-                <article><span>ϟ</span><h3>Коммуникации</h3><p>Электричество 15 кВт; газ — в проекте развития территории.</p></article>
+                <article><span>ϟ</span><h3>Коммуникации</h3><p>Электричество 15 кВт вдоль земельного участка; газ также вдоль земельного участка.</p></article>
               </div>
             </div>
           </div>
@@ -340,8 +340,8 @@ export function LesnoeOzeroPage({ Header, Footer, PrivacyConsent, apiBase, forma
                 <small>{LESNOE_OZERO_PHASES[selectedPlot.phase].label}</small>
                 <dl>
                   <dt>Назначение</dt><dd>ИЖС</dd>
-                  <dt>Электричество</dt><dd>15 кВт</dd>
-                  <dt>Газ</dt><dd>в проекте</dd>
+                  <dt>Электричество</dt><dd>15 кВт вдоль земельного участка</dd>
+                  <dt>Газ</dt><dd>вдоль земельного участка</dd>
                   <dt>Подъезд</dt><dd>круглогодичный</dd>
                   <dt>Цена</dt><dd>по запросу</dd>
                 </dl>
