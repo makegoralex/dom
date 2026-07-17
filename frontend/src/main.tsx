@@ -237,6 +237,62 @@ function formatPhoneMask(value: string) {
   return result;
 }
 
+const SELL_LAND_MAX_PHOTOS = 5;
+const SELL_LAND_PHOTO_TARGET_BYTES = 160 * 1024;
+
+function loadPhotoForCompression(file: File): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    image.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(image);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error(`Не удалось прочитать «${file.name}». Используйте JPG, PNG или WebP.`));
+    };
+    image.src = objectUrl;
+  });
+}
+
+async function prepareLandPhoto(file: File, index: number): Promise<File> {
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+    throw new Error(`Формат «${file.name}» не поддерживается. Используйте JPG, PNG или WebP.`);
+  }
+
+  const image = await loadPhotoForCompression(file);
+  const scale = Math.min(1, 1280 / Math.max(image.naturalWidth, image.naturalHeight));
+  let width = Math.max(1, Math.round(image.naturalWidth * scale));
+  let height = Math.max(1, Math.round(image.naturalHeight * scale));
+  let quality = 0.78;
+
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('Браузер не смог подготовить фотографию к отправке.');
+    context.fillStyle = '#ffffff';
+    context.fillRect(0, 0, width, height);
+    context.drawImage(image, 0, 0, width, height);
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+    if (!blob) throw new Error(`Не удалось подготовить «${file.name}» к отправке.`);
+    if (blob.size <= SELL_LAND_PHOTO_TARGET_BYTES) {
+      return new File([blob], `land-${index + 1}.jpg`, { type: 'image/jpeg' });
+    }
+
+    if (quality > 0.5) quality -= 0.08;
+    else {
+      width = Math.max(640, Math.round(width * 0.82));
+      height = Math.max(480, Math.round(height * 0.82));
+      quality = 0.68;
+    }
+  }
+
+  throw new Error(`Фотография «${file.name}» слишком большая. Попробуйте выбрать другое фото.`);
+}
+
 async function getApiErrorMessage(response: Response, fallback: string) {
   const contentType = response.headers.get('content-type') || '';
   try {
@@ -1831,6 +1887,7 @@ function LandsPage() {
   const [sellerMapUrl, setSellerMapUrl] = useState('');
   const [sellerPhotos, setSellerPhotos] = useState<File[]>([]);
   const [sellerStatus, setSellerStatus] = useState('');
+  const [sellerSubmitting, setSellerSubmitting] = useState(false);
   const [openSellLand, setOpenSellLand] = useState(false);
   useEffect(() => {
     document.title = 'Земля — Evtenia';
@@ -1850,6 +1907,20 @@ function LandsPage() {
     setMaxPrice(maxPriceLimit);
   }, [minPriceLimit, maxPriceLimit]);
 
+  useEffect(() => {
+    if (!openSellLand) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpenSellLand(false);
+    };
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [openSellLand]);
+
   const filtered = lands.filter((item) => {
     const price = parsePrice(item.price);
     const byDistrict = district === 'Все районы' || item.district === district;
@@ -1858,8 +1929,16 @@ function LandsPage() {
   });
   const submitSellLand = async (event: FormEvent) => {
     event.preventDefault();
-    setSellerStatus('Отправка...');
+    if (sellerSubmitting) return;
+    setSellerSubmitting(true);
+    setSellerStatus('Подготавливаем фотографии...');
     try {
+      if (!sellerPhotos.length) throw new Error('Добавьте хотя бы одно фото участка.');
+      if (sellerPhotos.length > SELL_LAND_MAX_PHOTOS) {
+        throw new Error(`Можно прикрепить не более ${SELL_LAND_MAX_PHOTOS} фотографий.`);
+      }
+      const preparedPhotos = await Promise.all(sellerPhotos.map(prepareLandPhoto));
+      setSellerStatus('Отправка...');
       const response = await fetch(`${API_BASE}/api/land-submissions`, {
         method: 'POST',
         body: (() => {
@@ -1872,12 +1951,16 @@ function LandsPage() {
           formData.append('district', sellerDistrict);
           formData.append('description', sellerDescription);
           formData.append('mapUrl', sellerMapUrl);
-          sellerPhotos.forEach((file) => formData.append('images', file));
+          preparedPhotos.forEach((file) => formData.append('images', file));
           return formData;
         })()
       });
-      if (!response.ok) throw new Error('bad');
-      setSellerStatus('Спасибо! Свяжемся с вами.');
+      const payload = await response.json().catch(() => null) as { message?: string } | null;
+      if (!response.ok) {
+        if (response.status === 413) throw new Error('Фотографии слишком большие для отправки. Уменьшите их количество или размер.');
+        throw new Error(payload?.message || 'Не удалось отправить заявку. Попробуйте ещё раз.');
+      }
+      setSellerStatus('Заявка отправлена на модерацию. Свяжемся с вами после проверки.');
       setSellerName('');
       setSellerPhone('');
       setSellerCadastralNumber('');
@@ -1887,8 +1970,10 @@ function LandsPage() {
       setSellerDescription('');
       setSellerMapUrl('');
       setSellerPhotos([]);
-    } catch {
-      setSellerStatus('Не удалось отправить заявку.');
+    } catch (error) {
+      setSellerStatus(error instanceof Error ? error.message : 'Не удалось отправить заявку. Попробуйте ещё раз.');
+    } finally {
+      setSellerSubmitting(false);
     }
   };
   return (
@@ -1964,9 +2049,18 @@ function LandsPage() {
         sourceTitle={activeLand ? `Земельный участок: ${activeLand.cadastralNumber}` : 'Заявка на участок'}
       />
       {openSellLand ? (
-        <div className="modal-backdrop" onClick={() => setOpenSellLand(false)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <h3>Продать свою землю</h3>
+        <div className="modal-backdrop" onMouseDown={() => setOpenSellLand(false)}>
+          <div
+            className="modal-card sell-land-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="sell-land-modal-title"
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <div className="modal-card-header">
+              <h3 id="sell-land-modal-title">Продать свою землю</h3>
+              <button className="modal-close-button" type="button" aria-label="Закрыть форму" onClick={() => setOpenSellLand(false)}>×</button>
+            </div>
             <form className="sell-land-form" onSubmit={submitSellLand}>
               <label>Контактное лицо<input value={sellerName} onChange={(e) => setSellerName(e.target.value)} required /></label>
               <label>
@@ -1985,11 +2079,11 @@ function LandsPage() {
               <label>Район<input value={sellerDistrict} onChange={(e) => setSellerDistrict(e.target.value)} required /></label>
               <label>Описание<textarea value={sellerDescription} onChange={(e) => setSellerDescription(e.target.value)} rows={3} required /></label>
               <label>Карта: ссылка<input value={sellerMapUrl} onChange={(e) => setSellerMapUrl(e.target.value)} /></label>
-              <label>Фото участка<input type="file" multiple accept="image/*" onChange={(e) => setSellerPhotos(Array.from(e.target.files || []))} required /></label>
-              {sellerPhotos.length ? <small>Выбрано фото: {sellerPhotos.length}</small> : null}
+              <label>Фото участка<input type="file" multiple accept="image/jpeg,image/png,image/webp" onChange={(e) => setSellerPhotos(Array.from(e.target.files || []))} required /></label>
+              {sellerPhotos.length ? <small>Выбрано фото: {sellerPhotos.length} из {SELL_LAND_MAX_PHOTOS}</small> : <small>До {SELL_LAND_MAX_PHOTOS} фото в формате JPG, PNG или WebP.</small>}
               <PrivacyConsent />
-              <button type="submit">Отправить заявку</button>
-              {sellerStatus ? <small>{sellerStatus}</small> : null}
+              <button type="submit" disabled={sellerSubmitting}>{sellerSubmitting ? 'Отправляем...' : 'Отправить заявку'}</button>
+              {sellerStatus ? <small className="sell-land-status" role="status" aria-live="polite">{sellerStatus}</small> : null}
             </form>
           </div>
         </div>
