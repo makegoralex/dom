@@ -579,16 +579,19 @@ app.post('/api/land-submissions', upload.array('images', 20), async (req, res) =
       id: `lead_${Date.now()}`,
       name: sellerName,
       phone: sellerPhone,
-      message: `Продать свою землю. Кадастровый номер: ${cadastralNumber}. Площадь: ${area}. Район: ${district}. Цена: ${price}. Описание: ${description}`,
+      message: `Новый участок ожидает модерации в админке: ${req.protocol}://${req.get('host')}/catalog-control-7f3a. Кадастровый номер: ${cadastralNumber}. Площадь: ${area}. Район: ${district}. Цена: ${price}. Описание: ${description}`,
+      sourceTitle: `Участок на модерацию: ${cadastralNumber}`,
       createdAt: pendingLand.createdAt
     });
     writeData(data);
+    let maxNotified = true;
     try {
-      await sendLeadToMax(data.leads[0], `Продать землю: ${cadastralNumber}`);
+      await sendLeadToMax(data.leads[0], `Участок на модерацию: ${cadastralNumber}`);
     } catch (error) {
+      maxNotified = false;
       console.error('Не удалось отправить заявку на землю в Max', error);
     }
-    res.status(201).json({ ok: true });
+    res.status(201).json({ ok: true, maxNotified });
   } catch (error) {
     console.error('Не удалось обработать заявку на землю', error);
     return res.status(500).json({ message: 'Не удалось обработать заявку' });
@@ -915,7 +918,8 @@ app.delete('/api/admin/upload/project-image', authMiddleware, (req, res) => {
 });
 
 app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
-  if (!req.path.startsWith('/api/admin/upload/')) return next(error);
+  const isImageUpload = req.path.startsWith('/api/admin/upload/') || req.path === '/api/land-submissions';
+  if (!isImageUpload) return next(error);
   if (res.headersSent) return next(error);
 
   if (error instanceof multer.MulterError) {
