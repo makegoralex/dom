@@ -8,6 +8,18 @@ export type LesnoeOzeroPlot = {
   status: LesnoeOzeroPlotStatus;
   position: { x: number; y: number };
   description: string;
+  price?: string;
+  cadastralNumber?: string;
+  purpose?: string;
+  electricity?: string;
+  gas?: string;
+  access?: string;
+};
+
+export const LESNOE_OZERO_STATUS_LABELS: Record<LesnoeOzeroPlotStatus, string> = {
+  available: 'В продаже',
+  reserved: 'Забронирован',
+  sold: 'Продан'
 };
 
 export const LESNOE_OZERO_PHASES: Record<LesnoeOzeroPhase, {
@@ -73,7 +85,7 @@ export const LESNOE_OZERO_PLOTS: LesnoeOzeroPlot[] = [
   },
   {
     id: '1394', phase: 'forest', areaSotka: 6, status: 'available', position: { x: 68, y: 28 },
-    description: 'Компактный лесной участок: под дом, дачу или инвестицию.'
+    description: 'Компактный лесной участок: под дом, дачу или инвестицию.', price: '550 000 ₽'
   },
   {
     id: '1388', phase: 'forest', areaSotka: 8.5, status: 'available', position: { x: 69, y: 38 },

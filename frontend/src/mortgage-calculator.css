@@ -1,0 +1,43 @@
+.mortgage-calc{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(310px,.85fr);border:1px solid #d9dde4;background:#fff;box-shadow:0 18px 50px rgba(17,31,45,.08);}
+.mortgage-calc__controls{display:grid;gap:24px;padding:32px;}
+.mortgage-calc__controls label{display:grid;gap:9px;color:#303844;font-size:14px;font-weight:700;}
+.mortgage-calc__controls input[type="number"],.mortgage-calc__controls select{width:100%;min-height:48px;border:1px solid #cfd5de;border-radius:0;padding:10px 12px;background:#fff;color:#18212d;font-size:18px;font-weight:700;}
+.mortgage-calc__controls input[type="range"]{width:100%;accent-color:#53ab28;}
+.mortgage-calc__controls small{color:#6b7280;font-size:12px;font-weight:400;}
+.mortgage-calc__row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.mortgage-calc__result{display:flex;flex-direction:column;padding:32px;color:#fff;background:#0a2f23;}
+.mortgage-calc__result>p{margin:0 0 8px;color:rgba(255,255,255,.7);font-size:14px;}
+.mortgage-calc__result>strong{display:block;color:#ffdd4d;font-size:clamp(34px,5vw,54px);line-height:1;}
+.mortgage-calc__result>strong small{display:block;margin-top:8px;color:#fff;font-size:13px;font-weight:600;}
+.mortgage-calc__result dl{display:grid;grid-template-columns:1fr auto;gap:13px 18px;margin:28px 0;padding:22px 0;border-top:1px solid rgba(255,255,255,.18);border-bottom:1px solid rgba(255,255,255,.18);font-size:14px;}
+.mortgage-calc__result dt{color:rgba(255,255,255,.68);}.mortgage-calc__result dd{margin:0;text-align:right;font-weight:700;}
+.mortgage-calc__result button{min-height:48px;border:0;border-radius:0;padding:12px 16px;color:#fff;background:#eb7b17;font-weight:800;cursor:pointer;}
+.mortgage-calc__notice{display:block;margin-top:16px;color:rgba(255,255,255,.58);font-size:11px;line-height:1.45;}
+.mortgage-calc--compact{grid-template-columns:1fr .9fr;box-shadow:none;}
+.mortgage-calc--compact .mortgage-calc__controls,.mortgage-calc--compact .mortgage-calc__result{padding:24px;}
+.mortgage-calc--compact .mortgage-calc__controls{gap:17px;}
+.mortgage-calc--compact .mortgage-calc__result>strong{font-size:38px;}
+.mortgage-page{color:#1c2530;background:#f4f5f3;}
+.mortgage-page__hero{padding:92px 0;color:#fff;background:linear-gradient(120deg,#082a20,#174e3c);}
+.mortgage-page__hero p{margin:0 0 14px;color:#ffdd4d;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;}
+.mortgage-page__hero h1{margin:0;font-size:clamp(42px,6vw,72px);line-height:1;}
+.mortgage-page__hero span{display:block;max-width:720px;margin-top:20px;color:rgba(255,255,255,.78);font-size:19px;line-height:1.5;}
+.mortgage-page__body{padding:76px 0 96px;}
+.mortgage-page__features{display:grid;grid-template-columns:repeat(3,1fr);margin-top:34px;border:1px solid #d9dde4;background:#d9dde4;gap:1px;}
+.mortgage-page__features article{padding:26px;background:#fff;}
+.mortgage-page__features strong{color:#eb7b17;font-size:26px;}
+.mortgage-page__features h2{margin:18px 0 8px;font-size:19px;}
+.mortgage-page__features p{margin:0;color:#666f7a;font-size:14px;line-height:1.5;}
+.mortgage-page__request{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:60px;margin-top:34px;padding:42px;color:#fff;background:#0a2f23;scroll-margin-top:20px;}
+.mortgage-page__request>div>p{margin:0 0 9px;color:#ffdd4d;font-size:12px;font-weight:800;text-transform:uppercase;}
+.mortgage-page__request h2{margin:0;font-size:42px;}.mortgage-page__request h2 small{font-size:15px;}
+.mortgage-page__request>div>span{display:block;margin-top:10px;color:rgba(255,255,255,.7);}
+.mortgage-page__request form{display:grid;gap:11px;}
+.mortgage-page__request form>label:not(.privacy-consent){display:grid;gap:5px;font-size:12px;}
+.mortgage-page__request input{min-height:46px;border:0;border-radius:0;padding:10px 12px;font-size:15px;}
+.mortgage-page__request .privacy-consent{font-size:11px;color:rgba(255,255,255,.8);}.mortgage-page__request .privacy-consent a{color:inherit;}
+.mortgage-page__request button{min-height:48px;border:0;color:#fff;background:#eb7b17;font-weight:800;cursor:pointer;}
+.mortgage-page__request form>p{margin:0;font-size:12px;line-height:1.4;}
+@media(max-width:760px){.mortgage-calc,.mortgage-calc--compact{grid-template-columns:1fr}.mortgage-calc__controls,.mortgage-calc__result,.mortgage-calc--compact .mortgage-calc__controls,.mortgage-calc--compact .mortgage-calc__result{padding:22px}.mortgage-calc__row{grid-template-columns:1fr 1fr}.mortgage-calc__result>strong{font-size:39px}}
+@media(max-width:430px){.mortgage-calc__row{grid-template-columns:1fr}.mortgage-calc__controls input[type="number"],.mortgage-calc__controls select{font-size:16px}}
+@media(max-width:760px){.mortgage-page__hero{padding:66px 0}.mortgage-page__body{padding:50px 0 68px}.mortgage-page__features,.mortgage-page__request{grid-template-columns:1fr}.mortgage-page__request{gap:30px;padding:24px}.mortgage-page__features article{padding:22px}}

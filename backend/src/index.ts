@@ -51,6 +51,24 @@ interface PendingLandPlot extends LandPlot {
   createdAt: string;
 }
 
+type LesnoeOzeroPhase = 'lake' | 'forest';
+type LesnoeOzeroPlotStatus = 'available' | 'reserved' | 'sold';
+
+interface LesnoeOzeroPlot {
+  id: string;
+  phase: LesnoeOzeroPhase;
+  areaSotka: number;
+  status: LesnoeOzeroPlotStatus;
+  price: string;
+  cadastralNumber: string;
+  description: string;
+  position: { x: number; y: number };
+  purpose: string;
+  electricity: string;
+  gas: string;
+  access: string;
+}
+
 interface ContentPage {
   slug: string;
   title: string;
@@ -72,6 +90,7 @@ interface DataStore {
   projects: HouseProject[];
   lands: LandPlot[];
   pendingLands: PendingLandPlot[];
+  lesnoeOzeroPlots: LesnoeOzeroPlot[];
   portfolio: PortfolioItem[];
   leads: Lead[];
   pages: Record<string, ContentPage>;
@@ -390,6 +409,44 @@ const seedLands: LandPlot[] = [
   { id: 'land3', cadastralNumber: '58:29:1003001:256', area: '8 соток', price: '980 000 ₽', district: 'Железнодорожный район', images: ['https://images.unsplash.com/photo-1493815793585-d94ccbc86df8?auto=format&fit=crop&w=1200&q=80'], mapUrl: '' }
 ];
 
+const seedLesnoeOzeroPlots: LesnoeOzeroPlot[] = [
+  { id: '899', phase: 'lake', areaSotka: 8.6, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 72, y: 24 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Компактный участок рядом с озером. Подойдёт для постоянного дома или дачи.' },
+  { id: '939', phase: 'lake', areaSotka: 8.9, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 59, y: 30 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Участок у воды с удобным выходом к внутренней дороге.' },
+  { id: '875', phase: 'lake', areaSotka: 10.1, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 57, y: 40 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Универсальная площадь и живописное природное окружение.' },
+  { id: '876', phase: 'lake', areaSotka: 10.8, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 53, y: 49 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Просторный участок с хорошей формой для посадки дома.' },
+  { id: '877', phase: 'lake', areaSotka: 13.3, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 52, y: 57 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Увеличенная площадь для дома, террасы и дополнительных строений.' },
+  { id: '878', phase: 'lake', areaSotka: 10.1, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 53, y: 65 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Отдельный участок в центральной части первой очереди.' },
+  { id: '879', phase: 'lake', areaSotka: 10.5, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 56, y: 73 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Участок рядом с лесным массивом и разворотной площадкой.' },
+  { id: '900', phase: 'lake', areaSotka: 10.2, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 77, y: 36 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Ровный участок на противоположной стороне основной дороги.' },
+  { id: '902', phase: 'lake', areaSotka: 7.2, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 82, y: 53 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Компактный вариант для дачного дома или инвестиции.' },
+  { id: '903', phase: 'lake', areaSotka: 7.1, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 84, y: 63 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Доступный по площади участок у лесной границы.' },
+  { id: '1394', phase: 'forest', areaSotka: 6, status: 'available', price: '550 000 ₽', cadastralNumber: '', position: { x: 68, y: 28 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Компактный лесной участок: под дом, дачу или инвестицию.' },
+  { id: '1388', phase: 'forest', areaSotka: 8.5, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 69, y: 38 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Участок хорошей формы с удобным расположением у дороги.' },
+  { id: '849', phase: 'forest', areaSotka: 16, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 58, y: 67 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Редкий крупный участок рядом с водой — под усадьбу или банный комплекс.' }
+];
+
+function normalizeLesnoeOzeroPlot(incoming: Partial<LesnoeOzeroPlot>, fallbackId = `plot_${Date.now()}`): LesnoeOzeroPlot {
+  const phase: LesnoeOzeroPhase = incoming.phase === 'forest' ? 'forest' : 'lake';
+  const status: LesnoeOzeroPlotStatus = incoming.status === 'reserved' || incoming.status === 'sold' ? incoming.status : 'available';
+  return {
+    id: String(incoming.id || fallbackId).trim(),
+    phase,
+    areaSotka: Math.max(0, Number(incoming.areaSotka) || 0),
+    status,
+    price: String(incoming.price || 'По запросу').trim(),
+    cadastralNumber: String(incoming.cadastralNumber || '').trim(),
+    description: String(incoming.description || '').trim(),
+    position: {
+      x: Math.min(100, Math.max(0, Number(incoming.position?.x) || 50)),
+      y: Math.min(100, Math.max(0, Number(incoming.position?.y) || 50))
+    },
+    purpose: String(incoming.purpose || 'ИЖС').trim(),
+    electricity: String(incoming.electricity || '15 кВт вдоль земельного участка').trim(),
+    gas: String(incoming.gas || 'вдоль земельного участка').trim(),
+    access: String(incoming.access || 'круглогодичный').trim()
+  };
+}
+
 function normalizeLandPlot(incoming: Partial<LandPlot> & { image?: string }, fallbackId = `land_${Date.now()}`): LandPlot {
   const images = Array.isArray(incoming.images)
     ? incoming.images.map((item) => String(item || '').trim()).filter(Boolean)
@@ -413,6 +470,7 @@ const ensureDataFile = (): void => {
       projects: seedProjects,
       lands: seedLands,
       pendingLands: [],
+      lesnoeOzeroPlots: seedLesnoeOzeroPlots,
       portfolio: seedPortfolio,
       leads: [],
       pages: seedPages,
@@ -440,6 +498,9 @@ const readData = (): DataStore => {
           createdAt: String((land as Partial<PendingLandPlot>)?.createdAt || new Date().toISOString())
         }))
       : [],
+    lesnoeOzeroPlots: Array.isArray(parsed.lesnoeOzeroPlots) && parsed.lesnoeOzeroPlots.length
+      ? parsed.lesnoeOzeroPlots.map((plot) => normalizeLesnoeOzeroPlot(plot, plot.id))
+      : seedLesnoeOzeroPlots,
     portfolio: parsed.portfolio || seedPortfolio,
     leads: parsed.leads || [],
     pages: { ...seedPages, ...(parsed.pages || {}) },
@@ -538,6 +599,7 @@ app.get('/api/projects', (_req, res) => {
   res.json(data.projects);
 });
 app.get('/api/lands', (_req, res) => res.json(readData().lands || seedLands));
+app.get('/api/lesnoe-ozero/plots', (_req, res) => res.json(readData().lesnoeOzeroPlots));
 app.post('/api/land-submissions', upload.array('images', 20), async (req, res) => {
   const { sellerName, sellerPhone, cadastralNumber, area, price, district, description, mapUrl } = req.body as Record<string, string>;
   if (!sellerName || !sellerPhone || !cadastralNumber || !area || !price || !district || !description) {
@@ -647,6 +709,37 @@ app.post('/api/admin/login', (req, res) => {
 app.get('/api/admin/projects', authMiddleware, (_req, res) => res.json(readData().projects));
 app.get('/api/admin/lands', authMiddleware, (_req, res) => res.json(readData().lands || []));
 app.get('/api/admin/pending-lands', authMiddleware, (_req, res) => res.json(readData().pendingLands || []));
+app.get('/api/admin/lesnoe-ozero/plots', authMiddleware, (_req, res) => res.json(readData().lesnoeOzeroPlots));
+
+app.post('/api/admin/lesnoe-ozero/plots', authMiddleware, (req, res) => {
+  const incoming = req.body as Partial<LesnoeOzeroPlot>;
+  const id = String(incoming.id || '').trim();
+  if (!id) return res.status(400).json({ message: 'Укажите номер участка' });
+  const data = readData();
+  if (data.lesnoeOzeroPlots.some((plot) => plot.id === id)) return res.status(409).json({ message: 'Участок с таким номером уже существует' });
+  const plot = normalizeLesnoeOzeroPlot({ ...incoming, id }, id);
+  data.lesnoeOzeroPlots.push(plot);
+  writeData(data);
+  res.status(201).json(plot);
+});
+
+app.put('/api/admin/lesnoe-ozero/plots/:id', authMiddleware, (req, res) => {
+  const id = String(req.params.id);
+  const data = readData();
+  const index = data.lesnoeOzeroPlots.findIndex((plot) => plot.id === id);
+  if (index === -1) return res.status(404).json({ message: 'Участок не найден' });
+  data.lesnoeOzeroPlots[index] = normalizeLesnoeOzeroPlot({ ...data.lesnoeOzeroPlots[index], ...(req.body as Partial<LesnoeOzeroPlot>), id }, id);
+  writeData(data);
+  res.json(data.lesnoeOzeroPlots[index]);
+});
+
+app.delete('/api/admin/lesnoe-ozero/plots/:id', authMiddleware, (req, res) => {
+  const id = String(req.params.id);
+  const data = readData();
+  data.lesnoeOzeroPlots = data.lesnoeOzeroPlots.filter((plot) => plot.id !== id);
+  writeData(data);
+  res.json({ ok: true });
+});
 app.post('/api/admin/projects', authMiddleware, (req, res) => {
   const incoming = req.body as Partial<HouseProject>;
   const data = readData();

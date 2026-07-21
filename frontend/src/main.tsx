@@ -2,6 +2,8 @@ import React, { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } fro
 import ReactDOM from 'react-dom/client';
 import './styles.css';
 import { LesnoeOzeroPage } from './LesnoeOzeroPage';
+import { MortgageCalculatorPage } from './MortgageCalculatorPage';
+import { LESNOE_OZERO_PHASES, LesnoeOzeroPlot } from './lesnoeOzeroPlots';
 
 type HouseProject = {
   id: string;
@@ -93,7 +95,7 @@ type MenuItem = {
   children?: MenuChildItem[];
   active?: boolean;
 };
-type AdminTab = 'projects' | 'lands' | 'landRequests' | 'pages' | 'portfolio' | 'leads' | 'settings';
+type AdminTab = 'projects' | 'lands' | 'lesnoeOzero' | 'landRequests' | 'pages' | 'portfolio' | 'leads' | 'settings';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 const API_ORIGIN = API_BASE ? new URL(API_BASE, window.location.origin).origin : '';
@@ -110,7 +112,7 @@ const CONTACTS = {
   email: '89022099279@mail.ru',
   emailHref: 'mailto:89022099279@mail.ru',
   vk: 'https://vk.ru/evtenia_house',
-  max: 'https://max.ru/join/1zjkiv7Ex8ofTgGHuB212RBgUa_GcPjKokLeHSRDj0w',
+  max: 'https://max.ru/channel_dom_evtenia',
   rutube: 'https://rutube.ru/plst/1224190/'
 };
 const OFFICE_ADDRESS = 'г. Пенза, ул. Гоголя, 41';
@@ -425,7 +427,7 @@ function HeaderNav({
       design: { label: 'ПРОЕКТИРОВАНИЕ', href: '/design', active: currentPath === '/design' },
       portfolio: { label: 'ПОРТФОЛИО', href: '/portfolio', active: currentPath === '/portfolio' },
       furniture: { label: 'МЕБЕЛЬ', href: '/furniture', active: currentPath === '/furniture' || currentPath.startsWith('/furniture/'), children: FURNITURE_MENU_CHILDREN },
-      promotions: { label: 'ИПОТЕКА И АКЦИИ', active: currentPath.startsWith('/discounts/'), children: PROMOTIONS_MENU.map((item) => ({ label: item.title, href: `/discounts/${item.slug}` })) },
+      promotions: { label: 'ИПОТЕКА И АКЦИИ', active: currentPath.startsWith('/discounts/') || currentPath === '/mortgage-calculator', children: [{ label: 'Ипотечный калькулятор', href: '/mortgage-calculator' }, ...PROMOTIONS_MENU.map((item) => ({ label: item.title, href: `/discounts/${item.slug}` }))] },
       contacts: { label: 'КОНТАКТЫ', href: '/contacts', active: currentPath === '/contacts' }
     };
     return menuOrder.map((key) => all[key]).filter(Boolean);
@@ -2530,6 +2532,8 @@ function AdminPage() {
   const [token, setToken] = useState('');
   const [projects, setProjects] = useState<HouseProject[]>([]);
   const [lands, setLands] = useState<LandPlot[]>([]);
+  const [lesnoeOzeroPlots, setLesnoeOzeroPlots] = useState<LesnoeOzeroPlot[]>([]);
+  const [lesnoeOzeroPlotDraft, setLesnoeOzeroPlotDraft] = useState<Partial<LesnoeOzeroPlot>>({});
   const [pendingLands, setPendingLands] = useState<PendingLandPlot[]>([]);
   const [pendingLandDraft, setPendingLandDraft] = useState<PendingLandPlot | null>(null);
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -2559,9 +2563,10 @@ function AdminPage() {
   );
 
   const loadAdminData = async (currentToken: string) => {
-    const [projectsRes, landsRes, pendingLandsRes, leadsRes, pagesRes, portfolioRes, menuOrderRes, siteSettingsRes] = await Promise.all([
+    const [projectsRes, landsRes, lesnoeOzeroPlotsRes, pendingLandsRes, leadsRes, pagesRes, portfolioRes, menuOrderRes, siteSettingsRes] = await Promise.all([
       fetch(`${API_BASE}/api/admin/projects`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/lands`, { headers: { 'x-admin-token': currentToken } }),
+      fetch(`${API_BASE}/api/admin/lesnoe-ozero/plots`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/pending-lands`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/leads`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/pages`, { headers: { 'x-admin-token': currentToken } }),
@@ -2570,7 +2575,7 @@ function AdminPage() {
       fetch(`${API_BASE}/api/admin/site-settings`, { headers: { 'x-admin-token': currentToken } })
     ]);
 
-    if (!projectsRes.ok || !landsRes.ok || !pendingLandsRes.ok || !leadsRes.ok || !pagesRes.ok || !portfolioRes.ok || !menuOrderRes.ok || !siteSettingsRes.ok) {
+    if (!projectsRes.ok || !landsRes.ok || !lesnoeOzeroPlotsRes.ok || !pendingLandsRes.ok || !leadsRes.ok || !pagesRes.ok || !portfolioRes.ok || !menuOrderRes.ok || !siteSettingsRes.ok) {
       setError('Не удалось загрузить данные админки');
       return;
     }
@@ -2578,6 +2583,7 @@ function AdminPage() {
     const pagesPayload = (await pagesRes.json()) as ContentPage[];
     setProjects(await projectsRes.json());
     setLands(await landsRes.json());
+    setLesnoeOzeroPlots(await lesnoeOzeroPlotsRes.json());
     setPendingLands(await pendingLandsRes.json());
     setLeads(await leadsRes.json());
     setPages(pagesPayload);
@@ -2651,6 +2657,36 @@ function AdminPage() {
       return;
     }
     setLandDraft({});
+    await loadAdminData(token);
+  };
+
+  const saveLesnoeOzeroPlot = async () => {
+    if (!lesnoeOzeroPlotDraft.id || !lesnoeOzeroPlotDraft.phase || !lesnoeOzeroPlotDraft.areaSotka) {
+      setError('Для участка «Лесного озера» укажите номер, очередь и площадь');
+      return;
+    }
+    const exists = lesnoeOzeroPlots.some((item) => item.id === lesnoeOzeroPlotDraft.id);
+    const response = await fetch(
+      exists ? `${API_BASE}/api/admin/lesnoe-ozero/plots/${lesnoeOzeroPlotDraft.id}` : `${API_BASE}/api/admin/lesnoe-ozero/plots`,
+      { method: exists ? 'PUT' : 'POST', headers: adminHeaders, body: JSON.stringify(lesnoeOzeroPlotDraft) }
+    );
+    if (!response.ok) {
+      setError(await getApiErrorMessage(response, 'Не удалось сохранить участок «Лесного озера»'));
+      return;
+    }
+    setError('');
+    setLesnoeOzeroPlotDraft({});
+    await loadAdminData(token);
+  };
+
+  const removeLesnoeOzeroPlot = async (id: string) => {
+    if (!window.confirm(`Удалить участок №${id} со страницы «Лесное озеро»?`)) return;
+    const response = await fetch(`${API_BASE}/api/admin/lesnoe-ozero/plots/${id}`, { method: 'DELETE', headers: adminHeaders });
+    if (!response.ok) {
+      setError(await getApiErrorMessage(response, 'Не удалось удалить участок'));
+      return;
+    }
+    if (lesnoeOzeroPlotDraft.id === id) setLesnoeOzeroPlotDraft({});
     await loadAdminData(token);
   };
 
@@ -3133,6 +3169,7 @@ function AdminPage() {
       <div className="admin-tabs">
         <button className={activeTab === 'projects' ? 'active' : ''} onClick={() => setActiveTab('projects')}>Проекты</button>
         <button className={activeTab === 'lands' ? 'active' : ''} onClick={() => setActiveTab('lands')}>Земля</button>
+        <button className={activeTab === 'lesnoeOzero' ? 'active' : ''} onClick={() => setActiveTab('lesnoeOzero')}>Лесное озеро ({lesnoeOzeroPlots.length})</button>
         <button className={activeTab === 'landRequests' ? 'active' : ''} onClick={() => setActiveTab('landRequests')}>Заявки на землю ({pendingLands.length})</button>
         <button className={activeTab === 'pages' ? 'active' : ''} onClick={() => setActiveTab('pages')}>Страницы</button>
         <button className={activeTab === 'settings' ? 'active' : ''} onClick={() => setActiveTab('settings')}>Настройки</button>
@@ -3300,6 +3337,36 @@ function AdminPage() {
               </div>
             </div>
           ))}
+        </div>
+      </section></div> : null}
+
+      {activeTab === 'lesnoeOzero' ? <div className="admin-grid"><section>
+        <h2>{lesnoeOzeroPlotDraft.id && lesnoeOzeroPlots.some((item) => item.id === lesnoeOzeroPlotDraft.id) ? `Участок №${lesnoeOzeroPlotDraft.id}` : 'Новый участок «Лесного озера»'}</h2>
+        <div className="admin-form">
+          <input placeholder="Номер участка" value={lesnoeOzeroPlotDraft.id || ''} onChange={(e) => setLesnoeOzeroPlotDraft({ ...lesnoeOzeroPlotDraft, id: e.target.value.trim() })} />
+          <label>Очередь<select value={lesnoeOzeroPlotDraft.phase || 'lake'} onChange={(e) => setLesnoeOzeroPlotDraft({ ...lesnoeOzeroPlotDraft, phase: e.target.value as LesnoeOzeroPlot['phase'] })}><option value="lake">У озера</option><option value="forest">Лесной массив</option></select></label>
+          <input type="number" min="1" step="0.1" placeholder="Площадь, соток" value={lesnoeOzeroPlotDraft.areaSotka || ''} onChange={(e) => setLesnoeOzeroPlotDraft({ ...lesnoeOzeroPlotDraft, areaSotka: Number(e.target.value) })} />
+          <label>Статус<select value={lesnoeOzeroPlotDraft.status || 'available'} onChange={(e) => setLesnoeOzeroPlotDraft({ ...lesnoeOzeroPlotDraft, status: e.target.value as LesnoeOzeroPlot['status'] })}><option value="available">В продаже</option><option value="reserved">Забронирован</option><option value="sold">Продан</option></select></label>
+          <input placeholder="Цена, например 550 000 ₽" value={lesnoeOzeroPlotDraft.price || ''} onChange={(e) => setLesnoeOzeroPlotDraft({ ...lesnoeOzeroPlotDraft, price: e.target.value })} />
+          <input placeholder="Кадастровый номер" value={lesnoeOzeroPlotDraft.cadastralNumber || ''} onChange={(e) => setLesnoeOzeroPlotDraft({ ...lesnoeOzeroPlotDraft, cadastralNumber: e.target.value })} />
+          <input placeholder="Назначение" value={lesnoeOzeroPlotDraft.purpose || 'ИЖС'} onChange={(e) => setLesnoeOzeroPlotDraft({ ...lesnoeOzeroPlotDraft, purpose: e.target.value })} />
+          <input placeholder="Электричество" value={lesnoeOzeroPlotDraft.electricity || '15 кВт вдоль земельного участка'} onChange={(e) => setLesnoeOzeroPlotDraft({ ...lesnoeOzeroPlotDraft, electricity: e.target.value })} />
+          <input placeholder="Газ" value={lesnoeOzeroPlotDraft.gas || 'вдоль земельного участка'} onChange={(e) => setLesnoeOzeroPlotDraft({ ...lesnoeOzeroPlotDraft, gas: e.target.value })} />
+          <input placeholder="Подъезд" value={lesnoeOzeroPlotDraft.access || 'круглогодичный'} onChange={(e) => setLesnoeOzeroPlotDraft({ ...lesnoeOzeroPlotDraft, access: e.target.value })} />
+          <textarea rows={4} placeholder="Описание участка" value={lesnoeOzeroPlotDraft.description || ''} onChange={(e) => setLesnoeOzeroPlotDraft({ ...lesnoeOzeroPlotDraft, description: e.target.value })} />
+          <label>Положение по горизонтали: {Math.round(lesnoeOzeroPlotDraft.position?.x ?? 50)}%<input type="range" min="0" max="100" value={lesnoeOzeroPlotDraft.position?.x ?? 50} onChange={(e) => setLesnoeOzeroPlotDraft({ ...lesnoeOzeroPlotDraft, position: { x: Number(e.target.value), y: lesnoeOzeroPlotDraft.position?.y ?? 50 } })} /></label>
+          <label>Положение по вертикали: {Math.round(lesnoeOzeroPlotDraft.position?.y ?? 50)}%<input type="range" min="0" max="100" value={lesnoeOzeroPlotDraft.position?.y ?? 50} onChange={(e) => setLesnoeOzeroPlotDraft({ ...lesnoeOzeroPlotDraft, position: { x: lesnoeOzeroPlotDraft.position?.x ?? 50, y: Number(e.target.value) } })} /></label>
+          <button type="button" onClick={saveLesnoeOzeroPlot}>Сохранить участок</button>
+          <button type="button" onClick={() => setLesnoeOzeroPlotDraft({ phase: 'lake', status: 'available', position: { x: 50, y: 50 } })}>Новый участок</button>
+        </div>
+      </section><section>
+        <h2>Схема и участки</h2>
+        <div className="admin-lesnoe-preview">
+          <img src={`${API_BASE}/api/assets/lesnoe-ozero/${LESNOE_OZERO_PHASES[lesnoeOzeroPlotDraft.phase || 'lake'].mapImage}`} alt="Предпросмотр схемы" />
+          {lesnoeOzeroPlotDraft.id ? <span style={{ left: `${lesnoeOzeroPlotDraft.position?.x ?? 50}%`, top: `${lesnoeOzeroPlotDraft.position?.y ?? 50}%` }}>{lesnoeOzeroPlotDraft.id}</span> : null}
+        </div>
+        <div className="list">
+          {lesnoeOzeroPlots.map((item) => <div key={item.id} className="list-item"><div><strong>№{item.id} · {item.areaSotka} сот.</strong><p>{LESNOE_OZERO_PHASES[item.phase].shortLabel} · {item.status} · {item.price || 'цена по запросу'}</p></div><div className="actions"><button type="button" onClick={() => setLesnoeOzeroPlotDraft(item)}>Изменить</button><button type="button" onClick={() => removeLesnoeOzeroPlot(item.id)}>Удалить</button></div></div>)}
         </div>
       </section></div> : null}
 
@@ -3660,6 +3727,9 @@ function App() {
     );
   }
   if (pathname === '/lands') return <AppLayout><LandsPage /></AppLayout>;
+  if (pathname === '/mortgage-calculator') {
+    return <AppLayout><MortgageCalculatorPage Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} apiBase={API_BASE} formatPhone={formatPhoneMask} /></AppLayout>;
+  }
   if (pathname.startsWith('/project/')) return <AppLayout><ProjectDetailPage /></AppLayout>;
   if (pathname === '/design') return <AppLayout><DesignPage /></AppLayout>;
   if (servicePage) return <AppLayout><ManagedTextPage slug={`services-${servicePage.slug}`} fallbackTitle={servicePage.title} fallbackContent={servicePage.text} sectionTitle="Услуги" /></AppLayout>;
