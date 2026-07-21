@@ -3,9 +3,11 @@ import {
   formatSotka,
   LESNOE_OZERO_PHASES,
   LESNOE_OZERO_PLOTS,
+  LESNOE_OZERO_STATUS_LABELS,
   LesnoeOzeroPhase,
   LesnoeOzeroPlot
 } from './lesnoeOzeroPlots';
+import { MortgageCalculation, MortgageCalculator } from './MortgageCalculator';
 import './lesnoe-ozero.css';
 
 type LesnoeOzeroPageProps = {
@@ -29,8 +31,71 @@ type LeadFormProps = {
 
 const LEAD_PRICE = '550 000 ₽';
 
+type CatalogProject = {
+  id: string;
+  title: string;
+  coverImage: string;
+  area: string;
+  constructionType: string;
+};
+
+type TurnkeyScenario = 'life' | 'business' | 'dacha';
+
+const TURNKEY_SCENARIOS: Record<TurnkeyScenario, {
+  tab: string;
+  title: string;
+  description: string;
+  accent: string;
+  projects: Array<{ projectId: string; fallbackTitle: string; fallbackImage: string; type: string; area: string; packagePrice: string }>;
+}> = {
+  life: {
+    tab: 'Дом для жизни',
+    title: 'Переехать в готовый загородный дом',
+    description: 'Полноценный дом для постоянного проживания: тёплый контур, чистовая отделка и благоустроенный участок.',
+    accent: 'Семейный сценарий',
+    projects: [
+      { projectId: 'project_1775029736038', fallbackTitle: 'Barus-4M-100', fallbackImage: 'https://dom.evtenia.ru/api/assets/projects/project_1775029705859_48njq1.webp', type: 'Модульный', area: '85 м²', packagePrice: 'от 8,9 млн ₽' },
+      { projectId: 'project_1775024865005', fallbackTitle: 'Барнхаус 105', fallbackImage: 'https://dom.evtenia.ru/api/assets/projects/project_1775024839358_nxy8nq.webp', type: 'Каркасный', area: '105 м²', packagePrice: 'от 10,4 млн ₽' },
+      { projectId: 'project_1775029178114', fallbackTitle: 'Исидор', fallbackImage: 'https://dom.evtenia.ru/api/assets/projects/project_1775029170850_ius60g.webp', type: 'Газобетонный', area: '126 м²', packagePrice: 'от 9,6 млн ₽' }
+    ]
+  },
+  business: {
+    tab: 'Бизнес под сдачу',
+    title: 'Запустить объект и сразу принимать гостей',
+    description: 'Дом, участок и базовое оснащение под посуточную аренду. Поможем подобрать планировку и посадку нескольких объектов.',
+    accent: 'Потенциал выручки от 200 000 ₽/мес.*',
+    projects: [
+      { projectId: 'project_1775030183021', fallbackTitle: 'Арго 3МУ.49-70', fallbackImage: 'https://dom.evtenia.ru/api/assets/projects/project_1775030176447_hp8z5l.webp', type: 'Модульный', area: '69 м²', packagePrice: 'от 7,4 млн ₽' },
+      { projectId: 'project_1775026915614', fallbackTitle: 'Афрейм', fallbackImage: 'https://dom.evtenia.ru/api/assets/projects/project_1775026890566_vzbg7z.webp', type: 'Каркасный', area: '62 м²', packagePrice: 'от 8,5 млн ₽' },
+      { projectId: 'project_1775027956740', fallbackTitle: 'Питиус', fallbackImage: 'https://dom.evtenia.ru/api/assets/projects/project_1775027937701_magwdo.webp', type: 'Газобетонный', area: '77 м²', packagePrice: 'от 7,9 млн ₽' }
+    ]
+  },
+  dacha: {
+    tab: 'Дача для отдыха',
+    title: 'Приезжать на выходные в своё место',
+    description: 'Компактный дом, терраса и всё необходимое для сезонного отдыха у леса и озера без лишних расходов.',
+    accent: 'Самый доступный старт',
+    projects: [
+      { projectId: 'project_1775030773434', fallbackTitle: '2М25-30-42', fallbackImage: 'https://dom.evtenia.ru/api/assets/projects/project_1775030762673_07a2nr.webp', type: 'Модульный', area: '30 м²', packagePrice: 'от 4,3 млн ₽' },
+      { projectId: 'project_1775025373144', fallbackTitle: 'Барнхаус 42', fallbackImage: 'https://dom.evtenia.ru/api/assets/projects/project_1775025340756_osi2bi.webp', type: 'Каркасный', area: '42 м²', packagePrice: 'от 6 млн ₽' },
+      { projectId: 'project_1775030609631', fallbackTitle: '3М59-69-116', fallbackImage: 'https://dom.evtenia.ru/api/assets/projects/project_1775030604817_qqeby6.webp', type: 'Газобетонный', area: '70 м²', packagePrice: 'от 6,4 млн ₽' }
+    ]
+  }
+};
+
+const TURNKEY_INCLUDED = [
+  'участок ИЖС', 'проект и посадка дома', 'фундамент и дом с отделкой',
+  'подключение коммуникаций', 'забор и въездная группа', 'подъезд и базовое благоустройство'
+];
+
 function assetUrl(apiBase: string, filename: string) {
   return `${apiBase.replace(/\/$/, '')}/api/assets/lesnoe-ozero/${filename}`;
+}
+
+function projectImageUrl(value: string) {
+  if (!value) return '';
+  if (value.startsWith('http://dom.evtenia.ru')) return value.replace('http://', 'https://');
+  return value;
 }
 
 function emitAnalytics(name: string, detail: Record<string, unknown> = {}) {
@@ -189,13 +254,19 @@ export function LesnoeOzeroPage({ Header, Footer, PrivacyConsent, apiBase, forma
   }, []);
   const [phase, setPhase] = useState<LesnoeOzeroPhase>(initialPlot.phase);
   const [selectedPlot, setSelectedPlot] = useState<LesnoeOzeroPlot>(initialPlot);
+  const [plots, setPlots] = useState<LesnoeOzeroPlot[]>(LESNOE_OZERO_PLOTS);
+  const [catalogProjects, setCatalogProjects] = useState<CatalogProject[]>([]);
+  const [turnkeyScenario, setTurnkeyScenario] = useState<TurnkeyScenario>('life');
   const [showAll, setShowAll] = useState(false);
   const [dialogInterest, setDialogInterest] = useState('');
   const mapSectionRef = useRef<HTMLElement>(null);
 
-  const phasePlots = useMemo(() => LESNOE_OZERO_PLOTS.filter((plot) => plot.phase === phase), [phase]);
-  const visibleCatalog = showAll ? LESNOE_OZERO_PLOTS : LESNOE_OZERO_PLOTS.slice(0, 6);
+  const phasePlots = useMemo(() => plots.filter((plot) => plot.phase === phase), [phase, plots]);
+  const availablePlots = useMemo(() => plots.filter((plot) => plot.status === 'available'), [plots]);
+  const visibleCatalog = showAll ? plots : plots.slice(0, 6);
   const phaseDetails = LESNOE_OZERO_PHASES[phase];
+  const scenario = TURNKEY_SCENARIOS[turnkeyScenario];
+  const catalogAreas = availablePlots.length ? availablePlots.map((plot) => plot.areaSotka) : plots.map((plot) => plot.areaSotka);
 
   useEffect(() => {
     const previousTitle = document.title;
@@ -210,6 +281,26 @@ export function LesnoeOzeroPage({ Header, Footer, PrivacyConsent, apiBase, forma
     };
   }, []);
 
+  useEffect(() => {
+    Promise.all([
+      fetch(`${apiBase}/api/lesnoe-ozero/plots`).then((response) => response.ok ? response.json() : Promise.reject()),
+      fetch(`${apiBase}/api/projects`).then((response) => response.ok ? response.json() : Promise.reject())
+    ]).then(([plotPayload, projectPayload]: [LesnoeOzeroPlot[], CatalogProject[]]) => {
+      if (Array.isArray(plotPayload) && plotPayload.length) {
+        setPlots(plotPayload);
+        const requestedId = new URLSearchParams(window.location.search).get('plot');
+        const nextSelected = plotPayload.find((plot) => plot.id === requestedId)
+          || plotPayload.find((plot) => plot.id === selectedPlot.id)
+          || plotPayload[0];
+        setSelectedPlot(nextSelected);
+        setPhase(nextSelected.phase);
+      }
+      if (Array.isArray(projectPayload)) setCatalogProjects(projectPayload);
+    }).catch(() => {
+      fetch(`${apiBase}/api/projects`).then((response) => response.ok ? response.json() : []).then(setCatalogProjects).catch(() => undefined);
+    });
+  }, [apiBase]);
+
   const choosePlot = (plot: LesnoeOzeroPlot, scrollToMap = false) => {
     setPhase(plot.phase);
     setSelectedPlot(plot);
@@ -222,7 +313,7 @@ export function LesnoeOzeroPage({ Header, Footer, PrivacyConsent, apiBase, forma
 
   const choosePhase = (nextPhase: LesnoeOzeroPhase) => {
     setPhase(nextPhase);
-    const firstPlot = LESNOE_OZERO_PLOTS.find((plot) => plot.phase === nextPhase);
+    const firstPlot = plots.find((plot) => plot.phase === nextPhase);
     if (firstPlot) choosePlot(firstPlot);
     emitAnalytics('plot_map_phase_change', { phase: nextPhase });
   };
@@ -230,6 +321,11 @@ export function LesnoeOzeroPage({ Header, Footer, PrivacyConsent, apiBase, forma
   const openDialog = (interest: string) => {
     setDialogInterest(interest);
     if (interest.includes(LEAD_PRICE)) emitAnalytics('lead_offer_open');
+  };
+
+  const requestMortgage = (calculation: MortgageCalculation) => {
+    openDialog(`Ипотечный расчёт: ${Math.round(calculation.monthlyPayment).toLocaleString('ru-RU')} ₽ в месяц`);
+    emitAnalytics('mortgage_request', { source: 'lesnoe_ozero', ...calculation });
   };
 
   return (
@@ -262,6 +358,8 @@ export function LesnoeOzeroPage({ Header, Footer, PrivacyConsent, apiBase, forma
             <a href="#lesnoe-about">О посёлке</a>
             <a href="#lesnoe-map">Карта участков</a>
             <a href="#lesnoe-catalog">Каталог</a>
+            <a href="#lesnoe-turnkey">Под ключ</a>
+            <a href="#lesnoe-mortgage">Ипотека</a>
             <a href="#lesnoe-gallery">Фотографии</a>
             <a href="#lesnoe-contacts">Записаться на просмотр</a>
           </div>
@@ -322,7 +420,7 @@ export function LesnoeOzeroPage({ Header, Footer, PrivacyConsent, apiBase, forma
                     <button
                       key={plot.id}
                       type="button"
-                      className={selectedPlot.id === plot.id ? 'active' : ''}
+                      className={`${selectedPlot.id === plot.id ? 'active' : ''} status-${plot.status}`}
                       style={{ left: `${plot.position.x}%`, top: `${plot.position.y}%` }}
                       aria-label={`Выбрать участок №${plot.id}, ${formatSotka(plot.areaSotka)} соток`}
                       onClick={() => choosePlot(plot)}
@@ -331,22 +429,23 @@ export function LesnoeOzeroPage({ Header, Footer, PrivacyConsent, apiBase, forma
                     </button>
                   ))}
                 </div>
-                <div className="lo-map-legend"><span>В продаже</span><span>Выбран</span></div>
+                <div className="lo-map-legend"><span>В продаже</span><span>Выбран</span><span>Бронь / продан</span></div>
               </div>
               <aside className="lo-plot-detail" aria-live="polite">
-                <span className="lo-status">В продаже</span>
+                <span className={`lo-status status-${selectedPlot.status}`}>{LESNOE_OZERO_STATUS_LABELS[selectedPlot.status]}</span>
                 <h3>Участок №{selectedPlot.id}</h3>
                 <strong className="lo-plot-area">{formatSotka(selectedPlot.areaSotka)} сот.</strong>
                 <small>{LESNOE_OZERO_PHASES[selectedPlot.phase].label}</small>
                 <dl>
-                  <dt>Назначение</dt><dd>ИЖС</dd>
-                  <dt>Электричество</dt><dd>15 кВт вдоль земельного участка</dd>
-                  <dt>Газ</dt><dd>вдоль земельного участка</dd>
-                  <dt>Подъезд</dt><dd>круглогодичный</dd>
-                  <dt>Цена</dt><dd>по запросу</dd>
+                  <dt>Назначение</dt><dd>{selectedPlot.purpose || 'ИЖС'}</dd>
+                  <dt>Электричество</dt><dd>{selectedPlot.electricity || '15 кВт вдоль участка'}</dd>
+                  <dt>Газ</dt><dd>{selectedPlot.gas || 'вдоль участка'}</dd>
+                  <dt>Подъезд</dt><dd>{selectedPlot.access || 'круглогодичный'}</dd>
+                  {selectedPlot.cadastralNumber ? <><dt>Кадастровый №</dt><dd>{selectedPlot.cadastralNumber}</dd></> : null}
+                  <dt>Цена</dt><dd>{selectedPlot.price || 'по запросу'}</dd>
                 </dl>
                 <p>{selectedPlot.description}</p>
-                <button className="lo-button lo-button--orange" type="button" onClick={() => openDialog(`Участок №${selectedPlot.id}`)}>Узнать цену и записаться на просмотр</button>
+                <button className="lo-button lo-button--orange" type="button" disabled={selectedPlot.status === 'sold'} onClick={() => openDialog(`Участок №${selectedPlot.id}`)}>{selectedPlot.status === 'sold' ? 'Участок продан' : 'Узнать цену и записаться на просмотр'}</button>
               </aside>
             </div>
           </div>
@@ -354,20 +453,71 @@ export function LesnoeOzeroPage({ Header, Footer, PrivacyConsent, apiBase, forma
 
         <section className="lo-catalog" id="lesnoe-catalog">
           <div className="container">
-            <div className="lo-section-head"><div><p className="lo-eyebrow">Каталог</p><h2>Участки в продаже</h2></div><p>13 вариантов · от 6 до 16 соток</p></div>
+            <div className="lo-section-head"><div><p className="lo-eyebrow">Каталог</p><h2>Участки в продаже</h2></div><p>{availablePlots.length} вариантов{catalogAreas.length ? ` · от ${formatSotka(Math.min(...catalogAreas))} до ${formatSotka(Math.max(...catalogAreas))} соток` : ''}</p></div>
             <div className="lo-cards">
               {visibleCatalog.map((plot) => (
                 <article className="lo-plot-card" key={plot.id}>
-                  <div className="lo-plot-card-top"><strong>№{plot.id}</strong><span>В продаже</span></div>
+                  <div className="lo-plot-card-top"><strong>№{plot.id}</strong><span className={`status-${plot.status}`}>{LESNOE_OZERO_STATUS_LABELS[plot.status]}</span></div>
                   <div className="lo-plot-card-body">
                     <h3>{formatSotka(plot.areaSotka)} сот.</h3>
                     <p>{LESNOE_OZERO_PHASES[plot.phase].shortLabel} · ИЖС · электричество</p>
-                    <div><strong>Цена по запросу</strong><button type="button" onClick={() => choosePlot(plot, true)}>На карте</button><button type="button" onClick={() => openDialog(`Участок №${plot.id}`)}>Подробнее</button></div>
+                    <div><strong>{plot.price || 'Цена по запросу'}</strong><button type="button" onClick={() => choosePlot(plot, true)}>На карте</button><button type="button" disabled={plot.status === 'sold'} onClick={() => openDialog(`Участок №${plot.id}`)}>Подробнее</button></div>
                   </div>
                 </article>
               ))}
             </div>
             {!showAll ? <div className="lo-more"><button className="lo-button lo-button--dark" type="button" onClick={() => setShowAll(true)}>Показать все участки</button></div> : null}
+          </div>
+        </section>
+
+        <section className="lo-turnkey" id="lesnoe-turnkey">
+          <div className="container">
+            <div className="lo-section-head">
+              <div><p className="lo-eyebrow">Готовые решения</p><h2>Дом и участок под ключ</h2><p className="lo-section-lead">Один договор и понятный результат: от выбора участка до готового дома, забора и подключённых коммуникаций.</p></div>
+              <span className="lo-turnkey-note">Предварительный бюджет — уточним после выбора участка и комплектации</span>
+            </div>
+            <div className="lo-turnkey-included" aria-label="Что входит в предложение">
+              {TURNKEY_INCLUDED.map((item) => <span key={item}>✓ {item}</span>)}
+            </div>
+            <div className="lo-scenario-tabs" role="tablist" aria-label="Сценарий покупки">
+              {(Object.keys(TURNKEY_SCENARIOS) as TurnkeyScenario[]).map((key) => (
+                <button key={key} type="button" role="tab" aria-selected={turnkeyScenario === key} className={turnkeyScenario === key ? 'active' : ''} onClick={() => setTurnkeyScenario(key)}>{TURNKEY_SCENARIOS[key].tab}</button>
+              ))}
+            </div>
+            <div className="lo-scenario-intro">
+              <div><p>{scenario.accent}</p><h3>{scenario.title}</h3><span>{scenario.description}</span></div>
+              {turnkeyScenario === 'business' ? <small>*Потенциальная выручка зависит от тарифа, загрузки, сезона, расходов и управления объектом. Не является гарантией дохода.</small> : null}
+            </div>
+            <div className="lo-turnkey-cards">
+              {scenario.projects.map((offer) => {
+                const project = catalogProjects.find((item) => item.id === offer.projectId)
+                  || catalogProjects.find((item) => item.title.toLowerCase() === offer.fallbackTitle.toLowerCase());
+                return (
+                  <article key={`${turnkeyScenario}-${offer.projectId}`}>
+                    <a className="lo-turnkey-image" href={`/project/${project?.id || offer.projectId}`}>
+                      <img src={projectImageUrl(project?.coverImage || offer.fallbackImage)} alt={`Проект ${project?.title || offer.fallbackTitle}`} loading="lazy" />
+                    </a>
+                    <div className="lo-turnkey-card-body">
+                      <span>{offer.type} · {project?.area || offer.area}</span>
+                      <h3>{project?.title || offer.fallbackTitle}</h3>
+                      <p>Участок, дом с отделкой, коммуникации, ограждение и подготовка территории.</p>
+                      <strong>{offer.packagePrice}<small>за комплекс под ключ</small></strong>
+                      <div><a href={`/project/${project?.id || offer.projectId}`}>Посмотреть проект</a><button type="button" onClick={() => openDialog(`${scenario.tab}: ${project?.title || offer.fallbackTitle}, ${offer.packagePrice}`)}>Рассчитать</button></div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="lo-mortgage" id="lesnoe-mortgage">
+          <div className="container">
+            <div className="lo-section-head">
+              <div><p className="lo-eyebrow">Финансирование</p><h2>Дом и участок — примерно от 20 000 ₽ в месяц</h2><p className="lo-section-lead">Стартовый пример рассчитан для доступного дачного комплекса. Измените цену, взнос, срок и ставку — результат пересчитается сразу.</p></div>
+              <a className="lo-button lo-button--dark" href="/mortgage-calculator">Открыть полный калькулятор</a>
+            </div>
+            <MortgageCalculator compact onRequest={requestMortgage} />
           </div>
         </section>
 

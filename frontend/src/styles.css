@@ -348,7 +348,7 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 }
 
 .lead-form {max-width:620px; display:grid; gap:12px;}
-.lead-form input,.lead-form select,.lead-form textarea,.admin-form input,.admin-form textarea {
+.lead-form input,.lead-form select,.lead-form textarea,.admin-form input,.admin-form select,.admin-form textarea {
   width:100%; border:1px solid #d0d7e3; border-radius:10px; padding:12px 14px; font-size:16px;
 }
 .lead-form button,.admin-form button,.actions button {border:none; background:#182230; color:#fff; padding:12px 18px; border-radius:10px; cursor:pointer;}
@@ -359,6 +359,10 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .admin-tabs button.active{background:#1f2a3a; color:#fff; border-color:#1f2a3a;}
 .admin-grid {display:grid; grid-template-columns:1fr 1fr; gap:20px;}
 .admin-form {display:grid; gap:10px;}
+.admin-form label{display:grid;gap:6px;color:#3d4652;font-size:13px;}
+.admin-lesnoe-preview{position:relative;min-height:440px;margin-bottom:16px;overflow:hidden;border:1px solid #d7dde5;background:#e6eae5;}
+.admin-lesnoe-preview img{width:100%;height:440px;display:block;object-fit:cover;}
+.admin-lesnoe-preview span{position:absolute;width:46px;height:46px;display:grid;place-items:center;transform:translate(-50%,-50%);border:3px solid #fff;border-radius:50%;color:#fff;background:#eb7b17;box-shadow:0 4px 15px rgba(0,0,0,.25);font-size:11px;font-weight:800;}
 .admin-media-preview{display:grid; gap:8px; margin:6px 0;}
 .admin-media-preview p{margin:0; font-size:13px; color:#4a5364;}
 .admin-images-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px;}

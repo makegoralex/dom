@@ -108,7 +108,51 @@
 .lo-plot-card-body > div > strong { margin-right: auto; color: var(--lo-dark); font-size: 14px; }
 .lo-plot-card-body button { min-height: 36px; border: 0; border-radius: 0; padding: 8px 10px; color: #fff; background: var(--lo-dark); font-size: 11px; font-weight: 700; cursor: pointer; }
 .lo-plot-card-body button:last-child { background: var(--lo-orange); }
+.lo-hotspots button.status-reserved { color: #fff; background: #8c7346; }
+.lo-hotspots button.status-sold { opacity: .72; color: #fff; background: #6f7479; }
+.lo-map-legend span:nth-child(3)::before { background: #777; }
+.lo-status.status-reserved,
+.lo-plot-card-top span.status-reserved { color: #fff; background: #8c7346; }
+.lo-status.status-sold,
+.lo-plot-card-top span.status-sold { color: #fff; background: #6f7479; }
+.lo-plot-card button:disabled,
+.lo-plot-detail button:disabled { opacity: .58; cursor: not-allowed; }
 .lo-more { display: flex; justify-content: center; margin-top: 27px; }
+
+.lo-turnkey { scroll-margin-top: 12px; padding: 96px 0; color: #fff; background: var(--lo-deep); }
+.lo-turnkey h2 { color: #fff !important; }
+.lo-turnkey .lo-section-lead { color: rgba(255,255,255,.72); }
+.lo-turnkey-note { max-width: 300px; color: rgba(255,255,255,.62); font-size: 12px; line-height: 1.45; text-align: right; }
+.lo-turnkey-included { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin: 32px 0; background: rgba(255,255,255,.14); }
+.lo-turnkey-included span { padding: 14px 18px; color: rgba(255,255,255,.88); background: #123e2f; font-size: 13px; }
+.lo-turnkey-included span::first-letter { color: var(--lo-yellow); }
+.lo-scenario-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+.lo-scenario-tabs button { min-height: 62px; border: 1px solid rgba(255,255,255,.2); padding: 14px; color: #fff; background: transparent; font-size: 15px; font-weight: 800; cursor: pointer; }
+.lo-scenario-tabs button.active { border-color: var(--lo-yellow); color: var(--lo-deep); background: var(--lo-yellow); }
+.lo-scenario-intro { min-height: 145px; display: grid; grid-template-columns: 1fr 320px; align-items: end; gap: 32px; padding: 30px 0 24px; }
+.lo-scenario-intro p { margin: 0 0 8px; color: var(--lo-yellow); font-size: 13px; font-weight: 800; text-transform: uppercase; }
+.lo-scenario-intro h3 { margin: 0 0 7px; color: #fff; font-size: clamp(26px, 3vw, 38px); }
+.lo-scenario-intro span { color: rgba(255,255,255,.7); font-size: 15px; line-height: 1.5; }
+.lo-scenario-intro > small { color: rgba(255,255,255,.52); font-size: 10px; line-height: 1.5; }
+.lo-turnkey-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.lo-turnkey-cards article { min-width: 0; color: #1c2530; background: #fff; }
+.lo-turnkey-image { min-height: 220px; display: grid; place-items: center; overflow: hidden; color: var(--lo-deep); background: var(--lo-yellow); font-size: 22px; font-weight: 800; text-decoration: none; }
+.lo-turnkey-image img { width: 100%; height: 220px; object-fit: cover; transition: transform .25s ease; }
+.lo-turnkey-image:hover img { transform: scale(1.03); }
+.lo-turnkey-card-body { padding: 22px; }
+.lo-turnkey-card-body > span { color: var(--lo-orange); font-size: 11px; font-weight: 800; text-transform: uppercase; }
+.lo-turnkey-card-body h3 { margin: 9px 0; color: var(--lo-navy); font-size: 24px; }
+.lo-turnkey-card-body > p { min-height: 62px; margin: 0 0 18px; color: #646b75; font-size: 13px; line-height: 1.5; }
+.lo-turnkey-card-body > strong { display: block; color: var(--lo-dark); font-size: 25px; }
+.lo-turnkey-card-body > strong small { display: block; margin-top: 3px; color: #777; font-size: 10px; font-weight: 500; text-transform: uppercase; }
+.lo-turnkey-card-body > div { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 20px; }
+.lo-turnkey-card-body a,
+.lo-turnkey-card-body button { min-height: 42px; display: flex; align-items: center; justify-content: center; border: 0; padding: 9px; color: #fff; background: var(--lo-dark); font-size: 11px; font-weight: 800; text-align: center; text-decoration: none; cursor: pointer; }
+.lo-turnkey-card-body button { background: var(--lo-orange); }
+
+.lo-mortgage { scroll-margin-top: 12px; padding: 92px 0; background: #e9eee9; }
+.lo-mortgage .lo-section-head { align-items: center; }
+.lo-mortgage .lo-section-head .lo-button { flex: 0 0 auto; }
 
 .lo-living { display: grid; grid-template-columns: 1.05fr .95fr; min-height: 690px; color: #fff; background: var(--lo-deep); }
 .lo-living-image { min-height: 520px; background-position: center; background-size: cover; }
@@ -174,6 +218,9 @@
   .lo-map-layout { grid-template-columns: 1fr; }
   .lo-map-canvas { min-height: 730px; }
   .lo-cards { grid-template-columns: 1fr 1fr; }
+  .lo-turnkey-cards { grid-template-columns: 1fr; }
+  .lo-turnkey-cards article { display: grid; grid-template-columns: 320px 1fr; }
+  .lo-turnkey-card-body > p { min-height: auto; }
   .lo-living-image { min-height: 620px; }
   .lo-gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: 350px 250px 250px; }
   .lo-gallery-grid figure:first-child { grid-column: 1 / -1; grid-row: auto; }
@@ -211,6 +258,16 @@
   .lo-map-canvas { min-height: 560px; }
   .lo-hotspots button { width: 39px; height: 39px; border-width: 2px; font-size: 9px; }
   .lo-cards { grid-template-columns: 1fr; }
+  .lo-turnkey,
+  .lo-mortgage { padding: 66px 0; }
+  .lo-turnkey-note { text-align: left; }
+  .lo-turnkey-included { grid-template-columns: 1fr; }
+  .lo-scenario-tabs { grid-template-columns: 1fr; }
+  .lo-scenario-tabs button { min-height: 49px; }
+  .lo-scenario-intro { grid-template-columns: 1fr; gap: 15px; }
+  .lo-turnkey-cards article { display: block; }
+  .lo-turnkey-image,
+  .lo-turnkey-image img { height: 230px; min-height: 230px; }
   .lo-living-image { min-height: 500px; }
   .lo-living-content { padding: 52px 22px; }
   .lo-gallery-grid { grid-template-columns: 1fr; grid-template-rows: repeat(4, 280px); }
