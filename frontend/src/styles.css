@@ -54,9 +54,10 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .menu-link-btn{border:none; background:transparent; color:#fff; font-weight:500; font-size:13px; cursor:pointer; padding:0 8px; white-space:nowrap; min-height:34px; display:flex; align-items:center;}
 .menu-link.active{color:#f8cc52; font-weight:600;}
 
-.menu-projects,.menu-services,.menu-promotions{position:relative; display:flex; align-items:center;}
+.menu-projects,.menu-services,.menu-promotions,.menu-about,.menu-settlements{position:relative; display:flex; align-items:center;}
 .projects-dropdown{position:absolute; left:50%; transform:translateX(-50%); top:100%; min-width:420px; background:#f7f8fb; color:#1f2330; border:1px solid #d3d6de; border-radius:10px; padding:12px 14px; display:none; grid-template-columns:1fr; gap:8px; z-index:60; box-shadow:0 12px 28px rgba(18,32,52,.18); max-height:min(70vh,560px); overflow-y:auto;}
 .menu-projects:hover .projects-dropdown{display:grid;}
+.menu-about:hover .projects-dropdown,.menu-settlements:hover .projects-dropdown{display:grid; min-width:250px;}
 .services-dropdown{position:absolute; left:50%; transform:translateX(-50%); top:100%; min-width:760px; max-width:min(1120px,92vw); background:#f7f8fb; color:#1f2330; border:1px solid #d3d6de; border-radius:10px; padding:10px 12px; display:none; z-index:60; box-shadow:0 12px 28px rgba(18,32,52,.18); grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:6px 10px; max-height:min(72vh,600px); overflow-y:auto;}
 .menu-services:hover .services-dropdown,.menu-promotions:hover .services-dropdown{display:grid;}
 .dropdown-heading{display:block; margin:0 0 4px; font-size:11px !important; font-weight:800 !important; color:#1f2530 !important; text-transform:uppercase; letter-spacing:.04em;}

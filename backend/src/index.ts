@@ -184,7 +184,7 @@ const FURNITURE_STRUCTURE = [
   { title: 'КАБИНЕТЫ', brands: ['CAMEL GROUP', 'PROFOFFICE'] },
   { title: 'МАТРАСЫ', brands: ['HUKLA'] }
 ];
-const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'lands', 'services', 'design', 'portfolio', 'furniture', 'promotions', 'contacts'];
+const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'lands', 'settlements', 'services', 'design', 'furniture', 'promotions', 'contacts'];
 const DEFAULT_LOGO_URL = '/assets/logo_small.png';
 const DEFAULT_CONTACTS = {
   contactPhotoUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=80',
