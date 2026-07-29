@@ -216,7 +216,7 @@ function chunkBy<T>(items: T[], size: number) {
   return chunks;
 }
 
-const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'lands', 'services', 'design', 'portfolio', 'furniture', 'promotions', 'contacts'] as const;
+const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'lands', 'settlements', 'services', 'design', 'furniture', 'promotions', 'contacts'] as const;
 type NavMenuKey = (typeof NAV_MENU_DEFAULT_ORDER)[number];
 
 function normalizeMenuOrder(order?: string[]) {
@@ -420,12 +420,24 @@ function HeaderNav({
     ];
     const all: Record<NavMenuKey, MenuItem> = {
       home: { label: 'ГЛАВНАЯ', href: '/', active: currentPath === '/' },
-      about: { label: 'О КОМПАНИИ', href: '/about', active: currentPath === '/about' },
+      about: {
+        label: 'О КОМПАНИИ',
+        href: '/about',
+        active: currentPath === '/about' || currentPath === '/portfolio',
+        children: [
+          { label: 'О компании', href: '/about' },
+          { label: 'Портфолио', href: '/portfolio' }
+        ]
+      },
       projects: { label: 'ПРОЕКТЫ ДОМОВ', href: '/projects', active: currentPath === '/projects' || currentPath === '/baths', children: projectsChildren },
-      lands: { label: 'ЗЕМЛЯ', href: '/lands', active: currentPath === '/lands' || currentPath.startsWith('/lands/') },
+      lands: { label: 'ЗЕМЛЯ', href: '/lands', active: currentPath === '/lands' || (currentPath.startsWith('/lands/') && currentPath !== '/lands/lesnoe-ozero') },
+      settlements: {
+        label: 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ',
+        active: currentPath === '/lands/lesnoe-ozero',
+        children: [{ label: 'ЖК «Лесное озеро»', href: '/lands/lesnoe-ozero' }]
+      },
       services: { label: 'УСЛУГИ', active: currentPath.startsWith('/services/'), children: serviceColumns.flatMap((column) => column.map((item) => ({ label: item.title, href: `/services/${item.slug}` }))) },
       design: { label: 'ПРОЕКТИРОВАНИЕ', href: '/design', active: currentPath === '/design' },
-      portfolio: { label: 'ПОРТФОЛИО', href: '/portfolio', active: currentPath === '/portfolio' },
       furniture: { label: 'МЕБЕЛЬ', href: '/furniture', active: currentPath === '/furniture' || currentPath.startsWith('/furniture/'), children: FURNITURE_MENU_CHILDREN },
       promotions: { label: 'ИПОТЕКА И АКЦИИ', active: currentPath.startsWith('/discounts/') || currentPath === '/mortgage-calculator', children: [{ label: 'Ипотечный калькулятор', href: '/mortgage-calculator' }, ...PROMOTIONS_MENU.map((item) => ({ label: item.title, href: `/discounts/${item.slug}` }))] },
       contacts: { label: 'КОНТАКТЫ', href: '/contacts', active: currentPath === '/contacts' }
@@ -446,13 +458,13 @@ function HeaderNav({
         {menuItems.map((item, index) => (
           <React.Fragment key={item.label}>
             {item.children ? (
-              <div className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : item.label === 'МЕБЕЛЬ' ? 'menu-furniture' : ''}`}>
+              <div className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'О КОМПАНИИ' ? 'menu-about' : item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'menu-settlements' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : item.label === 'МЕБЕЛЬ' ? 'menu-furniture' : ''}`}>
                 {item.href ? (
                   <a href={item.href} className={`menu-link ${item.active ? 'active' : ''}`}>{item.label} ▾</a>
                 ) : (
                   <button type="button" className={`menu-link menu-link-btn ${item.active ? 'active' : ''}`}>{item.label} ▾</button>
                 )}
-                <div className={item.label === 'ПРОЕКТЫ ДОМОВ' ? 'projects-dropdown' : 'services-dropdown'}>
+                <div className={item.label === 'ПРОЕКТЫ ДОМОВ' || item.label === 'О КОМПАНИИ' || item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'projects-dropdown' : 'services-dropdown'}>
                   {item.children.map((child, idx) => (
                     child.children ? (
                       <div className="dropdown-col" key={`${child.label}_${idx}`}>
@@ -1849,9 +1861,9 @@ function BathsPage() {
 }
 
 const LAND_FALLBACK: LandPlot[] = [
-  { id: 'land1', cadastralNumber: '58:29:1003001:254', area: '10 соток', price: '1 250 000 ₽', district: 'Пензенский район', images: ['https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80'] },
-  { id: 'land2', cadastralNumber: '58:29:1003001:255', area: '12 соток', price: '1 480 000 ₽', district: 'Бессоновский район', images: ['https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1200&q=80'] },
-  { id: 'land3', cadastralNumber: '58:29:1003001:256', area: '8 соток', price: '980 000 ₽', district: 'Железнодорожный район', images: ['https://images.unsplash.com/photo-1493815793585-d94ccbc86df8?auto=format&fit=crop&w=1200&q=80'] }
+  { id: 'land1', cadastralNumber: 'По запросу', area: '10 соток', price: '1 250 000 ₽', district: 'Пензенский район', images: ['https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80'] },
+  { id: 'land2', cadastralNumber: 'По запросу', area: '12 соток', price: '1 480 000 ₽', district: 'Бессоновский район', images: ['https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1200&q=80'] },
+  { id: 'land3', cadastralNumber: 'По запросу', area: '8 соток', price: '980 000 ₽', district: 'Железнодорожный район', images: ['https://images.unsplash.com/photo-1493815793585-d94ccbc86df8?auto=format&fit=crop&w=1200&q=80'] }
 ];
 
 function LandCardImageSlider({ land }: { land: LandPlot }) {
@@ -1871,6 +1883,69 @@ function LandCardImageSlider({ land }: { land: LandPlot }) {
       ) : null}
     </div>
   );
+}
+
+function LandDetailPage() {
+  const id = decodeURIComponent(normalizePathname(window.location.pathname).replace('/lands/', ''));
+  const [land, setLand] = useState<LandPlot | null>(null);
+  const [related, setRelated] = useState<LandPlot[]>([]);
+  const [activeLand, setActiveLand] = useState<LandPlot | null>(null);
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+    Promise.all([
+      fetch(`${API_BASE}/api/lands/${encodeURIComponent(id)}`).then((res) => res.ok ? res.json() : Promise.reject()),
+      fetch(`${API_BASE}/api/lands`).then((res) => res.ok ? res.json() : [])
+    ]).then(([item, all]: [LandPlot, LandPlot[]]) => {
+      setLand(item);
+      setRelated((Array.isArray(all) ? all : []).filter((candidate) => candidate.id !== item.id).slice(0, 3));
+    }).catch(() => setNotFound(true));
+  }, [id]);
+
+  useEffect(() => {
+    if (!land) return undefined;
+    const previousTitle = document.title;
+    const title = `Земельный участок ${land.area} в ${land.district} — Evtenia`;
+    const description = `${land.area}, ${land.district}. Цена ${land.price}. Подбор земли и строительство дома в Пензе.`;
+    document.title = title;
+    let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+    if (!meta) { meta = document.createElement('meta'); meta.name = 'description'; document.head.appendChild(meta); }
+    meta.content = description;
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.appendChild(canonical); }
+    canonical.href = `${window.location.origin}/lands/${encodeURIComponent(land.id)}`;
+    return () => { document.title = previousTitle; };
+  }, [land]);
+
+  if (notFound) return <><InternalHeader /><main className="internal-body"><div className="container"><Breadcrumbs items={['Главная', 'Земля']} /><h1>Участок не найден</h1><a href="/lands">Вернуться в каталог</a></div></main><SiteFooter /></>;
+  if (!land) return <><InternalHeader /><main className="internal-body"><div className="container"><p>Загружаем участок…</p></div></main><SiteFooter /></>;
+
+  const schema = { '@context': 'https://schema.org', '@type': 'Product', name: `Земельный участок ${land.area}`, description: land.description || `Участок в ${land.district}`, image: land.images, offers: { '@type': 'Offer', priceCurrency: 'RUB', price: Number(land.price.replace(/\D/g, '')) || undefined, availability: 'https://schema.org/InStock', url: window.location.href } };
+  return <>
+    <InternalHeader />
+    <main className="internal-body land-detail-page">
+      <div className="container">
+        <Breadcrumbs items={['Главная', 'Земля', `Участок ${land.area}`]} />
+        <h1>Земельный участок {land.area} в {land.district}</h1>
+        <div className="land-detail-layout">
+          <div className="land-detail-gallery"><LandCardImageSlider land={land} /></div>
+          <aside className="project-detail-side">
+            <h2>{land.price}</h2>
+            <div className="detail-row"><span>Площадь</span><b>{land.area}</b></div>
+            <div className="detail-row"><span>Район</span><b>{land.district}</b></div>
+            <div className="detail-row"><span>Кадастровый номер</span><b>{land.cadastralNumber}</b></div>
+            <button className="detail-btn" onClick={() => setActiveLand(land)}>Узнать подробности</button>
+          </aside>
+        </div>
+        <section className="land-detail-description"><h2>Об участке</h2><p>{land.description || 'Уточните подробности об участке у нашего специалиста.'}</p>{land.mapUrl ? <a href={land.mapUrl} target="_blank" rel="noreferrer">Посмотреть расположение на карте →</a> : null}</section>
+        <nav className="land-seo-links" aria-label="Полезные разделы"><h2>Полезно при покупке земли</h2><div><a href="/lands">Все земельные участки</a><a href="/projects">Проекты домов</a><a href="/mortgage-calculator">Ипотечный калькулятор</a><a href="/services/fundament">Строительство фундамента</a><a href="/lands/lesnoe-ozero">Участки в «Лесном озере»</a></div></nav>
+        {related.length ? <section className="related-lands"><h2>Другие участки</h2><div>{related.map((item) => <a key={item.id} href={`/lands/${encodeURIComponent(item.id)}`}><strong>Участок {item.area}</strong><span>{item.district} · {item.price}</span></a>)}</div></section> : null}
+      </div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+    </main>
+    <SiteFooter />
+    <PromoLeadModal open={Boolean(activeLand)} onClose={() => setActiveLand(null)} title="Заявка на участок" promoText={`${land.area}, ${land.district}, ${land.price}`} messagePrefix={`Заявка на участок ${land.id}`} sourceTitle={`Земельный участок: ${land.id}`} />
+  </>;
 }
 
 function LandsPage() {
@@ -2023,10 +2098,11 @@ function LandsPage() {
                 <article className="project-card land-card" key={item.id}>
                   <LandCardImageSlider land={item} />
                   <div className="project-content">
-                    <h3>{item.cadastralNumber}</h3>
+                    <h3><a href={`/lands/${encodeURIComponent(item.id)}`}>Земельный участок, {item.area}</a></h3>
+                    <p className="land-cadastral">Кадастровый номер: <strong>{item.cadastralNumber}</strong></p>
                     <p className="project-desc">Площадь: {item.area}</p>
                     <p className="project-desc">Район: {item.district}</p>
-                    {item.description ? <p className="project-desc">Описание: {item.description}</p> : null}
+                    {item.description ? <p className="project-desc land-card-description">{item.description}</p> : null}
                     {item.mapUrl ? (
                       <p className="project-desc">Карта: <a href={item.mapUrl} target="_blank" rel="noreferrer">Открыть</a></p>
                     ) : null}
@@ -2034,6 +2110,7 @@ function LandsPage() {
                       <strong className="project-price">{item.price}</strong>
                       <button className="project-cta" onClick={() => setActiveLand(item)}>Оставить заявку</button>
                     </div>
+                    <a className="land-more-link" href={`/lands/${encodeURIComponent(item.id)}`}>Подробнее об участке →</a>
                   </div>
                 </article>
               ))}
@@ -3727,6 +3804,7 @@ function App() {
     );
   }
   if (pathname === '/lands') return <AppLayout><LandsPage /></AppLayout>;
+  if (pathname.startsWith('/lands/')) return <AppLayout><LandDetailPage /></AppLayout>;
   if (pathname === '/mortgage-calculator') {
     return <AppLayout><MortgageCalculatorPage Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} apiBase={API_BASE} formatPhone={formatPhoneMask} /></AppLayout>;
   }
