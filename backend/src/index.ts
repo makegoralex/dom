@@ -464,6 +464,11 @@ function normalizeLandPlot(incoming: Partial<LandPlot> & { image?: string }, fal
   };
 }
 
+/** Keep the cadastral number in persistent storage, but never expose it publicly. */
+function toPublicLandPlot(land: LandPlot): LandPlot {
+  return { ...land, cadastralNumber: 'По запросу' };
+}
+
 const ensureDataFile = (): void => {
   if (!fs.existsSync(DATA_FILE)) {
     const initial: DataStore = {
@@ -598,7 +603,12 @@ app.get('/api/projects', (_req, res) => {
   const data = readData();
   res.json(data.projects);
 });
-app.get('/api/lands', (_req, res) => res.json(readData().lands || seedLands));
+app.get('/api/lands', (_req, res) => res.json((readData().lands || seedLands).map(toPublicLandPlot)));
+app.get('/api/lands/:id', (req, res) => {
+  const land = (readData().lands || seedLands).find((item) => item.id === req.params.id);
+  if (!land) return res.status(404).json({ message: 'Участок не найден' });
+  return res.json(toPublicLandPlot(land));
+});
 app.get('/api/lesnoe-ozero/plots', (_req, res) => res.json(readData().lesnoeOzeroPlots));
 app.post('/api/land-submissions', upload.array('images', 20), async (req, res) => {
   const { sellerName, sellerPhone, cadastralNumber, area, price, district, description, mapUrl } = req.body as Record<string, string>;
