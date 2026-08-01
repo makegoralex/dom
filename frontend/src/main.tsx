@@ -1875,6 +1875,8 @@ function LandCardImageSlider({ land }: { land: LandPlot }) {
   return (
     <div className="land-image-slider">
       <div className="project-image" style={{ backgroundImage: `url(${safeImage})` }} />
+      <span className="land-image-status">Земельный участок</span>
+      <span className="land-photo-count" aria-label={`Фотографий: ${images.length}`}>▧ {images.length}</span>
       {hasMultiple ? (
         <div className="land-slider-controls">
           <button type="button" onClick={() => setActiveIndex((prev) => (prev - 1 + images.length) % images.length)} aria-label="Предыдущее фото">←</button>
@@ -1953,7 +1955,9 @@ function LandsPage() {
   const [district, setDistrict] = useState('Все районы');
   const [minPrice, setMinPrice] = useState<number>(0);
   const [maxPrice, setMaxPrice] = useState<number>(0);
+  const [sortOrder, setSortOrder] = useState<'default' | 'price-asc' | 'price-desc'>('default');
   const [activeLand, setActiveLand] = useState<LandPlot | null>(null);
+  const [openSelection, setOpenSelection] = useState(false);
   const [sellerName, setSellerName] = useState('');
   const [sellerPhone, setSellerPhone] = useState('');
   const [sellerCadastralNumber, setSellerCadastralNumber] = useState('');
@@ -2003,7 +2007,23 @@ function LandsPage() {
     const byDistrict = district === 'Все районы' || item.district === district;
     const byPrice = !maxPriceLimit || (price >= minPrice && price <= maxPrice);
     return byDistrict && byPrice;
+  }).sort((left, right) => {
+    if (sortOrder === 'price-asc') return parsePrice(left.price) - parsePrice(right.price);
+    if (sortOrder === 'price-desc') return parsePrice(right.price) - parsePrice(left.price);
+    return 0;
   });
+  const filtersChanged = district !== 'Все районы' || minPrice !== minPriceLimit || maxPrice !== maxPriceLimit;
+  const resetFilters = () => {
+    setDistrict('Все районы');
+    setMinPrice(minPriceLimit);
+    setMaxPrice(maxPriceLimit);
+  };
+  const heroImage = resolveMediaUrl(lands[0]?.images?.[0] || LAND_IMAGE_FALLBACK);
+  const resultLabel = filtered.length % 10 === 1 && filtered.length % 100 !== 11
+    ? 'участок'
+    : [2, 3, 4].includes(filtered.length % 10) && ![12, 13, 14].includes(filtered.length % 100)
+      ? 'участка'
+      : 'участков';
   const submitSellLand = async (event: FormEvent) => {
     event.preventDefault();
     if (sellerSubmitting) return;
@@ -2056,23 +2076,64 @@ function LandsPage() {
   return (
     <div>
       <InternalHeader />
-      <section className="internal-body">
+      <section className="internal-body lands-page">
         <div className="container">
           <Breadcrumbs items={["Главная", "Земля"]} />
-          <h1>ЗЕМЛЯ</h1>
-          <section className="lo-lands-feature" aria-labelledby="lesnoe-ozero-feature-title">
-            <div>
-              <h2 id="lesnoe-ozero-feature-title">ЖК «Лесное озеро»</h2>
-              <p>Эксклюзивные участки ИЖС у соснового леса и озера — с интерактивной схемой выбора.</p>
+          <section
+            className="lands-hero"
+            style={{ backgroundImage: `linear-gradient(90deg, rgba(5, 43, 31, .96), rgba(5, 43, 31, .78) 55%, rgba(5, 43, 31, .2)), url('${heroImage}')` }}
+          >
+            <div className="lands-hero-content">
+              <span className="lands-kicker">Земля для жизни и инвестиций</span>
+              <h1>Участки, с которых начинается ваш дом</h1>
+              <p>Подберём землю под ваш проект, поможем разобраться с расположением, коммуникациями и документами.</p>
+              <div className="lands-hero-actions">
+                <a href="#land-catalog">Смотреть участки <span aria-hidden="true">→</span></a>
+                <button type="button" onClick={() => setOpenSellLand(true)}>Продать свою землю</button>
+              </div>
+              <div className="lands-hero-stats">
+                <div><strong>{lands.length}</strong><span>предложений в каталоге</span></div>
+                <div><strong>ИЖС</strong><span>земля под строительство</span></div>
+                <div><strong>Под ключ</strong><span>участок, проект и дом</span></div>
+              </div>
             </div>
-            <a href="/lands/lesnoe-ozero">Открыть спецпроект</a>
           </section>
-          <div className="lands-top-cta">
-            <p>Подберем участок под строительство дома или поможем выгодно реализовать вашу землю через нашу базу покупателей.</p>
-            <button className="sell-land-link" onClick={() => setOpenSellLand(true)}>Продать свою землю</button>
+
+          <div className="lands-trust-strip" aria-label="Преимущества подбора">
+            <div><span aria-hidden="true">⌖</span><p><strong>Знаем локации</strong><small>Подбираем землю в Пензе и области</small></p></div>
+            <div><span aria-hidden="true">✓</span><p><strong>Помогаем проверить</strong><small>Документы, подъезд и коммуникации</small></p></div>
+            <div><span aria-hidden="true">⌂</span><p><strong>Строим после покупки</strong><small>Подберём проект дома под участок</small></p></div>
           </div>
-          <div className="catalog-layout">
-            <aside className="catalog-filters">
+
+          <section className="lands-feature" aria-labelledby="lesnoe-ozero-feature-title">
+            <div className="lands-feature-copy">
+              <span>Спецпроект Evtenia</span>
+              <h2 id="lesnoe-ozero-feature-title">ЖК «Лесное озеро»</h2>
+              <p>Участки ИЖС у соснового леса и озера. Выберите свободный лот на интерактивной схеме посёлка.</p>
+              <a href="/lands/lesnoe-ozero">Выбрать участок <span aria-hidden="true">→</span></a>
+            </div>
+            <div className="lands-feature-visual" aria-hidden="true">
+              <span>15 минут</span>
+              <small>от Пензы</small>
+            </div>
+          </section>
+
+          <section className="lands-catalog" id="land-catalog">
+            <div className="lands-catalog-heading">
+              <div>
+                <span className="lands-section-label">Каталог земли</span>
+                <h2>Участки в продаже</h2>
+                <p>Выберите подходящий вариант или оставьте заявку — подготовим персональную подборку.</p>
+              </div>
+              <button className="lands-selection-button" type="button" onClick={() => setOpenSelection(true)}>Подобрать участок</button>
+            </div>
+
+            <div className="catalog-layout lands-catalog-layout">
+            <aside className="catalog-filters lands-filters">
+              <div className="lands-filter-heading">
+                <div><span aria-hidden="true">☷</span><h3>Фильтры</h3></div>
+                <button type="button" onClick={resetFilters} disabled={!filtersChanged}>Сбросить</button>
+              </div>
               <div className="filter-block">
                 <h4>Район</h4>
                 <select value={district} onChange={(e) => setDistrict(e.target.value)}>
@@ -2080,7 +2141,11 @@ function LandsPage() {
                 </select>
               </div>
               <div className="filter-block">
-                <h4>Цена: {minPrice.toLocaleString('ru-RU')} — {maxPrice.toLocaleString('ru-RU')} ₽</h4>
+                <h4>Стоимость</h4>
+                <div className="lands-price-values">
+                  <span><small>от</small><strong>{minPrice.toLocaleString('ru-RU')} ₽</strong></span>
+                  <span><small>до</small><strong>{maxPrice.toLocaleString('ru-RU')} ₽</strong></span>
+                </div>
                 <DualRangeSlider
                   min={minPriceLimit || 0}
                   max={maxPriceLimit || 0}
@@ -2092,40 +2157,69 @@ function LandsPage() {
                   disabled={!maxPriceLimit}
                 />
               </div>
+              <div className="lands-filter-help">
+                <span aria-hidden="true">?</span>
+                <p><strong>Не нашли подходящий?</strong><small>Расскажите, что ищете, и мы проверим закрытую базу.</small></p>
+                <button type="button" onClick={() => setOpenSelection(true)}>Оставить заявку</button>
+              </div>
             </aside>
-            <div className="catalog-grid">
+            <div className="lands-results">
+              <div className="lands-results-toolbar">
+                <p>Найдено <strong>{filtered.length} {resultLabel}</strong></p>
+                <label>
+                  <span>Сортировка</span>
+                  <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value as typeof sortOrder)}>
+                    <option value="default">По умолчанию</option>
+                    <option value="price-asc">Сначала дешевле</option>
+                    <option value="price-desc">Сначала дороже</option>
+                  </select>
+                </label>
+              </div>
+              <div className="catalog-grid lands-grid">
               {filtered.map((item) => (
                 <article className="project-card land-card" key={item.id}>
                   <LandCardImageSlider land={item} />
                   <div className="project-content">
-                    <h3><a href={`/lands/${encodeURIComponent(item.id)}`}>Земельный участок, {item.area}</a></h3>
-                    <p className="land-cadastral">Кадастровый номер: <strong>{item.cadastralNumber}</strong></p>
-                    <p className="project-desc">Площадь: {item.area}</p>
-                    <p className="project-desc">Район: {item.district}</p>
-                    {item.description ? <p className="project-desc land-card-description">{item.description}</p> : null}
-                    {item.mapUrl ? (
-                      <p className="project-desc">Карта: <a href={item.mapUrl} target="_blank" rel="noreferrer">Открыть</a></p>
-                    ) : null}
-                    <div className="land-card-actions">
-                      <strong className="project-price">{item.price}</strong>
-                      <button className="project-cta" onClick={() => setActiveLand(item)}>Оставить заявку</button>
+                    <p className="land-location"><span aria-hidden="true">⌖</span>{item.district}</p>
+                    <h3><a href={`/lands/${encodeURIComponent(item.id)}`}>Земельный участок {item.area}</a></h3>
+                    <div className="land-card-meta">
+                      <span><small>Площадь</small><strong>{item.area}</strong></span>
+                      <span><small>Кадастровый №</small><strong>{item.cadastralNumber}</strong></span>
                     </div>
-                    <a className="land-more-link" href={`/lands/${encodeURIComponent(item.id)}`}>Подробнее об участке →</a>
+                    {item.description ? <p className="project-desc land-card-description">{item.description}</p> : null}
+                    <div className="land-card-bottom">
+                      <div><small>Стоимость</small><strong className="project-price">{item.price}</strong></div>
+                      <button className="project-cta" onClick={() => setActiveLand(item)}>Узнать подробнее</button>
+                    </div>
+                    <div className="land-card-links">
+                      <a className="land-more-link" href={`/lands/${encodeURIComponent(item.id)}`}>Карточка участка →</a>
+                      {item.mapUrl ? <a href={item.mapUrl} target="_blank" rel="noreferrer">На карте ↗</a> : null}
+                    </div>
                   </div>
                 </article>
               ))}
+              </div>
+              {!filtered.length ? (
+                <div className="lands-empty">
+                  <span aria-hidden="true">⌕</span>
+                  <h3>По этим параметрам участков пока нет</h3>
+                  <p>Сбросьте фильтры или оставьте заявку — предложим варианты из закрытой базы.</p>
+                  <button type="button" onClick={resetFilters}>Сбросить фильтры</button>
+                </div>
+              ) : null}
             </div>
-          </div>
+            </div>
+          </section>
         </div>
       </section>
       <SiteFooter />
       <PromoLeadModal
-        open={Boolean(activeLand)}
-        onClose={() => setActiveLand(null)}
-        title={activeLand ? `Заявка на участок ${activeLand.cadastralNumber}` : 'Заявка'}
-        promoText={activeLand ? `Участок ${activeLand.area}, ${activeLand.district}, ${activeLand.price}` : ''}
-        messagePrefix={activeLand ? `Заявка на участок ${activeLand.cadastralNumber}` : ''}
-        sourceTitle={activeLand ? `Земельный участок: ${activeLand.cadastralNumber}` : 'Заявка на участок'}
+        open={Boolean(activeLand) || openSelection}
+        onClose={() => { setActiveLand(null); setOpenSelection(false); }}
+        title={activeLand ? `Заявка на участок ${activeLand.cadastralNumber}` : 'Подобрать участок'}
+        promoText={activeLand ? `Участок ${activeLand.area}, ${activeLand.district}, ${activeLand.price}` : 'Подберём варианты под ваш бюджет и задачу'}
+        messagePrefix={activeLand ? `Заявка на участок ${activeLand.cadastralNumber}` : 'Заявка на персональный подбор участка'}
+        sourceTitle={activeLand ? `Земельный участок: ${activeLand.cadastralNumber}` : 'Персональный подбор участка'}
       />
       {openSellLand ? (
         <div className="modal-backdrop" onMouseDown={() => setOpenSellLand(false)}>

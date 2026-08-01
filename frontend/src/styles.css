@@ -205,17 +205,32 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .project-meta strong{font-size:16px; color:#1d222c; line-height:1.1;}
 .project-price {display:block; margin:16px auto 0; width:max-content; padding:12px 28px; border:1px solid #2d2f33; border-radius:8px; font-size:20px; font-weight:700; color:#232832;}
 .project-cta{width:calc(100% - 24px); margin:0 12px 12px; border:none; background:#eb7b17; color:#fff; padding:10px 12px; font-weight:700; cursor:pointer;}
-.land-card .project-content{display:grid; gap:8px;}
+.land-image-slider{position:relative; overflow:hidden;}
+.land-image-status,.land-photo-count{position:absolute; top:14px; z-index:2; display:inline-flex; align-items:center; min-height:29px; border-radius:999px; padding:6px 10px; font-size:11px; font-weight:800; letter-spacing:.035em;}
+.land-image-status{left:14px; color:#174a34; background:#ecf6e9; text-transform:uppercase;}
+.land-photo-count{right:14px; color:#fff; background:rgba(5,35,26,.72); backdrop-filter:blur(7px);}
+.land-slider-controls{position:absolute; inset:auto 14px 14px auto; z-index:2; display:flex; gap:6px;}
+.land-slider-controls button{display:grid; place-items:center; border:1px solid rgba(255,255,255,.72); border-radius:50%; background:rgba(5,35,26,.7); color:#fff; width:34px; height:34px; cursor:pointer; backdrop-filter:blur(5px);}
+.land-card .project-content{display:grid; gap:12px; padding:20px;}
+.land-card .project-content h3{font-size:21px; line-height:1.16;}
 .land-card .project-content h3 a{color:inherit; text-decoration:none;}
-.land-card .project-content h3 a:hover{text-decoration:underline;}
-.land-cadastral{margin:0; color:#626b78; font-size:13px;}
-.land-card-description{display:-webkit-box; overflow:hidden; -webkit-box-orient:vertical; -webkit-line-clamp:3; line-clamp:3; min-height:3.75em; overflow-wrap:anywhere;}
-.land-image-slider{position:relative;}
-.land-slider-controls{position:absolute; inset:auto 10px 10px auto; display:flex; gap:6px;}
-.land-slider-controls button{border:1px solid rgba(255,255,255,.7); background:rgba(17,24,34,.62); color:#fff; width:34px; height:30px; cursor:pointer;}
-.land-card-actions{display:grid; grid-template-columns:1fr 1fr; gap:8px; align-items:center;}
-.land-card .project-price,.land-card .project-cta{margin:0; width:100%; text-align:center; padding:10px 12px;}
-.land-more-link{color:#26384d; font-size:14px; font-weight:700; text-underline-offset:3px;}
+.land-card .project-content h3 a:hover{color:#29734e;}
+.land-location{display:flex; align-items:center; gap:6px; margin:0; color:#65736b; font-size:13px;}
+.land-location span{color:#4e9a67; font-size:17px;}
+.land-card-meta{display:grid; grid-template-columns:.7fr 1.3fr; border:1px solid #e1e7e2; border-radius:10px; background:#f7faf7;}
+.land-card-meta span{display:grid; gap:4px; padding:11px 12px; min-width:0;}
+.land-card-meta span+span{border-left:1px solid #e1e7e2;}
+.land-card-meta small,.land-card-bottom small{color:#758078; font-size:11px;}
+.land-card-meta strong{overflow:hidden; color:#26342c; font-size:14px; text-overflow:ellipsis; white-space:nowrap;}
+.land-card-description{display:-webkit-box; overflow:hidden; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2; min-height:2.8em; margin:0; color:#647068; font-size:14px; line-height:1.4; overflow-wrap:anywhere;}
+.land-card-bottom{display:flex; align-items:end; justify-content:space-between; gap:12px; border-top:1px solid #e4e8e5; padding-top:15px;}
+.land-card-bottom>div{display:grid; gap:3px;}
+.land-card .project-price{margin:0; width:auto; border:0; padding:0; color:#153e2d; font-size:21px; line-height:1.1; white-space:nowrap;}
+.land-card .project-cta{width:auto; min-height:43px; margin:0; border-radius:8px; padding:10px 14px; background:#4f9c65; font-size:13px; transition:background .2s ease,transform .2s ease;}
+.land-card .project-cta:hover{background:#347b50; transform:translateY(-1px);}
+.land-card-links{display:flex; align-items:center; justify-content:space-between; gap:12px;}
+.land-card-links a{color:#2d6847; font-size:13px; font-weight:700; text-underline-offset:3px;}
+.land-more-link{color:#2d6847; font-size:13px; font-weight:700; text-underline-offset:3px;}
 
 .land-detail-layout{display:grid; grid-template-columns:minmax(0,1fr) 360px; gap:22px; align-items:start;}
 .land-detail-gallery .project-image{height:520px; background-size:cover;}
@@ -335,9 +350,89 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .service-page-layout{display:block;}
 .service-page-layout.is-service{display:grid; grid-template-columns:minmax(0,1fr) minmax(260px,30%); gap:16px; align-items:start;}
 .service-side{position:sticky; top:16px;}
-.lands-top-cta{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:14px; background:#f7f7f8; border:1px solid #d8dce3; padding:14px;}
-.lands-top-cta p{margin:0; font-size:14px; line-height:1.4;}
-.sell-land-link{border:none; background:#eb7b17; color:#fff; padding:10px 14px; font-weight:700; cursor:pointer; white-space:nowrap;}
+.lands-page{--land-green:#4f9c65; --land-dark:#123e2d; --land-deep:#092e21; --land-mint:#e9f3e7; --land-paper:#f5f7f3; padding-top:20px; background:#f2f4ef;}
+.lands-page>.container>.breadcrumbs{margin-bottom:18px;}
+.lands-hero{position:relative; overflow:hidden; min-height:510px; display:flex; align-items:flex-end; border-radius:18px; color:#fff; background-position:center; background-size:cover; box-shadow:0 24px 60px rgba(16,57,40,.18);}
+.lands-hero::after{content:""; position:absolute; right:-70px; bottom:-115px; width:330px; height:330px; border:1px solid rgba(255,255,255,.15); border-radius:50%; box-shadow:0 0 0 58px rgba(255,255,255,.035),0 0 0 116px rgba(255,255,255,.025);}
+.lands-hero-content{position:relative; z-index:1; width:min(760px,100%); padding:56px;}
+.lands-kicker,.lands-section-label{display:inline-flex; align-items:center; gap:8px; color:#bfe2b7; font-size:12px; font-weight:800; letter-spacing:.14em; text-transform:uppercase;}
+.lands-kicker::before,.lands-section-label::before{content:""; width:28px; height:2px; background:#8dcc78;}
+.lands-hero h1{max-width:700px; margin:14px 0 18px; color:#fff; font-size:clamp(44px,5.6vw,72px); font-weight:700; letter-spacing:-.04em; line-height:.98; text-transform:none;}
+.lands-hero-content>p{max-width:610px; margin:0; color:rgba(255,255,255,.82); font-size:18px; line-height:1.55;}
+.lands-hero-actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:28px;}
+.lands-hero-actions a,.lands-hero-actions button{min-height:48px; display:inline-flex; align-items:center; justify-content:center; gap:16px; border:0; border-radius:9px; padding:12px 18px; font-size:14px; font-weight:800; text-decoration:none; cursor:pointer;}
+.lands-hero-actions a{color:#133d2c; background:#f2d96e;}
+.lands-hero-actions button{border:1px solid rgba(255,255,255,.5); color:#fff; background:rgba(255,255,255,.08); backdrop-filter:blur(5px);}
+.lands-hero-stats{display:grid; grid-template-columns:repeat(3,1fr); gap:0; margin-top:42px; border-top:1px solid rgba(255,255,255,.2);}
+.lands-hero-stats div{display:grid; gap:4px; padding:18px 18px 0 0;}
+.lands-hero-stats strong{color:#d8edcf; font-size:20px;}
+.lands-hero-stats span{color:rgba(255,255,255,.68); font-size:12px; line-height:1.35;}
+.lands-trust-strip{display:grid; grid-template-columns:repeat(3,1fr); gap:0; margin:18px 0 34px; border:1px solid #dce5dd; border-radius:13px; background:#fff; box-shadow:0 10px 28px rgba(27,64,45,.05);}
+.lands-trust-strip>div{display:grid; grid-template-columns:42px 1fr; align-items:center; gap:12px; min-height:96px; padding:18px 22px;}
+.lands-trust-strip>div+div{border-left:1px solid #e3e9e3;}
+.lands-trust-strip>div>span{display:grid; place-items:center; width:42px; height:42px; border-radius:50%; color:#347852; background:#e8f3e8; font-size:19px; font-weight:800;}
+.lands-trust-strip p{display:grid; gap:4px; margin:0;}
+.lands-trust-strip strong{color:#24362c; font-size:14px;}
+.lands-trust-strip small{color:#758078; font-size:12px; line-height:1.35;}
+.lands-feature{position:relative; overflow:hidden; min-height:290px; display:grid; grid-template-columns:1.35fr .65fr; margin-bottom:58px; border-radius:17px; color:#fff; background:linear-gradient(120deg,#0a3828,#195b3f); box-shadow:0 20px 46px rgba(14,62,40,.14);}
+.lands-feature::before{content:""; position:absolute; inset:0; opacity:.16; background-image:radial-gradient(circle at 2px 2px,#fff 1px,transparent 0); background-size:24px 24px;}
+.lands-feature-copy{position:relative; z-index:1; align-self:center; padding:42px 46px;}
+.lands-feature-copy>span{color:#b8dcae; font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase;}
+.lands-feature h2{margin:9px 0 12px; color:#fff; font-size:clamp(32px,4.4vw,52px); line-height:1;}
+.lands-feature p{max-width:610px; margin:0 0 22px; color:rgba(255,255,255,.72); font-size:16px; line-height:1.5;}
+.lands-feature a{display:inline-flex; gap:18px; align-items:center; color:#f4dc75; font-size:14px; font-weight:800; text-decoration:none;}
+.lands-feature-visual{position:relative; z-index:1; display:grid; align-content:center; justify-items:center; border-left:1px solid rgba(255,255,255,.12); background:linear-gradient(rgba(10,56,40,.25),rgba(10,56,40,.38)),url('/api/assets/lesnoe-ozero/hero.jpg') center/cover; text-align:center;}
+.lands-feature-visual span{font-size:38px; font-weight:800; letter-spacing:-.04em;}
+.lands-feature-visual small{margin-top:4px; color:rgba(255,255,255,.75); font-size:13px; text-transform:uppercase; letter-spacing:.12em;}
+.lands-catalog{scroll-margin-top:18px;}
+.lands-catalog-heading{display:flex; align-items:end; justify-content:space-between; gap:24px; margin-bottom:24px;}
+.lands-section-label{color:#4b9564;}
+.lands-section-label::before{background:#4b9564;}
+.lands-catalog-heading h2{margin:8px 0 8px; color:#173a29; font-size:clamp(32px,4vw,48px); line-height:1.04;}
+.lands-catalog-heading p{max-width:680px; margin:0; color:#69756e; font-size:15px; line-height:1.5;}
+.lands-selection-button{flex:0 0 auto; min-height:46px; border:0; border-radius:8px; padding:11px 17px; color:#fff; background:var(--land-green); font-weight:800; cursor:pointer;}
+.lands-catalog-layout{grid-template-columns:280px minmax(0,1fr); gap:24px;}
+.lands-filters{position:sticky; top:16px; border:1px solid #dce4dc; border-radius:13px; padding:20px; background:#fff; box-shadow:0 12px 30px rgba(29,65,47,.05);}
+.lands-filter-heading{display:flex; align-items:center; justify-content:space-between; gap:12px; padding-bottom:17px; border-bottom:1px solid #e2e8e2;}
+.lands-filter-heading>div{display:flex; align-items:center; gap:8px;}
+.lands-filter-heading h3{margin:0; color:#20362a; font-size:18px;}
+.lands-filter-heading>div>span{color:#4b9564; font-size:18px;}
+.lands-filter-heading button{border:0; padding:0; color:#3f7f57; background:transparent; font-size:12px; font-weight:700; text-decoration:underline; cursor:pointer;}
+.lands-filter-heading button:disabled{opacity:.35; cursor:default;}
+.lands-filters .filter-block{border-color:#e5eae5; padding-top:17px; margin-top:17px;}
+.lands-filters .filter-block:first-of-type{border-top:0;}
+.lands-filters .filter-block h4{color:#2c3b32; font-size:13px; text-transform:uppercase; letter-spacing:.06em;}
+.lands-filters select{width:100%; min-height:43px; border:1px solid #d8e0d8; border-radius:8px; padding:9px 11px; color:#314339; background:#f9fbf8; font-size:13px;}
+.lands-price-values{display:grid; grid-template-columns:1fr 1fr; gap:7px;}
+.lands-price-values span{display:grid; gap:2px; min-width:0; border:1px solid #dce4dc; border-radius:8px; padding:9px 10px; background:#f9fbf8;}
+.lands-price-values small{color:#7a857e; font-size:10px; text-transform:uppercase;}
+.lands-price-values strong{overflow:hidden; color:#263a2e; font-size:12px; text-overflow:ellipsis; white-space:nowrap;}
+.lands-filters .double-range-fill{background:#4f9c65;}
+.lands-filters .double-range-input::-webkit-slider-thumb{border-color:#2e734c;}
+.lands-filters .double-range-input::-moz-range-thumb{border-color:#2e734c;}
+.lands-filter-help{display:grid; grid-template-columns:30px 1fr; gap:8px 10px; margin-top:20px; border-radius:10px; padding:14px; color:#fff; background:#143e2d;}
+.lands-filter-help>span{display:grid; place-items:center; width:30px; height:30px; border-radius:50%; color:#173d2d; background:#dfeecf; font-weight:900;}
+.lands-filter-help p{display:grid; gap:4px; margin:0;}
+.lands-filter-help strong{font-size:13px;}
+.lands-filter-help small{color:rgba(255,255,255,.65); font-size:11px; line-height:1.4;}
+.lands-filter-help button{grid-column:1/-1; min-height:37px; border:1px solid rgba(255,255,255,.3); border-radius:7px; color:#fff; background:rgba(255,255,255,.08); font-size:12px; font-weight:800; cursor:pointer;}
+.lands-results{min-width:0;}
+.lands-results-toolbar{display:flex; align-items:center; justify-content:space-between; gap:18px; min-height:49px; margin-bottom:14px; border-bottom:1px solid #d9e1da; padding:0 0 13px;}
+.lands-results-toolbar p{margin:0; color:#738078; font-size:13px;}
+.lands-results-toolbar p strong{color:#294032;}
+.lands-results-toolbar label{display:flex; align-items:center; gap:9px; color:#738078; font-size:12px;}
+.lands-results-toolbar select{min-height:37px; border:1px solid #d5ded6; border-radius:7px; padding:7px 30px 7px 10px; color:#2d4034; background:#fff; font-size:12px;}
+.lands-grid{gap:20px;}
+.lands-grid .land-card{border:1px solid #dce4dc; border-radius:13px; background:#fff; box-shadow:0 10px 30px rgba(24,60,41,.055);}
+.lands-grid .land-card:hover{box-shadow:0 18px 40px rgba(24,60,41,.13);}
+.lands-grid .project-image{height:235px; background-size:cover; transition:transform .45s ease;}
+.lands-grid .land-card:hover .project-image{transform:scale(1.025);}
+.lands-empty{display:grid; justify-items:center; border:1px dashed #cbd7cd; border-radius:13px; padding:58px 28px; background:#fff; text-align:center;}
+.lands-empty>span{display:grid; place-items:center; width:54px; height:54px; border-radius:50%; color:#3f8559; background:#e8f3e8; font-size:25px;}
+.lands-empty h3{margin:16px 0 6px; color:#213b2c;}
+.lands-empty p{max-width:450px; margin:0; color:#748078; font-size:14px; line-height:1.5;}
+.lands-empty button{margin-top:17px; border:0; border-radius:7px; padding:10px 14px; color:#fff; background:#4f9c65; font-weight:800; cursor:pointer;}
+.sell-land-link{border:none; background:#4f9c65; color:#fff; padding:10px 14px; font-weight:700; cursor:pointer; white-space:nowrap;}
 .sell-land-form{display:grid; gap:8px;}
 .sell-land-form h3{margin:0; font-size:18px;}
 .sell-land-form label{display:grid; gap:4px; font-size:13px;}
@@ -653,3 +748,43 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .privacy-consent a{color:inherit; text-decoration:underline;}
 .lead-bg-section .privacy-consent{color:#d7dbe1;}
 .service-discount-form .privacy-consent{color:#29303c;}
+
+@media (max-width: 992px) {
+  .lands-hero-content{padding:42px;}
+  .lands-trust-strip{grid-template-columns:1fr;}
+  .lands-trust-strip>div{min-height:82px;}
+  .lands-trust-strip>div+div{border-top:1px solid #e3e9e3; border-left:0;}
+  .lands-feature{grid-template-columns:1fr .6fr;}
+  .lands-feature-copy{padding:34px;}
+  .lands-catalog-layout{grid-template-columns:1fr;}
+  .lands-filters{position:static; display:grid; grid-template-columns:1fr 1fr; gap:0 18px;}
+  .lands-filter-heading,.lands-filter-help{grid-column:1/-1;}
+  .lands-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+
+@media (max-width: 720px) {
+  .lands-page{padding-top:14px;}
+  .lands-hero{min-height:560px; border-radius:12px; background-position:62% center;}
+  .lands-hero-content{padding:34px 22px 26px;}
+  .lands-hero h1{font-size:39px;}
+  .lands-hero-content>p{font-size:15px;}
+  .lands-hero-actions{display:grid; grid-template-columns:1fr;}
+  .lands-hero-actions a,.lands-hero-actions button{width:100%;}
+  .lands-hero-stats{grid-template-columns:1fr; margin-top:28px;}
+  .lands-hero-stats div{grid-template-columns:96px 1fr; align-items:center; padding-top:12px;}
+  .lands-trust-strip{margin-bottom:24px;}
+  .lands-trust-strip>div{padding:14px;}
+  .lands-feature{grid-template-columns:1fr; margin-bottom:42px;}
+  .lands-feature-copy{padding:30px 22px;}
+  .lands-feature-visual{min-height:170px; border-top:1px solid rgba(255,255,255,.12); border-left:0;}
+  .lands-catalog-heading{align-items:stretch; flex-direction:column;}
+  .lands-selection-button{width:100%;}
+  .lands-filters{display:block;}
+  .lands-results-toolbar{align-items:stretch; flex-direction:column;}
+  .lands-results-toolbar label{justify-content:space-between;}
+  .lands-results-toolbar select{flex:1;}
+  .lands-grid{grid-template-columns:1fr;}
+  .lands-grid .project-image{height:220px;}
+  .land-card-bottom{align-items:stretch; flex-direction:column;}
+  .land-card .project-cta{width:100%;}
+}
