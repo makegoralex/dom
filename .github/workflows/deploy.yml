@@ -13,12 +13,17 @@ jobs:
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: 85.239.54.244
+          # The VPS address can change; use DNS by default and allow an
+          # explicit repository variable when SSH lives on another endpoint.
+          host: ${{ vars.DEPLOY_HOST || 'dom.evtenia.ru' }}
+          port: ${{ vars.DEPLOY_PORT || 22 }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          timeout: 2m
           script_stop: true
           command_timeout: 30m
           script: |
             echo "Start deploy on server"
             /var/www/dom/deploy.sh
             echo "Deploy finished"
+
