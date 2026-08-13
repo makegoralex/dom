@@ -1,0 +1,92 @@
+.homes-page { background: #f5f2eb; color: #17382e; }
+.homes-breadcrumbs { display: flex; gap: 10px; align-items: center; padding: 22px 0; color: #718079; font-size: 13px; }
+.homes-breadcrumbs a { color: #45675d; text-decoration: none; }
+.homes-hero { min-height: 410px; border-radius: 28px; padding: 58px; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(230px, .55fr); align-items: end; gap: 40px; color: #fff; overflow: hidden; position: relative; background: linear-gradient(100deg, rgba(7,47,35,.98) 0%, rgba(7,47,35,.86) 50%, rgba(7,47,35,.2) 100%), url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1800&q=85') center/cover; box-shadow: 0 24px 60px rgba(19,48,38,.14); }
+.homes-hero > * { position: relative; z-index: 1; }
+.homes-eyebrow, .homes-heading > div > span { display: block; color: #d7b779; font-size: 12px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; margin-bottom: 14px; }
+.homes-hero h1 { max-width: 720px; margin: 0 0 18px; font-family: Georgia, serif; font-size: clamp(42px, 5.5vw, 76px); font-weight: 500; line-height: .98; }
+.homes-hero p { max-width: 670px; margin: 0; color: rgba(255,255,255,.78); font-size: 18px; line-height: 1.6; }
+.homes-hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; }
+.homes-hero-actions a, .homes-hero-actions button, .homes-heading > button { border: 1px solid #d7b779; border-radius: 999px; padding: 14px 24px; font: inherit; font-weight: 750; text-decoration: none; cursor: pointer; }
+.homes-hero-actions a { background: #d7b779; color: #143a2e; }
+.homes-hero-actions button { background: transparent; color: #fff; }
+.homes-hero-card { align-self: end; padding: 28px; border: 1px solid rgba(255,255,255,.24); border-radius: 22px; background: rgba(255,255,255,.1); backdrop-filter: blur(16px); }
+.homes-hero-card strong { display: block; font-family: Georgia, serif; font-size: 54px; line-height: 1; color: #e5c88e; }
+.homes-hero-card span, .homes-hero-card small { display: block; }
+.homes-hero-card span { margin-top: 8px; font-size: 18px; font-weight: 750; }
+.homes-hero-card small { margin-top: 16px; color: rgba(255,255,255,.66); }
+.homes-catalog { padding: 72px 0 90px; }
+.homes-heading { display: flex; justify-content: space-between; gap: 24px; align-items: end; margin-bottom: 28px; }
+.homes-heading h2 { margin: 0; color: #153a2e; font-family: Georgia, serif; font-size: clamp(34px, 4vw, 52px); font-weight: 500; }
+.homes-heading > button { background: transparent; color: #17382e; }
+.homes-market-tabs { display: flex; gap: 8px; margin-bottom: 24px; padding: 7px; width: fit-content; max-width: 100%; border-radius: 999px; background: #e8e3d9; }
+.homes-market-tabs button { border: 0; border-radius: 999px; padding: 11px 19px; color: #496159; background: transparent; font: inherit; font-weight: 750; cursor: pointer; white-space: nowrap; }
+.homes-market-tabs button.active { color: #fff; background: #143e31; box-shadow: 0 5px 16px rgba(20,62,49,.18); }
+.homes-layout { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 32px; align-items: start; }
+.homes-filters { position: sticky; top: 18px; padding: 24px; border: 1px solid #e1dbd0; border-radius: 20px; background: #fff; box-shadow: 0 12px 35px rgba(21,58,46,.06); }
+.homes-filter-title { display: flex; justify-content: space-between; align-items: center; padding-bottom: 18px; border-bottom: 1px solid #eee9df; }
+.homes-filter-title h3 { margin: 0; font-size: 21px; }
+.homes-filter-title button { border: 0; padding: 0; color: #7c6b4b; background: none; cursor: pointer; }
+.homes-filters label, .homes-filters fieldset { display: grid; gap: 8px; margin: 18px 0 0; padding: 0; border: 0; color: #405b52; font-size: 13px; font-weight: 750; }
+.homes-filters legend { margin-bottom: 8px; }
+.homes-filters input, .homes-filters select { width: 100%; border: 1px solid #dcd7cd; border-radius: 11px; padding: 12px; color: #17382e; background: #fbfaf7; font: inherit; font-weight: 500; box-sizing: border-box; }
+.homes-paired-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.homes-filter-note { margin-top: 22px; padding: 18px; border-radius: 14px; color: #fff; background: #173f32; }
+.homes-filter-note p { color: rgba(255,255,255,.7); font-size: 13px; line-height: 1.5; }
+.homes-filter-note button { border: 0; padding: 0; color: #e5c88e; background: transparent; font: inherit; font-weight: 800; cursor: pointer; }
+.homes-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 18px; }
+.homes-toolbar p { margin: 0; color: #64736e; }
+.homes-toolbar select { border: 1px solid #ded8cd; border-radius: 10px; padding: 10px 13px; background: #fff; color: #29483f; }
+.homes-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.home-card { overflow: hidden; border: 1px solid #e2ddd3; border-radius: 20px; background: #fff; box-shadow: 0 12px 34px rgba(20,56,44,.07); transition: transform .2s ease, box-shadow .2s ease; }
+.home-card:hover { transform: translateY(-4px); box-shadow: 0 18px 42px rgba(20,56,44,.13); }
+.home-gallery { position: relative; aspect-ratio: 1.45; overflow: hidden; background: #e5e3de; }
+.home-gallery > img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .45s ease; }
+.home-card:hover .home-gallery > img { transform: scale(1.025); }
+.home-market-badge, .home-photo-count { position: absolute; top: 14px; z-index: 2; border-radius: 999px; padding: 8px 11px; color: #fff; font-size: 11px; font-weight: 850; letter-spacing: .04em; }
+.home-market-badge { left: 14px; background: #173f32; }
+.home-market-badge.secondary { background: #7c6540; }
+.home-detail-heading .home-market-badge { position: static; display: inline-block; margin-bottom: 12px; }
+.home-photo-count { right: 14px; background: rgba(10,25,20,.68); backdrop-filter: blur(6px); }
+.home-gallery-controls { position: absolute; right: 13px; bottom: 13px; display: flex; gap: 6px; }
+.home-gallery-controls button { width: 36px; height: 36px; border: 1px solid rgba(255,255,255,.4); border-radius: 50%; color: #fff; background: rgba(10,30,23,.68); cursor: pointer; }
+.home-card-body { padding: 21px; }
+.home-card-meta { display: flex; gap: 7px; flex-wrap: wrap; }
+.home-card-meta span { border-radius: 999px; padding: 6px 9px; color: #51655e; background: #f1eee8; font-size: 12px; }
+.home-card h3 { margin: 15px 0 8px; font-family: Georgia, serif; font-size: 24px; font-weight: 500; line-height: 1.15; }
+.home-card h3 a { color: #153a2e; text-decoration: none; }
+.home-address { min-height: 38px; margin: 0 0 15px; color: #718079; font-size: 13px; line-height: 1.45; }
+.home-price { display: block; color: #173f32; font-size: 23px; }
+.home-card-link { display: flex; justify-content: space-between; margin-top: 17px; padding-top: 15px; border-top: 1px solid #eee9e0; color: #7b6341; text-decoration: none; font-weight: 750; }
+.homes-empty, .homes-not-found { padding: 50px; border: 1px dashed #cfc6b6; border-radius: 18px; text-align: center; background: #fff; }
+.homes-empty button, .homes-not-found a { border: 0; color: #886b3b; background: none; font: inherit; font-weight: 800; cursor: pointer; }
+.sell-home-modal { width: min(820px, calc(100vw - 28px)); max-height: 92vh; overflow-y: auto; }
+.sell-home-modal .modal-card-header span { color: #9a7a45; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.sell-home-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.sell-home-form label { display: grid; gap: 7px; color: #355248; font-size: 13px; font-weight: 750; }
+.sell-home-form input, .sell-home-form select, .sell-home-form textarea { width: 100%; box-sizing: border-box; border: 1px solid #d9d5cc; border-radius: 10px; padding: 12px; background: #fbfaf7; font: inherit; }
+.sell-home-wide, .sell-home-consent, .sell-home-submit, .sell-home-status { grid-column: 1 / -1; }
+.sell-home-photos input { padding: 10px; }
+.sell-home-photos small, .sell-home-consent { margin: 0; color: #7c8883; font-size: 12px; }
+.sell-home-submit { border: 0; border-radius: 12px; padding: 14px; color: #fff; background: #173f32; font: inherit; font-weight: 800; cursor: pointer; }
+.sell-home-status { margin: 0; color: #45675d; font-size: 13px; }
+.home-detail-page { background: #f6f3ed; }
+.home-detail-heading { display: flex; justify-content: space-between; gap: 30px; align-items: end; padding: 12px 0 32px; }
+.home-detail-heading h1 { max-width: 760px; margin: 0 0 8px; color: #143a2e; font-family: Georgia, serif; font-size: clamp(38px, 5vw, 64px); font-weight: 500; line-height: 1.04; }
+.home-detail-heading p { margin: 0; color: #6f7b76; }
+.home-detail-heading > strong { color: #173f32; font-family: Georgia, serif; font-size: clamp(28px, 3vw, 42px); white-space: nowrap; }
+.home-detail-layout { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(280px, .65fr); gap: 30px; padding-bottom: 80px; align-items: start; }
+.home-detail-layout > section > .home-gallery { aspect-ratio: 1.5; border-radius: 22px; }
+.home-detail-description, .home-detail-side { margin-top: 22px; padding: 28px; border: 1px solid #e1dbd0; border-radius: 20px; background: #fff; }
+.home-detail-description h2, .home-detail-side h2 { margin: 0 0 16px; color: #173f32; font-family: Georgia, serif; font-size: 29px; font-weight: 500; }
+.home-detail-description p { color: #536760; line-height: 1.75; }
+.home-detail-side { position: sticky; top: 20px; margin-top: 0; }
+.home-detail-side dl { margin: 0; }
+.home-detail-side dl div { display: flex; justify-content: space-between; gap: 15px; padding: 14px 0; border-bottom: 1px solid #eee9e0; }
+.home-detail-side dt { color: #78847f; }
+.home-detail-side dd { margin: 0; color: #173f32; font-weight: 800; text-align: right; }
+.home-detail-side > button { width: 100%; margin-top: 22px; border: 0; border-radius: 12px; padding: 15px; color: #fff; background: #173f32; font: inherit; font-weight: 800; cursor: pointer; }
+.home-detail-side > small { display: block; margin-top: 10px; color: #7c8883; text-align: center; }
+@media (max-width: 980px) { .homes-hero { grid-template-columns: 1fr; padding: 42px; } .homes-hero-card { display: none; } .homes-layout { grid-template-columns: 1fr; } .homes-filters { position: static; } .home-detail-layout { grid-template-columns: 1fr; } .home-detail-side { position: static; } }
+@media (max-width: 680px) { .homes-hero { min-height: 470px; padding: 32px 24px; border-radius: 20px; } .homes-hero h1 { font-size: 46px; } .homes-heading, .home-detail-heading, .homes-toolbar { align-items: stretch; flex-direction: column; } .homes-heading > button { align-self: flex-start; } .homes-market-tabs { width: 100%; overflow-x: auto; } .homes-grid { grid-template-columns: 1fr; } .homes-filters { padding: 18px; } .sell-home-form { grid-template-columns: 1fr; } .sell-home-form > * { grid-column: 1 !important; } .home-detail-heading > strong { white-space: normal; } }
+
