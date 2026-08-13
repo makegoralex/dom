@@ -1872,7 +1872,7 @@ const LAND_FALLBACK: LandPlot[] = [
   { id: 'land3', cadastralNumber: 'По запросу', area: '8 соток', price: '980 000 ₽', district: 'Железнодорожный район', images: ['https://images.unsplash.com/photo-1493815793585-d94ccbc86df8?auto=format&fit=crop&w=1200&q=80'] }
 ];
 
-function LandCardImageSlider({ land }: { land: LandPlot }) {
+function LandCardImageSlider({ land, href }: { land: LandPlot; href?: string }) {
   const images = (land.images || []).length ? (land.images || []) : [LAND_IMAGE_FALLBACK];
   const [activeIndex, setActiveIndex] = useState(0);
   const safeImage = resolveMediaUrl(images[activeIndex] || LAND_IMAGE_FALLBACK);
@@ -1880,17 +1880,30 @@ function LandCardImageSlider({ land }: { land: LandPlot }) {
 
   return (
     <div className="land-image-slider">
-      <div className="project-image" style={{ backgroundImage: `url(${safeImage})` }} />
+      {href ? <a className="land-image-click-target" href={href} aria-label={`Открыть участок ${land.area}`}><div className="project-image" style={{ backgroundImage: `url(${safeImage})` }} /></a> : <div className="project-image" style={{ backgroundImage: `url(${safeImage})` }} />}
       <span className="land-image-status">Земельный участок</span>
-      <span className="land-photo-count" aria-label={`Фотографий: ${images.length}`}>▧ {images.length}</span>
+      <span className="land-photo-count" aria-label={`Фото ${activeIndex + 1} из ${images.length}`}>{activeIndex + 1} / {images.length}</span>
       {hasMultiple ? (
         <div className="land-slider-controls">
-          <button type="button" onClick={() => setActiveIndex((prev) => (prev - 1 + images.length) % images.length)} aria-label="Предыдущее фото">←</button>
-          <button type="button" onClick={() => setActiveIndex((prev) => (prev + 1) % images.length)} aria-label="Следующее фото">→</button>
+          <button type="button" onClick={(event) => { event.preventDefault(); event.stopPropagation(); setActiveIndex((prev) => (prev - 1 + images.length) % images.length); }} aria-label="Предыдущее фото">←</button>
+          <button type="button" onClick={(event) => { event.preventDefault(); event.stopPropagation(); setActiveIndex((prev) => (prev + 1) % images.length); }} aria-label="Следующее фото">→</button>
         </div>
       ) : null}
     </div>
   );
+}
+
+function LandDetailGallery({ land }: { land: LandPlot }) {
+  const images = land.images?.length ? land.images : [LAND_IMAGE_FALLBACK];
+  const [activeIndex, setActiveIndex] = useState(0);
+  return <div className="land-detail-gallery-shell">
+    <div className="land-detail-main-photo">
+      <img src={resolveMediaUrl(images[activeIndex] || LAND_IMAGE_FALLBACK)} alt={`Участок ${land.area}, фото ${activeIndex + 1}`} />
+      <span>{activeIndex + 1} из {images.length}</span>
+      {images.length > 1 ? <div className="land-detail-gallery-nav"><button type="button" onClick={() => setActiveIndex((activeIndex - 1 + images.length) % images.length)} aria-label="Предыдущее фото">‹</button><button type="button" onClick={() => setActiveIndex((activeIndex + 1) % images.length)} aria-label="Следующее фото">›</button></div> : null}
+    </div>
+    {images.length > 1 ? <div className="land-detail-thumbnails">{images.map((image, index) => <button className={index === activeIndex ? 'active' : ''} type="button" key={`${image}_${index}`} onClick={() => setActiveIndex(index)} aria-label={`Показать фото ${index + 1}`}><img src={resolveMediaUrl(image)} alt="" /></button>)}</div> : null}
+  </div>;
 }
 
 function LandDetailPage() {
@@ -1934,18 +1947,19 @@ function LandDetailPage() {
     <main className="internal-body land-detail-page">
       <div className="container">
         <Breadcrumbs items={['Главная', 'Земля', `Участок ${land.area}`]} />
-        <h1>Земельный участок {land.area} в {land.district}</h1>
+        <div className="land-detail-title"><div><span>Земельный участок · {land.area} · ИЖС</span><h1>Участок {land.area} в {land.district}</h1><p><span aria-hidden="true">⌖</span> {land.district}</p></div><div className="land-detail-title-actions"><button type="button" onClick={() => navigator.clipboard?.writeText(window.location.href)}>Поделиться</button></div></div>
         <div className="land-detail-layout">
-          <div className="land-detail-gallery"><LandCardImageSlider land={land} /></div>
-          <aside className="project-detail-side">
-            <h2>{land.price}</h2>
-            <div className="detail-row"><span>Площадь</span><b>{land.area}</b></div>
-            <div className="detail-row"><span>Район</span><b>{land.district}</b></div>
-            <div className="detail-row"><span>Кадастровый номер</span><b>{land.cadastralNumber}</b></div>
-            <button className="detail-btn" onClick={() => setActiveLand(land)}>Узнать подробности</button>
+          <LandDetailGallery land={land} />
+          <aside className="land-detail-offer">
+            <span className="land-detail-verified"><b>✓</b> Объект проверен</span>
+            <small>Стоимость участка</small><h2>{land.price}</h2>
+            <button className="land-detail-primary" onClick={() => setActiveLand(land)}>Узнать подробности</button>
+            <a className="land-detail-phone" href={CONTACTS.mainPhoneHref}>Позвонить специалисту</a>
+            <p>Ответим на вопросы об участке, документах и строительстве дома.</p>
+            <div className="land-detail-help"><span aria-hidden="true">⌂</span><div><strong>Дом под этот участок</strong><small>Подберём проект и рассчитаем строительство</small></div></div>
           </aside>
         </div>
-        <section className="land-detail-description"><h2>Об участке</h2><p>{land.description || 'Уточните подробности об участке у нашего специалиста.'}</p>{land.mapUrl ? <a href={land.mapUrl} target="_blank" rel="noreferrer">Посмотреть расположение на карте →</a> : null}</section>
+        <div className="land-detail-content-grid"><section className="land-detail-description"><span className="lands-section-label">Описание объекта</span><h2>Об участке</h2><p>{land.description || 'Уточните подробности об участке у нашего специалиста.'}</p>{land.mapUrl ? <a href={land.mapUrl} target="_blank" rel="noreferrer">Посмотреть расположение на карте →</a> : null}</section><aside className="land-detail-specs"><h2>Характеристики</h2><dl><div><dt>Площадь</dt><dd>{land.area}</dd></div><div><dt>Назначение</dt><dd>ИЖС</dd></div><div><dt>Район</dt><dd>{land.district}</dd></div><div><dt>Кадастровый номер</dt><dd>{land.cadastralNumber}</dd></div></dl></aside></div>
         <nav className="land-seo-links" aria-label="Полезные разделы"><h2>Полезно при покупке земли</h2><div><a href="/lands">Все земельные участки</a><a href="/projects">Проекты домов</a><a href="/mortgage-calculator">Ипотечный калькулятор</a><a href="/services/fundament">Строительство фундамента</a><a href="/lands/lesnoe-ozero">Участки в «Лесном озере»</a></div></nav>
         {related.length ? <section className="related-lands"><h2>Другие участки</h2><div>{related.map((item) => <a key={item.id} href={`/lands/${encodeURIComponent(item.id)}`}><strong>Участок {item.area}</strong><span>{item.district} · {item.price}</span></a>)}</div></section> : null}
       </div>
@@ -2184,7 +2198,7 @@ function LandsPage() {
               <div className="catalog-grid lands-grid">
               {filtered.map((item) => (
                 <article className="land-card" key={item.id}>
-                  <a className="land-card-visual" href={`/lands/${encodeURIComponent(item.id)}`} aria-label={`Открыть участок ${item.area}`}><LandCardImageSlider land={item} /></a>
+                  <div className="land-card-visual"><LandCardImageSlider land={item} href={`/lands/${encodeURIComponent(item.id)}`} /></div>
                   <div className="land-card-content">
                     <div className="land-card-heading">
                       <div><p className="land-location"><span aria-hidden="true">⌖</span>{item.district}</p><h3><a href={`/lands/${encodeURIComponent(item.id)}`}>Участок {item.area}</a></h3></div>

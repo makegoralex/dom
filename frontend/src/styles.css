@@ -206,6 +206,7 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .project-price {display:block; margin:16px auto 0; width:max-content; padding:12px 28px; border:1px solid #2d2f33; border-radius:8px; font-size:20px; font-weight:700; color:#232832;}
 .project-cta{width:calc(100% - 24px); margin:0 12px 12px; border:none; background:#eb7b17; color:#fff; padding:10px 12px; font-weight:700; cursor:pointer;}
 .land-image-slider{position:relative; overflow:hidden;}
+.land-image-click-target{display:block; color:inherit; text-decoration:none;}
 .land-image-status,.land-photo-count{position:absolute; top:14px; z-index:2; display:inline-flex; align-items:center; min-height:29px; border-radius:999px; padding:6px 10px; font-size:11px; font-weight:800; letter-spacing:.035em;}
 .land-image-status{left:14px; color:#174a34; background:#ecf6e9; text-transform:uppercase;}
 .land-photo-count{right:14px; color:#fff; background:rgba(5,35,26,.72); backdrop-filter:blur(7px);}
@@ -238,12 +239,42 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .land-card-actions button{color:#173f32; background:#fff;}
 .land-map-link{color:#567267; font-size:12px; font-weight:750; text-align:center; text-underline-offset:3px;}
 
-.land-detail-layout{display:grid; grid-template-columns:minmax(0,1fr) 360px; gap:22px; align-items:start;}
-.land-detail-gallery .project-image{height:520px; background-size:cover;}
-.land-detail-gallery .land-slider-controls{bottom:14px; right:14px;}
-.land-detail-description{margin-top:22px; padding:22px; border:1px solid #d8dce3; background:#f7f7f8;}
-.land-detail-description h2,.land-seo-links h2,.related-lands h2{margin:0 0 12px; font-size:24px;}
-.land-detail-description p{margin:0 0 14px; line-height:1.65; white-space:pre-wrap; overflow-wrap:anywhere;}
+.land-detail-page{background:#f5f3ed;}
+.land-detail-title{display:flex; align-items:end; justify-content:space-between; gap:24px; padding:10px 0 28px;}
+.land-detail-title>div>span{color:#9a7843; font-size:12px; font-weight:850; letter-spacing:.07em; text-transform:uppercase;}
+.land-detail-title h1{max-width:850px; margin:8px 0 10px; color:#173c2f; font-family:Georgia,serif; font-size:clamp(36px,4.7vw,62px); font-weight:500; line-height:1.03;}
+.land-detail-title p{margin:0; color:#66766e;}
+.land-detail-title-actions button{border:1px solid #d8d4c9; border-radius:999px; padding:11px 17px; color:#436057; background:#fff; font:inherit; font-weight:750; cursor:pointer;}
+.land-detail-layout{display:grid; grid-template-columns:minmax(0,1fr) 350px; gap:26px; align-items:start;}
+.land-detail-gallery-shell{min-width:0;}
+.land-detail-main-photo{position:relative; overflow:hidden; height:560px; border-radius:22px; background:#e5e7e3; box-shadow:0 16px 42px rgba(24,55,43,.1);}
+.land-detail-main-photo>img{width:100%; height:100%; object-fit:cover; display:block;}
+.land-detail-main-photo>span{position:absolute; right:18px; bottom:18px; z-index:2; border-radius:999px; padding:8px 12px; color:#fff; background:rgba(5,35,26,.75); font-size:12px; font-weight:800; backdrop-filter:blur(7px);}
+.land-detail-gallery-nav{position:absolute; inset:50% 16px auto; display:flex; justify-content:space-between; transform:translateY(-50%); pointer-events:none;}
+.land-detail-gallery-nav button{display:grid; width:46px; height:46px; place-items:center; border:1px solid rgba(255,255,255,.65); border-radius:50%; color:#fff; background:rgba(8,43,32,.68); font-size:30px; cursor:pointer; pointer-events:auto; backdrop-filter:blur(7px);}
+.land-detail-thumbnails{display:grid; grid-auto-columns:112px; grid-auto-flow:column; gap:10px; overflow-x:auto; padding:12px 2px 3px; scrollbar-width:thin;}
+.land-detail-thumbnails button{overflow:hidden; height:76px; border:2px solid transparent; border-radius:11px; padding:0; background:#e4e5e2; cursor:pointer; opacity:.68;}
+.land-detail-thumbnails button.active{border-color:#b48b4b; opacity:1;}
+.land-detail-thumbnails img{width:100%; height:100%; object-fit:cover; display:block;}
+.land-detail-offer{position:sticky; top:18px; padding:28px; border:1px solid #ddd8cd; border-radius:20px; background:#fff; box-shadow:0 16px 38px rgba(24,55,43,.09);}
+.land-detail-verified{display:inline-flex; align-items:center; gap:7px; margin-bottom:23px; border-radius:999px; padding:7px 10px; color:#35634a; background:#edf5ed; font-size:10px; font-weight:850; letter-spacing:.05em; text-transform:uppercase;}
+.land-detail-verified b{display:grid; width:18px; height:18px; place-items:center; border-radius:50%; color:#fff; background:#4d9464;}
+.land-detail-offer>small{display:block; color:#7b8781; font-size:11px; text-transform:uppercase; letter-spacing:.05em;}
+.land-detail-offer h2{margin:6px 0 22px; color:#173c2f; font-family:Georgia,serif; font-size:38px; font-weight:600;}
+.land-detail-primary,.land-detail-phone{display:flex; width:100%; min-height:49px; align-items:center; justify-content:center; box-sizing:border-box; border-radius:11px; padding:12px; font:inherit; font-weight:800; cursor:pointer; text-decoration:none;}
+.land-detail-primary{border:0; color:#fff; background:#173f32;}
+.land-detail-phone{margin-top:9px; border:1px solid #173f32; color:#173f32; background:#fff;}
+.land-detail-offer>p{margin:15px 0 22px; color:#75817b; font-size:12px; line-height:1.45; text-align:center;}
+.land-detail-help{display:flex; gap:12px; align-items:center; border-top:1px solid #ebe7df; padding-top:20px;}
+.land-detail-help>span{display:grid; width:42px; height:42px; flex:0 0 auto; place-items:center; border-radius:12px; color:#e8ca8b; background:#173f32; font-size:21px;}
+.land-detail-help div{display:grid; gap:3px;}.land-detail-help strong{color:#29473d;font-size:13px}.land-detail-help small{color:#78837e;font-size:11px;line-height:1.35}
+.land-detail-content-grid{display:grid; grid-template-columns:minmax(0,1fr) 350px; gap:26px; margin-top:30px; align-items:start;}
+.land-detail-description,.land-detail-specs{margin:0; padding:30px; border:1px solid #dfdbd1; border-radius:19px; background:#fff;}
+.land-detail-description h2,.land-detail-specs h2,.land-seo-links h2,.related-lands h2{margin:8px 0 16px; color:#173c2f; font-family:Georgia,serif; font-size:29px; font-weight:500;}
+.land-detail-description p{margin:0; color:#50665d; font-size:16px; line-height:1.75; white-space:pre-line;}
+.land-detail-description>a{display:inline-block; margin-top:20px; color:#8c6a38; font-weight:800; text-underline-offset:4px;}
+.land-detail-specs dl{margin:0}.land-detail-specs dl div{display:flex; justify-content:space-between; gap:20px; padding:13px 0; border-bottom:1px solid #ebe7df}.land-detail-specs dl div:last-child{border-bottom:0}.land-detail-specs dt{color:#7b8781}.land-detail-specs dd{margin:0;color:#28463b;font-weight:800;text-align:right}
+.land-detail-description p{overflow-wrap:anywhere;}
 .land-seo-links,.related-lands{margin-top:22px;}
 .land-seo-links>div{display:flex; flex-wrap:wrap; gap:10px;}
 .land-seo-links a{padding:10px 13px; background:#fff; border:1px solid #ccd3df; color:#26384d; text-decoration:none;}
@@ -552,7 +583,8 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .service-page-layout.is-service{grid-template-columns:1fr;}
   .service-side{position:static;}
   .lands-top-cta{flex-direction:column; align-items:flex-start;}
-  .land-detail-layout{grid-template-columns:1fr;}
+  .land-detail-layout,.land-detail-content-grid{grid-template-columns:1fr;}
+  .land-detail-offer{position:static;}
   .related-lands>div{grid-template-columns:1fr;}
   .adv-grid{grid-template-columns:repeat(2,1fr)}
 }
@@ -576,7 +608,15 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .mobile-menu-contact a{font-size:18px; color:#1d2430; text-decoration:none; font-weight:700;}
   .mobile-menu-contact small{font-size:12px; color:#636c7b;}
   .internal-body h1{font-size:22px;}
-  .land-detail-gallery .project-image{height:300px;}
+  .land-detail-title{align-items:flex-start; flex-direction:column; padding-bottom:20px;}
+  .land-detail-title h1{font-size:34px;}
+  .land-detail-main-photo{height:360px; border-radius:15px;}
+  .land-detail-gallery-nav{inset:50% 10px auto;}
+  .land-detail-gallery-nav button{width:40px; height:40px; font-size:26px;}
+  .land-detail-thumbnails{grid-auto-columns:88px;}
+  .land-detail-thumbnails button{height:62px;}
+  .land-detail-offer,.land-detail-description,.land-detail-specs{padding:21px;}
+  .land-detail-content-grid{gap:16px; margin-top:20px;}
   .catalog-filters,.filter-block,.double-range{min-width:0; overflow:hidden;}
   .internal-text-box p{font-size:12px;}
   .contacts-box{grid-template-columns:1fr; padding:16px;}
