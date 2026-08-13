@@ -2183,24 +2183,28 @@ function LandsPage() {
               </div>
               <div className="catalog-grid lands-grid">
               {filtered.map((item) => (
-                <article className="project-card land-card" key={item.id}>
-                  <LandCardImageSlider land={item} />
-                  <div className="project-content">
-                    <p className="land-location"><span aria-hidden="true">⌖</span>{item.district}</p>
-                    <h3><a href={`/lands/${encodeURIComponent(item.id)}`}>Земельный участок {item.area}</a></h3>
-                    <div className="land-card-meta">
+                <article className="land-card" key={item.id}>
+                  <a className="land-card-visual" href={`/lands/${encodeURIComponent(item.id)}`} aria-label={`Открыть участок ${item.area}`}><LandCardImageSlider land={item} /></a>
+                  <div className="land-card-content">
+                    <div className="land-card-heading">
+                      <div><p className="land-location"><span aria-hidden="true">⌖</span>{item.district}</p><h3><a href={`/lands/${encodeURIComponent(item.id)}`}>Участок {item.area}</a></h3></div>
+                      <span className="land-verified"><b aria-hidden="true">✓</b> Проверен</span>
+                    </div>
+                    <div className="land-card-facts">
                       <span><small>Площадь</small><strong>{item.area}</strong></span>
+                      <span><small>Назначение</small><strong>ИЖС</strong></span>
                       <span><small>Кадастровый №</small><strong>{item.cadastralNumber}</strong></span>
                     </div>
                     {item.description ? <p className="project-desc land-card-description">{item.description}</p> : null}
                     <div className="land-card-bottom">
-                      <div><small>Стоимость</small><strong className="project-price">{item.price}</strong></div>
-                      <button className="project-cta" onClick={() => setActiveLand(item)}>Узнать подробнее</button>
+                      <div><small>Стоимость участка</small><strong className="land-card-price">{item.price}</strong></div>
+                      <small>Поможем проверить документы</small>
                     </div>
-                    <div className="land-card-links">
-                      <a className="land-more-link" href={`/lands/${encodeURIComponent(item.id)}`}>Карточка участка →</a>
-                      {item.mapUrl ? <a href={item.mapUrl} target="_blank" rel="noreferrer">На карте ↗</a> : null}
+                    <div className="land-card-actions">
+                      <a href={`/lands/${encodeURIComponent(item.id)}`}>Смотреть участок <span aria-hidden="true">→</span></a>
+                      <button type="button" onClick={() => setActiveLand(item)}>Узнать подробности</button>
                     </div>
+                    {item.mapUrl ? <a className="land-map-link" href={item.mapUrl} target="_blank" rel="noreferrer">Посмотреть на карте ↗</a> : null}
                   </div>
                 </article>
               ))}

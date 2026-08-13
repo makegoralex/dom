@@ -211,26 +211,32 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .land-photo-count{right:14px; color:#fff; background:rgba(5,35,26,.72); backdrop-filter:blur(7px);}
 .land-slider-controls{position:absolute; inset:auto 14px 14px auto; z-index:2; display:flex; gap:6px;}
 .land-slider-controls button{display:grid; place-items:center; border:1px solid rgba(255,255,255,.72); border-radius:50%; background:rgba(5,35,26,.7); color:#fff; width:34px; height:34px; cursor:pointer; backdrop-filter:blur(5px);}
-.land-card .project-content{display:grid; gap:12px; padding:20px;}
-.land-card .project-content h3{font-size:21px; line-height:1.16;}
-.land-card .project-content h3 a{color:inherit; text-decoration:none;}
-.land-card .project-content h3 a:hover{color:#29734e;}
+.land-card-visual{display:block; overflow:hidden; color:inherit; text-decoration:none;}
+.land-card-content{display:grid; gap:15px; padding:22px;}
+.land-card-heading{display:flex; align-items:start; justify-content:space-between; gap:14px;}
+.land-card-heading h3{margin:5px 0 0; color:#173c2f; font-family:Georgia,serif; font-size:25px; font-weight:500; line-height:1.1;}
+.land-card-heading h3 a{color:inherit; text-decoration:none;}
+.land-card-heading h3 a:hover{color:#29734e;}
+.land-verified{display:inline-flex; align-items:center; gap:5px; flex:0 0 auto; border-radius:999px; padding:6px 9px; color:#356349; background:#edf5ed; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.04em;}
+.land-verified b{display:grid; width:16px; height:16px; place-items:center; border-radius:50%; color:#fff; background:#4f9566; font-size:10px;}
 .land-location{display:flex; align-items:center; gap:6px; margin:0; color:#65736b; font-size:13px;}
 .land-location span{color:#4e9a67; font-size:17px;}
-.land-card-meta{display:grid; grid-template-columns:.7fr 1.3fr; border:1px solid #e1e7e2; border-radius:10px; background:#f7faf7;}
-.land-card-meta span{display:grid; gap:4px; padding:11px 12px; min-width:0;}
-.land-card-meta span+span{border-left:1px solid #e1e7e2;}
-.land-card-meta small,.land-card-bottom small{color:#758078; font-size:11px;}
-.land-card-meta strong{overflow:hidden; color:#26342c; font-size:14px; text-overflow:ellipsis; white-space:nowrap;}
-.land-card-description{display:-webkit-box; overflow:hidden; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2; min-height:2.8em; margin:0; color:#647068; font-size:14px; line-height:1.4; overflow-wrap:anywhere;}
-.land-card-bottom{display:flex; align-items:end; justify-content:space-between; gap:12px; border-top:1px solid #e4e8e5; padding-top:15px;}
+.land-card-facts{display:grid; grid-template-columns:.78fr .66fr 1.45fr; overflow:hidden; border:1px solid #e2e8e2; border-radius:12px; background:#f8faf7;}
+.land-card-facts span{display:grid; gap:5px; min-width:0; padding:12px;}
+.land-card-facts span+span{border-left:1px solid #e2e8e2;}
+.land-card-facts small,.land-card-bottom small{color:#7a877f; font-size:10px; text-transform:uppercase; letter-spacing:.035em;}
+.land-card-facts strong{overflow:hidden; color:#263b31; font-size:13px; text-overflow:ellipsis; white-space:nowrap;}
+.land-card-description{display:-webkit-box; overflow:hidden; -webkit-box-orient:vertical; -webkit-line-clamp:3; line-clamp:3; min-height:4.35em; margin:0; color:#647068; font-size:14px; line-height:1.45; overflow-wrap:anywhere;}
+.land-card-bottom{display:flex; align-items:end; justify-content:space-between; gap:12px; border-top:1px solid #e4e8e5; padding-top:16px;}
 .land-card-bottom>div{display:grid; gap:3px;}
-.land-card .project-price{margin:0; width:auto; border:0; padding:0; color:#153e2d; font-size:21px; line-height:1.1; white-space:nowrap;}
-.land-card .project-cta{width:auto; min-height:43px; margin:0; border-radius:8px; padding:10px 14px; background:#4f9c65; font-size:13px; transition:background .2s ease,transform .2s ease;}
-.land-card .project-cta:hover{background:#347b50; transform:translateY(-1px);}
-.land-card-links{display:flex; align-items:center; justify-content:space-between; gap:12px;}
-.land-card-links a{color:#2d6847; font-size:13px; font-weight:700; text-underline-offset:3px;}
-.land-more-link{color:#2d6847; font-size:13px; font-weight:700; text-underline-offset:3px;}
+.land-card-bottom>small{max-width:135px; text-align:right; line-height:1.35; text-transform:none; letter-spacing:0;}
+.land-card-price{color:#173f32; font-family:Georgia,serif; font-size:25px; font-weight:700; line-height:1.1; white-space:nowrap;}
+.land-card-actions{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+.land-card-actions a,.land-card-actions button{display:flex; align-items:center; justify-content:center; min-height:44px; border:1px solid #173f32; border-radius:10px; padding:10px 12px; font:inherit; font-size:12px; font-weight:800; cursor:pointer; text-decoration:none;}
+.land-card-actions a{justify-content:space-between; color:#fff; background:#173f32;}
+.land-card-actions a span{color:#e2c382; font-size:16px;}
+.land-card-actions button{color:#173f32; background:#fff;}
+.land-map-link{color:#567267; font-size:12px; font-weight:750; text-align:center; text-underline-offset:3px;}
 
 .land-detail-layout{display:grid; grid-template-columns:minmax(0,1fr) 360px; gap:22px; align-items:start;}
 .land-detail-gallery .project-image{height:520px; background-size:cover;}
@@ -422,11 +428,11 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .lands-results-toolbar p strong{color:#294032;}
 .lands-results-toolbar label{display:flex; align-items:center; gap:9px; color:#738078; font-size:12px;}
 .lands-results-toolbar select{min-height:37px; border:1px solid #d5ded6; border-radius:7px; padding:7px 30px 7px 10px; color:#2d4034; background:#fff; font-size:12px;}
-.lands-grid{gap:20px;}
-.lands-grid .land-card{border:1px solid #dce4dc; border-radius:13px; background:#fff; box-shadow:0 10px 30px rgba(24,60,41,.055);}
-.lands-grid .land-card:hover{box-shadow:0 18px 40px rgba(24,60,41,.13);}
-.lands-grid .project-image{height:235px; background-size:cover; transition:transform .45s ease;}
-.lands-grid .land-card:hover .project-image{transform:scale(1.025);}
+.lands-grid{gap:24px;}
+.lands-grid .land-card{overflow:hidden; border:1px solid #dbe3dc; border-radius:19px; background:#fff; box-shadow:0 12px 34px rgba(24,60,41,.07); transition:transform .22s ease,box-shadow .22s ease;}
+.lands-grid .land-card:hover{transform:translateY(-4px); box-shadow:0 22px 48px rgba(24,60,41,.14);}
+.lands-grid .project-image{height:255px; background-size:cover; transition:transform .45s ease;}
+.lands-grid .land-card:hover .project-image{transform:scale(1.035);}
 .lands-empty{display:grid; justify-items:center; border:1px dashed #cbd7cd; border-radius:13px; padding:58px 28px; background:#fff; text-align:center;}
 .lands-empty>span{display:grid; place-items:center; width:54px; height:54px; border-radius:50%; color:#3f8559; background:#e8f3e8; font-size:25px;}
 .lands-empty h3{margin:16px 0 6px; color:#213b2c;}
@@ -785,6 +791,9 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
   .lands-results-toolbar select{flex:1;}
   .lands-grid{grid-template-columns:1fr;}
   .lands-grid .project-image{height:220px;}
-  .land-card-bottom{align-items:stretch; flex-direction:column;}
-  .land-card .project-cta{width:100%;}
+  .land-card-bottom{align-items:flex-start; flex-direction:column;}
+  .land-card-bottom>small{max-width:none; text-align:left;}
+  .land-card-actions{grid-template-columns:1fr;}
+  .land-card-facts{grid-template-columns:1fr 1fr;}
+  .land-card-facts span:last-child{grid-column:1/-1; border-top:1px solid #e2e8e2; border-left:0;}
 }

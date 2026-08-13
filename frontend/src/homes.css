@@ -1,24 +1,36 @@
 .homes-page { background: #f5f2eb; color: #17382e; }
 .homes-breadcrumbs { display: flex; gap: 10px; align-items: center; padding: 22px 0; color: #718079; font-size: 13px; }
 .homes-breadcrumbs a { color: #45675d; text-decoration: none; }
-.homes-hero { min-height: 410px; border-radius: 28px; padding: 58px; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(230px, .55fr); align-items: end; gap: 40px; color: #fff; overflow: hidden; position: relative; background: linear-gradient(100deg, rgba(7,47,35,.98) 0%, rgba(7,47,35,.86) 50%, rgba(7,47,35,.2) 100%), url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1800&q=85') center/cover; box-shadow: 0 24px 60px rgba(19,48,38,.14); }
+.homes-hero { min-height: 410px; border-radius: 28px; padding: 58px; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(230px, .55fr); align-items: end; gap: 40px; color: #fff; overflow: hidden; position: relative; isolation:isolate; background: linear-gradient(100deg, #062f23 0%, rgba(6,47,35,.98) 43%, rgba(6,47,35,.72) 72%, rgba(6,47,35,.38) 100%), url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1800&q=85') center/cover; box-shadow: 0 24px 60px rgba(19,48,38,.14); }
+.homes-hero::after{content:""; position:absolute; inset:0; z-index:0; background:linear-gradient(0deg,rgba(2,24,17,.3),transparent 55%); pointer-events:none;}
 .homes-hero > * { position: relative; z-index: 1; }
+.homes-hero-copy{max-width:780px; padding:28px 32px; border:1px solid rgba(255,255,255,.12); border-radius:22px; background:rgba(4,39,28,.32); box-shadow:0 20px 50px rgba(0,0,0,.16); backdrop-filter:blur(4px);}
 .homes-eyebrow, .homes-heading > div > span { display: block; color: #d7b779; font-size: 12px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; margin-bottom: 14px; }
-.homes-hero h1 { max-width: 720px; margin: 0 0 18px; font-family: Georgia, serif; font-size: clamp(42px, 5.5vw, 76px); font-weight: 500; line-height: .98; }
-.homes-hero p { max-width: 670px; margin: 0; color: rgba(255,255,255,.78); font-size: 18px; line-height: 1.6; }
+.homes-hero h1 { max-width: 720px; margin: 0 0 18px; color:#fff; font-family: Georgia, serif; font-size: clamp(42px, 5.5vw, 76px); font-weight: 500; line-height: .98; text-shadow:0 3px 22px rgba(0,0,0,.48); }
+.homes-hero p { max-width: 670px; margin: 0; color: rgba(255,255,255,.92); font-size: 18px; line-height: 1.6; text-shadow:0 2px 12px rgba(0,0,0,.35); }
 .homes-hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; }
 .homes-hero-actions a, .homes-hero-actions button, .homes-heading > button { border: 1px solid #d7b779; border-radius: 999px; padding: 14px 24px; font: inherit; font-weight: 750; text-decoration: none; cursor: pointer; }
 .homes-hero-actions a { background: #d7b779; color: #143a2e; }
-.homes-hero-actions button { background: transparent; color: #fff; }
+.homes-hero-actions button { background: #fff; color: #143a2e; box-shadow:0 8px 20px rgba(0,0,0,.16); }
 .homes-hero-card { align-self: end; padding: 28px; border: 1px solid rgba(255,255,255,.24); border-radius: 22px; background: rgba(255,255,255,.1); backdrop-filter: blur(16px); }
 .homes-hero-card strong { display: block; font-family: Georgia, serif; font-size: 54px; line-height: 1; color: #e5c88e; }
 .homes-hero-card span, .homes-hero-card small { display: block; }
 .homes-hero-card span { margin-top: 8px; font-size: 18px; font-weight: 750; }
 .homes-hero-card small { margin-top: 16px; color: rgba(255,255,255,.66); }
-.homes-catalog { padding: 72px 0 90px; }
+.homes-sell-banner{display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:22px; align-items:center; margin-top:28px; padding:26px 30px; border:1px solid #ded5c5; border-radius:20px; color:#17382e; background:#fff; box-shadow:0 12px 32px rgba(20,56,44,.07);}
+.homes-sell-icon{display:grid; width:58px; height:58px; place-items:center; border-radius:16px; color:#f3e5c7; background:#173f32; font-size:29px;}
+.homes-sell-banner span{color:#9a7640; font-size:11px; font-weight:850; letter-spacing:.09em; text-transform:uppercase;}
+.homes-sell-banner h2{margin:4px 0 5px; font-family:Georgia,serif; font-size:27px; font-weight:500;}
+.homes-sell-banner p{margin:0; color:#687871; font-size:14px; line-height:1.45;}
+.homes-sell-banner>button{border:0; border-radius:999px; padding:14px 20px; color:#fff; background:#173f32; font:inherit; font-weight:800; cursor:pointer; white-space:nowrap;}
+.homes-sell-banner>button span{margin-left:7px; color:#e5c88e; font-size:16px;}
+.homes-catalog { padding: 58px 0 90px; }
 .homes-heading { display: flex; justify-content: space-between; gap: 24px; align-items: end; margin-bottom: 28px; }
 .homes-heading h2 { margin: 0; color: #153a2e; font-family: Georgia, serif; font-size: clamp(34px, 4vw, 52px); font-weight: 500; }
 .homes-heading > button { background: transparent; color: #17382e; }
+.homes-heading-actions{display:flex; gap:10px; flex-wrap:wrap;}
+.homes-heading-actions button{border:1px solid #173f32; border-radius:999px; padding:13px 20px; color:#173f32; background:transparent; font:inherit; font-weight:750; cursor:pointer;}
+.homes-heading-actions button:first-child{color:#fff; background:#173f32;}
 .homes-market-tabs { display: flex; gap: 8px; margin-bottom: 24px; padding: 7px; width: fit-content; max-width: 100%; border-radius: 999px; background: #e8e3d9; }
 .homes-market-tabs button { border: 0; border-radius: 999px; padding: 11px 19px; color: #496159; background: transparent; font: inherit; font-weight: 750; cursor: pointer; white-space: nowrap; }
 .homes-market-tabs button.active { color: #fff; background: #143e31; box-shadow: 0 5px 16px rgba(20,62,49,.18); }
@@ -87,5 +99,5 @@
 .home-detail-side dd { margin: 0; color: #173f32; font-weight: 800; text-align: right; }
 .home-detail-side > button { width: 100%; margin-top: 22px; border: 0; border-radius: 12px; padding: 15px; color: #fff; background: #173f32; font: inherit; font-weight: 800; cursor: pointer; }
 .home-detail-side > small { display: block; margin-top: 10px; color: #7c8883; text-align: center; }
-@media (max-width: 980px) { .homes-hero { grid-template-columns: 1fr; padding: 42px; } .homes-hero-card { display: none; } .homes-layout { grid-template-columns: 1fr; } .homes-filters { position: static; } .home-detail-layout { grid-template-columns: 1fr; } .home-detail-side { position: static; } }
-@media (max-width: 680px) { .homes-hero { min-height: 470px; padding: 32px 24px; border-radius: 20px; } .homes-hero h1 { font-size: 46px; } .homes-heading, .home-detail-heading, .homes-toolbar { align-items: stretch; flex-direction: column; } .homes-heading > button { align-self: flex-start; } .homes-market-tabs { width: 100%; overflow-x: auto; } .homes-grid { grid-template-columns: 1fr; } .homes-filters { padding: 18px; } .sell-home-form { grid-template-columns: 1fr; } .sell-home-form > * { grid-column: 1 !important; } .home-detail-heading > strong { white-space: normal; } }
+@media (max-width: 980px) { .homes-hero { grid-template-columns: 1fr; padding: 42px; } .homes-hero-card { display: none; } .homes-sell-banner{grid-template-columns:auto 1fr}.homes-sell-banner>button{grid-column:1/-1;width:100%}.homes-layout { grid-template-columns: 1fr; } .homes-filters { position: static; } .home-detail-layout { grid-template-columns: 1fr; } .home-detail-side { position: static; } }
+@media (max-width: 680px) { .homes-hero { min-height: 470px; padding: 20px; border-radius: 20px; } .homes-hero-copy{padding:25px 20px}.homes-hero h1 { font-size: 44px; } .homes-hero-actions{display:grid}.homes-hero-actions a,.homes-hero-actions button{text-align:center}.homes-sell-banner{grid-template-columns:1fr; padding:22px}.homes-sell-icon{width:50px;height:50px}.homes-heading, .home-detail-heading, .homes-toolbar { align-items: stretch; flex-direction: column; } .homes-heading-actions{display:grid}.homes-market-tabs { width: 100%; overflow-x: auto; } .homes-grid { grid-template-columns: 1fr; } .homes-filters { padding: 18px; } .sell-home-form { grid-template-columns: 1fr; } .sell-home-form > * { grid-column: 1 !important; } .home-detail-heading > strong { white-space: normal; } }

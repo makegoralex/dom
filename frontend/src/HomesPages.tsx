@@ -146,12 +146,18 @@ export function HomesPage({ apiBase, Header, Footer, LeadModal, formatPhone, res
       <div className="container">
         <div className="homes-breadcrumbs"><a href="/">Главная</a><span>•</span><span>Готовые дома</span></div>
         <section className="homes-hero">
-          <div><span className="homes-eyebrow">Недвижимость от Evtenia</span><h1>Готовые дома для жизни</h1><p>Новые дома от застройщиков и проверенное вторичное жильё в Пензе и области. Поможем с просмотром, документами и ипотекой.</p><div className="homes-hero-actions"><a href="#homes-catalog">Выбрать дом</a><button type="button" onClick={() => setSellOpen(true)}>Предложить свой дом</button></div></div>
+          <div className="homes-hero-copy"><span className="homes-eyebrow">Недвижимость от Evtenia</span><h1>Готовые дома для жизни</h1><p>Новые дома от застройщиков и проверенное вторичное жильё в Пензе и области. Поможем с просмотром, документами и ипотекой.</p><div className="homes-hero-actions"><a href="#homes-catalog">Выбрать дом</a><button type="button" onClick={() => setSellOpen(true)}>Предложить дом к продаже</button></div></div>
           <div className="homes-hero-card"><strong>{homes.length}</strong><span>{declension(homes.length, ['дом', 'дома', 'домов'])} в продаже</span><small>Все объявления проходят модерацию</small></div>
         </section>
 
+        <section className="homes-sell-banner" aria-label="Продать дом через Evtenia">
+          <div className="homes-sell-icon" aria-hidden="true">⌂</div>
+          <div><span>Есть дом на продажу?</span><h2>Разместите его в каталоге Evtenia</h2><p>Заполните данные и добавьте фотографии. После проверки объявление появится в каталоге.</p></div>
+          <button type="button" onClick={() => setSellOpen(true)}>Предложить свой дом <span aria-hidden="true">→</span></button>
+        </section>
+
         <section className="homes-catalog" id="homes-catalog">
-          <div className="homes-heading"><div><span>Каталог недвижимости</span><h2>Найдите свой дом</h2></div><button type="button" onClick={() => setSelectionOpen(true)}>Помочь с выбором</button></div>
+          <div className="homes-heading"><div><span>Каталог недвижимости</span><h2>Найдите свой дом</h2></div><div className="homes-heading-actions"><button type="button" onClick={() => setSellOpen(true)}>Продать дом</button><button type="button" onClick={() => setSelectionOpen(true)}>Помочь с выбором</button></div></div>
           <div className="homes-market-tabs" role="group" aria-label="Тип жилья">
             <button className={market === 'all' ? 'active' : ''} onClick={() => setMarket('all')}>Все дома</button>
             <button className={market === 'new' ? 'active' : ''} onClick={() => setMarket('new')}>Новые</button>
