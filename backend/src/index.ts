@@ -360,7 +360,480 @@ const seedPages: Record<string, ContentPage> = {
   'services-interernoe-ozelenenie': { slug: 'services-interernoe-ozelenenie', title: 'Интерьерное озеленение', content: '<p>Создаем проекты озеленения интерьера и подбираем растения под условия помещения.</p>' },
   'services-otsenka-nedvizhimosti': { slug: 'services-otsenka-nedvizhimosti', title: 'Оценка недвижимости', content: '<p>Проводим профессиональную оценку недвижимости для продажи, ипотеки и юридических задач.</p>' },
   'services-plastikovye-okna': { slug: 'services-plastikovye-okna', title: 'Пластиковые окна', content: '<p>Подбираем и устанавливаем ПВХ-окна с учетом теплопотерь и дизайна.</p>' },
-  'services-dveri': { slug: 'services-dveri', title: 'Двери', content: '<p>Входные и межкомнатные двери с монт…7380 tokens truncated…uOrder || NAV_MENU_DEFAULT_ORDER }));
+  'services-dveri': { slug: 'services-dveri', title: 'Двери', content: '<p>Входные и межкомнатные двери с монтажом и фурнитурой.</p>' },
+  'services-remont': { slug: 'services-remont', title: 'Ремонт', content: '<p>Выполняем внутренний ремонт и отделку домов под ключ.</p>' },
+  'services-lestnitsy': { slug: 'services-lestnitsy', title: 'Лестницы', content: '<p>Проектируем и изготавливаем деревянные и комбинированные лестницы.</p>' },
+  'services-svai': { slug: 'services-svai', title: 'Сваи', content: '<p>Монтаж винтовых и железобетонных свай под разные типы грунта.</p>' },
+  'services-dizainer': { slug: 'services-dizainer', title: 'Дизайнер', content: '<p>Разрабатываем дизайн-концепцию интерьеров и экстерьеров.</p>' },
+  'services-landshaftnyy-dizayn': { slug: 'services-landshaftnyy-dizayn', title: 'Ландшафтный дизайн', content: '<p>Проектируем благоустройство участка и озеленение территории.</p>' },
+  'services-mezhevanie': { slug: 'services-mezhevanie', title: 'Межевание', content: '<p>Готовим документы и выполняем межевание земельных участков.</p>' },
+  'services-ipoteka-oformlenie': { slug: 'services-ipoteka-oformlenie', title: 'Ипотека. Оформление', content: '<p>Помогаем с подбором банка, программой, пакетом документов и сопровождением сделки.</p>' },
+  ...Object.fromEntries(furnitureLeafPages.map((page) => [page.slug, page]))
+};
+
+const seedPortfolio: PortfolioItem[] = [
+  {
+    id: 'portfolio_1',
+    title: 'Дом из двойного бруса 69 кв.м.',
+    image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80',
+    boxPrice: 'от 2 449 500 руб',
+    buildDuration: '2 месяца',
+    rating: 5,
+    clientName: 'Юлия Александровна',
+    review: 'Купила участок недалеко от города, сразу решила строиться. Ребята помогли выбрать проект и сделали всё в срок.'
+  },
+  {
+    id: 'portfolio_2',
+    title: 'Дом из профилированного бруса 131 кв.м.',
+    image: 'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?auto=format&fit=crop&w=1200&q=80',
+    boxPrice: 'от 4 847 000 руб',
+    buildDuration: '2 месяца',
+    rating: 5,
+    clientName: 'Ирина Савельева',
+    review: 'Сбылась мечта о новом уютном доме. Организация работ и обратная связь с прорабом были отличными.'
+  },
+  {
+    id: 'portfolio_3',
+    title: 'Каркасный дом 104 кв.м.',
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+    boxPrice: 'от 3 950 000 руб',
+    buildDuration: '1.5 месяца',
+    rating: 5,
+    clientName: 'Андрей Петров',
+    review: 'Дом построили быстро и аккуратно, тепло держит отлично. Результат полностью устроил.'
+  },
+  {
+    id: 'portfolio_4',
+    title: 'Кирпичный дом 156 кв.м.',
+    image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80',
+    boxPrice: 'от 7 100 000 руб',
+    buildDuration: '4 месяца',
+    rating: 5,
+    clientName: 'Наталья Ефремова',
+    review: 'Сложный рельеф участка, но команда всё продумала. Получилось красиво и надежно.'
+  },
+  {
+    id: 'portfolio_5',
+    title: 'Дом из газобетона 118 кв.м.',
+    image: 'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80',
+    boxPrice: 'от 5 200 000 руб',
+    buildDuration: '3 месяца',
+    rating: 5,
+    clientName: 'Евгений Климов',
+    review: 'Прозрачная смета, адекватные сроки и отличная работа бригады. Рекомендуем.'
+  },
+  {
+    id: 'portfolio_6',
+    title: 'Дачный дом 82 кв.м.',
+    image: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=1200&q=80',
+    boxPrice: 'от 3 600 000 руб',
+    buildDuration: '1 месяц',
+    rating: 5,
+    clientName: 'Олег и Марина',
+    review: 'Нужен был удобный дом для выходных — получили именно то, что хотели, без лишних затрат.'
+  }
+];
+
+const seedLands: LandPlot[] = [
+  { id: 'land1', cadastralNumber: '58:29:1003001:254', area: '10 соток', price: '1 250 000 ₽', district: 'Пензенский район', images: ['https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80'], mapUrl: '' },
+  { id: 'land2', cadastralNumber: '58:29:1003001:255', area: '12 соток', price: '1 480 000 ₽', district: 'Бессоновский район', images: ['https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1200&q=80'], mapUrl: '' },
+  { id: 'land3', cadastralNumber: '58:29:1003001:256', area: '8 соток', price: '980 000 ₽', district: 'Железнодорожный район', images: ['https://images.unsplash.com/photo-1493815793585-d94ccbc86df8?auto=format&fit=crop&w=1200&q=80'], mapUrl: '' }
+];
+
+const seedHomes: HouseListing[] = [
+  {
+    id: 'home-sosnovy-128',
+    title: 'Новый дом в Сосновом квартале',
+    marketType: 'new',
+    area: '128 м²',
+    landArea: '8 соток',
+    price: '9 850 000 ₽',
+    district: 'Пензенский район',
+    address: 'с. Засечное, Сосновый квартал',
+    floors: '1 этаж',
+    bedrooms: '3 спальни',
+    yearBuilt: '2026',
+    description: 'Готовый одноэтажный дом с просторной кухней-гостиной, мастер-спальней и террасой. Предчистовая отделка, газ и электричество заведены в дом.',
+    images: [
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1400&q=85',
+      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1400&q=85'
+    ]
+  },
+  {
+    id: 'home-arbekovo-174',
+    title: 'Семейный дом в Арбеково',
+    marketType: 'secondary',
+    area: '174 м²',
+    landArea: '10 соток',
+    price: '13 400 000 ₽',
+    district: 'Октябрьский район',
+    address: 'Пенза, район Арбеково',
+    floors: '2 этажа',
+    bedrooms: '4 спальни',
+    yearBuilt: '2018',
+    description: 'Кирпичный дом с ремонтом, мебелью и благоустроенным участком. На первом этаже кухня-гостиная и гостевая спальня, на втором — три спальни.',
+    images: [
+      'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=1400&q=85',
+      'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1400&q=85'
+    ]
+  }
+];
+
+const seedLesnoeOzeroPlots: LesnoeOzeroPlot[] = [
+  { id: '899', phase: 'lake', areaSotka: 8.6, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 72, y: 24 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Компактный участок рядом с озером. Подойдёт для постоянного дома или дачи.' },
+  { id: '939', phase: 'lake', areaSotka: 8.9, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 59, y: 30 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Участок у воды с удобным выходом к внутренней дороге.' },
+  { id: '875', phase: 'lake', areaSotka: 10.1, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 57, y: 40 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Универсальная площадь и живописное природное окружение.' },
+  { id: '876', phase: 'lake', areaSotka: 10.8, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 53, y: 49 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Просторный участок с хорошей формой для посадки дома.' },
+  { id: '877', phase: 'lake', areaSotka: 13.3, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 52, y: 57 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Увеличенная площадь для дома, террасы и дополнительных строений.' },
+  { id: '878', phase: 'lake', areaSotka: 10.1, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 53, y: 65 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Отдельный участок в центральной части первой очереди.' },
+  { id: '879', phase: 'lake', areaSotka: 10.5, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 56, y: 73 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Участок рядом с лесным массивом и разворотной площадкой.' },
+  { id: '900', phase: 'lake', areaSotka: 10.2, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 77, y: 36 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Ровный участок на противоположной стороне основной дороги.' },
+  { id: '902', phase: 'lake', areaSotka: 7.2, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 82, y: 53 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Компактный вариант для дачного дома или инвестиции.' },
+  { id: '903', phase: 'lake', areaSotka: 7.1, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 84, y: 63 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Доступный по площади участок у лесной границы.' },
+  { id: '1394', phase: 'forest', areaSotka: 6, status: 'available', price: '550 000 ₽', cadastralNumber: '', position: { x: 68, y: 28 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Компактный лесной участок: под дом, дачу или инвестицию.' },
+  { id: '1388', phase: 'forest', areaSotka: 8.5, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 69, y: 38 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Участок хорошей формы с удобным расположением у дороги.' },
+  { id: '849', phase: 'forest', areaSotka: 16, status: 'available', price: 'По запросу', cadastralNumber: '', position: { x: 58, y: 67 }, purpose: 'ИЖС', electricity: '15 кВт вдоль земельного участка', gas: 'вдоль земельного участка', access: 'круглогодичный', description: 'Редкий крупный участок рядом с водой — под усадьбу или банный комплекс.' }
+];
+
+function normalizeLesnoeOzeroPlot(incoming: Partial<LesnoeOzeroPlot>, fallbackId = `plot_${Date.now()}`): LesnoeOzeroPlot {
+  const phase: LesnoeOzeroPhase = incoming.phase === 'forest' ? 'forest' : 'lake';
+  const status: LesnoeOzeroPlotStatus = incoming.status === 'reserved' || incoming.status === 'sold' ? incoming.status : 'available';
+  return {
+    id: String(incoming.id || fallbackId).trim(),
+    phase,
+    areaSotka: Math.max(0, Number(incoming.areaSotka) || 0),
+    status,
+    price: String(incoming.price || 'По запросу').trim(),
+    cadastralNumber: String(incoming.cadastralNumber || '').trim(),
+    description: String(incoming.description || '').trim(),
+    position: {
+      x: Math.min(100, Math.max(0, Number(incoming.position?.x) || 50)),
+      y: Math.min(100, Math.max(0, Number(incoming.position?.y) || 50))
+    },
+    purpose: String(incoming.purpose || 'ИЖС').trim(),
+    electricity: String(incoming.electricity || '15 кВт вдоль земельного участка').trim(),
+    gas: String(incoming.gas || 'вдоль земельного участка').trim(),
+    access: String(incoming.access || 'круглогодичный').trim()
+  };
+}
+
+function normalizeLandPlot(incoming: Partial<LandPlot> & { image?: string }, fallbackId = `land_${Date.now()}`): LandPlot {
+  const images = Array.isArray(incoming.images)
+    ? incoming.images.map((item) => String(item || '').trim()).filter(Boolean)
+    : [];
+  if (!images.length && incoming.image) images.push(String(incoming.image).trim());
+  return {
+    id: incoming.id || fallbackId,
+    cadastralNumber: incoming.cadastralNumber || '',
+    area: incoming.area || '',
+    price: incoming.price || '',
+    district: incoming.district || '',
+    description: incoming.description || '',
+    images,
+    mapUrl: incoming.mapUrl || ''
+  };
+}
+
+function normalizeHouseListing(incoming: Partial<HouseListing> & { image?: string }, fallbackId = `home_${Date.now()}`): HouseListing {
+  const images = Array.isArray(incoming.images) ? incoming.images.map((item) => String(item || '').trim()).filter(Boolean) : [];
+  if (!images.length && incoming.image) images.push(String(incoming.image).trim());
+  return {
+    id: String(incoming.id || fallbackId),
+    title: String(incoming.title || 'Готовый дом').trim(),
+    marketType: incoming.marketType === 'secondary' ? 'secondary' : 'new',
+    area: String(incoming.area || '').trim(),
+    landArea: String(incoming.landArea || '').trim(),
+    price: String(incoming.price || '').trim(),
+    district: String(incoming.district || '').trim(),
+    address: String(incoming.address || '').trim(),
+    floors: String(incoming.floors || '').trim(),
+    bedrooms: String(incoming.bedrooms || '').trim(),
+    yearBuilt: String(incoming.yearBuilt || '').trim(),
+    description: String(incoming.description || '').trim(),
+    images
+  };
+}
+
+/** Keep the cadastral number in persistent storage, but never expose it publicly. */
+function toPublicLandPlot(land: LandPlot): LandPlot {
+  return { ...land, cadastralNumber: 'По запросу' };
+}
+
+const ensureDataFile = (): void => {
+  if (!fs.existsSync(DATA_FILE)) {
+    const initial: DataStore = {
+      projects: seedProjects,
+      lands: seedLands,
+      pendingLands: [],
+      homes: seedHomes,
+      pendingHomes: [],
+      lesnoeOzeroPlots: seedLesnoeOzeroPlots,
+      portfolio: seedPortfolio,
+      leads: [],
+      pages: seedPages,
+      menuOrder: [...NAV_MENU_DEFAULT_ORDER],
+      siteSettings: { logoUrl: DEFAULT_LOGO_URL, ...DEFAULT_CONTACTS }
+    };
+    fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2), 'utf-8');
+  }
+};
+
+const readData = (): DataStore => {
+  ensureDataFile();
+  const content = fs.readFileSync(DATA_FILE, 'utf-8');
+  const parsed = JSON.parse(content) as Partial<DataStore>;
+  return {
+    projects: parsed.projects || seedProjects,
+    lands: Array.isArray(parsed.lands) && parsed.lands.length
+      ? parsed.lands.map((land) => normalizeLandPlot(land as Partial<LandPlot> & { image?: string }, (land as Partial<LandPlot>)?.id || `land_${Date.now()}`))
+      : seedLands,
+    pendingLands: Array.isArray(parsed.pendingLands)
+      ? parsed.pendingLands.map((land) => ({
+          ...normalizeLandPlot(land as Partial<LandPlot> & { image?: string }, (land as Partial<LandPlot>)?.id || `pending_land_${Date.now()}`),
+          sellerName: String((land as Partial<PendingLandPlot>)?.sellerName || ''),
+          sellerPhone: String((land as Partial<PendingLandPlot>)?.sellerPhone || ''),
+          createdAt: String((land as Partial<PendingLandPlot>)?.createdAt || new Date().toISOString())
+        }))
+      : [],
+    homes: Array.isArray(parsed.homes)
+      ? parsed.homes.map((home) => normalizeHouseListing(home, home.id))
+      : seedHomes,
+    pendingHomes: Array.isArray(parsed.pendingHomes)
+      ? parsed.pendingHomes.map((home) => ({
+          ...normalizeHouseListing(home, home.id || `pending_home_${Date.now()}`),
+          sellerName: String(home.sellerName || ''),
+          sellerPhone: String(home.sellerPhone || ''),
+          createdAt: String(home.createdAt || new Date().toISOString())
+        }))
+      : [],
+    lesnoeOzeroPlots: Array.isArray(parsed.lesnoeOzeroPlots) && parsed.lesnoeOzeroPlots.length
+      ? parsed.lesnoeOzeroPlots.map((plot) => normalizeLesnoeOzeroPlot(plot, plot.id))
+      : seedLesnoeOzeroPlots,
+    portfolio: parsed.portfolio || seedPortfolio,
+    leads: parsed.leads || [],
+    pages: { ...seedPages, ...(parsed.pages || {}) },
+    menuOrder: normalizeMenuOrder(parsed.menuOrder),
+    siteSettings: {
+      logoUrl: typeof parsed.siteSettings?.logoUrl === 'string' && parsed.siteSettings.logoUrl.trim()
+        ? parsed.siteSettings.logoUrl
+        : DEFAULT_LOGO_URL,
+      contactPhotoUrl: typeof parsed.siteSettings?.contactPhotoUrl === 'string' && parsed.siteSettings.contactPhotoUrl.trim()
+        ? parsed.siteSettings.contactPhotoUrl
+        : DEFAULT_CONTACTS.contactPhotoUrl,
+      contactName: typeof parsed.siteSettings?.contactName === 'string' && parsed.siteSettings.contactName.trim()
+        ? parsed.siteSettings.contactName
+        : DEFAULT_CONTACTS.contactName,
+      contactPosition: typeof parsed.siteSettings?.contactPosition === 'string' && parsed.siteSettings.contactPosition.trim()
+        ? parsed.siteSettings.contactPosition
+        : DEFAULT_CONTACTS.contactPosition,
+      contactPhone: typeof parsed.siteSettings?.contactPhone === 'string' && parsed.siteSettings.contactPhone.trim()
+        ? parsed.siteSettings.contactPhone
+        : DEFAULT_CONTACTS.contactPhone,
+      contactCityPhone: typeof parsed.siteSettings?.contactCityPhone === 'string' && parsed.siteSettings.contactCityPhone.trim()
+        ? parsed.siteSettings.contactCityPhone
+        : DEFAULT_CONTACTS.contactCityPhone,
+      contactEmail: typeof parsed.siteSettings?.contactEmail === 'string' && parsed.siteSettings.contactEmail.trim()
+        ? parsed.siteSettings.contactEmail
+        : DEFAULT_CONTACTS.contactEmail
+    }
+  };
+};
+
+const writeData = (data: DataStore): void => {
+  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
+};
+
+const deleteAssetByUrl = (rawUrl: string): boolean => {
+  if (!rawUrl) return false;
+  try {
+    const parsed = rawUrl.startsWith('http://') || rawUrl.startsWith('https://')
+      ? new URL(rawUrl)
+      : new URL(rawUrl, 'http://localhost');
+    const pathname = parsed.pathname;
+    const normalized = pathname.startsWith('/api/assets/')
+      ? pathname.replace('/api/assets/', '')
+      : pathname.startsWith('/assets/')
+        ? pathname.replace('/assets/', '')
+        : '';
+    if (!normalized) return false;
+    const targetPath = path.resolve(ASSETS_DIR, normalized);
+    if (!targetPath.startsWith(path.resolve(ASSETS_DIR))) return false;
+    if (fs.existsSync(targetPath)) {
+      fs.unlinkSync(targetPath);
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+};
+
+const ensureAssetsDirs = (): void => {
+  if (!fs.existsSync(ASSETS_DIR)) fs.mkdirSync(ASSETS_DIR, { recursive: true });
+  if (!fs.existsSync(PROJECTS_ASSETS_DIR)) fs.mkdirSync(PROJECTS_ASSETS_DIR, { recursive: true });
+};
+
+const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+  if (req.header('x-admin-token') !== ADMIN_TOKEN) {
+    res.status(401).json({ message: 'Unauthorized' });
+    return;
+  }
+  next();
+};
+
+app.use(cors());
+app.use(express.json());
+ensureAssetsDirs();
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 12 * 1024 * 1024
+  },
+  fileFilter: (_req, file, cb) => {
+    if (!file.mimetype?.startsWith('image/')) {
+      cb(new Error(`Недопустимый формат файла: ${file.originalname}. Разрешены только изображения.`));
+      return;
+    }
+    cb(null, true);
+  }
+});
+
+app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
+app.get('/api/construction-types', (_req, res) => res.json(CONSTRUCTION_TYPES));
+
+app.get('/api/projects', (_req, res) => {
+  const data = readData();
+  res.json(data.projects);
+});
+app.get('/api/lands', (_req, res) => res.json((readData().lands || seedLands).map(toPublicLandPlot)));
+app.get('/api/lands/:id', (req, res) => {
+  const land = (readData().lands || seedLands).find((item) => item.id === req.params.id);
+  if (!land) return res.status(404).json({ message: 'Участок не найден' });
+  return res.json(toPublicLandPlot(land));
+});
+app.get('/api/homes', (_req, res) => res.json(readData().homes || seedHomes));
+app.get('/api/homes/:id', (req, res) => {
+  const home = (readData().homes || seedHomes).find((item) => item.id === req.params.id);
+  if (!home) return res.status(404).json({ message: 'Дом не найден' });
+  return res.json(home);
+});
+app.get('/api/lesnoe-ozero/plots', (_req, res) => res.json(readData().lesnoeOzeroPlots));
+app.post('/api/land-submissions', upload.array('images', 20), async (req, res) => {
+  const { sellerName, sellerPhone, cadastralNumber, area, price, district, description, mapUrl } = req.body as Record<string, string>;
+  if (!sellerName || !sellerPhone || !cadastralNumber || !area || !price || !district || !description) {
+    return res.status(400).json({ message: 'Заполните все обязательные поля участка' });
+  }
+
+  const files = req.files as Express.Multer.File[] | undefined;
+  if (!files?.length) return res.status(400).json({ message: 'Добавьте хотя бы одно фото участка' });
+
+  try {
+    const images: string[] = [];
+    for (const file of files) {
+      const filename = `land_submission_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.webp`;
+      const outputPath = path.join(PROJECTS_ASSETS_DIR, filename);
+      await sharp(file.buffer)
+        .rotate()
+        .resize(1200, 900, { fit: 'cover', position: 'attention' })
+        .webp({ lossless: true, nearLossless: true, quality: 100 })
+        .toFile(outputPath);
+      images.push(`${req.protocol}://${req.get('host')}/api/assets/projects/${filename}`);
+    }
+
+    const data = readData();
+    const pendingLand: PendingLandPlot = {
+      id: `pending_land_${Date.now()}`,
+      sellerName,
+      sellerPhone,
+      cadastralNumber,
+      area,
+      price,
+      district,
+      description,
+      images,
+      mapUrl: mapUrl || '',
+      createdAt: new Date().toISOString()
+    };
+    data.pendingLands.unshift(pendingLand);
+    data.leads.unshift({
+      id: `lead_${Date.now()}`,
+      name: sellerName,
+      phone: sellerPhone,
+      message: `Новый участок ожидает модерации в админке: ${req.protocol}://${req.get('host')}/catalog-control-7f3a. Кадастровый номер: ${cadastralNumber}. Площадь: ${area}. Район: ${district}. Цена: ${price}. Описание: ${description}`,
+      sourceTitle: `Участок на модерацию: ${cadastralNumber}`,
+      createdAt: pendingLand.createdAt
+    });
+    writeData(data);
+    let maxNotified = true;
+    try {
+      await sendLeadToMax(data.leads[0], `Участок на модерацию: ${cadastralNumber}`);
+    } catch (error) {
+      maxNotified = false;
+      console.error('Не удалось отправить заявку на землю в Max', error);
+    }
+    res.status(201).json({ ok: true, maxNotified });
+  } catch (error) {
+    console.error('Не удалось обработать заявку на землю', error);
+    return res.status(500).json({ message: 'Не удалось обработать заявку' });
+  }
+});
+app.post('/api/home-submissions', upload.array('images', 20), async (req, res) => {
+  const { sellerName, sellerPhone, title, marketType, area, landArea, price, district, address, floors, bedrooms, yearBuilt, description } = req.body as Record<string, string>;
+  if (!sellerName || !sellerPhone || !title || !area || !landArea || !price || !district || !address || !description) {
+    return res.status(400).json({ message: 'Заполните все обязательные поля дома' });
+  }
+  const files = req.files as Express.Multer.File[] | undefined;
+  if (!files?.length) return res.status(400).json({ message: 'Добавьте хотя бы одно фото дома' });
+
+  try {
+    const images: string[] = [];
+    for (const file of files) {
+      const filename = `home_submission_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.webp`;
+      const outputPath = path.join(PROJECTS_ASSETS_DIR, filename);
+      await sharp(file.buffer).rotate().resize(1400, 1000, { fit: 'cover', position: 'attention' }).webp({ quality: 88 }).toFile(outputPath);
+      images.push(`${req.protocol}://${req.get('host')}/api/assets/projects/${filename}`);
+    }
+
+    const data = readData();
+    const pendingHome: PendingHouseListing = {
+      ...normalizeHouseListing({ title, marketType: marketType === 'secondary' ? 'secondary' : 'new', area, landArea, price, district, address, floors, bedrooms, yearBuilt, description, images }, `pending_home_${Date.now()}`),
+      sellerName,
+      sellerPhone,
+      createdAt: new Date().toISOString()
+    };
+    data.pendingHomes.unshift(pendingHome);
+    const lead: Lead = {
+      id: `lead_${Date.now()}`,
+      name: sellerName,
+      phone: sellerPhone,
+      message: `Новый дом ожидает модерации в админке: ${req.protocol}://${req.get('host')}/catalog-control-7f3a. ${title}, ${area}, ${district}, ${price}. Адрес: ${address}.`,
+      sourceTitle: `Дом на модерацию: ${title}`,
+      createdAt: pendingHome.createdAt
+    };
+    data.leads.unshift(lead);
+    writeData(data);
+    let maxNotified = true;
+    try {
+      await sendLeadToMax(lead, `Дом на модерацию: ${title}`);
+    } catch (error) {
+      maxNotified = false;
+      console.error('Не удалось отправить заявку на дом в Max', error);
+    }
+    return res.status(201).json({ ok: true, maxNotified });
+  } catch (error) {
+    console.error('Не удалось обработать заявку на дом', error);
+    return res.status(500).json({ message: 'Не удалось обработать заявку' });
+  }
+});
+app.get('/api/portfolio', (_req, res) => res.json(readData().portfolio));
+
+app.get('/api/pages/:slug', (req, res) => {
+  const page = readData().pages[req.params.slug];
+  if (!page) return res.status(404).json({ message: 'Страница не найдена' });
+  res.json(page);
+});
+app.get('/api/menu-order', (_req, res) => res.json({ order: readData().menuOrder || NAV_MENU_DEFAULT_ORDER }));
 app.get('/api/site-settings', (_req, res) => res.json(readData().siteSettings));
 
 app.post('/api/leads', async (req, res) => {
@@ -795,4 +1268,3 @@ if (fs.existsSync(FRONTEND_DIST)) {
 }
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
