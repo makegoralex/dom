@@ -17,6 +17,16 @@ export type HouseListing = {
   yearBuilt: string;
   description: string;
   images: string[];
+  livingArea?: string;
+  kitchenArea?: string;
+  bathrooms?: string;
+  wallMaterial?: string;
+  renovation?: string;
+  heating?: string;
+  waterSupply?: string;
+  sewerage?: string;
+  electricity?: string;
+  gas?: string;
 };
 
 type SharedProps = {
@@ -31,6 +41,25 @@ type SharedProps = {
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1400&q=85';
 const MARKET_LABELS: Record<HouseMarketType, string> = { new: 'Новый дом', secondary: 'Вторичное жильё' };
 const parseNumber = (value: string) => Number(String(value || '').replace(/[^\d]/g, '') || 0);
+
+const houseFacts = (home: HouseListing) => [
+  ['Площадь дома', home.area],
+  ['Площадь участка', home.landArea],
+  ['Жилая площадь', home.livingArea],
+  ['Площадь кухни', home.kitchenArea],
+  ['Этажность', home.floors],
+  ['Спальни', home.bedrooms],
+  ['Санузлы', home.bathrooms],
+  ['Год постройки', home.yearBuilt],
+  ['Материал стен', home.wallMaterial],
+  ['Ремонт', home.renovation],
+  ['Отопление', home.heating],
+  ['Водоснабжение', home.waterSupply],
+  ['Канализация', home.sewerage],
+  ['Электричество', home.electricity],
+  ['Газ', home.gas],
+  ['Район', home.district]
+].filter((fact): fact is [string, string] => Boolean(fact[1]?.trim()));
 
 function declension(count: number, forms: [string, string, string]) {
   const mod100 = count % 100;
@@ -174,7 +203,7 @@ export function HomesPage({ apiBase, Header, Footer, LeadModal, formatPhone, res
             </aside>
             <div className="homes-results">
               <div className="homes-toolbar"><p>Найдено <strong>{filtered.length} {declension(filtered.length, ['объявление', 'объявления', 'объявлений'])}</strong></p><select aria-label="Сортировка" value={sort} onChange={(event) => setSort(event.target.value as typeof sort)}><option value="default">Сначала актуальные</option><option value="price-asc">Сначала дешевле</option><option value="price-desc">Сначала дороже</option></select></div>
-              <div className="homes-grid">{filtered.map((home) => <article className="home-card" key={home.id}><a href={`/homes/${encodeURIComponent(home.id)}`}><HouseGallery home={home} resolveMedia={resolveMedia} /></a><div className="home-card-body"><div className="home-card-meta"><span>{home.area}</span><span>{home.landArea}</span><span>{home.floors}</span></div><h3><a href={`/homes/${encodeURIComponent(home.id)}`}>{home.title}</a></h3><p className="home-address">⌖ {home.address || home.district}</p><strong className="home-price">{home.price}</strong><a className="home-card-link" href={`/homes/${encodeURIComponent(home.id)}`}>Подробнее о доме <span>→</span></a></div></article>)}</div>
+              <div className="homes-grid">{filtered.map((home) => <article className="home-card" key={home.id}><a href={`/homes/${encodeURIComponent(home.id)}`}><HouseGallery home={home} resolveMedia={resolveMedia} /></a><div className="home-card-body"><h3><a href={`/homes/${encodeURIComponent(home.id)}`}>{home.title}</a></h3><p className="home-address">⌖ {home.address || home.district}</p><div className="home-card-facts">{houseFacts(home).filter(([label]) => ['Площадь дома', 'Площадь участка', 'Этажность', 'Спальни', 'Материал стен', 'Год постройки'].includes(label)).slice(0, 6).map(([label, value]) => <span key={label}><small>{label}</small><strong>{value}</strong></span>)}</div>{home.description ? <p className="home-card-description">{home.description}</p> : null}<strong className="home-price">{home.price}</strong><a className="home-card-link" href={`/homes/${encodeURIComponent(home.id)}`}>Подробнее о доме <span>→</span></a></div></article>)}</div>
               {!filtered.length ? <div className="homes-empty"><h3>Подходящих домов пока нет</h3><p>Измените параметры или оставьте заявку — мы найдём варианты под ваш запрос.</p><button type="button" onClick={reset}>Сбросить фильтры</button></div> : null}
             </div>
           </div>
@@ -200,5 +229,6 @@ export function HomeDetailPage({ apiBase, Header, Footer, LeadModal, resolveMedi
   if (notFound) return <><Header /><main className="internal-body"><div className="container homes-not-found"><h1>Дом не найден</h1><a href="/homes">Вернуться в каталог</a></div></main><Footer /></>;
   if (!home) return <><Header /><main className="internal-body"><div className="container"><p>Загружаем дом…</p></div></main><Footer /></>;
   const schema = { '@context': 'https://schema.org', '@type': 'SingleFamilyResidence', name: home.title, description: home.description, image: home.images, address: home.address, floorSize: home.area, offers: { '@type': 'Offer', priceCurrency: 'RUB', price: parseNumber(home.price), availability: 'https://schema.org/InStock' } };
-  return <><Header /><main className="internal-body home-detail-page"><div className="container"><div className="homes-breadcrumbs"><a href="/">Главная</a><span>•</span><a href="/homes">Готовые дома</a><span>•</span><span>{home.title}</span></div><div className="home-detail-heading"><div><span className={`home-market-badge ${home.marketType}`}>{MARKET_LABELS[home.marketType]}</span><h1>{home.title}</h1><p>⌖ {home.address}</p></div><strong>{home.price}</strong></div><div className="home-detail-layout"><section><HouseGallery home={home} resolveMedia={resolveMedia} /><div className="home-detail-description"><h2>О доме</h2><p>{home.description}</p></div></section><aside className="home-detail-side"><h2>Характеристики</h2><dl><div><dt>Площадь дома</dt><dd>{home.area}</dd></div><div><dt>Участок</dt><dd>{home.landArea}</dd></div><div><dt>Этажность</dt><dd>{home.floors || 'Уточняется'}</dd></div><div><dt>Спальни</dt><dd>{home.bedrooms || 'Уточняется'}</dd></div><div><dt>Год постройки</dt><dd>{home.yearBuilt || 'Уточняется'}</dd></div><div><dt>Район</dt><dd>{home.district}</dd></div></dl><button type="button" onClick={() => setRequestOpen(true)}>Записаться на просмотр</button><small>Ответим на вопросы и согласуем удобное время</small></aside></div></div><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} /></main><Footer /><LeadModal open={requestOpen} onClose={() => setRequestOpen(false)} title="Записаться на просмотр" promoText={`${home.title}, ${home.price}`} messagePrefix={`Заявка на просмотр дома ${home.id}`} sourceTitle={`Готовый дом: ${home.title}`} /></>;
+  const facts = houseFacts(home);
+  return <><Header /><main className="internal-body home-detail-page"><div className="container"><div className="homes-breadcrumbs"><a href="/">Главная</a><span>•</span><a href="/homes">Готовые дома</a><span>•</span><span>{home.title}</span></div><div className="home-detail-heading"><div><span className={`home-market-badge ${home.marketType}`}>{MARKET_LABELS[home.marketType]}</span><h1>{home.title}</h1><p>⌖ {home.address}</p></div><strong>{home.price}</strong></div><div className="home-detail-layout"><section><HouseGallery home={home} resolveMedia={resolveMedia} /><div className="home-detail-facts" aria-label="Ключевые характеристики">{facts.slice(0, 6).map(([label, value]) => <div key={label}><small>{label}</small><strong>{value}</strong></div>)}</div><div className="home-detail-description"><span>Описание объекта</span><h2>О доме</h2><p>{home.description || 'Описание появится после заполнения.'}</p></div></section><aside className="home-detail-side"><span>Параметры объекта</span><h2>Характеристики</h2>{facts.length ? <dl>{facts.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl> : <p className="home-detail-empty-facts">Характеристики уточняются.</p>}<button type="button" onClick={() => setRequestOpen(true)}>Записаться на просмотр</button><small>Ответим на вопросы и согласуем удобное время</small></aside></div></div><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} /></main><Footer /><LeadModal open={requestOpen} onClose={() => setRequestOpen(false)} title="Записаться на просмотр" promoText={`${home.title}, ${home.price}`} messagePrefix={`Заявка на просмотр дома ${home.id}`} sourceTitle={`Готовый дом: ${home.title}`} /></>;
 }

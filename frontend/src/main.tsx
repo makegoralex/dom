@@ -32,7 +32,29 @@ type LandPlot = {
   description?: string;
   images?: string[];
   mapUrl?: string;
+  purpose?: string;
+  landCategory?: string;
+  electricity?: string;
+  gas?: string;
+  waterSupply?: string;
+  sewerage?: string;
+  accessRoad?: string;
+  relief?: string;
 };
+
+const landFacts = (land: LandPlot) => [
+  ['Площадь', land.area],
+  ['Назначение', land.purpose],
+  ['Категория земли', land.landCategory],
+  ['Электричество', land.electricity],
+  ['Газ', land.gas],
+  ['Водоснабжение', land.waterSupply],
+  ['Канализация', land.sewerage],
+  ['Подъезд', land.accessRoad],
+  ['Рельеф', land.relief],
+  ['Район', land.district],
+  ['Кадастровый номер', land.cadastralNumber]
+].filter((fact): fact is [string, string] => Boolean(fact[1]?.trim()));
 
 type PendingLandPlot = LandPlot & {
   sellerName: string;
@@ -853,7 +875,7 @@ function ProjectTile({ project, onRequest }: { project: HouseProject; onRequest?
         <h3>{project.title}</h3>
         <div className="project-meta">
           <span><small>Площадь:</small><strong>{project.area}</strong></span>
-          <span><small>Габариты:</small><strong>{project.floors}</strong></span>
+          <span><small>Этажность:</small><strong>{project.floors}</strong></span>
           <span><small>Комнат:</small><strong>{project.bedrooms}</strong></span>
         </div>
         <strong className="project-price">{normalizePrice(project.priceFrom)}</strong>
@@ -1367,35 +1389,46 @@ function AboutPage() {
   return (
     <div>
       <InternalHeader />
-      <section className="internal-body">
-        <div className="container">
+      <section className="internal-body about-page">
+        <div className="container about-container">
           <Breadcrumbs items={["Главная", page.title]} />
-          <h1>{page.title}</h1>
-          <div className="about-anchor-menu">
-            <a href="#about-company">О компании</a>
-            <a href="#about-team">Наша команда</a>
-            <a href="#about-partners">Наши партнеры</a>
-            <a href="#about-agency">Наше агентство</a>
+          <header className="about-hero">
+            <span>Строительная компания в Пензе</span>
+            <h1>Строим пространство, которое становится домом</h1>
+            <p>Evtenia объединяет проектирование, строительство и обустройство участка в одном понятном процессе — с договором, прозрачной сметой и ответственностью за результат.</p>
+            <div><a href="/projects">Выбрать проект</a><a href="/contacts">Обсудить строительство</a></div>
+          </header>
+          <div className="about-stats" aria-label="Компания в цифрах">
+            <div><strong>с 2014</strong><span>работаем в сфере строительства</span></div>
+            <div><strong>под ключ</strong><span>от проекта до готового дома</span></div>
+            <div><strong>1 команда</strong><span>единый центр ответственности</span></div>
           </div>
-          <div className="internal-text-box">
-            <p>{page.content}</p>
-          </div>
-          <div id="about-company" className="about-slider-block">
-            <h3>О компании</h3>
-            <div className="about-slider"><img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80" alt="О компании" /><img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1200&q=80" alt="О компании 2" /></div>
-          </div>
-          <div id="about-team" className="about-slider-block">
-            <h3>Наша команда</h3>
-            <div className="about-slider"><img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80" alt="Команда" /><img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80" alt="Команда 2" /></div>
-          </div>
-          <div id="about-partners" className="about-slider-block">
-            <h3>Наши партнеры</h3>
-            <div className="about-slider"><img src="https://images.unsplash.com/photo-1556155092-490a1ba16284?auto=format&fit=crop&w=1200&q=80" alt="Партнеры" /><img src="https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1200&q=80" alt="Партнеры 2" /></div>
-          </div>
-          <div id="about-agency" className="about-slider-block">
-            <h3>Наше агентство</h3>
-            <p><a href="https://evtenia.ru/" target="_blank" rel="noreferrer">Перейти на сайт агентства evtenia.ru</a></p>
-          </div>
+          <section id="about-company" className="about-intro-grid">
+            <div><span className="about-label">О компании</span><h2>Дом начинается с доверия</h2></div>
+            <div className="about-cms-copy"><CmsHtmlContent html={sanitizeCmsHtml(page.content.replace(/TMдом/gi, 'Evtenia'))} /></div>
+          </section>
+          <section className="about-principles">
+            <article><b>01</b><h3>Прозрачность</h3><p>Фиксируем состав работ, стоимость и сроки. Клиент понимает, за что платит и что получит на каждом этапе.</p></article>
+            <article><b>02</b><h3>Комплексный подход</h3><p>Проект, фундамент, инженерные сети, отделка и благоустройство участка связаны в единую систему.</p></article>
+            <article><b>03</b><h3>Практичные решения</h3><p>Подбираем технологию и комплектацию под образ жизни семьи, особенности участка и реальный бюджет.</p></article>
+          </section>
+          <section id="about-team" className="about-directions">
+            <div className="about-section-heading"><span className="about-label">Что мы делаем</span><h2>Всё необходимое для загородной жизни</h2><p>Можно заказать отдельный этап или доверить Evtenia весь путь до переезда.</p></div>
+            <div className="about-direction-grid">
+              <a href="/projects"><span>⌂</span><h3>Дома и бани</h3><p>Проектирование и строительство по современным технологиям.</p><b>Смотреть проекты →</b></a>
+              <a href="/services/fundament"><span>◇</span><h3>Фундаменты</h3><p>Основание с учётом проекта, грунта и условий участка.</p><b>Подробнее →</b></a>
+              <a href="/lands"><span>⌖</span><h3>Земельные участки</h3><p>Подбор земли и оценка пригодности под строительство.</p><b>Выбрать участок →</b></a>
+              <a href="/services/remont"><span>↯</span><h3>Инженерия и отделка</h3><p>Коммуникации, внутренние работы и подготовка дома к жизни.</p><b>Подробнее →</b></a>
+            </div>
+          </section>
+          <section id="about-partners" className="about-process">
+            <div className="about-section-heading"><span className="about-label">Как мы работаем</span><h2>Понятный путь к готовому дому</h2></div>
+            <ol><li><b>1</b><div><h3>Знакомимся с задачей</h3><p>Обсуждаем состав семьи, участок, пожелания и бюджет.</p></div></li><li><b>2</b><div><h3>Готовим решение</h3><p>Подбираем проект, технологию, комплектацию и рассчитываем смету.</p></div></li><li><b>3</b><div><h3>Заключаем договор</h3><p>Фиксируем объём работ, стоимость и этапы реализации.</p></div></li><li><b>4</b><div><h3>Строим и сдаём</h3><p>Организуем работы и передаём готовый результат клиенту.</p></div></li></ol>
+          </section>
+          <section id="about-agency" className="about-cta">
+            <div><span className="about-label">Начнём с разговора</span><h2>Расскажите, какой дом вам нужен</h2><p>Поможем соотнести пожелания, участок и бюджет и предложим следующий практичный шаг.</p></div>
+            <div><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a><a href="/contacts">Все контакты →</a></div>
+          </section>
         </div>
       </section>
       <SiteFooter />
@@ -1942,12 +1975,13 @@ function LandDetailPage() {
   if (!land) return <><InternalHeader /><main className="internal-body"><div className="container"><p>Загружаем участок…</p></div></main><SiteFooter /></>;
 
   const schema = { '@context': 'https://schema.org', '@type': 'Product', name: `Земельный участок ${land.area}`, description: land.description || `Участок в ${land.district}`, image: land.images, offers: { '@type': 'Offer', priceCurrency: 'RUB', price: Number(land.price.replace(/\D/g, '')) || undefined, availability: 'https://schema.org/InStock', url: window.location.href } };
+  const facts = landFacts(land);
   return <>
     <InternalHeader />
     <main className="internal-body land-detail-page">
       <div className="container">
         <Breadcrumbs items={['Главная', 'Земля', `Участок ${land.area}`]} />
-        <div className="land-detail-title"><div><span>Земельный участок · {land.area} · ИЖС</span><h1>Участок {land.area} в {land.district}</h1><p><span aria-hidden="true">⌖</span> {land.district}</p></div><div className="land-detail-title-actions"><button type="button" onClick={() => navigator.clipboard?.writeText(window.location.href)}>Поделиться</button></div></div>
+        <div className="land-detail-title"><div><span>Земельный участок · {land.area}{land.purpose ? ` · ${land.purpose}` : ''}</span><h1>Участок {land.area} в {land.district}</h1><p><span aria-hidden="true">⌖</span> {land.district}</p></div><div className="land-detail-title-actions"><button type="button" onClick={() => navigator.clipboard?.writeText(window.location.href)}>Поделиться</button></div></div>
         <div className="land-detail-layout">
           <LandDetailGallery land={land} />
           <aside className="land-detail-offer">
@@ -1959,7 +1993,8 @@ function LandDetailPage() {
             <div className="land-detail-help"><span aria-hidden="true">⌂</span><div><strong>Дом под этот участок</strong><small>Подберём проект и рассчитаем строительство</small></div></div>
           </aside>
         </div>
-        <div className="land-detail-content-grid"><section className="land-detail-description"><span className="lands-section-label">Описание объекта</span><h2>Об участке</h2><p>{land.description || 'Уточните подробности об участке у нашего специалиста.'}</p>{land.mapUrl ? <a href={land.mapUrl} target="_blank" rel="noreferrer">Посмотреть расположение на карте →</a> : null}</section><aside className="land-detail-specs"><h2>Характеристики</h2><dl><div><dt>Площадь</dt><dd>{land.area}</dd></div><div><dt>Назначение</dt><dd>ИЖС</dd></div><div><dt>Район</dt><dd>{land.district}</dd></div><div><dt>Кадастровый номер</dt><dd>{land.cadastralNumber}</dd></div></dl></aside></div>
+        <div className="land-detail-fact-grid" aria-label="Ключевые характеристики участка">{facts.slice(0, 6).map(([label, value]) => <div key={label}><small>{label}</small><strong>{value}</strong></div>)}</div>
+        <div className="land-detail-content-grid"><section className="land-detail-description"><span className="lands-section-label">Описание объекта</span><h2>Об участке</h2><p>{land.description || 'Уточните подробности об участке у нашего специалиста.'}</p>{land.mapUrl ? <a href={land.mapUrl} target="_blank" rel="noreferrer">Посмотреть расположение на карте →</a> : null}</section><aside className="land-detail-specs"><span className="lands-section-label">Параметры объекта</span><h2>Характеристики</h2>{facts.length ? <dl>{facts.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl> : <p>Характеристики уточняются.</p>}</aside></div>
         <nav className="land-seo-links" aria-label="Полезные разделы"><h2>Полезно при покупке земли</h2><div><a href="/lands">Все земельные участки</a><a href="/projects">Проекты домов</a><a href="/mortgage-calculator">Ипотечный калькулятор</a><a href="/services/fundament">Строительство фундамента</a><a href="/lands/lesnoe-ozero">Участки в «Лесном озере»</a></div></nav>
         {related.length ? <section className="related-lands"><h2>Другие участки</h2><div>{related.map((item) => <a key={item.id} href={`/lands/${encodeURIComponent(item.id)}`}><strong>Участок {item.area}</strong><span>{item.district} · {item.price}</span></a>)}</div></section> : null}
       </div>
@@ -2205,9 +2240,7 @@ function LandsPage() {
                       <span className="land-verified"><b aria-hidden="true">✓</b> Проверен</span>
                     </div>
                     <div className="land-card-facts">
-                      <span><small>Площадь</small><strong>{item.area}</strong></span>
-                      <span><small>Назначение</small><strong>ИЖС</strong></span>
-                      <span><small>Кадастровый №</small><strong>{item.cadastralNumber}</strong></span>
+                      {landFacts(item).filter(([label]) => ['Площадь', 'Назначение', 'Электричество', 'Газ', 'Подъезд', 'Кадастровый номер'].includes(label)).slice(0, 6).map(([label, value]) => <span key={label}><small>{label === 'Кадастровый номер' ? 'Кадастровый №' : label}</small><strong>{value}</strong></span>)}
                     </div>
                     {item.description ? <p className="project-desc land-card-description">{item.description}</p> : null}
                     <div className="land-card-bottom">
@@ -3563,6 +3596,17 @@ function AdminPage() {
           <input placeholder="Этажность" value={homeDraft.floors || ''} onChange={(e) => setHomeDraft({ ...homeDraft, floors: e.target.value })} />
           <input placeholder="Спальни" value={homeDraft.bedrooms || ''} onChange={(e) => setHomeDraft({ ...homeDraft, bedrooms: e.target.value })} />
           <input placeholder="Год постройки" value={homeDraft.yearBuilt || ''} onChange={(e) => setHomeDraft({ ...homeDraft, yearBuilt: e.target.value })} />
+          <h3>Дополнительные характеристики</h3>
+          <input placeholder="Жилая площадь" value={homeDraft.livingArea || ''} onChange={(e) => setHomeDraft({ ...homeDraft, livingArea: e.target.value })} />
+          <input placeholder="Площадь кухни" value={homeDraft.kitchenArea || ''} onChange={(e) => setHomeDraft({ ...homeDraft, kitchenArea: e.target.value })} />
+          <input placeholder="Санузлы" value={homeDraft.bathrooms || ''} onChange={(e) => setHomeDraft({ ...homeDraft, bathrooms: e.target.value })} />
+          <input placeholder="Материал стен" value={homeDraft.wallMaterial || ''} onChange={(e) => setHomeDraft({ ...homeDraft, wallMaterial: e.target.value })} />
+          <input placeholder="Ремонт / состояние" value={homeDraft.renovation || ''} onChange={(e) => setHomeDraft({ ...homeDraft, renovation: e.target.value })} />
+          <input placeholder="Отопление" value={homeDraft.heating || ''} onChange={(e) => setHomeDraft({ ...homeDraft, heating: e.target.value })} />
+          <input placeholder="Водоснабжение" value={homeDraft.waterSupply || ''} onChange={(e) => setHomeDraft({ ...homeDraft, waterSupply: e.target.value })} />
+          <input placeholder="Канализация" value={homeDraft.sewerage || ''} onChange={(e) => setHomeDraft({ ...homeDraft, sewerage: e.target.value })} />
+          <input placeholder="Электричество" value={homeDraft.electricity || ''} onChange={(e) => setHomeDraft({ ...homeDraft, electricity: e.target.value })} />
+          <input placeholder="Газ" value={homeDraft.gas || ''} onChange={(e) => setHomeDraft({ ...homeDraft, gas: e.target.value })} />
           <textarea rows={5} placeholder="Описание" value={homeDraft.description || ''} onChange={(e) => setHomeDraft({ ...homeDraft, description: e.target.value })} />
           <textarea rows={2} placeholder="Ссылки на фото через запятую" value={(homeDraft.images || []).join(', ')} onChange={(e) => setHomeDraft({ ...homeDraft, images: e.target.value.split(',').map((value) => value.trim()).filter(Boolean) })} />
           <label>Загрузить фотографии<input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadHomeImages(files); e.currentTarget.value = ''; }} /></label>
@@ -3575,7 +3619,8 @@ function AdminPage() {
       {activeTab === 'homeRequests' ? <div className="admin-grid"><section><h2>Дома на модерации ({pendingHomes.length})</h2><div className="list">{pendingHomes.map((home) => <div className="list-item" key={home.id}><div><strong>{home.title}</strong><p>{home.area} • {home.district} • {home.price}</p><p>Продавец: {home.sellerName}, {home.sellerPhone}</p><small>Фото: {(home.images || []).length}</small></div><div className="actions"><button onClick={() => setPendingHomeDraft(home)}>Подробнее / изменить</button><button onClick={() => rejectPendingHome(home.id)}>Отклонить</button></div></div>)}</div></section><section><h2>{pendingHomeDraft ? 'Проверка объявления' : 'Выберите заявку'}</h2>{pendingHomeDraft ? <div className="admin-form">
         <input placeholder="Продавец" value={pendingHomeDraft.sellerName} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, sellerName: e.target.value })} /><input placeholder="Телефон" value={pendingHomeDraft.sellerPhone} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, sellerPhone: e.target.value })} />
         <input placeholder="Название" value={pendingHomeDraft.title} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, title: e.target.value })} /><label>Категория<select value={pendingHomeDraft.marketType} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, marketType: e.target.value as HouseListing['marketType'] })}><option value="new">Новый дом</option><option value="secondary">Вторичное жильё</option></select></label>
-        <input placeholder="Площадь дома" value={pendingHomeDraft.area} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, area: e.target.value })} /><input placeholder="Площадь участка" value={pendingHomeDraft.landArea} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, landArea: e.target.value })} /><input placeholder="Цена" value={pendingHomeDraft.price} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, price: e.target.value })} /><input placeholder="Район" value={pendingHomeDraft.district} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, district: e.target.value })} /><input placeholder="Адрес" value={pendingHomeDraft.address} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, address: e.target.value })} /><input placeholder="Этажность" value={pendingHomeDraft.floors} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, floors: e.target.value })} /><input placeholder="Спальни" value={pendingHomeDraft.bedrooms} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, bedrooms: e.target.value })} /><input placeholder="Год постройки" value={pendingHomeDraft.yearBuilt} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, yearBuilt: e.target.value })} /><textarea rows={5} placeholder="Описание" value={pendingHomeDraft.description} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, description: e.target.value })} />
+        <input placeholder="Площадь дома" value={pendingHomeDraft.area} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, area: e.target.value })} /><input placeholder="Площадь участка" value={pendingHomeDraft.landArea} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, landArea: e.target.value })} /><input placeholder="Цена" value={pendingHomeDraft.price} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, price: e.target.value })} /><input placeholder="Район" value={pendingHomeDraft.district} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, district: e.target.value })} /><input placeholder="Адрес" value={pendingHomeDraft.address} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, address: e.target.value })} /><input placeholder="Этажность" value={pendingHomeDraft.floors} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, floors: e.target.value })} /><input placeholder="Спальни" value={pendingHomeDraft.bedrooms} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, bedrooms: e.target.value })} /><input placeholder="Год постройки" value={pendingHomeDraft.yearBuilt} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, yearBuilt: e.target.value })} />
+        <h3>Дополнительные характеристики</h3><input placeholder="Жилая площадь" value={pendingHomeDraft.livingArea || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, livingArea: e.target.value })} /><input placeholder="Площадь кухни" value={pendingHomeDraft.kitchenArea || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, kitchenArea: e.target.value })} /><input placeholder="Санузлы" value={pendingHomeDraft.bathrooms || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, bathrooms: e.target.value })} /><input placeholder="Материал стен" value={pendingHomeDraft.wallMaterial || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, wallMaterial: e.target.value })} /><input placeholder="Ремонт / состояние" value={pendingHomeDraft.renovation || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, renovation: e.target.value })} /><input placeholder="Отопление" value={pendingHomeDraft.heating || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, heating: e.target.value })} /><input placeholder="Водоснабжение" value={pendingHomeDraft.waterSupply || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, waterSupply: e.target.value })} /><input placeholder="Канализация" value={pendingHomeDraft.sewerage || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, sewerage: e.target.value })} /><input placeholder="Электричество" value={pendingHomeDraft.electricity || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, electricity: e.target.value })} /><input placeholder="Газ" value={pendingHomeDraft.gas || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, gas: e.target.value })} /><textarea rows={5} placeholder="Описание" value={pendingHomeDraft.description} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, description: e.target.value })} />
         <label>Добавить фотографии<input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadHomeImages(files, true); e.currentTarget.value = ''; }} /></label>
         {(pendingHomeDraft.images || []).length ? <div className="admin-images-grid">{pendingHomeDraft.images.map((image, index) => <div className="admin-image-card" key={`${image}_${index}`}><img src={resolveMediaUrl(image)} alt={`Фото заявки ${index + 1}`} /><div className="admin-image-actions"><button type="button" onClick={() => setPendingHomeDraft({ ...pendingHomeDraft, images: pendingHomeDraft.images.filter((_, itemIndex) => itemIndex !== index) })}>Удалить</button></div></div>)}</div> : null}
         <button onClick={savePendingHome}>Сохранить изменения</button><button onClick={approvePendingHome}>Одобрить и опубликовать</button><button onClick={() => rejectPendingHome(pendingHomeDraft.id)}>Отклонить</button><button onClick={() => setPendingHomeDraft(null)}>Закрыть</button>
@@ -3588,6 +3633,15 @@ function AdminPage() {
           <input placeholder="Площадь" value={landDraft.area || ''} onChange={(e) => setLandDraft({ ...landDraft, area: e.target.value })} />
           <input placeholder="Цена" value={landDraft.price || ''} onChange={(e) => setLandDraft({ ...landDraft, price: e.target.value })} />
           <input placeholder="Район" value={landDraft.district || ''} onChange={(e) => setLandDraft({ ...landDraft, district: e.target.value })} />
+          <h3>Дополнительные характеристики</h3>
+          <input placeholder="Назначение, например ИЖС" value={landDraft.purpose || ''} onChange={(e) => setLandDraft({ ...landDraft, purpose: e.target.value })} />
+          <input placeholder="Категория земли" value={landDraft.landCategory || ''} onChange={(e) => setLandDraft({ ...landDraft, landCategory: e.target.value })} />
+          <input placeholder="Электричество" value={landDraft.electricity || ''} onChange={(e) => setLandDraft({ ...landDraft, electricity: e.target.value })} />
+          <input placeholder="Газ" value={landDraft.gas || ''} onChange={(e) => setLandDraft({ ...landDraft, gas: e.target.value })} />
+          <input placeholder="Водоснабжение" value={landDraft.waterSupply || ''} onChange={(e) => setLandDraft({ ...landDraft, waterSupply: e.target.value })} />
+          <input placeholder="Канализация" value={landDraft.sewerage || ''} onChange={(e) => setLandDraft({ ...landDraft, sewerage: e.target.value })} />
+          <input placeholder="Подъезд к участку" value={landDraft.accessRoad || ''} onChange={(e) => setLandDraft({ ...landDraft, accessRoad: e.target.value })} />
+          <input placeholder="Рельеф / форма участка" value={landDraft.relief || ''} onChange={(e) => setLandDraft({ ...landDraft, relief: e.target.value })} />
           <textarea rows={3} placeholder="Описание" value={landDraft.description || ''} onChange={(e) => setLandDraft({ ...landDraft, description: e.target.value })} />
           <input placeholder="Карта: ссылка" value={landDraft.mapUrl || ''} onChange={(e) => setLandDraft({ ...landDraft, mapUrl: e.target.value })} />
           <textarea
@@ -3699,6 +3753,15 @@ function AdminPage() {
             <input placeholder="Площадь" value={pendingLandDraft.area} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, area: e.target.value })} />
             <input placeholder="Цена" value={pendingLandDraft.price} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, price: e.target.value })} />
             <input placeholder="Район" value={pendingLandDraft.district} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, district: e.target.value })} />
+            <h3>Дополнительные характеристики</h3>
+            <input placeholder="Назначение" value={pendingLandDraft.purpose || ''} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, purpose: e.target.value })} />
+            <input placeholder="Категория земли" value={pendingLandDraft.landCategory || ''} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, landCategory: e.target.value })} />
+            <input placeholder="Электричество" value={pendingLandDraft.electricity || ''} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, electricity: e.target.value })} />
+            <input placeholder="Газ" value={pendingLandDraft.gas || ''} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, gas: e.target.value })} />
+            <input placeholder="Водоснабжение" value={pendingLandDraft.waterSupply || ''} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, waterSupply: e.target.value })} />
+            <input placeholder="Канализация" value={pendingLandDraft.sewerage || ''} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, sewerage: e.target.value })} />
+            <input placeholder="Подъезд к участку" value={pendingLandDraft.accessRoad || ''} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, accessRoad: e.target.value })} />
+            <input placeholder="Рельеф / форма участка" value={pendingLandDraft.relief || ''} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, relief: e.target.value })} />
             <textarea rows={4} placeholder="Описание" value={pendingLandDraft.description || ''} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, description: e.target.value })} />
             <input placeholder="Карта: ссылка" value={pendingLandDraft.mapUrl || ''} onChange={(e) => setPendingLandDraft({ ...pendingLandDraft, mapUrl: e.target.value })} />
             <textarea

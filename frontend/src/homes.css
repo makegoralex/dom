@@ -63,11 +63,16 @@
 .home-gallery-controls { position: absolute; right: 13px; bottom: 13px; display: flex; gap: 6px; }
 .home-gallery-controls button { width: 36px; height: 36px; border: 1px solid rgba(255,255,255,.4); border-radius: 50%; color: #fff; background: rgba(10,30,23,.68); cursor: pointer; }
 .home-card-body { padding: 21px; }
-.home-card-meta { display: flex; gap: 7px; flex-wrap: wrap; }
-.home-card-meta span { border-radius: 999px; padding: 6px 9px; color: #51655e; background: #f1eee8; font-size: 12px; }
-.home-card h3 { margin: 15px 0 8px; font-family: Georgia, serif; font-size: 24px; font-weight: 500; line-height: 1.15; }
+.home-card h3 { margin: 0 0 8px; font-family: Georgia, serif; font-size: 24px; font-weight: 500; line-height: 1.15; }
 .home-card h3 a { color: #153a2e; text-decoration: none; }
-.home-address { min-height: 38px; margin: 0 0 15px; color: #718079; font-size: 13px; line-height: 1.45; }
+.home-address { min-height: 38px; margin: 0 0 13px; color: #718079; font-size: 13px; line-height: 1.45; }
+.home-card-facts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); overflow:hidden; margin-bottom:14px; border:1px solid #e4dfd5; border-radius:12px; background:#f8f6f1; }
+.home-card-facts span { display:grid; gap:4px; min-width:0; padding:11px; border-right:1px solid #e4dfd5; border-bottom:1px solid #e4dfd5; }
+.home-card-facts span:nth-child(3n) { border-right:0; }
+.home-card-facts span:nth-last-child(-n+3) { border-bottom:0; }
+.home-card-facts small { overflow:hidden; color:#808a85; font-size:9px; letter-spacing:.04em; text-overflow:ellipsis; text-transform:uppercase; white-space:nowrap; }
+.home-card-facts strong { overflow:hidden; color:#29473d; font-size:12px; text-overflow:ellipsis; white-space:nowrap; }
+.home-card-description { display:-webkit-box; overflow:hidden; min-height:4.35em; margin:0 0 16px; color:#68766f; font-size:13px; line-height:1.45; -webkit-box-orient:vertical; -webkit-line-clamp:3; line-clamp:3; }
 .home-price { display: block; color: #173f32; font-size: 23px; }
 .home-card-link { display: flex; justify-content: space-between; margin-top: 17px; padding-top: 15px; border-top: 1px solid #eee9e0; color: #7b6341; text-decoration: none; font-weight: 750; }
 .homes-empty, .homes-not-found { padding: 50px; border: 1px dashed #cfc6b6; border-radius: 18px; text-align: center; background: #fff; }
@@ -89,15 +94,22 @@
 .home-detail-heading > strong { color: #173f32; font-family: Georgia, serif; font-size: clamp(28px, 3vw, 42px); white-space: nowrap; }
 .home-detail-layout { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(280px, .65fr); gap: 30px; padding-bottom: 80px; align-items: start; }
 .home-detail-layout > section > .home-gallery { aspect-ratio: 1.5; border-radius: 22px; }
+.home-detail-facts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); overflow:hidden; margin-top:18px; border:1px solid #e1dbd0; border-radius:18px; background:#fff; }
+.home-detail-facts div { display:grid; gap:6px; min-width:0; padding:20px; border-right:1px solid #eee9e0; border-bottom:1px solid #eee9e0; }
+.home-detail-facts div:nth-child(3n) { border-right:0; }
+.home-detail-facts div:nth-last-child(-n+3) { border-bottom:0; }
+.home-detail-facts small,.home-detail-side>span,.home-detail-description>span { color:#9a7640; font-size:10px; font-weight:850; letter-spacing:.08em; text-transform:uppercase; }
+.home-detail-facts strong { overflow-wrap:anywhere; color:#173f32; font-size:17px; }
 .home-detail-description, .home-detail-side { margin-top: 22px; padding: 28px; border: 1px solid #e1dbd0; border-radius: 20px; background: #fff; }
-.home-detail-description h2, .home-detail-side h2 { margin: 0 0 16px; color: #173f32; font-family: Georgia, serif; font-size: 29px; font-weight: 500; }
-.home-detail-description p { color: #536760; line-height: 1.75; }
+.home-detail-description h2, .home-detail-side h2 { margin: 7px 0 16px; color: #173f32; font-family: Georgia, serif; font-size: 29px; font-weight: 500; }
+.home-detail-description p { margin-bottom:0; color: #536760; line-height: 1.75; white-space:pre-line; }
 .home-detail-side { position: sticky; top: 20px; margin-top: 0; }
 .home-detail-side dl { margin: 0; }
 .home-detail-side dl div { display: flex; justify-content: space-between; gap: 15px; padding: 14px 0; border-bottom: 1px solid #eee9e0; }
 .home-detail-side dt { color: #78847f; }
 .home-detail-side dd { margin: 0; color: #173f32; font-weight: 800; text-align: right; }
+.home-detail-empty-facts { color:#78847f; }
 .home-detail-side > button { width: 100%; margin-top: 22px; border: 0; border-radius: 12px; padding: 15px; color: #fff; background: #173f32; font: inherit; font-weight: 800; cursor: pointer; }
 .home-detail-side > small { display: block; margin-top: 10px; color: #7c8883; text-align: center; }
 @media (max-width: 980px) { .homes-hero { grid-template-columns: 1fr; padding: 42px; } .homes-hero-card { display: none; } .homes-sell-banner{grid-template-columns:auto 1fr}.homes-sell-banner>button{grid-column:1/-1;width:100%}.homes-layout { grid-template-columns: 1fr; } .homes-filters { position: static; } .home-detail-layout { grid-template-columns: 1fr; } .home-detail-side { position: static; } }
-@media (max-width: 680px) { .homes-hero { min-height: 470px; padding: 20px; border-radius: 20px; } .homes-hero-copy{padding:25px 20px}.homes-hero h1 { font-size: 44px; } .homes-hero-actions{display:grid}.homes-hero-actions a,.homes-hero-actions button{text-align:center}.homes-sell-banner{grid-template-columns:1fr; padding:22px}.homes-sell-icon{width:50px;height:50px}.homes-heading, .home-detail-heading, .homes-toolbar { align-items: stretch; flex-direction: column; } .homes-heading-actions{display:grid}.homes-market-tabs { width: 100%; overflow-x: auto; } .homes-grid { grid-template-columns: 1fr; } .homes-filters { padding: 18px; } .sell-home-form { grid-template-columns: 1fr; } .sell-home-form > * { grid-column: 1 !important; } .home-detail-heading > strong { white-space: normal; } }
+@media (max-width: 680px) { .homes-hero { min-height: 470px; padding: 20px; border-radius: 20px; } .homes-hero-copy{padding:25px 20px}.homes-hero h1 { font-size: 44px; } .homes-hero-actions{display:grid}.homes-hero-actions a,.homes-hero-actions button{text-align:center}.homes-sell-banner{grid-template-columns:1fr; padding:22px}.homes-sell-icon{width:50px;height:50px}.homes-heading, .home-detail-heading, .homes-toolbar { align-items: stretch; flex-direction: column; } .homes-heading-actions{display:grid}.homes-market-tabs { width: 100%; overflow-x: auto; } .homes-grid { grid-template-columns: 1fr; } .homes-filters { padding: 18px; } .sell-home-form { grid-template-columns: 1fr; } .sell-home-form > * { grid-column: 1 !important; } .home-detail-heading > strong { white-space: normal; } .home-detail-facts{grid-template-columns:repeat(2,minmax(0,1fr))}.home-detail-facts div:nth-child(3n){border-right:1px solid #eee9e0}.home-detail-facts div:nth-child(2n){border-right:0}.home-detail-facts div:nth-last-child(-n+3){border-bottom:1px solid #eee9e0}.home-detail-facts div:nth-last-child(-n+2){border-bottom:0} }

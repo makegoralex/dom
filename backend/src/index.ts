@@ -43,6 +43,14 @@ interface LandPlot {
   description?: string;
   images: string[];
   mapUrl?: string;
+  purpose?: string;
+  landCategory?: string;
+  electricity?: string;
+  gas?: string;
+  waterSupply?: string;
+  sewerage?: string;
+  accessRoad?: string;
+  relief?: string;
 }
 
 interface PendingLandPlot extends LandPlot {
@@ -67,6 +75,16 @@ interface HouseListing {
   yearBuilt: string;
   description: string;
   images: string[];
+  livingArea?: string;
+  kitchenArea?: string;
+  bathrooms?: string;
+  wallMaterial?: string;
+  renovation?: string;
+  heating?: string;
+  waterSupply?: string;
+  sewerage?: string;
+  electricity?: string;
+  gas?: string;
 }
 
 interface PendingHouseListing extends HouseListing {
@@ -332,7 +350,7 @@ const seedPages: Record<string, ContentPage> = {
   about: {
     slug: 'about',
     title: 'О компании',
-    content: 'Строительная компания «TMдом» открыта в 2014 году. Мы строим качественные дома под ключ.'
+    content: 'Строительная компания Evtenia работает с 2014 года. Мы проектируем и строим качественные дома под ключ, помогаем с выбором участка, инженерными решениями, отделкой и благоустройством.'
   },
   furniture: {
     slug: 'furniture',
@@ -530,7 +548,15 @@ function normalizeLandPlot(incoming: Partial<LandPlot> & { image?: string }, fal
     district: incoming.district || '',
     description: incoming.description || '',
     images,
-    mapUrl: incoming.mapUrl || ''
+    mapUrl: incoming.mapUrl || '',
+    purpose: String(incoming.purpose || '').trim(),
+    landCategory: String(incoming.landCategory || '').trim(),
+    electricity: String(incoming.electricity || '').trim(),
+    gas: String(incoming.gas || '').trim(),
+    waterSupply: String(incoming.waterSupply || '').trim(),
+    sewerage: String(incoming.sewerage || '').trim(),
+    accessRoad: String(incoming.accessRoad || '').trim(),
+    relief: String(incoming.relief || '').trim()
   };
 }
 
@@ -550,7 +576,17 @@ function normalizeHouseListing(incoming: Partial<HouseListing> & { image?: strin
     bedrooms: String(incoming.bedrooms || '').trim(),
     yearBuilt: String(incoming.yearBuilt || '').trim(),
     description: String(incoming.description || '').trim(),
-    images
+    images,
+    livingArea: String(incoming.livingArea || '').trim(),
+    kitchenArea: String(incoming.kitchenArea || '').trim(),
+    bathrooms: String(incoming.bathrooms || '').trim(),
+    wallMaterial: String(incoming.wallMaterial || '').trim(),
+    renovation: String(incoming.renovation || '').trim(),
+    heating: String(incoming.heating || '').trim(),
+    waterSupply: String(incoming.waterSupply || '').trim(),
+    sewerage: String(incoming.sewerage || '').trim(),
+    electricity: String(incoming.electricity || '').trim(),
+    gas: String(incoming.gas || '').trim()
   };
 }
 
@@ -1242,7 +1278,7 @@ app.delete('/api/admin/upload/project-image', authMiddleware, (req, res) => {
 });
 
 app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
-  const isImageUpload = req.path.startsWith('/api/admin/upload/') || req.path === '/api/land-submissions';
+  const isImageUpload = req.path.startsWith('/api/admin/upload/') || req.path === '/api/land-submissions' || req.path === '/api/home-submissions';
   if (!isImageUpload) return next(error);
   if (res.headersSent) return next(error);
 
