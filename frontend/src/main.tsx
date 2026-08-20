@@ -126,6 +126,19 @@ type MenuItem = {
 };
 type AdminTab = 'projects' | 'homes' | 'homeRequests' | 'lands' | 'lesnoeOzero' | 'landRequests' | 'pages' | 'portfolio' | 'leads' | 'settings';
 
+const ADMIN_TAB_META: Record<AdminTab, { label: string; eyebrow: string; description: string; icon: string }> = {
+  projects: { label: 'Проекты домов', eyebrow: 'Каталог', description: 'Создание и редактирование проектов домов и бань.', icon: '⌂' },
+  homes: { label: 'Готовые дома', eyebrow: 'Каталог', description: 'Объявления о готовых домах на сайте.', icon: '▤' },
+  lands: { label: 'Земельные участки', eyebrow: 'Каталог', description: 'Участки, опубликованные в разделе «Земля».', icon: '◇' },
+  lesnoeOzero: { label: 'Лесное озеро', eyebrow: 'Посёлки', description: 'Интерактивная схема и статусы участков посёлка.', icon: '◉' },
+  portfolio: { label: 'Портфолио', eyebrow: 'Контент', description: 'Готовые объекты, отзывы и результаты строительства.', icon: '▧' },
+  pages: { label: 'Страницы сайта', eyebrow: 'Контент', description: 'Тексты внутренних страниц и порядок главного меню.', icon: '✎' },
+  homeRequests: { label: 'Дома на модерации', eyebrow: 'Модерация', description: 'Проверка предложенных пользователями домов перед публикацией.', icon: '⌛' },
+  landRequests: { label: 'Земля на модерации', eyebrow: 'Модерация', description: 'Проверка предложенных пользователями участков перед публикацией.', icon: '⌛' },
+  leads: { label: 'Заявки клиентов', eyebrow: 'Обращения', description: 'Контакты посетителей, отправленные через формы сайта.', icon: '✉' },
+  settings: { label: 'Настройки сайта', eyebrow: 'Система', description: 'Логотип и основные контактные данные компании.', icon: '⚙' }
+};
+
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 const API_ORIGIN = API_BASE ? new URL(API_BASE, window.location.origin).origin : '';
 const loadMoreRef: { current: HTMLDivElement | null } = { current: null };
@@ -3443,41 +3456,115 @@ function AdminPage() {
 
   if (!token) {
     return (
-      <div className="admin-wrap">
-        <h1>Служебный вход</h1>
-        <form className="admin-form" onSubmit={doLogin}>
-          <input placeholder="Логин" value={login} onChange={(e) => setLogin(e.target.value)} required />
-          <input
-            placeholder="Пароль"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <button type="submit">Войти</button>
-          {error ? <p className="error">{error}</p> : null}
-        </form>
+      <div className="admin-login-page">
+        <div className="admin-login-card">
+          <a className="admin-login-brand" href="/" aria-label="Перейти на сайт">
+            <span>EVTENIA</span>
+            <small>управление сайтом</small>
+          </a>
+          <div className="admin-login-copy">
+            <span className="admin-kicker">Служебный раздел</span>
+            <h1>Вход в CMS</h1>
+            <p>Управление каталогом, страницами и обращениями клиентов.</p>
+          </div>
+          <form className="admin-form admin-login-form" onSubmit={doLogin}>
+            <label>Логин<input placeholder="Введите логин" value={login} onChange={(e) => setLogin(e.target.value)} required autoComplete="username" /></label>
+            <label>Пароль<input placeholder="Введите пароль" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" /></label>
+            <button type="submit">Войти в систему</button>
+            {error ? <p className="admin-alert is-error" role="alert">{error}</p> : null}
+          </form>
+          <a className="admin-login-back" href="/">← Вернуться на сайт</a>
+        </div>
       </div>
     );
   }
 
+  const currentAdminTab = ADMIN_TAB_META[activeTab];
+  const pendingTotal = pendingHomes.length + pendingLands.length;
+  const adminNavigation: Array<{ title: string; items: AdminTab[] }> = [
+    { title: 'Каталог', items: ['projects', 'homes', 'lands', 'lesnoeOzero'] },
+    { title: 'Контент', items: ['pages', 'portfolio'] },
+    { title: 'Модерация', items: ['homeRequests', 'landRequests'] },
+    { title: 'Работа с клиентами', items: ['leads'] },
+    { title: 'Система', items: ['settings'] }
+  ];
+  const getAdminTabCount = (tab: AdminTab) => {
+    if (tab === 'projects') return projects.length;
+    if (tab === 'homes') return homes.length;
+    if (tab === 'lands') return lands.length;
+    if (tab === 'lesnoeOzero') return lesnoeOzeroPlots.length;
+    if (tab === 'portfolio') return portfolio.length;
+    if (tab === 'pages') return pages.length;
+    if (tab === 'homeRequests') return pendingHomes.length;
+    if (tab === 'landRequests') return pendingLands.length;
+    if (tab === 'leads') return leads.length;
+    return null;
+  };
+  const openAdminTab = (tab: AdminTab) => {
+    setActiveTab(tab);
+    setError('');
+    setUploadStatus('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
-    <div className="admin-wrap">
-      <h1>Админка каталога</h1>
-      <div className="admin-tabs">
-        <button className={activeTab === 'projects' ? 'active' : ''} onClick={() => setActiveTab('projects')}>Проекты</button>
-        <button className={activeTab === 'homes' ? 'active' : ''} onClick={() => setActiveTab('homes')}>Готовые дома ({homes.length})</button>
-        <button className={activeTab === 'homeRequests' ? 'active' : ''} onClick={() => setActiveTab('homeRequests')}>Заявки на дома ({pendingHomes.length})</button>
-        <button className={activeTab === 'lands' ? 'active' : ''} onClick={() => setActiveTab('lands')}>Земля</button>
-        <button className={activeTab === 'lesnoeOzero' ? 'active' : ''} onClick={() => setActiveTab('lesnoeOzero')}>Лесное озеро ({lesnoeOzeroPlots.length})</button>
-        <button className={activeTab === 'landRequests' ? 'active' : ''} onClick={() => setActiveTab('landRequests')}>Заявки на землю ({pendingLands.length})</button>
-        <button className={activeTab === 'pages' ? 'active' : ''} onClick={() => setActiveTab('pages')}>Страницы</button>
-        <button className={activeTab === 'settings' ? 'active' : ''} onClick={() => setActiveTab('settings')}>Настройки</button>
-        <button className={activeTab === 'portfolio' ? 'active' : ''} onClick={() => setActiveTab('portfolio')}>Портфолио</button>
-        <button className={activeTab === 'leads' ? 'active' : ''} onClick={() => setActiveTab('leads')}>Заявки</button>
-      </div>
-      {error ? <p className="error">{error}</p> : null}
-      {uploadStatus ? <p>{uploadStatus}</p> : null}
+    <div className="admin-cms">
+      <aside className="admin-sidebar">
+        <a className="admin-brand" href="/" aria-label="Открыть сайт">
+          <span className="admin-brand-mark">E</span>
+          <span><strong>EVTENIA</strong><small>Управление сайтом</small></span>
+        </a>
+        <nav className="admin-nav" aria-label="Разделы CMS">
+          {adminNavigation.map((group) => (
+            <div className="admin-nav-group" key={group.title}>
+              <p>{group.title}</p>
+              {group.items.map((tab) => {
+                const item = ADMIN_TAB_META[tab];
+                const count = getAdminTabCount(tab);
+                return (
+                  <button type="button" className={activeTab === tab ? 'active' : ''} onClick={() => openAdminTab(tab)} aria-current={activeTab === tab ? 'page' : undefined} key={tab}>
+                    <span className="admin-nav-icon" aria-hidden="true">{item.icon}</span>
+                    <span>{item.label}</span>
+                    {count !== null ? <small className={(tab === 'homeRequests' || tab === 'landRequests') && count > 0 ? 'is-attention' : ''}>{count}</small> : null}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </nav>
+        <div className="admin-sidebar-footer">
+          <a href="/" target="_blank" rel="noreferrer">↗ Открыть сайт</a>
+          <button type="button" onClick={() => setToken('')}>Выйти</button>
+        </div>
+      </aside>
+
+      <main className="admin-main">
+        <header className="admin-topbar">
+          <div>
+            <span className="admin-kicker">{currentAdminTab.eyebrow}</span>
+            <h1>{currentAdminTab.label}</h1>
+            <p>{currentAdminTab.description}</p>
+          </div>
+          <div className="admin-topbar-actions">
+            <span className="admin-online"><i /> Сайт работает</span>
+            <a href="/" target="_blank" rel="noreferrer">Посмотреть сайт ↗</a>
+          </div>
+        </header>
+
+        <div className="admin-summary" aria-label="Сводка по сайту">
+          <button type="button" onClick={() => openAdminTab('projects')}><span>Проекты</span><strong>{projects.length}</strong></button>
+          <button type="button" onClick={() => openAdminTab('homes')}><span>Готовые дома</span><strong>{homes.length}</strong></button>
+          <button type="button" onClick={() => openAdminTab('lands')}><span>Участки</span><strong>{lands.length + lesnoeOzeroPlots.length}</strong></button>
+          <button type="button" className={pendingTotal > 0 ? 'is-attention' : ''} onClick={() => openAdminTab(pendingHomes.length ? 'homeRequests' : 'landRequests')}><span>На модерации</span><strong>{pendingTotal}</strong></button>
+          <button type="button" onClick={() => openAdminTab('leads')}><span>Заявки</span><strong>{leads.length}</strong></button>
+        </div>
+
+        <div className="admin-notices" aria-live="polite">
+          {error ? <p className="admin-alert is-error" role="alert">{error}<button type="button" onClick={() => setError('')} aria-label="Закрыть">×</button></p> : null}
+          {uploadStatus ? <p className="admin-alert is-success">{uploadStatus}<button type="button" onClick={() => setUploadStatus('')} aria-label="Закрыть">×</button></p> : null}
+        </div>
+
+        <div className="admin-workspace">
 
       {activeTab === 'projects' ? <div className="admin-grid"><section>
           <h2>{draft.id ? 'Редактирование проекта' : 'Новый проект'}</h2>
@@ -3494,8 +3581,6 @@ function AdminPage() {
               value={draft.shortDescription || ''}
               onChange={(e) => setDraft({ ...draft, shortDescription: e.target.value })}
             />
-            <button onClick={saveProject}>Сохранить</button>
-            
             <textarea
               rows={4}
               placeholder="Полное описание"
@@ -3560,6 +3645,7 @@ function AdminPage() {
                 <option key={style} value={style}>{style}</option>
               ))}
             </select>
+            <button onClick={saveProject}>{draft.id ? 'Сохранить изменения' : 'Добавить проект'}</button>
             {draft.id ? <button onClick={() => setDraft({})}>Отменить</button> : null}
           </div>
         </section>
@@ -3616,7 +3702,7 @@ function AdminPage() {
         </div>
       </section><section><h2>Дома в каталоге ({homes.length})</h2><div className="list">{homes.map((home) => <div className="list-item" key={home.id}><div><strong>{home.title}</strong><p>{home.marketType === 'new' ? 'Новый дом' : 'Вторичное жильё'} • {home.area} • {home.price}</p><small>{home.address}</small></div><div className="actions"><button onClick={() => setHomeDraft(home)}>Изменить</button><button onClick={() => removeHome(home.id)}>Удалить</button></div></div>)}</div></section></div> : null}
 
-      {activeTab === 'homeRequests' ? <div className="admin-grid"><section><h2>Дома на модерации ({pendingHomes.length})</h2><div className="list">{pendingHomes.map((home) => <div className="list-item" key={home.id}><div><strong>{home.title}</strong><p>{home.area} • {home.district} • {home.price}</p><p>Продавец: {home.sellerName}, {home.sellerPhone}</p><small>Фото: {(home.images || []).length}</small></div><div className="actions"><button onClick={() => setPendingHomeDraft(home)}>Подробнее / изменить</button><button onClick={() => rejectPendingHome(home.id)}>Отклонить</button></div></div>)}</div></section><section><h2>{pendingHomeDraft ? 'Проверка объявления' : 'Выберите заявку'}</h2>{pendingHomeDraft ? <div className="admin-form">
+      {activeTab === 'homeRequests' ? <div className="admin-grid"><section><h2>Дома на модерации ({pendingHomes.length})</h2><div className="list">{pendingHomes.length ? pendingHomes.map((home) => <div className="list-item" key={home.id}><div><strong>{home.title}</strong><p>{home.area} • {home.district} • {home.price}</p><p>Продавец: {home.sellerName}, {home.sellerPhone}</p><small>Фото: {(home.images || []).length}</small></div><div className="actions"><button onClick={() => setPendingHomeDraft(home)}>Подробнее / изменить</button><button onClick={() => rejectPendingHome(home.id)}>Отклонить</button></div></div>) : <div className="admin-empty"><span>✓</span><strong>Очередь пуста</strong><p>Новых домов для проверки пока нет.</p></div>}</div></section><section><h2>{pendingHomeDraft ? 'Проверка объявления' : 'Выберите заявку'}</h2>{pendingHomeDraft ? <div className="admin-form">
         <input placeholder="Продавец" value={pendingHomeDraft.sellerName} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, sellerName: e.target.value })} /><input placeholder="Телефон" value={pendingHomeDraft.sellerPhone} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, sellerPhone: e.target.value })} />
         <input placeholder="Название" value={pendingHomeDraft.title} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, title: e.target.value })} /><label>Категория<select value={pendingHomeDraft.marketType} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, marketType: e.target.value as HouseListing['marketType'] })}><option value="new">Новый дом</option><option value="secondary">Вторичное жильё</option></select></label>
         <input placeholder="Площадь дома" value={pendingHomeDraft.area} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, area: e.target.value })} /><input placeholder="Площадь участка" value={pendingHomeDraft.landArea} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, landArea: e.target.value })} /><input placeholder="Цена" value={pendingHomeDraft.price} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, price: e.target.value })} /><input placeholder="Район" value={pendingHomeDraft.district} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, district: e.target.value })} /><input placeholder="Адрес" value={pendingHomeDraft.address} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, address: e.target.value })} /><input placeholder="Этажность" value={pendingHomeDraft.floors} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, floors: e.target.value })} /><input placeholder="Спальни" value={pendingHomeDraft.bedrooms} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, bedrooms: e.target.value })} /><input placeholder="Год постройки" value={pendingHomeDraft.yearBuilt} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, yearBuilt: e.target.value })} />
@@ -3726,7 +3812,7 @@ function AdminPage() {
       {activeTab === 'landRequests' ? <div className="admin-grid"><section>
         <h2>Заявки на публикацию земли ({pendingLands.length})</h2>
         <div className="list">
-          {pendingLands.map((item) => (
+          {pendingLands.length ? pendingLands.map((item) => (
             <div key={item.id} className="list-item">
               <div>
                 <strong>{item.cadastralNumber}</strong>
@@ -3740,7 +3826,7 @@ function AdminPage() {
                 <button onClick={() => rejectPendingLand(item.id)}>Отклонить</button>
               </div>
             </div>
-          ))}
+          )) : <div className="admin-empty"><span>✓</span><strong>Очередь пуста</strong><p>Новых участков для проверки пока нет.</p></div>}
         </div>
       </section>
       <section>
@@ -3967,7 +4053,7 @@ function AdminPage() {
       {activeTab === 'leads' ? <section>
         <h2>Заявки ({leads.length})</h2>
         <div className="list">
-          {leads.map((lead) => (
+          {leads.length ? leads.map((lead) => (
             <div key={lead.id} className="list-item">
               <div>
                 <strong>
@@ -3977,9 +4063,12 @@ function AdminPage() {
               </div>
               <small>{new Date(lead.createdAt).toLocaleString('ru-RU')}</small>
             </div>
-          ))}
+          )) : <div className="admin-empty"><span>✉</span><strong>Заявок пока нет</strong><p>Новые обращения с сайта появятся в этом разделе.</p></div>}
         </div>
       </section> : null}
+        </div>
+        <footer className="admin-footer">CMS Evtenia · изменения публикуются на сайте после сохранения</footer>
+      </main>
     </div>
   );
 }
