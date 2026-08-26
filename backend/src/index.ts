@@ -32,6 +32,9 @@ interface Lead {
   projectId?: string;
   sourceTitle?: string;
   createdAt: string;
+  crmRequestId?: number;
+  crmSyncedAt?: string;
+  crmSyncError?: string;
 }
 
 interface LandPlot {
@@ -167,6 +170,16 @@ const SMTP_PASS = process.env.SMTP_PASS || '';
 const SMTP_FROM = process.env.SMTP_FROM || SMTP_USER || CALLBACK_RECEIVER;
 const MAX_BOT_TOKEN = process.env.MAX_BOT_TOKEN || 'f9LHodD0cOJgTouupLUHk-9x_6WPxh5mFpY61H_hXQAs90iZlxFbTTY874ImDgGp53fS9MCY9SRpOxQoqaQU';
 const MAX_CALLBACK_CHAT_ID = Number(process.env.MAX_CALLBACK_CHAT_ID || '-76263328333110');
+const CRM_API_URL = process.env.CRM_API_URL || 'https://crm.evtenia.ru/site-lead/create';
+const CRM_API_SECRET_FILE = process.env.CRM_API_SECRET_FILE || '/var/www/dom/.crm_api_secret';
+const CRM_API_SECRET = process.env.CRM_API_SECRET || (() => {
+  try {
+    return fs.readFileSync(CRM_API_SECRET_FILE, 'utf-8').trim();
+  } catch {
+    return '';
+  }
+})();
+const CRM_SYNC_TIMEOUT_MS = Number(process.env.CRM_SYNC_TIMEOUT_MS || 8000);
 
 const mailTransport = SMTP_HOST && SMTP_USER && SMTP_PASS
   ? nodemailer.createTransport({
@@ -211,6 +224,89 @@ function getLeadSourceTitle(lead: Lead, data: DataStore) {
     if (project) return `Проект дома: ${project.title}`;
   }
   return 'Форма заявки на сайте';
+}
+
+type CrmPipeline = 'construction' | 'construction_service';
+
+function getLeadCrmPipeline(lead: Lead, sourceTitle: string): CrmPipeline | null {
+  if (sourceTitle === 'Проектирование' || sourceTitle.startsWith('Услуга:')) {
+    return 'construction_service';
+  }
+  if (
+    sourceTitle.startsWith('Земельный участок:')
+    || sourceTitle.startsWith('Лесное озеро:')
+    || sourceTitle.startsWith('Готовый дом:')
+    || sourceTitle === 'Подбор готового дома'
+    || sourceTitle === 'Персональный подбор участка'
+    || sourceTitle === 'Ипотечный калькулятор'
+  ) {
+    return null;
+  }
+  if (lead.projectId || sourceTitle.startsWith('Проект дома:') || sourceTitle === 'Заявка на просчет дома') {
+    return 'construction';
+  }
+  return 'construction';
+}
+
+async function sendLeadToCrm(lead: Lead, sourceTitle: string): Promise<number | null> {
+  const pipeline = getLeadCrmPipeline(lead, sourceTitle);
+  if (!pipeline) return null;
+  if (!CRM_API_SECRET) throw new Error('CRM integration secret is not configured');
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), CRM_SYNC_TIMEOUT_MS);
+  try {
+    const response = await fetch(CRM_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Evtenia-Webhook-Token': CRM_API_SECRET
+      },
+      body: JSON.stringify({
+        external_id: lead.id,
+        name: lead.name,
+        phone: lead.phone,
+        email: lead.email || '',
+        message: lead.message || '',
+        source_title: sourceTitle,
+        pipeline
+      }),
+      signal: controller.signal
+    });
+    const payload = await response.json().catch(() => ({})) as { request_id?: number; message?: string };
+    if (!response.ok || !payload.request_id) {
+      throw new Error(`CRM returned ${response.status}: ${payload.message || 'unknown error'}`);
+    }
+    return payload.request_id;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function retryPendingCrmLeads(): Promise<void> {
+  if (!CRM_API_SECRET) return;
+  const data = readData();
+  const pending = data.leads.filter((lead) => !lead.crmSyncedAt && Boolean(lead.crmSyncError)).slice(0, 20);
+  let changed = false;
+  for (const lead of pending) {
+    const sourceTitle = getLeadSourceTitle(lead, data);
+    if (!getLeadCrmPipeline(lead, sourceTitle)) continue;
+    try {
+      const requestId = await sendLeadToCrm(lead, sourceTitle);
+      if (requestId) {
+        lead.crmRequestId = requestId;
+        lead.crmSyncedAt = new Date().toISOString();
+        delete lead.crmSyncError;
+        changed = true;
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      lead.crmSyncError = message.slice(0, 300);
+      changed = true;
+      console.error(`Не удалось повторно отправить заявку ${lead.id} в CRM`, message);
+    }
+  }
+  if (changed) writeData(data);
 }
 
 const CONSTRUCTION_TYPES = [
@@ -876,7 +972,7 @@ app.post('/api/leads', async (req, res) => {
   const { name, phone, email, message, projectId, sourceTitle } = req.body as Partial<Lead>;
   if (!name || !phone) return res.status(400).json({ message: 'Укажите имя и телефон' });
   const data = readData();
-  const lead: Lead = { id: `lead_${Date.now()}`, name, phone, email: email || '', message: message || '', projectId, sourceTitle: sourceTitle || '', createdAt: new Date().toISOString() };
+  const lead: Lead = { id: `lead_${Date.now()}`, name, phone, email: email || '', message: message || '', projectId, sourceTitle: sourceTitle || '', createdAt: new Date().toISOString(), crmSyncError: 'pending' };
   const leadSourceTitle = getLeadSourceTitle(lead, data);
   data.leads.unshift(lead);
   writeData(data);
@@ -885,6 +981,21 @@ app.post('/api/leads', async (req, res) => {
     await sendLeadToMax(lead, leadSourceTitle);
   } catch (error) {
     console.error('Не удалось отправить заявку в Max', error);
+  }
+
+  try {
+    const requestId = await sendLeadToCrm(lead, leadSourceTitle);
+    if (requestId) {
+      lead.crmRequestId = requestId;
+      lead.crmSyncedAt = new Date().toISOString();
+      delete lead.crmSyncError;
+      writeData(data);
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    lead.crmSyncError = errorMessage.slice(0, 300);
+    writeData(data);
+    console.error('Не удалось отправить заявку в CRM; будет выполнена повторная попытка', errorMessage);
   }
 
   if (mailTransport) {
@@ -1303,4 +1414,8 @@ if (fs.existsSync(FRONTEND_DIST)) {
   app.get(/^(?!\/api).*/, (_req, res) => res.sendFile(path.join(FRONTEND_DIST, 'index.html')));
 }
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  void retryPendingCrmLeads();
+  setInterval(() => void retryPendingCrmLeads(), 60_000).unref();
+});

@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          CRM_API_SECRET: ${{ secrets.CRM_API_SECRET }}
         with:
           # The VPS address can change; use DNS by default and allow an
           # explicit repository variable when SSH lives on another endpoint.
@@ -22,8 +24,12 @@ jobs:
           timeout: 2m
           script_stop: true
           command_timeout: 30m
+          envs: CRM_API_SECRET
           script: |
             echo "Start deploy on server"
+            test -n "$CRM_API_SECRET"
+            umask 077
+            printf '%s' "$CRM_API_SECRET" > /var/www/dom/.crm_api_secret
             /var/www/dom/deploy.sh
             echo "Deploy finished"
 
