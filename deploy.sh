@@ -45,7 +45,9 @@ if [ "$backend_ready" -ne 1 ]; then
 fi
 
 nginx -t
-systemctl restart nginx
+# Reload workers gracefully so active HTTPS connections are not interrupted
+# during an ordinary application deploy.
+systemctl reload nginx
 
 echo "Waiting for HTTPS health check"
 https_ready=0

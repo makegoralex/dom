@@ -1,0 +1,36 @@
+name: Diagnose production server
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect nginx and server health
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ vars.DEPLOY_HOST || 'dom.evtenia.ru' }}
+          port: ${{ vars.DEPLOY_PORT || 22 }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          timeout: 2m
+          command_timeout: 10m
+          script_stop: true
+          script: |
+            set -eu
+            echo '=== SYSTEM ==='
+            date -u
+            uptime
+            free -m
+            df -h /
+            echo '=== NGINX SERVICE ==='
+            systemctl --no-pager --full status nginx || true
+            echo '=== ENABLED NGINX SITES ==='
+            find /etc/nginx/sites-enabled -maxdepth 1 -mindepth 1 -printf '%f -> %l\n' | sort
+            echo '=== NGINX LISTENERS AND SERVER NAMES ==='
+            nginx -T 2>&1 | grep -E 'configuration file|^[[:space:]]*listen|^[[:space:]]*server_name' || true
+            echo '=== PORTS 80 AND 443 ==='
+            ss -ltnp | grep -E ':(80|443)[[:space:]]' || true
+            echo '=== RECENT NGINX LOG ==='
+            journalctl -u nginx --since '24 hours ago' --no-pager | tail -n 250 || true
