@@ -30,6 +30,7 @@ jobs:
             test -n "$CRM_API_SECRET"
             umask 077
             printf '%s' "$CRM_API_SECRET" > /var/www/dom/.crm_api_secret
+            umask 022
             /var/www/dom/deploy.sh
             echo "Deploy finished"
 
