@@ -131,6 +131,40 @@ interface PortfolioItem {
   review: string;
 }
 
+type JournalArticleStatus = 'draft' | 'review' | 'published';
+
+interface JournalCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  order: number;
+}
+
+interface JournalArticle {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  coverImage: string;
+  categoryId: string;
+  tags: string[];
+  author: string;
+  status: JournalArticleStatus;
+  featured: boolean;
+  relatedProjectIds: string[];
+  relatedServiceSlugs: string[];
+  ctaTitle: string;
+  ctaText: string;
+  ctaHref: string;
+  seoTitle: string;
+  seoDescription: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt?: string;
+}
+
 interface DataStore {
   projects: HouseProject[];
   lands: LandPlot[];
@@ -139,6 +173,8 @@ interface DataStore {
   pendingHomes: PendingHouseListing[];
   lesnoeOzeroPlots: LesnoeOzeroPlot[];
   portfolio: PortfolioItem[];
+  journalCategories: JournalCategory[];
+  journalArticles: JournalArticle[];
   leads: Lead[];
   pages: Record<string, ContentPage>;
   menuOrder: string[];
@@ -324,7 +360,7 @@ const FURNITURE_STRUCTURE = [
   { title: 'КАБИНЕТЫ', brands: ['CAMEL GROUP', 'PROFOFFICE'] },
   { title: 'МАТРАСЫ', brands: ['HUKLA'] }
 ];
-const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'homes', 'lands', 'settlements', 'services', 'furniture', 'promotions', 'contacts'];
+const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'homes', 'lands', 'settlements', 'services', 'furniture', 'promotions', 'journal', 'contacts'];
 
 function normalizeMenuOrder(order?: string[]) {
   const incoming = Array.isArray(order) ? order.filter((item) => NAV_MENU_DEFAULT_ORDER.includes(item)) : [];
@@ -342,6 +378,15 @@ const DEFAULT_CONTACTS = {
 
 function slugify(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-+|-+$/g, '');
+}
+
+function journalSlugify(value: string) {
+  const translit: Record<string, string> = {
+    а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y',
+    к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f',
+    х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya'
+  };
+  return value.toLowerCase().split('').map((letter) => translit[letter] ?? letter).join('').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
 const furnitureLeafPages = FURNITURE_STRUCTURE.flatMap((category) =>
@@ -548,6 +593,18 @@ const seedPortfolio: PortfolioItem[] = [
   }
 ];
 
+const seedJournalCategories: JournalCategory[] = [
+  { id: 'journal-category-technologies', name: 'Технологии домов', slug: 'tekhnologii-domov', description: 'Каркасные, модульные и газобетонные дома: сравнения и выбор технологии.', order: 10 },
+  { id: 'journal-category-projects', name: 'Проекты и планировки', slug: 'proekty-i-planirovki', description: 'Как выбрать площадь, этажность, комнаты и подходящий проект дома.', order: 20 },
+  { id: 'journal-category-foundation', name: 'Фундамент и участок', slug: 'fundament-i-uchastok', description: 'Грунты, фундаменты, посадка дома и подготовка участка к строительству.', order: 30 },
+  { id: 'journal-category-construction', name: 'Строительство и инженерия', slug: 'stroitelstvo-i-inzheneriya', description: 'Этапы работ, материалы, утепление, кровля, скважины и коммуникации.', order: 40 },
+  { id: 'journal-category-finance', name: 'Ипотека, цены и документы', slug: 'ipoteka-tseny-i-dokumenty', description: 'Смета, ипотека на строительство, договоры, земля и межевание.', order: 50 },
+  { id: 'journal-category-finishing', name: 'Отделка и благоустройство', slug: 'otdelka-i-blagoustroystvo', description: 'Ремонт, двери, мебель, заборы, дизайн и благоустройство участка.', order: 60 },
+  { id: 'journal-category-cases', name: 'Объекты и опыт Evtenia', slug: 'obekty-i-opyt', description: 'Разборы построенных домов, практические решения и опыт команды.', order: 70 }
+];
+
+const seedJournalArticles: JournalArticle[] = [];
+
 const seedLands: LandPlot[] = [
   { id: 'land1', cadastralNumber: '58:29:1003001:254', area: '10 соток', price: '1 250 000 ₽', district: 'Пензенский район', images: ['https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80'], mapUrl: '' },
   { id: 'land2', cadastralNumber: '58:29:1003001:255', area: '12 соток', price: '1 480 000 ₽', district: 'Бессоновский район', images: ['https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1200&q=80'], mapUrl: '' },
@@ -701,6 +758,8 @@ const ensureDataFile = (): void => {
       pendingHomes: [],
       lesnoeOzeroPlots: seedLesnoeOzeroPlots,
       portfolio: seedPortfolio,
+      journalCategories: seedJournalCategories,
+      journalArticles: seedJournalArticles,
       leads: [],
       pages: seedPages,
       menuOrder: [...NAV_MENU_DEFAULT_ORDER],
@@ -742,6 +801,10 @@ const readData = (): DataStore => {
       ? parsed.lesnoeOzeroPlots.map((plot) => normalizeLesnoeOzeroPlot(plot, plot.id))
       : seedLesnoeOzeroPlots,
     portfolio: parsed.portfolio || seedPortfolio,
+    journalCategories: Array.isArray(parsed.journalCategories) && parsed.journalCategories.length
+      ? parsed.journalCategories
+      : seedJournalCategories,
+    journalArticles: Array.isArray(parsed.journalArticles) ? parsed.journalArticles : seedJournalArticles,
     leads: parsed.leads || [],
     pages: { ...seedPages, ...(parsed.pages || {}) },
     menuOrder: normalizeMenuOrder(parsed.menuOrder),
@@ -959,6 +1022,31 @@ app.post('/api/home-submissions', upload.array('images', 20), async (req, res) =
   }
 });
 app.get('/api/portfolio', (_req, res) => res.json(readData().portfolio));
+
+app.get('/api/journal/categories', (_req, res) => {
+  const data = readData();
+  const published = data.journalArticles.filter((article) => article.status === 'published');
+  res.json([...data.journalCategories]
+    .sort((a, b) => a.order - b.order)
+    .map((category) => ({ ...category, articleCount: published.filter((article) => article.categoryId === category.id).length })));
+});
+
+app.get('/api/journal/articles', (req, res) => {
+  const data = readData();
+  const categorySlug = String(req.query.category || '').trim();
+  const category = categorySlug ? data.journalCategories.find((item) => item.slug === categorySlug) : undefined;
+  const articles = data.journalArticles
+    .filter((article) => article.status === 'published' && (!categorySlug || article.categoryId === category?.id))
+    .sort((a, b) => String(b.publishedAt || b.updatedAt).localeCompare(String(a.publishedAt || a.updatedAt)));
+  res.json(articles);
+});
+
+app.get('/api/journal/articles/:slug', (req, res) => {
+  const data = readData();
+  const article = data.journalArticles.find((item) => item.slug === req.params.slug && item.status === 'published');
+  if (!article) return res.status(404).json({ message: 'Статья не найдена' });
+  return res.json(article);
+});
 
 app.get('/api/pages/:slug', (req, res) => {
   const page = readData().pages[req.params.slug];
@@ -1227,6 +1315,112 @@ app.delete('/api/admin/pending-homes/:id', authMiddleware, (req, res) => {
 });
 
 app.get('/api/admin/pages', authMiddleware, (_req, res) => res.json(Object.values(readData().pages)));
+app.get('/api/admin/journal/categories', authMiddleware, (_req, res) => res.json([...readData().journalCategories].sort((a, b) => a.order - b.order)));
+app.get('/api/admin/journal/articles', authMiddleware, (_req, res) => res.json(readData().journalArticles));
+
+app.post('/api/admin/journal/categories', authMiddleware, (req, res) => {
+  const data = readData();
+  const name = String(req.body?.name || '').trim();
+  const slug = journalSlugify(String(req.body?.slug || name));
+  if (!name || !slug) return res.status(400).json({ message: 'Укажите название рубрики' });
+  if (data.journalCategories.some((item) => item.slug === slug)) return res.status(409).json({ message: 'Рубрика с таким адресом уже есть' });
+  const category: JournalCategory = {
+    id: `journal_category_${Date.now()}`,
+    name,
+    slug,
+    description: String(req.body?.description || '').trim(),
+    order: Number(req.body?.order || (data.journalCategories.length + 1) * 10)
+  };
+  data.journalCategories.push(category);
+  writeData(data);
+  return res.status(201).json(category);
+});
+
+app.put('/api/admin/journal/categories/:id', authMiddleware, (req, res) => {
+  const data = readData();
+  const index = data.journalCategories.findIndex((item) => item.id === req.params.id);
+  if (index === -1) return res.status(404).json({ message: 'Рубрика не найдена' });
+  const name = String(req.body?.name || data.journalCategories[index].name).trim();
+  const slug = journalSlugify(String(req.body?.slug || data.journalCategories[index].slug));
+  if (!name || !slug) return res.status(400).json({ message: 'Укажите название рубрики' });
+  if (data.journalCategories.some((item, itemIndex) => itemIndex !== index && item.slug === slug)) return res.status(409).json({ message: 'Рубрика с таким адресом уже есть' });
+  data.journalCategories[index] = {
+    ...data.journalCategories[index],
+    name,
+    slug,
+    description: String(req.body?.description ?? data.journalCategories[index].description).trim(),
+    order: Number(req.body?.order ?? data.journalCategories[index].order)
+  };
+  writeData(data);
+  return res.json(data.journalCategories[index]);
+});
+
+app.delete('/api/admin/journal/categories/:id', authMiddleware, (req, res) => {
+  const data = readData();
+  if (data.journalArticles.some((article) => article.categoryId === req.params.id)) return res.status(409).json({ message: 'Сначала перенесите статьи из этой рубрики' });
+  data.journalCategories = data.journalCategories.filter((item) => item.id !== req.params.id);
+  writeData(data);
+  return res.json({ ok: true });
+});
+
+function normalizeJournalArticle(incoming: Partial<JournalArticle>, existing?: JournalArticle): JournalArticle {
+  const now = new Date().toISOString();
+  const status: JournalArticleStatus = incoming.status === 'published' || incoming.status === 'review' ? incoming.status : 'draft';
+  const title = String(incoming.title ?? existing?.title ?? '').trim();
+  return {
+    id: existing?.id || `journal_article_${Date.now()}`,
+    title,
+    slug: journalSlugify(String(incoming.slug || existing?.slug || title)),
+    excerpt: String(incoming.excerpt ?? existing?.excerpt ?? '').trim(),
+    content: String(incoming.content ?? existing?.content ?? ''),
+    coverImage: String(incoming.coverImage ?? existing?.coverImage ?? '').trim(),
+    categoryId: String(incoming.categoryId ?? existing?.categoryId ?? '').trim(),
+    tags: Array.isArray(incoming.tags) ? incoming.tags.map(String).map((item) => item.trim()).filter(Boolean) : (existing?.tags || []),
+    author: String(incoming.author ?? existing?.author ?? 'Команда Evtenia').trim(),
+    status,
+    featured: Boolean(incoming.featured ?? existing?.featured),
+    relatedProjectIds: Array.isArray(incoming.relatedProjectIds) ? incoming.relatedProjectIds.map(String) : (existing?.relatedProjectIds || []),
+    relatedServiceSlugs: Array.isArray(incoming.relatedServiceSlugs) ? incoming.relatedServiceSlugs.map(String) : (existing?.relatedServiceSlugs || []),
+    ctaTitle: String(incoming.ctaTitle ?? existing?.ctaTitle ?? 'Поможем выбрать решение').trim(),
+    ctaText: String(incoming.ctaText ?? existing?.ctaText ?? 'Обсудим участок, бюджет и задачи вашей семьи.').trim(),
+    ctaHref: String(incoming.ctaHref ?? existing?.ctaHref ?? '/#lead-form').trim(),
+    seoTitle: String(incoming.seoTitle ?? existing?.seoTitle ?? title).trim(),
+    seoDescription: String(incoming.seoDescription ?? existing?.seoDescription ?? incoming.excerpt ?? existing?.excerpt ?? '').trim(),
+    createdAt: existing?.createdAt || now,
+    updatedAt: now,
+    publishedAt: status === 'published' ? (existing?.publishedAt || now) : existing?.publishedAt
+  };
+}
+
+app.post('/api/admin/journal/articles', authMiddleware, (req, res) => {
+  const data = readData();
+  const article = normalizeJournalArticle(req.body as Partial<JournalArticle>);
+  if (!article.title || !article.slug || !article.categoryId) return res.status(400).json({ message: 'Укажите заголовок, URL и рубрику' });
+  if (!data.journalCategories.some((item) => item.id === article.categoryId)) return res.status(400).json({ message: 'Выберите существующую рубрику' });
+  if (data.journalArticles.some((item) => item.slug === article.slug)) return res.status(409).json({ message: 'Статья с таким URL уже есть' });
+  data.journalArticles.unshift(article);
+  writeData(data);
+  return res.status(201).json(article);
+});
+
+app.put('/api/admin/journal/articles/:id', authMiddleware, (req, res) => {
+  const data = readData();
+  const index = data.journalArticles.findIndex((item) => item.id === req.params.id);
+  if (index === -1) return res.status(404).json({ message: 'Статья не найдена' });
+  const article = normalizeJournalArticle(req.body as Partial<JournalArticle>, data.journalArticles[index]);
+  if (!article.title || !article.slug || !article.categoryId) return res.status(400).json({ message: 'Укажите заголовок, URL и рубрику' });
+  if (data.journalArticles.some((item, itemIndex) => itemIndex !== index && item.slug === article.slug)) return res.status(409).json({ message: 'Статья с таким URL уже есть' });
+  data.journalArticles[index] = article;
+  writeData(data);
+  return res.json(article);
+});
+
+app.delete('/api/admin/journal/articles/:id', authMiddleware, (req, res) => {
+  const data = readData();
+  data.journalArticles = data.journalArticles.filter((item) => item.id !== req.params.id);
+  writeData(data);
+  return res.json({ ok: true });
+});
 app.get('/api/admin/menu-order', authMiddleware, (_req, res) => res.json({ order: readData().menuOrder || NAV_MENU_DEFAULT_ORDER }));
 app.get('/api/admin/site-settings', authMiddleware, (_req, res) => res.json(readData().siteSettings));
 app.put('/api/admin/site-settings', authMiddleware, (req, res) => {

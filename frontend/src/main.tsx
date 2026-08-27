@@ -1,10 +1,12 @@
 import React, { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles.css';
+import './journal.css';
 import { LesnoeOzeroPage } from './LesnoeOzeroPage';
 import { MortgageCalculatorPage } from './MortgageCalculatorPage';
 import { LESNOE_OZERO_PHASES, LesnoeOzeroPlot } from './lesnoeOzeroPlots';
 import { HomeDetailPage, HomesPage, HouseListing } from './HomesPages';
+import { JournalArticle, JournalArticlePage, JournalCategory, JournalIndexPage } from './JournalPages';
 
 type HouseProject = {
   id: string;
@@ -124,7 +126,7 @@ type MenuItem = {
   children?: MenuChildItem[];
   active?: boolean;
 };
-type AdminTab = 'projects' | 'homes' | 'homeRequests' | 'lands' | 'lesnoeOzero' | 'landRequests' | 'pages' | 'portfolio' | 'leads' | 'settings';
+type AdminTab = 'projects' | 'homes' | 'homeRequests' | 'lands' | 'lesnoeOzero' | 'landRequests' | 'journal' | 'pages' | 'portfolio' | 'leads' | 'settings';
 
 const ADMIN_TAB_META: Record<AdminTab, { label: string; eyebrow: string; description: string; icon: string }> = {
   projects: { label: 'Проекты домов', eyebrow: 'Каталог', description: 'Создание и редактирование проектов домов и бань.', icon: '⌂' },
@@ -132,6 +134,7 @@ const ADMIN_TAB_META: Record<AdminTab, { label: string; eyebrow: string; descrip
   lands: { label: 'Земельные участки', eyebrow: 'Каталог', description: 'Участки, опубликованные в разделе «Земля».', icon: '◇' },
   lesnoeOzero: { label: 'Лесное озеро', eyebrow: 'Посёлки', description: 'Интерактивная схема и статусы участков посёлка.', icon: '◉' },
   portfolio: { label: 'Портфолио', eyebrow: 'Контент', description: 'Готовые объекты, отзывы и результаты строительства.', icon: '▧' },
+  journal: { label: 'Журнал', eyebrow: 'Контент', description: 'Статьи, рубрики, SEO и связи с проектами и услугами.', icon: 'Ж' },
   pages: { label: 'Страницы сайта', eyebrow: 'Контент', description: 'Тексты внутренних страниц и порядок главного меню.', icon: '✎' },
   homeRequests: { label: 'Дома на модерации', eyebrow: 'Модерация', description: 'Проверка предложенных пользователями домов перед публикацией.', icon: '⌛' },
   landRequests: { label: 'Земля на модерации', eyebrow: 'Модерация', description: 'Проверка предложенных пользователями участков перед публикацией.', icon: '⌛' },
@@ -174,6 +177,25 @@ const HOME_PROJECT_CATEGORY_TABS: Array<{ label: string; value: string }> = [
   { label: 'Газобетонные', value: 'Из газобетона' }
 ];
 const ADMIN_STYLE_OPTIONS = ['Классический', 'Современный', 'Сканди', 'Барнхаус', 'Минимализм', 'Русский'];
+const makeEmptyJournalArticle = (categoryId = ''): Partial<JournalArticle> => ({
+  categoryId,
+  title: '',
+  slug: '',
+  excerpt: '',
+  content: '',
+  coverImage: '',
+  tags: [],
+  author: 'Команда Evtenia',
+  status: 'draft',
+  featured: false,
+  relatedProjectIds: [],
+  relatedServiceSlugs: [],
+  ctaTitle: 'Поможем выбрать решение',
+  ctaText: 'Обсудим участок, бюджет и задачи вашей семьи.',
+  ctaHref: '/#lead-form',
+  seoTitle: '',
+  seoDescription: ''
+});
 const DEFAULT_LOGO_URL = `${API_ORIGIN || window.location.origin}/api/assets/logo_small.png`;
 const CONTACT_PAGE_PHOTO_URL = 'https://s6.iimage.su/s/01/g1cKW9hxDJrMROPHFjBAYozo9BaKvKsjsH0luvHyJ.png';
 const DEFAULT_CONTACT_PROFILE = {
@@ -228,6 +250,15 @@ function slugify(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-+|-+$/g, '');
 }
 
+function journalSlugify(value: string) {
+  const translit: Record<string, string> = {
+    а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y',
+    к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f',
+    х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya'
+  };
+  return value.toLowerCase().split('').map((letter) => translit[letter] ?? letter).join('').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
 function normalizePathname(pathname: string) {
   try {
     return decodeURIComponent(pathname);
@@ -258,7 +289,7 @@ function chunkBy<T>(items: T[], size: number) {
   return chunks;
 }
 
-const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'homes', 'lands', 'settlements', 'services', 'furniture', 'promotions', 'contacts'] as const;
+const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'homes', 'lands', 'settlements', 'services', 'furniture', 'promotions', 'journal', 'contacts'] as const;
 type NavMenuKey = (typeof NAV_MENU_DEFAULT_ORDER)[number];
 
 function normalizeMenuOrder(order?: string[]) {
@@ -354,8 +385,14 @@ function sanitizeCmsHtml(html: string) {
   if (!html) return '';
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
+  doc.body.querySelectorAll('script, style, iframe, object, embed, form').forEach((node) => node.remove());
   doc.body.querySelectorAll('*').forEach((node) => {
     ['style', 'id', 'width', 'height'].forEach((attr) => node.removeAttribute(attr));
+    [...node.attributes].forEach((attribute) => {
+      const name = attribute.name.toLowerCase();
+      const value = attribute.value.trim().toLowerCase();
+      if (name.startsWith('on') || (['href', 'src'].includes(name) && value.startsWith('javascript:'))) node.removeAttribute(attribute.name);
+    });
     const className = node.getAttribute('class') || '';
     const allowedClasses = ['cms-gallery', 'single', 'cols-2', 'cols-3', 'align-left', 'align-center', 'align-right', 'size-sm', 'size-md', 'cms-image-grid', 'grid2', 'grid3', 'cms-slider', 'cms-slider-track', 'cms-slider-btn', 'prev', 'next'];
     const normalized = className
@@ -481,6 +518,7 @@ function HeaderNav({
       services: { label: 'УСЛУГИ', active: currentPath.startsWith('/services/') || currentPath === '/design', children: [{ label: 'Проектирование', href: '/design' }, ...serviceColumns.flatMap((column) => column.map((item) => ({ label: item.title, href: `/services/${item.slug}` })))] },
       furniture: { label: 'МЕБЕЛЬ', href: '/furniture', active: currentPath === '/furniture' || currentPath.startsWith('/furniture/'), children: FURNITURE_MENU_CHILDREN },
       promotions: { label: 'ИПОТЕКА И АКЦИИ', active: currentPath.startsWith('/discounts/') || currentPath === '/mortgage-calculator', children: [{ label: 'Ипотечный калькулятор', href: '/mortgage-calculator' }, ...PROMOTIONS_MENU.map((item) => ({ label: item.title, href: `/discounts/${item.slug}` }))] },
+      journal: { label: 'ЖУРНАЛ', href: '/journal', active: currentPath === '/journal' || currentPath.startsWith('/journal/') },
       contacts: { label: 'КОНТАКТЫ', href: '/contacts', active: currentPath === '/contacts' }
     };
     return menuOrder.map((key) => all[key]).filter(Boolean);
@@ -2784,6 +2822,10 @@ function AdminPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [pages, setPages] = useState<ContentPage[]>([]);
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
+  const [journalArticles, setJournalArticles] = useState<JournalArticle[]>([]);
+  const [journalCategories, setJournalCategories] = useState<JournalCategory[]>([]);
+  const [journalArticleDraft, setJournalArticleDraft] = useState<Partial<JournalArticle>>(makeEmptyJournalArticle());
+  const [journalCategoryDraft, setJournalCategoryDraft] = useState<Partial<JournalCategory>>({});
   const [pageDraft, setPageDraft] = useState<ContentPage | null>(null);
   const [draft, setDraft] = useState<Partial<HouseProject>>({});
   const [landDraft, setLandDraft] = useState<Partial<LandPlot>>({});
@@ -2808,7 +2850,7 @@ function AdminPage() {
   );
 
   const loadAdminData = async (currentToken: string) => {
-    const [projectsRes, homesRes, pendingHomesRes, landsRes, lesnoeOzeroPlotsRes, pendingLandsRes, leadsRes, pagesRes, portfolioRes, menuOrderRes, siteSettingsRes] = await Promise.all([
+    const [projectsRes, homesRes, pendingHomesRes, landsRes, lesnoeOzeroPlotsRes, pendingLandsRes, leadsRes, pagesRes, portfolioRes, journalArticlesRes, journalCategoriesRes, menuOrderRes, siteSettingsRes] = await Promise.all([
       fetch(`${API_BASE}/api/admin/projects`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/homes`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/pending-homes`, { headers: { 'x-admin-token': currentToken } }),
@@ -2818,11 +2860,13 @@ function AdminPage() {
       fetch(`${API_BASE}/api/admin/leads`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/pages`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/portfolio`, { headers: { 'x-admin-token': currentToken } }),
+      fetch(`${API_BASE}/api/admin/journal/articles`, { headers: { 'x-admin-token': currentToken } }),
+      fetch(`${API_BASE}/api/admin/journal/categories`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/menu-order`, { headers: { 'x-admin-token': currentToken } }),
       fetch(`${API_BASE}/api/admin/site-settings`, { headers: { 'x-admin-token': currentToken } })
     ]);
 
-    if (!projectsRes.ok || !homesRes.ok || !pendingHomesRes.ok || !landsRes.ok || !lesnoeOzeroPlotsRes.ok || !pendingLandsRes.ok || !leadsRes.ok || !pagesRes.ok || !portfolioRes.ok || !menuOrderRes.ok || !siteSettingsRes.ok) {
+    if (!projectsRes.ok || !homesRes.ok || !pendingHomesRes.ok || !landsRes.ok || !lesnoeOzeroPlotsRes.ok || !pendingLandsRes.ok || !leadsRes.ok || !pagesRes.ok || !portfolioRes.ok || !journalArticlesRes.ok || !journalCategoriesRes.ok || !menuOrderRes.ok || !siteSettingsRes.ok) {
       setError('Не удалось загрузить данные админки');
       return;
     }
@@ -2837,6 +2881,11 @@ function AdminPage() {
     setLeads(await leadsRes.json());
     setPages(pagesPayload);
     setPortfolio(await portfolioRes.json());
+    const articlePayload = await journalArticlesRes.json() as JournalArticle[];
+    const categoryPayload = await journalCategoriesRes.json() as JournalCategory[];
+    setJournalArticles(articlePayload);
+    setJournalCategories(categoryPayload);
+    setJournalArticleDraft((current) => current.categoryId ? current : { ...current, categoryId: categoryPayload[0]?.id || '' });
     setSiteSettingsDraft(await siteSettingsRes.json());
     const orderPayload = (await menuOrderRes.json()) as { order?: NavMenuKey[] };
     if (Array.isArray(orderPayload.order) && orderPayload.order.length) setMenuOrderDraft(orderPayload.order);
@@ -3228,6 +3277,91 @@ function AdminPage() {
     await loadAdminData(token);
   };
 
+  const saveJournalArticle = async () => {
+    if (!journalArticleDraft.title || !journalArticleDraft.categoryId) {
+      setError('Для статьи укажите заголовок и рубрику');
+      return;
+    }
+    const payload = {
+      ...journalArticleDraft,
+      slug: journalArticleDraft.slug || journalSlugify(journalArticleDraft.title),
+      content: sanitizeCmsHtml(journalArticleDraft.content || ''),
+      seoTitle: journalArticleDraft.seoTitle || journalArticleDraft.title,
+      seoDescription: journalArticleDraft.seoDescription || journalArticleDraft.excerpt || ''
+    };
+    const response = await fetch(journalArticleDraft.id ? `${API_BASE}/api/admin/journal/articles/${journalArticleDraft.id}` : `${API_BASE}/api/admin/journal/articles`, {
+      method: journalArticleDraft.id ? 'PUT' : 'POST',
+      headers: adminHeaders,
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      setError(await getApiErrorMessage(response, 'Не удалось сохранить статью'));
+      return;
+    }
+    const saved = await response.json() as JournalArticle;
+    setJournalArticleDraft(saved);
+    setUploadStatus(saved.status === 'published' ? 'Статья сохранена и опубликована' : 'Черновик статьи сохранён');
+    await loadAdminData(token);
+  };
+
+  const removeJournalArticle = async (id: string) => {
+    if (!window.confirm('Удалить эту статью? Восстановить её автоматически не получится.')) return;
+    const response = await fetch(`${API_BASE}/api/admin/journal/articles/${id}`, { method: 'DELETE', headers: adminHeaders });
+    if (!response.ok) { setError(await getApiErrorMessage(response, 'Не удалось удалить статью')); return; }
+    if (journalArticleDraft.id === id) setJournalArticleDraft(makeEmptyJournalArticle(journalCategories[0]?.id));
+    await loadAdminData(token);
+  };
+
+  const saveJournalCategory = async () => {
+    if (!journalCategoryDraft.name) { setError('Укажите название рубрики'); return; }
+    const response = await fetch(journalCategoryDraft.id ? `${API_BASE}/api/admin/journal/categories/${journalCategoryDraft.id}` : `${API_BASE}/api/admin/journal/categories`, {
+      method: journalCategoryDraft.id ? 'PUT' : 'POST',
+      headers: adminHeaders,
+      body: JSON.stringify({ ...journalCategoryDraft, slug: journalCategoryDraft.slug || journalSlugify(journalCategoryDraft.name) })
+    });
+    if (!response.ok) { setError(await getApiErrorMessage(response, 'Не удалось сохранить рубрику')); return; }
+    setJournalCategoryDraft({});
+    setUploadStatus('Рубрика сохранена');
+    await loadAdminData(token);
+  };
+
+  const removeJournalCategory = async (id: string) => {
+    if (!window.confirm('Удалить рубрику?')) return;
+    const response = await fetch(`${API_BASE}/api/admin/journal/categories/${id}`, { method: 'DELETE', headers: adminHeaders });
+    if (!response.ok) { setError(await getApiErrorMessage(response, 'Не удалось удалить рубрику')); return; }
+    if (journalCategoryDraft.id === id) setJournalCategoryDraft({});
+    await loadAdminData(token);
+  };
+
+  const uploadJournalImage = async (files: File[], target: 'cover' | 'content') => {
+    if (!files.length) return;
+    setUploadStatus(target === 'cover' ? 'Загрузка обложки...' : 'Загрузка изображений в статью...');
+    const formData = new FormData();
+    files.forEach((file) => formData.append('images', file));
+    const response = await fetch(`${API_BASE}/api/admin/upload/page-image`, { method: 'POST', headers: { 'x-admin-token': token }, body: formData });
+    if (!response.ok) { setError(await getApiErrorMessage(response, 'Не удалось загрузить изображение')); return; }
+    const payload = await response.json() as { urls: string[] };
+    if (target === 'cover') {
+      setJournalArticleDraft((current) => ({ ...current, coverImage: payload.urls?.[0] || '' }));
+    } else {
+      const html = (payload.urls || []).map((url) => `<figure><img src="${url}" alt="" /><figcaption></figcaption></figure>`).join('');
+      const editor = document.getElementById('cms-journal-editor');
+      if (editor) {
+        editor.focus();
+        document.execCommand('insertHTML', false, html);
+        setJournalArticleDraft((current) => ({ ...current, content: sanitizeCmsHtml(editor.innerHTML) }));
+      }
+    }
+    setUploadStatus('Изображение добавлено. Сохраните статью.');
+  };
+
+  const applyJournalFormat = (command: string, value?: string) => {
+    const editor = document.getElementById('cms-journal-editor');
+    editor?.focus();
+    document.execCommand(command, false, value);
+    if (editor) setJournalArticleDraft((current) => ({ ...current, content: sanitizeCmsHtml(editor.innerHTML) }));
+  };
+
   const uploadPageImage = async (files: File[]) => {
     if (!files.length || !pageDraft) return;
     setUploadStatus('Загрузка изображения для страницы...');
@@ -3483,7 +3617,7 @@ function AdminPage() {
   const pendingTotal = pendingHomes.length + pendingLands.length;
   const adminNavigation: Array<{ title: string; items: AdminTab[] }> = [
     { title: 'Каталог', items: ['projects', 'homes', 'lands', 'lesnoeOzero'] },
-    { title: 'Контент', items: ['pages', 'portfolio'] },
+    { title: 'Контент', items: ['journal', 'pages', 'portfolio'] },
     { title: 'Модерация', items: ['homeRequests', 'landRequests'] },
     { title: 'Работа с клиентами', items: ['leads'] },
     { title: 'Система', items: ['settings'] }
@@ -3494,6 +3628,7 @@ function AdminPage() {
     if (tab === 'lands') return lands.length;
     if (tab === 'lesnoeOzero') return lesnoeOzeroPlots.length;
     if (tab === 'portfolio') return portfolio.length;
+    if (tab === 'journal') return journalArticles.length;
     if (tab === 'pages') return pages.length;
     if (tab === 'homeRequests') return pendingHomes.length;
     if (tab === 'landRequests') return pendingLands.length;
@@ -3882,6 +4017,89 @@ function AdminPage() {
         ) : <p>Нажмите «Подробнее / изменить» у нужной заявки, чтобы увидеть все поля и фотографии.</p>}
       </section></div> : null}
 
+      {activeTab === 'journal' ? <>
+        <div className="admin-grid journal-admin-grid">
+          <section>
+            <div className="admin-section-heading-row">
+              <div><h2>{journalArticleDraft.id ? 'Редактирование статьи' : 'Новая статья'}</h2><p>До проверки сохраняйте материал черновиком.</p></div>
+              <button type="button" onClick={() => setJournalArticleDraft(makeEmptyJournalArticle(journalCategories[0]?.id))}>+ Новая статья</button>
+            </div>
+            <div className="admin-form">
+              <label>Заголовок статьи<input value={journalArticleDraft.title || ''} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, title: e.target.value, slug: journalArticleDraft.id ? journalArticleDraft.slug : journalSlugify(e.target.value) })} placeholder="Например: какой фундамент выбрать для дома" /></label>
+              <div className="admin-form-columns">
+                <label>Адрес статьи<input value={journalArticleDraft.slug || ''} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, slug: journalSlugify(e.target.value) })} placeholder="kakoy-fundament-vybrat" /></label>
+                <label>Рубрика<select value={journalArticleDraft.categoryId || ''} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, categoryId: e.target.value })}><option value="">Выберите рубрику</option>{journalCategories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
+              </div>
+              <label>Краткое описание<textarea rows={3} value={journalArticleDraft.excerpt || ''} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, excerpt: e.target.value })} placeholder="Два-три предложения для карточки и начала статьи" /></label>
+              <div className="admin-form-columns">
+                <label>Автор<input value={journalArticleDraft.author || ''} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, author: e.target.value })} /></label>
+                <label>Статус<select value={journalArticleDraft.status || 'draft'} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, status: e.target.value as JournalArticle['status'] })}><option value="draft">Черновик</option><option value="review">На проверке</option><option value="published">Опубликовано</option></select></label>
+              </div>
+              <label>Теги через запятую<input value={(journalArticleDraft.tags || []).join(', ')} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, tags: e.target.value.split(',').map((item) => item.trim()).filter(Boolean) })} placeholder="Каркасный дом, Пенза, фундамент" /></label>
+              <label>URL обложки<input value={journalArticleDraft.coverImage || ''} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, coverImage: e.target.value })} /></label>
+              <label>Загрузить обложку<input type="file" accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadJournalImage(files, 'cover'); e.currentTarget.value = ''; }} /></label>
+              {journalArticleDraft.coverImage ? <div className="admin-image-card journal-cover-preview"><img src={resolveMediaUrl(journalArticleDraft.coverImage)} alt="Обложка статьи" /></div> : null}
+
+              <div className="cms-toolbar journal-editor-toolbar">
+                <button type="button" onClick={() => applyJournalFormat('formatBlock', 'h2')}>Заголовок H2</button>
+                <button type="button" onClick={() => applyJournalFormat('formatBlock', 'h3')}>Подзаголовок H3</button>
+                <button type="button" onClick={() => applyJournalFormat('bold')}>Жирный</button>
+                <button type="button" onClick={() => applyJournalFormat('insertUnorderedList')}>Список</button>
+                <button type="button" onClick={() => applyJournalFormat('formatBlock', 'blockquote')}>Цитата</button>
+                <label>Добавить фото<input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadJournalImage(files, 'content'); e.currentTarget.value = ''; }} /></label>
+              </div>
+              <div
+                id="cms-journal-editor"
+                key={journalArticleDraft.id || 'new-journal-article'}
+                className="cms-editor journal-editor"
+                contentEditable
+                suppressContentEditableWarning
+                onPaste={(e) => { e.preventDefault(); document.execCommand('insertText', false, e.clipboardData.getData('text/plain')); }}
+                onInput={(e) => setJournalArticleDraft({ ...journalArticleDraft, content: sanitizeCmsHtml((e.target as HTMLDivElement).innerHTML) })}
+                dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(journalArticleDraft.content || '') }}
+              />
+
+              <div className="admin-form-columns">
+                <label>SEO title<input value={journalArticleDraft.seoTitle || ''} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, seoTitle: e.target.value })} placeholder={journalArticleDraft.title || 'Заголовок в поиске'} /></label>
+                <label>SEO description<textarea rows={2} value={journalArticleDraft.seoDescription || ''} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, seoDescription: e.target.value })} placeholder={journalArticleDraft.excerpt || 'Описание в поиске'} /></label>
+              </div>
+
+              <details className="journal-admin-details">
+                <summary>Связи с продажами и призыв к действию</summary>
+                <label>Связанные проекты<select multiple value={journalArticleDraft.relatedProjectIds || []} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, relatedProjectIds: Array.from(e.target.selectedOptions).map((option) => option.value) })}>{projects.filter((project) => project.category === 'house').map((project) => <option key={project.id} value={project.id}>{project.title} · {project.area}</option>)}</select></label>
+                <label>Связанные услуги<select multiple value={journalArticleDraft.relatedServiceSlugs || []} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, relatedServiceSlugs: Array.from(e.target.selectedOptions).map((option) => option.value) })}>{SERVICES_MENU.map((service) => <option key={service.slug} value={service.slug}>{service.title}</option>)}</select></label>
+                <input placeholder="Заголовок призыва" value={journalArticleDraft.ctaTitle || ''} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, ctaTitle: e.target.value })} />
+                <textarea rows={2} placeholder="Текст призыва" value={journalArticleDraft.ctaText || ''} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, ctaText: e.target.value })} />
+                <input placeholder="Ссылка кнопки" value={journalArticleDraft.ctaHref || ''} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, ctaHref: e.target.value })} />
+              </details>
+
+              <label className="admin-check-row"><input type="checkbox" checked={Boolean(journalArticleDraft.featured)} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, featured: e.target.checked })} /> Главный материал Журнала</label>
+              <div className="actions"><button type="button" onClick={saveJournalArticle}>Сохранить статью</button>{journalArticleDraft.id && journalArticleDraft.status === 'published' ? <a className="admin-button-link" href={`/journal/${journalArticleDraft.slug}`} target="_blank" rel="noreferrer">Открыть на сайте ↗</a> : null}</div>
+            </div>
+          </section>
+
+          <section>
+            <h2>Статьи ({journalArticles.length})</h2>
+            <div className="journal-admin-filters"><span>Черновики: {journalArticles.filter((article) => article.status === 'draft').length}</span><span>На проверке: {journalArticles.filter((article) => article.status === 'review').length}</span><span>Опубликовано: {journalArticles.filter((article) => article.status === 'published').length}</span></div>
+            <div className="list journal-article-list">{journalArticles.length ? journalArticles.map((article) => <div className="list-item" key={article.id}><div><span className={`journal-status is-${article.status}`}>{article.status === 'published' ? 'Опубликовано' : article.status === 'review' ? 'На проверке' : 'Черновик'}</span><strong>{article.title}</strong><p>{journalCategories.find((category) => category.id === article.categoryId)?.name || 'Без рубрики'}</p><small>Обновлено {new Date(article.updatedAt).toLocaleDateString('ru-RU')}</small></div><div className="actions"><button type="button" onClick={() => setJournalArticleDraft(article)}>Изменить</button><button type="button" onClick={() => removeJournalArticle(article.id)}>Удалить</button></div></div>) : <div className="admin-empty"><span>Ж</span><strong>Статей пока нет</strong><p>Создайте первый материал и сохраните его черновиком.</p></div>}</div>
+          </section>
+        </div>
+
+        <section className="journal-category-admin">
+          <div className="admin-section-heading-row"><div><h2>Рубрики Журнала</h2><p>Рубрики формируют структуру базы знаний и отдельные SEO-страницы.</p></div></div>
+          <div className="admin-grid">
+            <div className="admin-form">
+              <input placeholder="Название рубрики" value={journalCategoryDraft.name || ''} onChange={(e) => setJournalCategoryDraft({ ...journalCategoryDraft, name: e.target.value, slug: journalCategoryDraft.id ? journalCategoryDraft.slug : journalSlugify(e.target.value) })} />
+              <input placeholder="URL рубрики" value={journalCategoryDraft.slug || ''} onChange={(e) => setJournalCategoryDraft({ ...journalCategoryDraft, slug: journalSlugify(e.target.value) })} />
+              <textarea rows={3} placeholder="Описание рубрики" value={journalCategoryDraft.description || ''} onChange={(e) => setJournalCategoryDraft({ ...journalCategoryDraft, description: e.target.value })} />
+              <input type="number" placeholder="Порядок" value={journalCategoryDraft.order || ''} onChange={(e) => setJournalCategoryDraft({ ...journalCategoryDraft, order: Number(e.target.value) })} />
+              <div className="actions"><button type="button" onClick={saveJournalCategory}>Сохранить рубрику</button>{journalCategoryDraft.id ? <button type="button" onClick={() => setJournalCategoryDraft({})}>Отмена</button> : null}</div>
+            </div>
+            <div className="list">{journalCategories.map((category) => <div className="list-item" key={category.id}><div><strong>{category.name}</strong><p>{category.description}</p><small>/journal/category/{category.slug}</small></div><div className="actions"><button type="button" onClick={() => setJournalCategoryDraft(category)}>Изменить</button><button type="button" onClick={() => removeJournalCategory(category.id)}>Удалить</button></div></div>)}</div>
+          </div>
+        </section>
+      </> : null}
+
       {activeTab === 'pages' ? <section>
         <h2>Внутренние страницы</h2>
         <div className="admin-form">
@@ -4184,6 +4402,9 @@ function App() {
     return <AppLayout><MortgageCalculatorPage Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} apiBase={API_BASE} formatPhone={formatPhoneMask} /></AppLayout>;
   }
   if (pathname.startsWith('/project/')) return <AppLayout><ProjectDetailPage /></AppLayout>;
+  if (pathname === '/journal') return <AppLayout><JournalIndexPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} resolveMedia={resolveMediaUrl} /></AppLayout>;
+  if (pathname.startsWith('/journal/category/')) return <AppLayout><JournalIndexPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} resolveMedia={resolveMediaUrl} categorySlug={pathname.replace('/journal/category/', '')} /></AppLayout>;
+  if (pathname.startsWith('/journal/')) return <AppLayout><JournalArticlePage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} resolveMedia={resolveMediaUrl} slug={pathname.replace('/journal/', '')} /></AppLayout>;
   if (pathname === '/design') return <AppLayout><DesignPage /></AppLayout>;
   if (servicePage) return <AppLayout><ManagedTextPage slug={`services-${servicePage.slug}`} fallbackTitle={servicePage.title} fallbackContent={servicePage.text} sectionTitle="Услуги" /></AppLayout>;
   if (discountPage) return <AppLayout><ManagedTextPage slug={`discounts-${discountPage.slug}`} fallbackTitle={discountPage.title} fallbackContent={discountPage.text} sectionTitle="Ипотека и акции" /></AppLayout>;
