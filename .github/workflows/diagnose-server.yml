@@ -45,6 +45,11 @@ jobs:
             df -h /
             echo '=== NGINX SERVICE ==='
             systemctl --no-pager --full status nginx || true
+            nginx -v || true
+            echo '=== NGINX MAIN CONFIG ==='
+            sed -n '1,240p' /etc/nginx/nginx.conf
+            echo '=== DOM VIRTUAL HOST ==='
+            sed -n '1,240p' /etc/nginx/sites-available/dom
             echo '=== ENABLED NGINX SITES ==='
             find /etc/nginx/sites-enabled -maxdepth 1 -mindepth 1 -printf '%f -> %l\n' | sort
             echo '=== NGINX LISTENERS AND SERVER NAMES ==='
