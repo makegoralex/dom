@@ -44,7 +44,24 @@ if [ "$backend_ready" -ne 1 ]; then
   exit 1
 fi
 
-nginx -t
+# Backup copies inside sites-enabled are parsed as live virtual hosts. Archive
+# the known stale people.evtenia.ru copies before validating nginx. Keeping
+# them outside /etc/nginx preserves rollback data without duplicate servers.
+nginx_backup_configs=(/etc/nginx/sites-enabled/people.bak-*)
+if [ -e "${nginx_backup_configs[0]}" ]; then
+  nginx_archive_dir="/etc/nginx/disabled-sites/people-$(date -u +%Y%m%dT%H%M%SZ)"
+  install -d -m 700 "$nginx_archive_dir"
+  mv -- "${nginx_backup_configs[@]}" "$nginx_archive_dir/"
+  echo "Archived ${#nginx_backup_configs[@]} stale nginx backup configuration(s)"
+fi
+
+nginx_test_output="$(nginx -t 2>&1)"
+printf '%s\n' "$nginx_test_output"
+if grep -q 'conflicting server name' <<<"$nginx_test_output"; then
+  echo "Conflicting nginx virtual hosts remain; refusing to reload" >&2
+  exit 1
+fi
+
 # Reload workers gracefully so active HTTPS connections are not interrupted
 # during an ordinary application deploy.
 systemctl reload nginx
