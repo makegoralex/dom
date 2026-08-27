@@ -123,6 +123,22 @@ export function JournalIndexPage({ apiBase, Header, Footer, resolveMedia, catego
 
   useEffect(() => {
     document.title = activeCategory ? `${activeCategory.name} — Журнал Evtenia` : 'Журнал о строительстве домов — Evtenia';
+    let description = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+    if (!description) {
+      description = document.createElement('meta');
+      description.name = 'description';
+      document.head.appendChild(description);
+    }
+    description.content = activeCategory?.description || 'Практический журнал Evtenia о технологиях строительства домов, проектах, фундаментах, инженерии, ипотеке и благоустройстве.';
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      document.head.appendChild(canonical);
+    }
+    canonical.href = activeCategory
+      ? `${window.location.origin}/journal/category/${activeCategory.slug}`
+      : `${window.location.origin}/journal`;
   }, [activeCategory]);
 
   return (
