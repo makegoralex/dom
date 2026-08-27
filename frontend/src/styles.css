@@ -1056,6 +1056,7 @@ body { background: var(--ev-paper); color: var(--ev-ink); }
 .hero-exact {
   min-height: 720px;
   overflow: visible;
+  z-index: 20;
   background-color: var(--ev-ink-deep);
   background-position: center 46%;
   background-size: cover;
@@ -1081,11 +1082,13 @@ body { background: var(--ev-paper); color: var(--ev-ink); }
 .top-contacts a:hover { opacity: 1; }
 
 .hero-main { padding-top: 20px; }
-.hero-upper-row { gap: 28px; padding: 0 0 20px; border: 0; }
-.brand-line { gap: 12px; color: #fff; }
-.logo-badge { width: 50px; height: 50px; box-shadow: 0 8px 30px rgba(0, 0, 0, .16); }
-.brand-logo { font-family: Georgia, "Times New Roman", serif; font-size: 40px; font-weight: 500; letter-spacing: -.035em; }
-.brand-line p { color: rgba(255, 255, 255, .68); font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.hero-upper-row { gap: 28px; padding: 0 4px 20px; border: 0; }
+.brand-line { gap: 11px; color: #fff; }
+.logo-badge { width: 46px; height: 46px; flex: 0 0 46px; border: 1px solid rgba(255, 255, 255, .48); border-radius: 14px; box-shadow: 0 8px 30px rgba(0, 0, 0, .16); }
+.logo-badge img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
+.brand-logo { font-family: Georgia, "Times New Roman", serif; font-size: 36px; font-weight: 500; letter-spacing: -.035em; line-height: .9; }
+.brand-text { gap: 5px; }
+.brand-line p { color: rgba(255, 255, 255, .62); font-size: 10px; font-weight: 700; letter-spacing: .12em; line-height: 1; text-transform: uppercase; }
 .hero-contact-line { gap: 18px; }
 .hero-help-text { max-width: 310px !important; border: 0; border-left: 1px solid rgba(255, 255, 255, .25); padding: 0 0 0 16px; color: rgba(255, 255, 255, .72); background: transparent; line-height: 1.35; }
 .phone-icon { color: var(--ev-gold); }
@@ -1095,7 +1098,7 @@ body { background: var(--ev-paper); color: var(--ev-ink); }
 .phone-block small { color: rgba(255, 255, 255, .58); }
 .call-btn { min-height: 44px; border: 1px solid var(--ev-gold); border-radius: 999px; padding: 10px 18px; color: var(--ev-ink-deep); background: var(--ev-gold); font-weight: 800; }
 
-.hero-nav { justify-content: flex-start; gap: 1px; padding: 7px; border: 1px solid rgba(255, 255, 255, .16); border-radius: 16px; background: rgba(8, 35, 27, .52); box-shadow: 0 14px 38px rgba(0, 0, 0, .14); backdrop-filter: blur(16px); }
+.hero-nav { justify-content: center; gap: 1px; padding: 7px; border: 1px solid rgba(255, 255, 255, .16); border-radius: 16px; background: rgba(8, 35, 27, .82); box-shadow: 0 14px 38px rgba(0, 0, 0, .14); backdrop-filter: blur(16px); }
 .hero-nav > span { display: none; }
 .hero-nav a,
 .menu-link-btn { min-height: 38px; border-radius: 10px; padding: 0 9px; font-size: 11px; font-weight: 700; letter-spacing: .025em; }
@@ -1103,7 +1106,17 @@ body { background: var(--ev-paper); color: var(--ev-ink); }
 .menu-link-btn:hover { background: rgba(255, 255, 255, .11); }
 .menu-link.active { color: var(--ev-gold); background: rgba(216, 183, 111, .12); }
 .projects-dropdown,
-.services-dropdown { top: calc(100% + 8px); border: 1px solid rgba(23, 60, 47, .12); border-radius: 16px; padding: 14px; color: var(--ev-ink); background: var(--ev-white); box-shadow: 0 22px 60px rgba(8, 35, 27, .2); }
+.services-dropdown { top: 100%; border: 1px solid rgba(23, 60, 47, .12); border-radius: 16px; padding: 14px; color: var(--ev-ink); background: #fffdf8; box-shadow: 0 22px 60px rgba(8, 35, 27, .2); opacity: 1; }
+.services-dropdown { width: min(1000px, calc(100vw - 48px)); min-width: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 12px; }
+.projects-dropdown::before,
+.services-dropdown::before { content: ""; position: absolute; right: 0; bottom: 100%; left: 0; height: 10px; }
+.projects-dropdown .dropdown-link,
+.services-dropdown .dropdown-link { display: block; min-height: 0; padding: 9px 10px; white-space: normal; line-height: 1.3; }
+.menu-projects:focus-within .projects-dropdown,
+.menu-about:focus-within .projects-dropdown,
+.menu-settlements:focus-within .projects-dropdown,
+.menu-services:focus-within .services-dropdown,
+.menu-promotions:focus-within .services-dropdown { display: grid; }
 .dropdown-link { border-radius: 9px; color: var(--ev-ink) !important; }
 .dropdown-link:hover { color: var(--ev-ink) !important; background: var(--ev-gold-soft); }
 
