@@ -44,6 +44,10 @@ if [ "$backend_ready" -ne 1 ]; then
   exit 1
 fi
 
+# Keep the production virtual host versioned with the application.
+install -m 644 /var/www/dom/ops/nginx/dom.conf /etc/nginx/sites-available/dom
+ln -sfn /etc/nginx/sites-available/dom /etc/nginx/sites-enabled/dom
+
 # Backup copies inside sites-enabled are parsed as live virtual hosts. Archive
 # the known stale people.evtenia.ru copies before validating nginx. Keeping
 # them outside /etc/nginx preserves rollback data without duplicate servers.

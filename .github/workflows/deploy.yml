@@ -31,6 +31,8 @@ jobs:
             umask 077
             printf '%s' "$CRM_API_SECRET" > /var/www/dom/.crm_api_secret
             umask 022
+            git -C /var/www/dom fetch origin main
+            git -C /var/www/dom reset --hard origin/main
             /var/www/dom/deploy.sh
             echo "Deploy finished"
 
