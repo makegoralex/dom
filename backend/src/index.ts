@@ -60,6 +60,8 @@ interface PendingLandPlot extends LandPlot {
   sellerName: string;
   sellerPhone: string;
   createdAt: string;
+  source?: 'site' | 'crm';
+  sourceRealtyId?: string;
 }
 
 type HouseMarketType = 'new' | 'secondary';
@@ -94,6 +96,8 @@ interface PendingHouseListing extends HouseListing {
   sellerName: string;
   sellerPhone: string;
   createdAt: string;
+  source?: 'site' | 'crm';
+  sourceRealtyId?: string;
 }
 
 type LesnoeOzeroPhase = 'lake' | 'forest';
@@ -218,6 +222,7 @@ const CRM_API_SECRET = process.env.CRM_API_SECRET || (() => {
     return '';
   }
 })();
+const CRM_SUBMISSION_SECRET = process.env.CRM_SUBMISSION_SECRET || CRM_API_SECRET;
 const CRM_SYNC_TIMEOUT_MS = Number(process.env.CRM_SYNC_TIMEOUT_MS || 8000);
 
 const mailTransport = SMTP_HOST && SMTP_USER && SMTP_PASS
@@ -786,7 +791,9 @@ const readData = (): DataStore => {
           ...normalizeLandPlot(land as Partial<LandPlot> & { image?: string }, (land as Partial<LandPlot>)?.id || `pending_land_${Date.now()}`),
           sellerName: String((land as Partial<PendingLandPlot>)?.sellerName || ''),
           sellerPhone: String((land as Partial<PendingLandPlot>)?.sellerPhone || ''),
-          createdAt: String((land as Partial<PendingLandPlot>)?.createdAt || new Date().toISOString())
+          createdAt: String((land as Partial<PendingLandPlot>)?.createdAt || new Date().toISOString()),
+          source: (land as Partial<PendingLandPlot>)?.source,
+          sourceRealtyId: String((land as Partial<PendingLandPlot>)?.sourceRealtyId || '')
         }))
       : [],
     homes: Array.isArray(parsed.homes)
@@ -797,7 +804,9 @@ const readData = (): DataStore => {
           ...normalizeHouseListing(home, home.id || `pending_home_${Date.now()}`),
           sellerName: String(home.sellerName || ''),
           sellerPhone: String(home.sellerPhone || ''),
-          createdAt: String(home.createdAt || new Date().toISOString())
+          createdAt: String(home.createdAt || new Date().toISOString()),
+          source: home.source,
+          sourceRealtyId: String(home.sourceRealtyId || '')
         }))
       : [],
     lesnoeOzeroPlots: Array.isArray(parsed.lesnoeOzeroPlots) && parsed.lesnoeOzeroPlots.length
@@ -895,6 +904,18 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction): void =
   next();
 };
 
+const crmSubmissionAuthMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+  if (!CRM_SUBMISSION_SECRET) {
+    res.status(503).json({ message: 'CRM submission integration is not configured' });
+    return;
+  }
+  if (req.header('x-evtenia-webhook-token') !== CRM_SUBMISSION_SECRET) {
+    res.status(401).json({ message: 'Unauthorized' });
+    return;
+  }
+  next();
+};
+
 app.use(cors());
 app.use(express.json());
 ensureAssetsDirs();
@@ -931,6 +952,65 @@ app.get('/api/homes/:id', (req, res) => {
   const home = (readData().homes || seedHomes).find((item) => item.id === req.params.id);
   if (!home) return res.status(404).json({ message: 'Дом не найден' });
   return res.json(home);
+});
+app.post('/api/crm/realty-submissions', crmSubmissionAuthMiddleware, (req, res) => {
+  const incoming = req.body as Record<string, unknown>;
+  const kind = incoming.kind === 'land' ? 'land' : incoming.kind === 'home' ? 'home' : '';
+  const sourceRealtyId = String(incoming.sourceRealtyId || '').trim();
+  const sellerName = String(incoming.sellerName || '').trim();
+  const sellerPhone = String(incoming.sellerPhone || '').trim();
+  const images = Array.isArray(incoming.images)
+    ? incoming.images.map((item) => String(item || '').trim()).filter(Boolean)
+    : [];
+
+  if (!kind || !sourceRealtyId || !sellerName || !sellerPhone) {
+    return res.status(400).json({ message: 'Не указан тип, ID объекта или контакт ответственного' });
+  }
+  if (!images.length) {
+    return res.status(400).json({ message: 'Добавьте хотя бы одну фотографию объекта' });
+  }
+
+  const data = readData();
+  const createdAt = new Date().toISOString();
+  if (kind === 'land') {
+    const existingIndex = data.pendingLands.findIndex(
+      (item) => item.source === 'crm' && item.sourceRealtyId === sourceRealtyId
+    );
+    const id = existingIndex >= 0
+      ? data.pendingLands[existingIndex].id
+      : `pending_land_crm_${sourceRealtyId}_${Date.now()}`;
+    const pendingLand: PendingLandPlot = {
+      ...normalizeLandPlot({ ...(incoming as Partial<LandPlot>), images }, id),
+      sellerName,
+      sellerPhone,
+      createdAt: existingIndex >= 0 ? data.pendingLands[existingIndex].createdAt : createdAt,
+      source: 'crm',
+      sourceRealtyId
+    };
+    if (existingIndex >= 0) data.pendingLands[existingIndex] = pendingLand;
+    else data.pendingLands.unshift(pendingLand);
+    writeData(data);
+    return res.status(existingIndex >= 0 ? 200 : 201).json({ ok: true, id, updated: existingIndex >= 0 });
+  }
+
+  const existingIndex = data.pendingHomes.findIndex(
+    (item) => item.source === 'crm' && item.sourceRealtyId === sourceRealtyId
+  );
+  const id = existingIndex >= 0
+    ? data.pendingHomes[existingIndex].id
+    : `pending_home_crm_${sourceRealtyId}_${Date.now()}`;
+  const pendingHome: PendingHouseListing = {
+    ...normalizeHouseListing({ ...(incoming as Partial<HouseListing>), images }, id),
+    sellerName,
+    sellerPhone,
+    createdAt: existingIndex >= 0 ? data.pendingHomes[existingIndex].createdAt : createdAt,
+    source: 'crm',
+    sourceRealtyId
+  };
+  if (existingIndex >= 0) data.pendingHomes[existingIndex] = pendingHome;
+  else data.pendingHomes.unshift(pendingHome);
+  writeData(data);
+  return res.status(existingIndex >= 0 ? 200 : 201).json({ ok: true, id, updated: existingIndex >= 0 });
 });
 app.get('/api/lesnoe-ozero/plots', (_req, res) => res.json(readData().lesnoeOzeroPlots));
 app.post('/api/land-submissions', upload.array('images', 20), async (req, res) => {
@@ -1271,7 +1351,9 @@ app.put('/api/admin/pending-lands/:id', authMiddleware, (req, res) => {
     ...normalizedLand,
     sellerName: incoming.sellerName || data.pendingLands[idx].sellerName,
     sellerPhone: incoming.sellerPhone || data.pendingLands[idx].sellerPhone,
-    createdAt: data.pendingLands[idx].createdAt
+    createdAt: data.pendingLands[idx].createdAt,
+    source: data.pendingLands[idx].source,
+    sourceRealtyId: data.pendingLands[idx].sourceRealtyId
   };
   writeData(data);
   res.json(data.pendingLands[idx]);
@@ -1307,7 +1389,9 @@ app.put('/api/admin/pending-homes/:id', authMiddleware, (req, res) => {
     ...normalizeHouseListing({ ...data.pendingHomes[index], ...incoming, id }, id),
     sellerName: String(incoming.sellerName || data.pendingHomes[index].sellerName),
     sellerPhone: String(incoming.sellerPhone || data.pendingHomes[index].sellerPhone),
-    createdAt: data.pendingHomes[index].createdAt
+    createdAt: data.pendingHomes[index].createdAt,
+    source: data.pendingHomes[index].source,
+    sourceRealtyId: data.pendingHomes[index].sourceRealtyId
   };
   writeData(data);
   res.json(data.pendingHomes[index]);

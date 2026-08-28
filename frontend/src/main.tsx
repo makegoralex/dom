@@ -62,12 +62,16 @@ type PendingLandPlot = LandPlot & {
   sellerName: string;
   sellerPhone: string;
   createdAt: string;
+  source?: 'site' | 'crm';
+  sourceRealtyId?: string;
 };
 
 type PendingHouseListing = HouseListing & {
   sellerName: string;
   sellerPhone: string;
   createdAt: string;
+  source?: 'site' | 'crm';
+  sourceRealtyId?: string;
 };
 
 type Lead = {
@@ -3849,7 +3853,7 @@ function AdminPage() {
         </div>
       </section><section><h2>Дома в каталоге ({homes.length})</h2><div className="list">{homes.map((home) => <div className="list-item" key={home.id}><div><strong>{home.title}</strong><p>{home.marketType === 'new' ? 'Новый дом' : 'Вторичное жильё'} • {home.area} • {home.price}</p><small>{home.address}</small></div><div className="actions"><button onClick={() => setHomeDraft(home)}>Изменить</button><button onClick={() => removeHome(home.id)}>Удалить</button></div></div>)}</div></section></div> : null}
 
-      {activeTab === 'homeRequests' ? <div className="admin-grid"><section><h2>Дома на модерации ({pendingHomes.length})</h2><div className="list">{pendingHomes.length ? pendingHomes.map((home) => <div className="list-item" key={home.id}><div><strong>{home.title}</strong><p>{home.area} • {home.district} • {home.price}</p><p>Продавец: {home.sellerName}, {home.sellerPhone}</p><small>Фото: {(home.images || []).length}</small></div><div className="actions"><button onClick={() => setPendingHomeDraft(home)}>Подробнее / изменить</button><button onClick={() => rejectPendingHome(home.id)}>Отклонить</button></div></div>) : <div className="admin-empty"><span>✓</span><strong>Очередь пуста</strong><p>Новых домов для проверки пока нет.</p></div>}</div></section><section><h2>{pendingHomeDraft ? 'Проверка объявления' : 'Выберите заявку'}</h2>{pendingHomeDraft ? <div className="admin-form">
+      {activeTab === 'homeRequests' ? <div className="admin-grid"><section><h2>Дома на модерации ({pendingHomes.length})</h2><div className="list">{pendingHomes.length ? pendingHomes.map((home) => <div className="list-item" key={home.id}><div><strong>{home.title}</strong><p>{home.area} • {home.district} • {home.price}</p><p>Продавец: {home.sellerName}, {home.sellerPhone}</p>{home.source === 'crm' ? <small>Источник: CRM, объект #{home.sourceRealtyId}</small> : null}<small>Фото: {(home.images || []).length}</small></div><div className="actions"><button onClick={() => setPendingHomeDraft(home)}>Подробнее / изменить</button><button onClick={() => rejectPendingHome(home.id)}>Отклонить</button></div></div>) : <div className="admin-empty"><span>✓</span><strong>Очередь пуста</strong><p>Новых домов для проверки пока нет.</p></div>}</div></section><section><h2>{pendingHomeDraft ? 'Проверка объявления' : 'Выберите заявку'}</h2>{pendingHomeDraft ? <div className="admin-form">
         <input placeholder="Продавец" value={pendingHomeDraft.sellerName} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, sellerName: e.target.value })} /><input placeholder="Телефон" value={pendingHomeDraft.sellerPhone} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, sellerPhone: e.target.value })} />
         <input placeholder="Название" value={pendingHomeDraft.title} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, title: e.target.value })} /><label>Категория<select value={pendingHomeDraft.marketType} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, marketType: e.target.value as HouseListing['marketType'] })}><option value="new">Новый дом</option><option value="secondary">Вторичное жильё</option></select></label>
         <input placeholder="Площадь дома" value={pendingHomeDraft.area} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, area: e.target.value })} /><input placeholder="Площадь участка" value={pendingHomeDraft.landArea} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, landArea: e.target.value })} /><input placeholder="Цена" value={pendingHomeDraft.price} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, price: e.target.value })} /><input placeholder="Район" value={pendingHomeDraft.district} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, district: e.target.value })} /><input placeholder="Адрес" value={pendingHomeDraft.address} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, address: e.target.value })} /><input placeholder="Этажность" value={pendingHomeDraft.floors} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, floors: e.target.value })} /><input placeholder="Спальни" value={pendingHomeDraft.bedrooms} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, bedrooms: e.target.value })} /><input placeholder="Год постройки" value={pendingHomeDraft.yearBuilt} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, yearBuilt: e.target.value })} />
@@ -3965,6 +3969,7 @@ function AdminPage() {
                 <strong>{item.cadastralNumber}</strong>
                 <p>{item.area} • {item.district} • {item.price}</p>
                 <p>Продавец: {item.sellerName}, {item.sellerPhone}</p>
+                {item.source === 'crm' ? <small>Источник: CRM, объект #{item.sourceRealtyId}</small> : null}
                 {item.description ? <small>{item.description}</small> : null}
                 {(item.images || []).length ? <small>Фото: {(item.images || []).length}</small> : null}
               </div>
