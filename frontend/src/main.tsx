@@ -4072,7 +4072,13 @@ function AdminPage() {
                 className="cms-editor journal-editor"
                 contentEditable
                 suppressContentEditableWarning
-                onPaste={(e) => { e.preventDefault(); document.execCommand('insertText', false, e.clipboardData.getData('text/plain')); }}
+                onPaste={(e) => {
+                  e.preventDefault();
+                  const clipboardHtml = e.clipboardData.getData('text/html');
+                  const clipboardText = e.clipboardData.getData('text/plain');
+                  document.execCommand(clipboardHtml ? 'insertHTML' : 'insertText', false, clipboardHtml ? sanitizeCmsHtml(clipboardHtml) : clipboardText);
+                  setJournalArticleDraft((current) => ({ ...current, content: sanitizeCmsHtml(e.currentTarget.innerHTML) }));
+                }}
                 onInput={(e) => setJournalArticleDraft({ ...journalArticleDraft, content: sanitizeCmsHtml((e.target as HTMLDivElement).innerHTML) })}
                 dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(journalArticleDraft.content || '') }}
               />
