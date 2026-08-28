@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SEO semantic map",
+  "type": "object",
+  "required": ["version", "site", "updated", "clusters"],
+  "properties": {
+    "version": { "type": "integer", "minimum": 1 },
+    "site": { "type": "string", "format": "uri" },
+    "updated": { "type": "string", "format": "date" },
+    "clusters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "page", "status", "pageType", "intent", "main", "keywords", "priority", "humanReviewRequired"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+          "page": { "type": "string", "pattern": "^/" },
+          "recommendedPage": { "type": "string", "pattern": "^/" },
+          "status": { "enum": ["published", "planned", "reserved", "review", "blocked", "retired"] },
+          "pageType": { "type": "string" },
+          "intent": { "type": "string" },
+          "funnel": { "enum": ["awareness", "consideration", "decision"] },
+          "category": { "type": ["string", "null"] },
+          "main": { "$ref": "#/$defs/query" },
+          "keywords": { "type": "array", "items": { "$ref": "#/$defs/query" } },
+          "priority": { "type": "integer", "minimum": 0, "maximum": 100 },
+          "humanReviewRequired": { "type": "boolean" },
+          "indexingState": { "type": "string" },
+          "requiredLinks": { "type": "array", "items": { "type": "string" } },
+          "notes": { "type": "string" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "query": {
+      "type": "object",
+      "required": ["q", "vol"],
+      "properties": {
+        "q": { "type": "string", "minLength": 1 },
+        "vol": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    }
+  }
+}
+

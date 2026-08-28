@@ -1,0 +1,3675 @@
+{
+  "version": 2,
+  "site": "https://dom.evtenia.ru",
+  "brand": "Evtenia",
+  "region": [
+    "Пенза",
+    "Пензенская область"
+  ],
+  "serviceAreas": {
+    "houseConstruction": [
+      "Пенза",
+      "Пензенская область"
+    ],
+    "modularHouses": [
+      "Россия"
+    ],
+    "constructionServices": [
+      "Пензенская область"
+    ],
+    "potentialNotYetConfirmed": [
+      "строительные услуги по России"
+    ]
+  },
+  "updated": "2026-08-27",
+  "volumePolicy": {
+    "source": "Yandex Wordstat web snapshot",
+    "snapshot": "data/wordstat-raw-2026-08-27.json",
+    "clusterVolumes": "data/wordstat-cluster-volumes-2026-08-27.json",
+    "period": "2026-07-27/2026-08-25",
+    "penzaRegionId": 11095,
+    "russiaRegionId": 225,
+    "rule": "One normalized query has one owner. Main volume is the maximum observed Wordstat row in the cluster. Counts from overlapping seed lists are never summed. Ambiguous and unmatched rows require review.",
+    "softClusters": "data/soft-clusters-2026-08-27.json",
+    "reviewTail": "data/soft-cluster-review-2026-08-27.json"
+  },
+  "clusterRules": {
+    "oneIntentOneOwner": true,
+    "commercialOwnerWins": true,
+    "softClustering": true,
+    "yearVariantsStayInOneCluster": true,
+    "definitions": "cluster-definitions.json",
+    "queryHasExactlyOneOwner": true,
+    "ambiguousQueriesGoToReview": true
+  },
+  "clusters": [
+    {
+      "id": "modulnye-doma-russia",
+      "page": "/projects/modulnye-doma",
+      "status": "published",
+      "pageType": "commercial",
+      "intent": "transactional",
+      "funnel": "decision",
+      "category": "Технологии домов",
+      "region": "Россия",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "модульные дома",
+        "vol": 260561
+      },
+      "keywords": [
+        {
+          "q": "модульные дома под",
+          "vol": 34943
+        },
+        {
+          "q": "дом ключ модульный",
+          "vol": 33866
+        },
+        {
+          "q": "модульные дома под ключ",
+          "vol": 33798
+        },
+        {
+          "q": "купить модульный дом",
+          "vol": 30487
+        },
+        {
+          "q": "модульный дом цена",
+          "vol": 19589
+        },
+        {
+          "q": "модульные дома под ключ цена",
+          "vol": 12871
+        },
+        {
+          "q": "модульный дом для проживания",
+          "vol": 8001
+        },
+        {
+          "q": "модульные дома спб",
+          "vol": 5649
+        },
+        {
+          "q": "модульные дома круглогодичные",
+          "vol": 5113
+        },
+        {
+          "q": "модульные дома для круглогодичного проживания",
+          "vol": 4744
+        },
+        {
+          "q": "проекты модульных домов",
+          "vol": 4299
+        },
+        {
+          "q": "готовые модульные дома",
+          "vol": 4086
+        },
+        {
+          "q": "модульный дом московская",
+          "vol": 3990
+        },
+        {
+          "q": "модульные дома москва",
+          "vol": 3778
+        },
+        {
+          "q": "модульные дома фото",
+          "vol": 3681
+        },
+        {
+          "q": "модульные дома московская область",
+          "vol": 3654
+        },
+        {
+          "q": "модульный дом для проживания под ключ",
+          "vol": 2831
+        },
+        {
+          "q": "модульный дом для постоянного проживания",
+          "vol": 2681
+        },
+        {
+          "q": "модульный круглогодичный дом под ключ",
+          "vol": 1689
+        },
+        {
+          "q": "модульные дома под ключ для круглогодичного проживания",
+          "vol": 1559
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": false,
+      "indexingState": "live_or_recommended_owner",
+      "requiredLinks": [
+        "/projects",
+        "/services/fundament",
+        "/projects/modulnye-doma"
+      ],
+      "notes": "Protected owner consolidated from routing rules: modulnye-doma-russia, modulnye-doma-dlya-prozhivaniya-russia, modulnye-doma-proekty.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 598,
+        "sourceSeeds": [
+          "модульные дома",
+          "модульный дом под ключ",
+          "модульный дом цена",
+          "дом под ключ"
+        ]
+      },
+      "absorbedDefinitionIds": [
+        "modulnye-doma-russia",
+        "modulnye-doma-dlya-prozhivaniya-russia",
+        "modulnye-doma-proekty"
+      ]
+    },
+    {
+      "id": "modulnye-bani-russia",
+      "page": "/baths",
+      "status": "published",
+      "pageType": "catalog",
+      "intent": "transactional",
+      "funnel": "decision",
+      "category": "Бани и дополнительные строения",
+      "region": "Россия",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "модульная баня",
+        "vol": 35032
+      },
+      "keywords": [
+        {
+          "q": "модульная баня под",
+          "vol": 4202
+        },
+        {
+          "q": "модульная баня под ключ",
+          "vol": 4030
+        },
+        {
+          "q": "модульная баня купить",
+          "vol": 3993
+        },
+        {
+          "q": "модульная баня цена",
+          "vol": 1903
+        },
+        {
+          "q": "модульная баня под ключ цена",
+          "vol": 1056
+        },
+        {
+          "q": "dp модульные дома и бани",
+          "vol": 743
+        },
+        {
+          "q": "бани dp module модульные",
+          "vol": 736
+        },
+        {
+          "q": "dp module модульные дома и бани",
+          "vol": 735
+        },
+        {
+          "q": "модульные бани екатеринбург",
+          "vol": 723
+        },
+        {
+          "q": "модульные бани фото",
+          "vol": 698
+        },
+        {
+          "q": "модульный дом с баней",
+          "vol": 690
+        },
+        {
+          "q": "модульные каркасные бани",
+          "vol": 633
+        }
+      ],
+      "priority": 96,
+      "humanReviewRequired": false,
+      "indexingState": "live_or_recommended_owner",
+      "requiredLinks": [
+        "/baths"
+      ],
+      "notes": "Protected commercial owner. An article must not target the same transactional intent.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 193,
+        "sourceSeeds": [
+          "модульные бани",
+          "модульные дома",
+          "модульный дом под ключ",
+          "модульный дом цена"
+        ]
+      }
+    },
+    {
+      "id": "stroitelstvo-domov-pod-klyuch-penza",
+      "page": "/",
+      "status": "published",
+      "pageType": "commercial",
+      "intent": "transactional",
+      "funnel": "decision",
+      "category": null,
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "строительство домов",
+        "vol": 9522
+      },
+      "keywords": [
+        {
+          "q": "дом под ключ",
+          "vol": 2994
+        },
+        {
+          "q": "дом под ключ пенза",
+          "vol": 930
+        },
+        {
+          "q": "строительство домов под",
+          "vol": 754
+        },
+        {
+          "q": "строительство домов пенза",
+          "vol": 743
+        },
+        {
+          "q": "дом под ключ цена",
+          "vol": 636
+        },
+        {
+          "q": "услуги по строительству домов",
+          "vol": 615
+        },
+        {
+          "q": "строительства дома ключ",
+          "vol": 466
+        },
+        {
+          "q": "строительство домов под ключ",
+          "vol": 465
+        },
+        {
+          "q": "купить дом строительство",
+          "vol": 230
+        },
+        {
+          "q": "строительство жилого дома",
+          "vol": 221
+        },
+        {
+          "q": "дома в пензе под ключ цена",
+          "vol": 220
+        },
+        {
+          "q": "строительство дома какой",
+          "vol": 181
+        },
+        {
+          "q": "строительство домов под купить дом",
+          "vol": 168
+        },
+        {
+          "q": "купить дом под ключ",
+          "vol": 139
+        },
+        {
+          "q": "дом купить в пензе строительство",
+          "vol": 126
+        },
+        {
+          "q": "строительство частных домов",
+          "vol": 125
+        },
+        {
+          "q": "построить дом под ключ",
+          "vol": 119
+        },
+        {
+          "q": "купить в пензе под строительство дома",
+          "vol": 118
+        },
+        {
+          "q": "блоки для строительства дома",
+          "vol": 116
+        },
+        {
+          "q": "строительство дома область",
+          "vol": 114
+        }
+      ],
+      "priority": 92,
+      "humanReviewRequired": false,
+      "indexingState": "live_or_recommended_owner",
+      "requiredLinks": [
+        "/projects",
+        "/journal"
+      ],
+      "notes": "Protected owner consolidated from routing rules: stroitelstvo-domov-pod-klyuch-penza, dom-pod-klyuch-penza.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 150,
+        "sourceSeeds": [
+          "строительство домов",
+          "какой дом выбрать",
+          "ремонт дома",
+          "фундамент для дома"
+        ]
+      },
+      "absorbedDefinitionIds": [
+        "stroitelstvo-domov-pod-klyuch-penza",
+        "dom-pod-klyuch-penza"
+      ]
+    },
+    {
+      "id": "modulnye-doma-otzyvy-i-minusy",
+      "page": "/journal/modulnye-doma-otzyvy-i-minusy",
+      "status": "reserved",
+      "pageType": "article",
+      "intent": "informational_investigation",
+      "funnel": "consideration",
+      "category": "Модульные дома",
+      "region": "Россия",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "модульные дома отзывы",
+        "vol": 6071
+      },
+      "keywords": [
+        {
+          "q": "минусы модульных домов",
+          "vol": 3278
+        },
+        {
+          "q": "модульный дом плюсы",
+          "vol": 2695
+        },
+        {
+          "q": "модульный дом плюсы и минусы",
+          "vol": 2545
+        },
+        {
+          "q": "модульные дома отзывы владельцев",
+          "vol": 1468
+        },
+        {
+          "q": "модульные дома под ключ отзывы",
+          "vol": 160
+        },
+        {
+          "q": "модульные дома и бани отзывы",
+          "vol": 105
+        },
+        {
+          "q": "модульные дома цена отзывы",
+          "vol": 49
+        },
+        {
+          "q": "минусы модульных домов",
+          "vol": 25
+        },
+        {
+          "q": "модульный дом плюсы",
+          "vol": 22
+        },
+        {
+          "q": "модульный дом плюсы и минусы",
+          "vol": 22
+        },
+        {
+          "q": "можно ли приобрести проект модульного дома отзывы",
+          "vol": 13
+        },
+        {
+          "q": "модульные дома отзывы владельцев",
+          "vol": 7
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/projects/modulnye-doma"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 20,
+        "sourceSeeds": [
+          "модульные дома",
+          "модульный дом под ключ",
+          "модульные бани",
+          "модульный дом цена",
+          "проекты модульных домов"
+        ]
+      }
+    },
+    {
+      "id": "karkasnye-doma-penza",
+      "page": "/projects/karkasnye-doma",
+      "status": "published",
+      "pageType": "commercial",
+      "intent": "transactional",
+      "funnel": "decision",
+      "category": "Технологии домов",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "каркасные дома",
+        "vol": 4588
+      },
+      "keywords": [
+        {
+          "q": "каркасный дом под",
+          "vol": 982
+        },
+        {
+          "q": "каркасные дома под ключ",
+          "vol": 888
+        },
+        {
+          "q": "каркасных домов ключ",
+          "vol": 888
+        },
+        {
+          "q": "каркасные дома пенза",
+          "vol": 647
+        },
+        {
+          "q": "купить каркасный дом",
+          "vol": 179
+        },
+        {
+          "q": "строительство каркасных домов",
+          "vol": 171
+        },
+        {
+          "q": "каркасный дом цена",
+          "vol": 163
+        },
+        {
+          "q": "какой каркасный дом",
+          "vol": 141
+        },
+        {
+          "q": "проекты каркасных домов",
+          "vol": 129
+        },
+        {
+          "q": "одноэтажный каркасный дом",
+          "vol": 106
+        },
+        {
+          "q": "каркасный дом видео",
+          "vol": 91
+        },
+        {
+          "q": "каркасные дома под цены",
+          "vol": 90
+        }
+      ],
+      "priority": 94,
+      "humanReviewRequired": false,
+      "indexingState": "live_or_recommended_owner",
+      "requiredLinks": [
+        "/projects",
+        "/services/fundament"
+      ],
+      "notes": "Protected commercial owner. An article must not target the same transactional intent.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 180,
+        "sourceSeeds": [
+          "каркасные дома",
+          "дом под ключ",
+          "строительство домов",
+          "проекты домов",
+          "планировка дома",
+          "отделка дома",
+          "стоимость строительства дома"
+        ]
+      }
+    },
+    {
+      "id": "proekty-domov-penza",
+      "page": "/projects",
+      "status": "published",
+      "pageType": "catalog",
+      "intent": "commercial_investigation",
+      "funnel": "decision",
+      "category": "Проекты и планировки",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "проекты домов",
+        "vol": 3589
+      },
+      "keywords": [
+        {
+          "q": "проекты одноэтажных домов",
+          "vol": 554
+        },
+        {
+          "q": "проект дом 2",
+          "vol": 297
+        },
+        {
+          "q": "проекты домов м",
+          "vol": 181
+        },
+        {
+          "q": "проект домов кв м",
+          "vol": 174
+        },
+        {
+          "q": "проект дома пенза",
+          "vol": 160
+        },
+        {
+          "q": "проекты частных домов",
+          "vol": 158
+        },
+        {
+          "q": "проект дома 100",
+          "vol": 135
+        },
+        {
+          "q": "проекты одноэтажных домов проект м",
+          "vol": 133
+        },
+        {
+          "q": "проекты одноэтажных домов кв м",
+          "vol": 132
+        },
+        {
+          "q": "проекты домов под",
+          "vol": 130
+        },
+        {
+          "q": "проект дома цена",
+          "vol": 125
+        },
+        {
+          "q": "второй проект дома",
+          "vol": 100
+        }
+      ],
+      "priority": 90,
+      "humanReviewRequired": false,
+      "indexingState": "live_or_recommended_owner",
+      "requiredLinks": [
+        "/",
+        "/mortgage-calculator"
+      ],
+      "notes": "Protected commercial owner. An article must not target the same transactional intent.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 188,
+        "sourceSeeds": [
+          "проекты домов",
+          "какой дом выбрать"
+        ]
+      }
+    },
+    {
+      "id": "kakuyu-tekhnologiyu-doma-vybrat",
+      "page": "/journal/kakuyu-tekhnologiyu-doma-vybrat",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_comparison",
+      "funnel": "consideration",
+      "category": "Технологии домов",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "какой дом выбрать",
+        "vol": 2861
+      },
+      "keywords": [
+        {
+          "q": "какой дом лучше выбрать",
+          "vol": 934
+        },
+        {
+          "q": "какой дом выбрать для дачи",
+          "vol": 40
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/projects/karkasnye-doma",
+        "/projects/modulnye-doma",
+        "/projects/doma-iz-gazobetona"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 3,
+        "sourceSeeds": [
+          "какой дом выбрать"
+        ]
+      }
+    },
+    {
+      "id": "otdelka-doma-penza",
+      "page": "/services/remont",
+      "status": "published",
+      "pageType": "service",
+      "intent": "transactional",
+      "funnel": "decision",
+      "category": "Отделка и ремонт",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "отделка дома",
+        "vol": 2323
+      },
+      "keywords": [
+        {
+          "q": "ремонт на дом пенза",
+          "vol": 1218
+        },
+        {
+          "q": "наружная отделка дома",
+          "vol": 1097
+        },
+        {
+          "q": "отделка дома сайдингом",
+          "vol": 555
+        },
+        {
+          "q": "сайдинг для наружной отделки дома",
+          "vol": 481
+        },
+        {
+          "q": "отделка домов цены",
+          "vol": 446
+        },
+        {
+          "q": "панели для отделки дома",
+          "vol": 417
+        },
+        {
+          "q": "для наружной отделки дома цена",
+          "vol": 382
+        },
+        {
+          "q": "отделка домов пенза",
+          "vol": 356
+        },
+        {
+          "q": "панели для наружной отделки дома",
+          "vol": 337
+        },
+        {
+          "q": "отделка дома под",
+          "vol": 312
+        },
+        {
+          "q": "фасадная отделка дома",
+          "vol": 306
+        },
+        {
+          "q": "фасадные наружной отделки дома",
+          "vol": 291
+        },
+        {
+          "q": "отделка фасада дома",
+          "vol": 271
+        },
+        {
+          "q": "сайдинг для отделки дома цена",
+          "vol": 260
+        },
+        {
+          "q": "сайдинг для наружной отделки дома цена",
+          "vol": 246
+        },
+        {
+          "q": "отделка дома фасадными панелями",
+          "vol": 230
+        },
+        {
+          "q": "фасадные панели для наружной отделки дома",
+          "vol": 221
+        },
+        {
+          "q": "отделка частного дома",
+          "vol": 205
+        },
+        {
+          "q": "отделка дома под кирпич",
+          "vol": 170
+        },
+        {
+          "q": "внутренняя отделка дома",
+          "vol": 134
+        }
+      ],
+      "priority": 94,
+      "humanReviewRequired": false,
+      "indexingState": "live_or_recommended_owner",
+      "requiredLinks": [
+        "/services/remont"
+      ],
+      "notes": "Protected owner consolidated from routing rules: otdelka-doma-penza, fasad-i-naruzhnaya-otdelka-penza, remont-chastnogo-doma-penza.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 43,
+        "sourceSeeds": [
+          "отделка дома"
+        ]
+      },
+      "absorbedDefinitionIds": [
+        "otdelka-doma-penza",
+        "fasad-i-naruzhnaya-otdelka-penza",
+        "remont-chastnogo-doma-penza"
+      ]
+    },
+    {
+      "id": "dostavka-i-montazh-modulnogo-doma",
+      "page": "/journal/dostavka-i-montazh-modulnogo-doma",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_commercial",
+      "funnel": "consideration",
+      "category": "Модульные дома",
+      "region": "Россия",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "доставка модульных домов",
+        "vol": 1261
+      },
+      "keywords": [
+        {
+          "q": "модульный дом купить с доставкой",
+          "vol": 336
+        },
+        {
+          "q": "модульные дома с доставкой по россии",
+          "vol": 254
+        },
+        {
+          "q": "готовый модульный дом с доставкой",
+          "vol": 231
+        },
+        {
+          "q": "модульные дома с доставкой и установкой",
+          "vol": 221
+        },
+        {
+          "q": "готовый модульный дом с доставкой и установкой",
+          "vol": 172
+        },
+        {
+          "q": "модульный дом под ключ с доставкой",
+          "vol": 153
+        },
+        {
+          "q": "доставка модульного дома цена",
+          "vol": 137
+        },
+        {
+          "q": "модульный дом купить с доставкой по россии",
+          "vol": 85
+        },
+        {
+          "q": "сколько стоит доставка модульного дома",
+          "vol": 53
+        },
+        {
+          "q": "модульные дома с доставкой по рф",
+          "vol": 43
+        },
+        {
+          "q": "доставка модульных домов из китая",
+          "vol": 34
+        },
+        {
+          "q": "модульные дома с доставкой на участок",
+          "vol": 28
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/projects/modulnye-doma"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 19,
+        "sourceSeeds": [
+          "модульные дома",
+          "доставка модульного дома",
+          "модульный дом под ключ",
+          "модульный дом цена"
+        ]
+      }
+    },
+    {
+      "id": "planirovka-chastnogo-doma",
+      "page": "/journal/kak-vybrat-planirovku-doma",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_inspiration",
+      "funnel": "awareness",
+      "category": "Проекты и планировки",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "планировка дома",
+        "vol": 1153
+      },
+      "keywords": [
+        {
+          "q": "планировка одноэтажного дома",
+          "vol": 219
+        },
+        {
+          "q": "планировка дома пенза",
+          "vol": 60
+        },
+        {
+          "q": "планировка дома спальней",
+          "vol": 57
+        },
+        {
+          "q": "планировка дома 3",
+          "vol": 53
+        },
+        {
+          "q": "планировка двухэтажного дома",
+          "vol": 51
+        },
+        {
+          "q": "планировка дома фото",
+          "vol": 43
+        },
+        {
+          "q": "планировка дома 100",
+          "vol": 41
+        },
+        {
+          "q": "планировка частного дома",
+          "vol": 41
+        },
+        {
+          "q": "планировка дома 10 на 10",
+          "vol": 36
+        },
+        {
+          "q": "планировка дома 1",
+          "vol": 32
+        },
+        {
+          "q": "планировка дома 8 на 8",
+          "vol": 30
+        },
+        {
+          "q": "планировка дома 100 кв м",
+          "vol": 28
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/projects"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 88,
+        "sourceSeeds": [
+          "планировка дома"
+        ]
+      }
+    },
+    {
+      "id": "mezhevanie-uchastka-penza",
+      "page": "/services/mezhevanie",
+      "status": "published",
+      "pageType": "service",
+      "intent": "transactional",
+      "funnel": "decision",
+      "category": "Участок и оформление",
+      "region": "Пензенская область",
+      "author": "Евгения Викторовна Кислякова",
+      "reviewer": null,
+      "main": {
+        "q": "межевание участка",
+        "vol": 1084
+      },
+      "keywords": [
+        {
+          "q": "межевание земельного участка",
+          "vol": 804
+        },
+        {
+          "q": "межевание участка пенза",
+          "vol": 196
+        },
+        {
+          "q": "межевание земельного участка в пензе",
+          "vol": 108
+        },
+        {
+          "q": "межевания участка области",
+          "vol": 93
+        },
+        {
+          "q": "сколько межевание участка",
+          "vol": 91
+        },
+        {
+          "q": "области межевание земельного участка",
+          "vol": 84
+        },
+        {
+          "q": "межевание стоять участок",
+          "vol": 79
+        },
+        {
+          "q": "межевание участка цена",
+          "vol": 77
+        },
+        {
+          "q": "сколько стоит межевание участка",
+          "vol": 76
+        },
+        {
+          "q": "межевание участков 2026",
+          "vol": 73
+        },
+        {
+          "q": "межевание земельного участка цена",
+          "vol": 69
+        },
+        {
+          "q": "кадастровое межевание участка",
+          "vol": 64
+        }
+      ],
+      "priority": 92,
+      "humanReviewRequired": false,
+      "indexingState": "live_or_recommended_owner",
+      "requiredLinks": [
+        "/lands"
+      ],
+      "notes": "Protected commercial owner. An article must not target the same transactional intent.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 170,
+        "sourceSeeds": [
+          "межевание участка"
+        ]
+      }
+    },
+    {
+      "id": "modulnyy-dom-s-kommunikaciyami",
+      "page": "/journal/modulnyy-dom-s-kommunikaciyami",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_commercial",
+      "funnel": "consideration",
+      "category": "Модульные дома",
+      "region": "Россия",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "модульный дом с коммуникациями",
+        "vol": 882
+      },
+      "keywords": [
+        {
+          "q": "модульный дом под ключ с коммуникациями",
+          "vol": 805
+        },
+        {
+          "q": "модульные дома с отделкой и коммуникациями",
+          "vol": 615
+        },
+        {
+          "q": "модульный дом под ключ с коммуникациями купить",
+          "vol": 59
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/projects/modulnye-doma"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 4,
+        "sourceSeeds": [
+          "модульные дома",
+          "модульный дом под ключ"
+        ]
+      }
+    },
+    {
+      "id": "dveri-v-chastnyy-dom-penza",
+      "page": "/services/dveri",
+      "status": "published",
+      "pageType": "service",
+      "intent": "transactional",
+      "funnel": "decision",
+      "category": "Отделка и ремонт",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "дверь в частный дом",
+        "vol": 746
+      },
+      "keywords": [
+        {
+          "q": "входная дверь в частный дом",
+          "vol": 592
+        },
+        {
+          "q": "двери в частный дом в пензе",
+          "vol": 194
+        },
+        {
+          "q": "пластиковые двери в частный дом",
+          "vol": 190
+        },
+        {
+          "q": "входная пластиковая дверь в частный дом",
+          "vol": 181
+        },
+        {
+          "q": "металлические двери в частный дом",
+          "vol": 124
+        },
+        {
+          "q": "дверь в частный дом купить",
+          "vol": 120
+        },
+        {
+          "q": "входная металлическая дверь в частный дом",
+          "vol": 116
+        },
+        {
+          "q": "купить входную дверь в частный дом",
+          "vol": 103
+        },
+        {
+          "q": "уличная дверь в частный дом",
+          "vol": 79
+        },
+        {
+          "q": "двери в частный дом цена",
+          "vol": 69
+        },
+        {
+          "q": "пластиковая входная дверь в частный дом цена",
+          "vol": 57
+        },
+        {
+          "q": "пластиковая дверь в частный дом цена",
+          "vol": 57
+        }
+      ],
+      "priority": 88,
+      "humanReviewRequired": false,
+      "indexingState": "live_or_recommended_owner",
+      "requiredLinks": [
+        "/services/dveri"
+      ],
+      "notes": "Protected commercial owner. An article must not target the same transactional intent.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 77,
+        "sourceSeeds": [
+          "двери в частный дом"
+        ]
+      }
+    },
+    {
+      "id": "modulnyy-dom-dlya-postoyannogo-prozhivaniya",
+      "page": "/journal/modulnyy-dom-dlya-postoyannogo-prozhivaniya",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_investigation",
+      "funnel": "consideration",
+      "category": "Модульные дома",
+      "region": "Россия",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "минусы модульных домов для постоянного проживания",
+        "vol": 734
+      },
+      "keywords": [
+        {
+          "q": "плюсы модульных домов для постоянного проживания",
+          "vol": 632
+        },
+        {
+          "q": "модульный дом для постоянного проживания отзывы владельцев",
+          "vol": 223
+        },
+        {
+          "q": "отзывы о модульных домах для постоянного проживания",
+          "vol": 196
+        },
+        {
+          "q": "срок службы модульного дома для постоянного проживания",
+          "vol": 54
+        },
+        {
+          "q": "модульный дом для постоянного проживания отзывы владельцев",
+          "vol": 3
+        },
+        {
+          "q": "плюсы модульных домов для постоянного проживания",
+          "vol": 3
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/projects/modulnye-doma"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 8,
+        "sourceSeeds": [
+          "модульные дома",
+          "модульный дом для постоянного проживания"
+        ]
+      }
+    },
+    {
+      "id": "modulnyy-ili-karkasnyy-dom",
+      "page": "/journal/modulnyy-ili-karkasnyy-dom",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_comparison",
+      "funnel": "consideration",
+      "category": "Технологии домов",
+      "region": "Россия",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "чем отличается каркасный дом от модульного",
+        "vol": 591
+      },
+      "keywords": [
+        {
+          "q": "модульный или каркасный дом что лучше",
+          "vol": 5
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/projects/karkasnye-doma",
+        "/projects/modulnye-doma"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 2,
+        "sourceSeeds": [
+          "модульные дома"
+        ]
+      }
+    },
+    {
+      "id": "modulnye-bani-otzyvy-i-minusy",
+      "page": "/journal/modulnye-bani-otzyvy-i-minusy",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_investigation",
+      "funnel": "consideration",
+      "category": "Бани и дополнительные строения",
+      "region": "Россия",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "модульная баня отзывы",
+        "vol": 507
+      },
+      "keywords": [
+        {
+          "q": "минусы модульных бань",
+          "vol": 172
+        },
+        {
+          "q": "модульные бани плюсы и минусы",
+          "vol": 149
+        },
+        {
+          "q": "баня модульная отзывы реальные",
+          "vol": 69
+        },
+        {
+          "q": "модульные бани отзывы владельцев",
+          "vol": 54
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/baths"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 5,
+        "sourceSeeds": [
+          "модульные бани"
+        ]
+      }
+    },
+    {
+      "id": "septic-pod-klyuch-penza",
+      "page": "/services/septik",
+      "status": "published",
+      "pageType": "service",
+      "intent": "transactional",
+      "funnel": "decision",
+      "category": "Инженерные системы",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "септик для дома",
+        "vol": 505
+      },
+      "keywords": [
+        {
+          "q": "септик для частного дома",
+          "vol": 456
+        },
+        {
+          "q": "септик для дома пенза",
+          "vol": 110
+        },
+        {
+          "q": "септик для частного дома пенза",
+          "vol": 110
+        },
+        {
+          "q": "купить септик для дома",
+          "vol": 80
+        },
+        {
+          "q": "септик для дома цена",
+          "vol": 70
+        },
+        {
+          "q": "септик для частного дома цена",
+          "vol": 70
+        },
+        {
+          "q": "купить септик для частного дома",
+          "vol": 63
+        },
+        {
+          "q": "септик для частного дома под",
+          "vol": 46
+        },
+        {
+          "q": "сколько стоит септик для дома",
+          "vol": 30
+        },
+        {
+          "q": "сколько стоит септик для частного дома",
+          "vol": 30
+        },
+        {
+          "q": "септик для частного дома из колец",
+          "vol": 18
+        },
+        {
+          "q": "сколько стоит септик для частного дома цена",
+          "vol": 18
+        }
+      ],
+      "priority": 92,
+      "humanReviewRequired": false,
+      "indexingState": "live_or_recommended_owner",
+      "requiredLinks": [
+        "/services/septik"
+      ],
+      "notes": "Protected commercial owner. An article must not target the same transactional intent.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 96,
+        "sourceSeeds": [
+          "септик для дома"
+        ]
+      }
+    },
+    {
+      "id": "doma-iz-gazobetona-penza",
+      "page": "/projects/doma-iz-gazobetona",
+      "status": "published",
+      "pageType": "commercial",
+      "intent": "transactional",
+      "funnel": "decision",
+      "category": "Технологии домов",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "дом из газобетона",
+        "vol": 430
+      },
+      "keywords": [
+        {
+          "q": "одноэтажный дом из газобетона",
+          "vol": 92
+        },
+        {
+          "q": "дома из газобетона под",
+          "vol": 48
+        },
+        {
+          "q": "строительство домов из газобетона",
+          "vol": 36
+        },
+        {
+          "q": "стоим дом из газобетона",
+          "vol": 24
+        },
+        {
+          "q": "дом из газобетона под ключ",
+          "vol": 23
+        },
+        {
+          "q": "построить дом из газобетона",
+          "vol": 23
+        },
+        {
+          "q": "дом из газобетона этажи",
+          "vol": 20
+        },
+        {
+          "q": "строительство газобетонных домов",
+          "vol": 19
+        },
+        {
+          "q": "дом из газобетона пенза",
+          "vol": 16
+        },
+        {
+          "q": "дом из газобетона цена",
+          "vol": 16
+        },
+        {
+          "q": "коробка дома из газобетона",
+          "vol": 13
+        },
+        {
+          "q": "частный дом из газобетона",
+          "vol": 13
+        }
+      ],
+      "priority": 94,
+      "humanReviewRequired": false,
+      "indexingState": "live_or_recommended_owner",
+      "requiredLinks": [
+        "/projects",
+        "/services/fundament"
+      ],
+      "notes": "Protected commercial owner. An article must not target the same transactional intent.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 133,
+        "sourceSeeds": [
+          "дома из газобетона",
+          "строительство домов",
+          "дом под ключ",
+          "планировка дома",
+          "окна в частный дом"
+        ]
+      }
+    },
+    {
+      "id": "fundament-pod-dom-penza",
+      "page": "/services/fundament",
+      "status": "published",
+      "pageType": "service",
+      "intent": "transactional",
+      "funnel": "decision",
+      "category": "Фундамент и участок",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "фундамент для дома",
+        "vol": 374
+      },
+      "keywords": [
+        {
+          "q": "ленточный фундамент для дома",
+          "vol": 63
+        },
+        {
+          "q": "фундамент для дома цена",
+          "vol": 23
+        },
+        {
+          "q": "как сделать фундамент для дома",
+          "vol": 21
+        },
+        {
+          "q": "фундамент для дома инструкция",
+          "vol": 19
+        },
+        {
+          "q": "свайный фундамент для дома",
+          "vol": 17
+        },
+        {
+          "q": "под фундамент для дома",
+          "vol": 16
+        },
+        {
+          "q": "фундамент для дома бетон",
+          "vol": 16
+        },
+        {
+          "q": "фундамент для дома из пеноблока",
+          "vol": 15
+        },
+        {
+          "q": "фундамент для дома из газоблока",
+          "vol": 14
+        },
+        {
+          "q": "залить фундамент для дома",
+          "vol": 13
+        },
+        {
+          "q": "винтовой фундамент для дома",
+          "vol": 11
+        },
+        {
+          "q": "ростверковый фундамент для дома",
+          "vol": 10
+        }
+      ],
+      "priority": 88,
+      "humanReviewRequired": false,
+      "indexingState": "live_or_recommended_owner",
+      "requiredLinks": [
+        "/services/fundament"
+      ],
+      "notes": "Protected commercial owner. An article must not target the same transactional intent.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 52,
+        "sourceSeeds": [
+          "фундамент для дома"
+        ]
+      }
+    },
+    {
+      "id": "okna-v-chastnyy-dom-penza",
+      "page": "/services/plastikovye-okna",
+      "status": "published",
+      "pageType": "service",
+      "intent": "transactional",
+      "funnel": "decision",
+      "category": "Отделка и ремонт",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "окна в частном доме",
+        "vol": 332
+      },
+      "keywords": [
+        {
+          "q": "пластиковые окна в частный дом",
+          "vol": 33
+        },
+        {
+          "q": "современные окна в частный дом",
+          "vol": 17
+        },
+        {
+          "q": "большие окна в частном доме",
+          "vol": 12
+        },
+        {
+          "q": "шторы на окна в частном доме",
+          "vol": 11
+        },
+        {
+          "q": "поставить окна в частном доме",
+          "vol": 8
+        },
+        {
+          "q": "витражные окна в частном доме",
+          "vol": 7
+        },
+        {
+          "q": "окна в частном доме цена",
+          "vol": 7
+        },
+        {
+          "q": "сколько стоит окна в частный дом",
+          "vol": 7
+        },
+        {
+          "q": "витражные окна в частном доме купить",
+          "vol": 5
+        },
+        {
+          "q": "купить окна в частный дом",
+          "vol": 5
+        },
+        {
+          "q": "пластиковые окна в частный дом цена",
+          "vol": 5
+        },
+        {
+          "q": "серые окна в частном доме",
+          "vol": 4
+        }
+      ],
+      "priority": 86,
+      "humanReviewRequired": false,
+      "indexingState": "live_or_recommended_owner",
+      "requiredLinks": [
+        "/services/plastikovye-okna"
+      ],
+      "notes": "Protected commercial owner. An article must not target the same transactional intent.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 33,
+        "sourceSeeds": [
+          "окна в частный дом"
+        ]
+      }
+    },
+    {
+      "id": "landshaftnyy-dizayn-penza",
+      "page": "/services/landshaftnyy-dizayn",
+      "status": "published",
+      "pageType": "service",
+      "intent": "transactional",
+      "funnel": "decision",
+      "category": "Благоустройство участка",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "ландшафтный дизайн участка",
+        "vol": 239
+      },
+      "keywords": [
+        {
+          "q": "ландшафтный дизайн дачного участка",
+          "vol": 71
+        },
+        {
+          "q": "ландшафтный дизайн участка соток",
+          "vol": 55
+        },
+        {
+          "q": "ландшафтный дизайн участка 10",
+          "vol": 20
+        },
+        {
+          "q": "ландшафтный дизайн участка с огородом",
+          "vol": 8
+        },
+        {
+          "q": "ландшафтный дизайн участок 6",
+          "vol": 7
+        },
+        {
+          "q": "участок с уклоном ландшафтный дизайн",
+          "vol": 7
+        },
+        {
+          "q": "ландшафтный дизайн 3d участка",
+          "vol": 6
+        },
+        {
+          "q": "ландшафтный дизайн участка с баней",
+          "vol": 6
+        },
+        {
+          "q": "ландшафтный дизайн участка с беседкой",
+          "vol": 6
+        },
+        {
+          "q": "бесплатный ландшафтный дизайн участка",
+          "vol": 5
+        },
+        {
+          "q": "ландшафтный дизайн садового участка",
+          "vol": 5
+        },
+        {
+          "q": "красивый ландшафтный дизайн участка",
+          "vol": 4
+        }
+      ],
+      "priority": 84,
+      "humanReviewRequired": false,
+      "indexingState": "live_or_recommended_owner",
+      "requiredLinks": [
+        "/services/landshaftnyy-dizayn"
+      ],
+      "notes": "Protected commercial owner. An article must not target the same transactional intent.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 90,
+        "sourceSeeds": [
+          "ландшафтный дизайн участка"
+        ]
+      }
+    },
+    {
+      "id": "stena-i-uteplenie-karkasnogo-doma",
+      "page": "/journal/stena-i-uteplenie-karkasnogo-doma",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational",
+      "funnel": "consideration",
+      "category": "Каркасные дома",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "стена каркасного дома",
+        "vol": 210
+      },
+      "keywords": [
+        {
+          "q": "утепление каркасного дома",
+          "vol": 88
+        },
+        {
+          "q": "утепление каркасного дома пенопластом",
+          "vol": 19
+        },
+        {
+          "q": "какое утепление каркасного дома",
+          "vol": 15
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/projects/karkasnye-doma"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 4,
+        "sourceSeeds": [
+          "каркасные дома"
+        ]
+      }
+    },
+    {
+      "id": "zemelnye-uchastki-pod-stroitelstvo-penza",
+      "page": "/lands",
+      "status": "published",
+      "pageType": "catalog",
+      "intent": "transactional",
+      "funnel": "decision",
+      "category": "Участок и оформление",
+      "region": "Пензенская область",
+      "author": "Евгения Викторовна Кислякова",
+      "reviewer": null,
+      "main": {
+        "q": "участки под строительство дома",
+        "vol": 199
+      },
+      "keywords": [
+        {
+          "q": "купить участок под строительство дома",
+          "vol": 145
+        },
+        {
+          "q": "участки под строительство дома пенза",
+          "vol": 126
+        },
+        {
+          "q": "строительство дома на участке",
+          "vol": 120
+        },
+        {
+          "q": "купить участок в пензе под строительство дома",
+          "vol": 108
+        },
+        {
+          "q": "земельный участок под строительство дома",
+          "vol": 49
+        },
+        {
+          "q": "земельный участок строительства жилого дома",
+          "vol": 42
+        },
+        {
+          "q": "участок под строительство жилого дома",
+          "vol": 29
+        },
+        {
+          "q": "земельные участки под строительство жилых домов",
+          "vol": 28
+        },
+        {
+          "q": "участок земли строительства дома",
+          "vol": 25
+        },
+        {
+          "q": "долевое участие в строительстве дома",
+          "vol": 23
+        },
+        {
+          "q": "участие в строительстве дома",
+          "vol": 23
+        },
+        {
+          "q": "земельный участок для строительства дома",
+          "vol": 22
+        }
+      ],
+      "priority": 90,
+      "humanReviewRequired": false,
+      "indexingState": "live_or_recommended_owner",
+      "requiredLinks": [
+        "/lands",
+        "/projects"
+      ],
+      "notes": "Protected commercial owner. An article must not target the same transactional intent.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 26,
+        "sourceSeeds": [
+          "строительство домов",
+          "ипотека на строительство дома",
+          "стоимость строительства дома"
+        ]
+      }
+    },
+    {
+      "id": "skvazhina-pod-klyuch-penza",
+      "page": "/services/skvazhiny",
+      "status": "published",
+      "pageType": "service",
+      "intent": "transactional",
+      "funnel": "decision",
+      "category": "Инженерные системы",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "дом для скважины",
+        "vol": 185
+      },
+      "keywords": [
+        {
+          "q": "скважина для воды дома",
+          "vol": 144
+        },
+        {
+          "q": "скважина для частного дома",
+          "vol": 142
+        },
+        {
+          "q": "скважина для воды в частном доме",
+          "vol": 84
+        },
+        {
+          "q": "система скважины для частного дома",
+          "vol": 25
+        },
+        {
+          "q": "дом для скважины купить",
+          "vol": 14
+        },
+        {
+          "q": "скважина для воды под домом",
+          "vol": 14
+        },
+        {
+          "q": "система для скважины в дом",
+          "vol": 11
+        },
+        {
+          "q": "скважина для частного дома купить",
+          "vol": 11
+        },
+        {
+          "q": "скважина для дома дачи",
+          "vol": 9
+        },
+        {
+          "q": "водоподготовка для скважины для дома",
+          "vol": 8
+        },
+        {
+          "q": "водоподготовка для частного дома из скважины",
+          "vol": 8
+        },
+        {
+          "q": "скважина для дома цена",
+          "vol": 8
+        }
+      ],
+      "priority": 90,
+      "humanReviewRequired": false,
+      "indexingState": "live_or_recommended_owner",
+      "requiredLinks": [
+        "/services/skvazhiny"
+      ],
+      "notes": "Protected commercial owner. An article must not target the same transactional intent.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 49,
+        "sourceSeeds": [
+          "скважина для дома"
+        ]
+      }
+    },
+    {
+      "id": "ipoteka-na-stroitelstvo-penza",
+      "page": "/services/ipoteka-oformlenie",
+      "status": "published",
+      "pageType": "service",
+      "intent": "transactional",
+      "funnel": "decision",
+      "category": "Ипотека и документы",
+      "region": "Пензенская область",
+      "author": "Евгения Викторовна Кислякова",
+      "reviewer": null,
+      "main": {
+        "q": "ипотека на строительство дома",
+        "vol": 150
+      },
+      "keywords": [
+        {
+          "q": "ипотека на строительство дома 2026",
+          "vol": 49
+        },
+        {
+          "q": "ипотека под строительство дома",
+          "vol": 23
+        },
+        {
+          "q": "ли взять ипотеку на строительство дома",
+          "vol": 15
+        },
+        {
+          "q": "можно взять ипотеку на строительство дома",
+          "vol": 15
+        },
+        {
+          "q": "ипотека на строительство дома в 2026 году",
+          "vol": 9
+        },
+        {
+          "q": "сельская ипотека на строительство дома",
+          "vol": 9
+        },
+        {
+          "q": "ипотека на строительство дома 2026 новые",
+          "vol": 6
+        },
+        {
+          "q": "ипотека на строительство дома сбербанк",
+          "vol": 6
+        },
+        {
+          "q": "новая ипотека на строительство дома",
+          "vol": 6
+        },
+        {
+          "q": "сельская ипотека на строительство дома 2026",
+          "vol": 4
+        },
+        {
+          "q": "взять ипотеку на строительство дома в 2026",
+          "vol": 3
+        },
+        {
+          "q": "дают ипотеку на строительство дома",
+          "vol": 3
+        }
+      ],
+      "priority": 86,
+      "humanReviewRequired": false,
+      "indexingState": "live_or_recommended_owner",
+      "requiredLinks": [
+        "/mortgage-calculator",
+        "/projects"
+      ],
+      "notes": "Protected commercial owner. An article must not target the same transactional intent.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 94,
+        "sourceSeeds": [
+          "строительство домов",
+          "ипотека на строительство дома"
+        ]
+      }
+    },
+    {
+      "id": "kak-vybrat-vhodnuyu-dver-v-dom",
+      "page": "/journal/kak-vybrat-vhodnuyu-dver-v-dom",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_commercial",
+      "funnel": "consideration",
+      "category": "Отделка и ремонт",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "дверь стекло в частном доме",
+        "vol": 135
+      },
+      "keywords": [
+        {
+          "q": "двери со стеклом в частный дом",
+          "vol": 114
+        },
+        {
+          "q": "входная дверь в частный дом со стеклом",
+          "vol": 107
+        },
+        {
+          "q": "двери с терморазрывом в частный дом",
+          "vol": 102
+        },
+        {
+          "q": "дверь в частный дом входная с терморазрывом",
+          "vol": 89
+        },
+        {
+          "q": "двери в частный дом размеры",
+          "vol": 83
+        },
+        {
+          "q": "размеры входной двери в частном доме",
+          "vol": 83
+        },
+        {
+          "q": "размер коробки входной двери в частном доме",
+          "vol": 58
+        },
+        {
+          "q": "размеры входных дверей в частный дом металлические",
+          "vol": 57
+        },
+        {
+          "q": "купить дверь с терморазрывом в частном доме",
+          "vol": 42
+        },
+        {
+          "q": "металлическая дверь с терморазрывом в частный дом",
+          "vol": 39
+        },
+        {
+          "q": "дверь входная с стеклом в частный дом",
+          "vol": 22
+        },
+        {
+          "q": "стандартные размеры двери в частный дом",
+          "vol": 22
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/services/dveri"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 33,
+        "sourceSeeds": [
+          "двери в частный дом"
+        ]
+      }
+    },
+    {
+      "id": "skolko-stoit-postroit-dom",
+      "page": "/journal/skolko-stoit-postroit-dom",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_commercial",
+      "funnel": "consideration",
+      "category": "Стоимость и бюджет",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "сколько стоит дом под ключ",
+        "vol": 92
+      },
+      "keywords": [
+        {
+          "q": "сколько стоит построить дом под ключ",
+          "vol": 30
+        },
+        {
+          "q": "стоимость строительства дома",
+          "vol": 28
+        },
+        {
+          "q": "стоимость строительства дома 8 8",
+          "vol": 7
+        },
+        {
+          "q": "стоимость строительства дома по годам",
+          "vol": 7
+        },
+        {
+          "q": "рассчитать стоимость строительства дома",
+          "vol": 1
+        },
+        {
+          "q": "расчет стоимости строительства дома",
+          "vol": 1
+        },
+        {
+          "q": "стоимость строительства дома в 2026",
+          "vol": 1
+        },
+        {
+          "q": "стоимость строительства дома в 2026 году",
+          "vol": 1
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/",
+        "/projects"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 9,
+        "sourceSeeds": [
+          "дом под ключ",
+          "строительство домов",
+          "стоимость строительства дома"
+        ]
+      }
+    },
+    {
+      "id": "karkasnyy-dom-dlya-postoyannogo-prozhivaniya",
+      "page": "/journal/karkasnyy-dom-dlya-postoyannogo-prozhivaniya",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_investigation",
+      "funnel": "consideration",
+      "category": "Каркасные дома",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "каркасные дома проживания",
+        "vol": 88
+      },
+      "keywords": [
+        {
+          "q": "каркасные дома для постоянного проживания",
+          "vol": 47
+        },
+        {
+          "q": "каркасный дом для круглогодичного проживания",
+          "vol": 29
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/projects/karkasnye-doma"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 3,
+        "sourceSeeds": [
+          "каркасные дома"
+        ]
+      }
+    },
+    {
+      "id": "plyusy-minusy-karkasnogo-doma",
+      "page": "/journal/plyusy-minusy-karkasnogo-doma",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_investigation",
+      "funnel": "consideration",
+      "category": "Каркасные дома",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "каркасные дома отзывы",
+        "vol": 68
+      },
+      "keywords": [
+        {
+          "q": "минусы каркасных домов",
+          "vol": 53
+        },
+        {
+          "q": "плюсы каркасного дома",
+          "vol": 44
+        },
+        {
+          "q": "каркасный дом плюсы и минусы",
+          "vol": 40
+        },
+        {
+          "q": "каркасные дома отзывы владельцев",
+          "vol": 16
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/projects/karkasnye-doma"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 5,
+        "sourceSeeds": [
+          "каркасные дома"
+        ]
+      }
+    },
+    {
+      "id": "mezhevanie-pered-stroitelstvom",
+      "page": "/journal/mezhevanie-pered-stroitelstvom",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational",
+      "funnel": "consideration",
+      "category": "Участок и оформление",
+      "region": "Пензенская область",
+      "author": "Евгения Викторовна Кислякова",
+      "reviewer": null,
+      "main": {
+        "q": "межевание границ участка",
+        "vol": 68
+      },
+      "keywords": [
+        {
+          "q": "межевание границ земельного участка",
+          "vol": 47
+        },
+        {
+          "q": "участок без межевания",
+          "vol": 47
+        },
+        {
+          "q": "нужно ли межевание участка",
+          "vol": 26
+        },
+        {
+          "q": "продать участок без межевания",
+          "vol": 20
+        },
+        {
+          "q": "нужно ли межевание земельного участка",
+          "vol": 19
+        },
+        {
+          "q": "земельный участок без межевания",
+          "vol": 16
+        },
+        {
+          "q": "межевание обозначение границ земельного участка в пензе",
+          "vol": 13
+        },
+        {
+          "q": "можно ли продать участок без межевания",
+          "vol": 11
+        },
+        {
+          "q": "можно продать участок без межевания",
+          "vol": 11
+        },
+        {
+          "q": "межевание границ земельного участка соседа",
+          "vol": 10
+        },
+        {
+          "q": "оформить участок без межевания",
+          "vol": 10
+        },
+        {
+          "q": "дачный участок без межевания",
+          "vol": 9
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/services/mezhevanie",
+        "/lands"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 24,
+        "sourceSeeds": [
+          "межевание участка"
+        ]
+      }
+    },
+    {
+      "id": "zabory-penza",
+      "page": "/services/zabory",
+      "status": "published",
+      "pageType": "service",
+      "intent": "transactional",
+      "funnel": "decision",
+      "category": "Благоустройство участка",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "забор для участка",
+        "vol": 67
+      },
+      "keywords": [
+        {
+          "q": "установка забор для участка",
+          "vol": 7
+        },
+        {
+          "q": "забор для участка 6 соток",
+          "vol": 3
+        },
+        {
+          "q": "забор для участка металлический",
+          "vol": 1
+        }
+      ],
+      "priority": 88,
+      "humanReviewRequired": false,
+      "indexingState": "live_or_recommended_owner",
+      "requiredLinks": [
+        "/services/zabory"
+      ],
+      "notes": "Protected commercial owner. An article must not target the same transactional intent.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 4,
+        "sourceSeeds": [
+          "забор для участка"
+        ]
+      }
+    },
+    {
+      "id": "ochistka-vody-iz-skvazhiny",
+      "page": "/journal/ochistka-vody-iz-skvazhiny",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_commercial",
+      "funnel": "consideration",
+      "category": "Инженерные системы",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "фильтр для воды из скважины частного дома",
+        "vol": 59
+      },
+      "keywords": [
+        {
+          "q": "очистка воды для дома из скважины",
+          "vol": 46
+        },
+        {
+          "q": "очистка воды для частного дома из скважины",
+          "vol": 37
+        },
+        {
+          "q": "система очистки воды для дома из скважины",
+          "vol": 33
+        },
+        {
+          "q": "система очистки воды для скважины частного дома",
+          "vol": 24
+        },
+        {
+          "q": "фильтры очистки воды для дома из скважины",
+          "vol": 21
+        },
+        {
+          "q": "очистка воды для дома из скважины комплект",
+          "vol": 9
+        },
+        {
+          "q": "фильтра для скважины на воду в доме",
+          "vol": 2
+        },
+        {
+          "q": "фильтрация воды для частного дома из скважины",
+          "vol": 2
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/services/skvazhina"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 9,
+        "sourceSeeds": [
+          "скважина для дома"
+        ]
+      }
+    },
+    {
+      "id": "fundament-dlya-doma-iz-gazobetona",
+      "page": "/journal/fundament-dlya-doma-iz-gazobetona",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_comparison",
+      "funnel": "consideration",
+      "category": "Фундамент и участок",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "фундамент для дома из газобетона",
+        "vol": 55
+      },
+      "keywords": [
+        {
+          "q": "ленточный фундамент для дома из газобетона",
+          "vol": 13
+        },
+        {
+          "q": "фундамент для дома из газобетона одноэтажный",
+          "vol": 13
+        },
+        {
+          "q": "фундамент под дом из газобетона",
+          "vol": 13
+        },
+        {
+          "q": "ростверковый фундамент для дома из газобетона",
+          "vol": 8
+        },
+        {
+          "q": "свайно ростверковый фундамент для дома из газобетона",
+          "vol": 8
+        },
+        {
+          "q": "свайный фундамент для дома из газобетона",
+          "vol": 8
+        },
+        {
+          "q": "фундамент глубина дома из газобетона",
+          "vol": 7
+        },
+        {
+          "q": "арматура для фундамента дома из газобетона",
+          "vol": 6
+        },
+        {
+          "q": "фундамент для дома под газобетон",
+          "vol": 6
+        },
+        {
+          "q": "глубина фундамента для дома из газобетона",
+          "vol": 5
+        },
+        {
+          "q": "строительство домов из газобетона фундамент",
+          "vol": 4
+        },
+        {
+          "q": "какой фундамент для дома из газобетона",
+          "vol": 3
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/projects/doma-iz-gazobetona",
+        "/services/fundament"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 21,
+        "sourceSeeds": [
+          "дома из газобетона",
+          "фундамент для дома"
+        ]
+      }
+    },
+    {
+      "id": "kak-vybrat-septik-dlya-doma",
+      "page": "/journal/kak-vybrat-septik-dlya-doma",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_commercial",
+      "funnel": "consideration",
+      "category": "Инженерные системы",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "септик для частного дома без откачки",
+        "vol": 51
+      },
+      "keywords": [
+        {
+          "q": "септики для дома без откачки",
+          "vol": 51
+        },
+        {
+          "q": "септик для дома какой",
+          "vol": 28
+        },
+        {
+          "q": "какой септик лучше для частного дома",
+          "vol": 10
+        },
+        {
+          "q": "септик для дома какой лучше",
+          "vol": 10
+        },
+        {
+          "q": "выбрать септик для дома",
+          "vol": 6
+        },
+        {
+          "q": "какой септик выбрать для частного дома",
+          "vol": 6
+        },
+        {
+          "q": "септик для дома какой выбрать",
+          "vol": 6
+        },
+        {
+          "q": "септик для частного дома выбрать",
+          "vol": 6
+        },
+        {
+          "q": "септик для частного дома без откачки цена",
+          "vol": 5
+        },
+        {
+          "q": "цена септиков для дома без откачки",
+          "vol": 5
+        },
+        {
+          "q": "устройство септика для частного дома без откачки",
+          "vol": 3
+        },
+        {
+          "q": "какой септик для дома постоянного проживания",
+          "vol": 2
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/services/septik"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 16,
+        "sourceSeeds": [
+          "септик для дома"
+        ]
+      }
+    },
+    {
+      "id": "semeynaya-ipoteka-na-stroitelstvo-doma",
+      "page": "/journal/semeynaya-ipoteka-na-stroitelstvo-doma",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_commercial",
+      "funnel": "decision",
+      "category": "Ипотека и документы",
+      "region": "Пензенская область",
+      "author": "Евгения Викторовна Кислякова",
+      "reviewer": null,
+      "main": {
+        "q": "семейная ипотека на строительство дома",
+        "vol": 47
+      },
+      "keywords": [
+        {
+          "q": "семейная ипотека на строительство дома условия",
+          "vol": 15
+        },
+        {
+          "q": "семейная ипотека на строительство дома 2026",
+          "vol": 10
+        },
+        {
+          "q": "семейная ипотека на строительство дома условия 2026",
+          "vol": 8
+        },
+        {
+          "q": "семейная ипотека на строительство нового дома",
+          "vol": 5
+        },
+        {
+          "q": "можно взять семейную ипотеку на строительство дома",
+          "vol": 3
+        },
+        {
+          "q": "семейная ипотека на строительство дома можно",
+          "vol": 3
+        },
+        {
+          "q": "семейная ипотека на строительство дома сбербанк",
+          "vol": 2
+        },
+        {
+          "q": "семейная ипотека сумма на строительство дома",
+          "vol": 2
+        },
+        {
+          "q": "банк семейная ипотека на строительство дома",
+          "vol": 1
+        },
+        {
+          "q": "берем семейную ипотеку на строительство дома",
+          "vol": 1
+        },
+        {
+          "q": "как взять семейную ипотеку на строительство дома",
+          "vol": 1
+        },
+        {
+          "q": "семейная ипотека на землю и строительство дома",
+          "vol": 1
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/services/mortgage",
+        "/mortgage-calculator"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 21,
+        "sourceSeeds": [
+          "строительство домов",
+          "ипотека на строительство дома"
+        ]
+      }
+    },
+    {
+      "id": "etapy-stroitelstva-doma",
+      "page": "/journal/etapy-stroitelstva-doma",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational",
+      "funnel": "consideration",
+      "category": "Строительство дома",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "этапы строительства дома",
+        "vol": 37
+      },
+      "keywords": [
+        {
+          "q": "этапы строительства каркасного дома",
+          "vol": 7
+        },
+        {
+          "q": "какие этапы строительства дома",
+          "vol": 5
+        },
+        {
+          "q": "дом на винтовых сваях этапы строительства",
+          "vol": 3
+        },
+        {
+          "q": "этапы строительства дома на сваях",
+          "vol": 3
+        },
+        {
+          "q": "этапы строительства дома на участке",
+          "vol": 3
+        },
+        {
+          "q": "этапы строительства каркасного дома на винтовых сваях",
+          "vol": 3
+        },
+        {
+          "q": "этапы строительства каркасного дома на сваях",
+          "vol": 3
+        },
+        {
+          "q": "на каком этапе строительства дома можно",
+          "vol": 2
+        },
+        {
+          "q": "после фундамента следующий этап строительства дома",
+          "vol": 2
+        },
+        {
+          "q": "строительство дома этап 1",
+          "vol": 2
+        },
+        {
+          "q": "этапы строительства дома из блоков",
+          "vol": 2
+        },
+        {
+          "q": "этапы строительства дома из газобетона",
+          "vol": 2
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 30,
+        "sourceSeeds": [
+          "строительство домов",
+          "этапы строительства дома"
+        ]
+      }
+    },
+    {
+      "id": "usloviya-ipoteki-na-stroitelstvo",
+      "page": "/journal/usloviya-ipoteki-na-stroitelstvo",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_commercial",
+      "funnel": "decision",
+      "category": "Ипотека и документы",
+      "region": "Пензенская область",
+      "author": "Евгения Викторовна Кислякова",
+      "reviewer": null,
+      "main": {
+        "q": "ипотека на строительство дома условия",
+        "vol": 32
+      },
+      "keywords": [
+        {
+          "q": "ипотека на строительство дома условия 2026",
+          "vol": 21
+        },
+        {
+          "q": "можно ли ипотеку на строительство дома",
+          "vol": 18
+        },
+        {
+          "q": "можно ли взять ипотеку на строительство дома",
+          "vol": 15
+        },
+        {
+          "q": "ипотека на строительство дома 2026 новые условия",
+          "vol": 6
+        },
+        {
+          "q": "условия ипотеки на строительство нового дома",
+          "vol": 6
+        },
+        {
+          "q": "ставки по ипотеке на строительство дома",
+          "vol": 5
+        },
+        {
+          "q": "как взять ипотеку на строительство дома",
+          "vol": 2
+        },
+        {
+          "q": "можно ли оформить ипотеку на строительство дома",
+          "vol": 2
+        },
+        {
+          "q": "ипотека на строительство дома 2026 сбербанк условия",
+          "vol": 1
+        },
+        {
+          "q": "ипотека на строительство дома в снт условия",
+          "vol": 1
+        },
+        {
+          "q": "ипотека на строительство дома какие условия",
+          "vol": 1
+        },
+        {
+          "q": "ипотека на строительство дома процентная ставка",
+          "vol": 1
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/services/mortgage",
+        "/mortgage-calculator"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 18,
+        "sourceSeeds": [
+          "строительство домов",
+          "ипотека на строительство дома"
+        ]
+      }
+    },
+    {
+      "id": "kak-vybrat-skvazhinu-dlya-doma",
+      "page": "/journal/kak-vybrat-skvazhinu-dlya-doma",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_commercial",
+      "funnel": "consideration",
+      "category": "Инженерные системы",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "какую скважину выбрать для частного дома",
+        "vol": 23
+      },
+      "keywords": [
+        {
+          "q": "скважина какую выбрать для дома",
+          "vol": 23
+        },
+        {
+          "q": "какая скважина лучше для дома",
+          "vol": 16
+        },
+        {
+          "q": "какая скважина лучше для частного дома",
+          "vol": 14
+        },
+        {
+          "q": "лучше колодец или скважина для дома",
+          "vol": 3
+        },
+        {
+          "q": "скважина насос какой выбрать для дома",
+          "vol": 1
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/services/skvazhina"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 6,
+        "sourceSeeds": [
+          "какой дом выбрать",
+          "скважина для дома"
+        ]
+      }
+    },
+    {
+      "id": "landshaftnyy-dizayn-10-sotok",
+      "page": "/journal/landshaftnyy-dizayn-uchastka-10-sotok",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_inspiration",
+      "funnel": "awareness",
+      "category": "Благоустройство участка",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "ландшафтный дизайн участка с домом",
+        "vol": 23
+      },
+      "keywords": [
+        {
+          "q": "ландшафтный дизайн участка 10 соток",
+          "vol": 20
+        },
+        {
+          "q": "ландшафтный дизайн участка 10 соток с домом",
+          "vol": 14
+        },
+        {
+          "q": "ландшафтный дизайн участка 6 соток",
+          "vol": 7
+        },
+        {
+          "q": "ландшафтный дизайн участка 8 соток",
+          "vol": 7
+        },
+        {
+          "q": "ландшафтный дизайн участка идеи",
+          "vol": 7
+        },
+        {
+          "q": "идеи ландшафтного дизайна дачного участка",
+          "vol": 6
+        },
+        {
+          "q": "план ландшафтного дизайна участка",
+          "vol": 6
+        },
+        {
+          "q": "ландшафтный дизайн участка 10 соток баней",
+          "vol": 5
+        },
+        {
+          "q": "ландшафтный дизайн дачного участка 8 соток",
+          "vol": 4
+        },
+        {
+          "q": "ландшафтный дизайн участка 10 соток фото",
+          "vol": 4
+        },
+        {
+          "q": "ландшафтный дизайн дачного участка 10 соток",
+          "vol": 3
+        },
+        {
+          "q": "ландшафтный дизайн дачного участка фото 10 соток",
+          "vol": 3
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/services/landshaft"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 29,
+        "sourceSeeds": [
+          "ландшафтный дизайн участка"
+        ]
+      }
+    },
+    {
+      "id": "kak-vybrat-okna-v-chastnyy-dom",
+      "page": "/journal/kak-vybrat-okna-v-chastnyy-dom",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_commercial",
+      "funnel": "consideration",
+      "category": "Отделка и ремонт",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "какие окна в частном доме",
+        "vol": 20
+      },
+      "keywords": [
+        {
+          "q": "панорамные окна в частном доме",
+          "vol": 19
+        },
+        {
+          "q": "какие окна лучше в частном доме",
+          "vol": 6
+        },
+        {
+          "q": "окно в котельную размеры в частном доме",
+          "vol": 5
+        },
+        {
+          "q": "панорамное окно в спальне частного дома",
+          "vol": 5
+        },
+        {
+          "q": "панорамные окна в частном доме фото",
+          "vol": 5
+        },
+        {
+          "q": "большие панорамные окна в частном доме фото",
+          "vol": 4
+        },
+        {
+          "q": "большое панорамное окно в частном доме",
+          "vol": 4
+        },
+        {
+          "q": "какие окна лучше поставить в частный дом",
+          "vol": 4
+        },
+        {
+          "q": "какие окна поставить в частный дом",
+          "vol": 4
+        },
+        {
+          "q": "какие окна ставить в частный дом",
+          "vol": 4
+        },
+        {
+          "q": "окно в туалете в частном доме размеры",
+          "vol": 3
+        },
+        {
+          "q": "стандартный размер окна в частном доме",
+          "vol": 3
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/services/okna"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 17,
+        "sourceSeeds": [
+          "окна в частный дом"
+        ]
+      }
+    },
+    {
+      "id": "fundament-dlya-karkasnogo-doma",
+      "page": "/journal/fundament-dlya-karkasnogo-doma",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_comparison",
+      "funnel": "consideration",
+      "category": "Фундамент и участок",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "фундамент для каркасного дома",
+        "vol": 17
+      },
+      "keywords": [
+        {
+          "q": "какой фундамент для каркасного дома",
+          "vol": 4
+        },
+        {
+          "q": "сваи для фундамента каркасного дома",
+          "vol": 3
+        },
+        {
+          "q": "винтовой фундамент для каркасного дома",
+          "vol": 2
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/projects/karkasnye-doma",
+        "/services/fundament"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 4,
+        "sourceSeeds": [
+          "каркасные дома",
+          "фундамент для дома"
+        ]
+      }
+    },
+    {
+      "id": "nuzhno-li-uteplyat-gazobeton",
+      "page": "/journal/nuzhno-li-uteplyat-gazobeton",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational",
+      "funnel": "consideration",
+      "category": "Газобетонные дома",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "чем утеплить дом из газобетона",
+        "vol": 14
+      },
+      "keywords": [
+        {
+          "q": "чем утеплить дом из газобетона снаружи",
+          "vol": 13
+        },
+        {
+          "q": "чем лучше утеплить дом из газобетона",
+          "vol": 7
+        },
+        {
+          "q": "чем лучше утеплить дом из газобетона снаружи",
+          "vol": 6
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/projects/doma-iz-gazobetona"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 4,
+        "sourceSeeds": [
+          "дома из газобетона"
+        ]
+      }
+    },
+    {
+      "id": "plyusy-minusy-doma-iz-gazobetona",
+      "page": "/journal/plyusy-minusy-doma-iz-gazobetona",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_investigation",
+      "funnel": "consideration",
+      "category": "Газобетонные дома",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "дома из газобетона лучше",
+        "vol": 14
+      },
+      "keywords": [],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/projects/doma-iz-gazobetona"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 1,
+        "sourceSeeds": [
+          "дома из газобетона"
+        ]
+      }
+    },
+    {
+      "id": "kakoy-fundament-vybrat-dlya-doma",
+      "page": "/journal/kakoy-fundament-vybrat-dlya-doma",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_comparison",
+      "funnel": "consideration",
+      "category": "Фундамент и участок",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "какой фундамент лучше для дома",
+        "vol": 13
+      },
+      "keywords": [
+        {
+          "q": "какой фундамент для одноэтажного дома",
+          "vol": 10
+        },
+        {
+          "q": "какой бывает фундамент для дома",
+          "vol": 9
+        },
+        {
+          "q": "какой фундамент нужен для дома",
+          "vol": 9
+        },
+        {
+          "q": "виды фундамента для дома",
+          "vol": 7
+        },
+        {
+          "q": "какой бетон для фундамента дома",
+          "vol": 7
+        },
+        {
+          "q": "виды фундаментов для частного дома",
+          "vol": 6
+        },
+        {
+          "q": "какие виды фундамента бывают для дома",
+          "vol": 4
+        },
+        {
+          "q": "какие виды фундамента бывают для частного дома",
+          "vol": 4
+        },
+        {
+          "q": "какой глубиной фундамент для одноэтажного дома",
+          "vol": 4
+        },
+        {
+          "q": "какой глубины должен быть фундамент для дома",
+          "vol": 4
+        },
+        {
+          "q": "какой фундамент для газоблоков дома",
+          "vol": 4
+        },
+        {
+          "q": "какой фундамент для дома из пеноблока",
+          "vol": 4
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/services/fundament"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 22,
+        "sourceSeeds": [
+          "фундамент для дома"
+        ]
+      }
+    },
+    {
+      "id": "kak-vybrat-zabor-dlya-uchastka",
+      "page": "/journal/kak-vybrat-zabor-dlya-uchastka",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_commercial",
+      "funnel": "consideration",
+      "category": "Благоустройство участка",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "дешевые заборы для участка",
+        "vol": 10
+      },
+      "keywords": [
+        {
+          "q": "самый дешевый забор для участка",
+          "vol": 10
+        },
+        {
+          "q": "варианты заборов для дачного участка",
+          "vol": 5
+        },
+        {
+          "q": "варианты заборов для участка",
+          "vol": 5
+        },
+        {
+          "q": "виды заборов для участка",
+          "vol": 3
+        },
+        {
+          "q": "забор для участка с уклоном",
+          "vol": 2
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/services/zabory"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 6,
+        "sourceSeeds": [
+          "забор для участка"
+        ]
+      }
+    },
+    {
+      "id": "karkasnyy-ili-gazobetonnyy-dom",
+      "page": "/journal/karkasnyy-ili-gazobetonnyy-dom",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_comparison",
+      "funnel": "consideration",
+      "category": "Технологии домов",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "дом из газобетона или каркасный",
+        "vol": 3
+      },
+      "keywords": [],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/projects/karkasnye-doma",
+        "/projects/doma-iz-gazobetona"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 1,
+        "sourceSeeds": [
+          "дома из газобетона"
+        ]
+      }
+    },
+    {
+      "id": "dokumenty-dlya-ipoteki-na-stroitelstvo",
+      "page": "/journal/dokumenty-dlya-ipoteki-na-stroitelstvo",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_commercial",
+      "funnel": "decision",
+      "category": "Ипотека и документы",
+      "region": "Пензенская область",
+      "author": "Евгения Викторовна Кислякова",
+      "reviewer": null,
+      "main": {
+        "q": "ипотека на строительство дома документы",
+        "vol": 2
+      },
+      "keywords": [
+        {
+          "q": "ипотека на строительство дома какие документы",
+          "vol": 1
+        }
+      ],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/services/mortgage"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 2,
+        "sourceSeeds": [
+          "ипотека на строительство дома"
+        ]
+      }
+    },
+    {
+      "id": "podgotovka-uchastka-k-stroitelstvu",
+      "page": "/journal/podgotovka-uchastka-k-stroitelstvu",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational",
+      "funnel": "consideration",
+      "category": "Фундамент и участок",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": "Евгения Викторовна Кислякова",
+      "main": {
+        "q": "подготовка участка к строительству",
+        "vol": 2
+      },
+      "keywords": [],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/lands",
+        "/services/fundament"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 1,
+        "sourceSeeds": [
+          "подготовка участка к строительству"
+        ]
+      }
+    },
+    {
+      "id": "fundament-dlya-modulnogo-doma",
+      "page": "/journal/fundament-dlya-modulnogo-doma",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational",
+      "funnel": "consideration",
+      "category": "Фундамент и участок",
+      "region": "Россия",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "дом",
+        "vol": 0
+      },
+      "keywords": [],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/projects/modulnye-doma",
+        "/services/fundament"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 0,
+        "sourceSeeds": []
+      }
+    },
+    {
+      "id": "chto-vkhodit-v-dom-pod-klyuch",
+      "page": "/journal/chto-vkhodit-v-dom-pod-klyuch",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_commercial",
+      "funnel": "consideration",
+      "category": "Стоимость и бюджет",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "что входит",
+        "vol": 0
+      },
+      "keywords": [],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/",
+        "/projects"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 0,
+        "sourceSeeds": []
+      }
+    },
+    {
+      "id": "kak-vybrat-proekt-doma",
+      "page": "/journal/kak-vybrat-proekt-doma",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_commercial",
+      "funnel": "consideration",
+      "category": "Проекты и планировки",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "как выбрать",
+        "vol": 0
+      },
+      "keywords": [],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/projects"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 0,
+        "sourceSeeds": []
+      }
+    },
+    {
+      "id": "odnoetazhnyy-ili-dvukhetazhnyy-dom",
+      "page": "/journal/odnoetazhnyy-ili-dvukhetazhnyy-dom",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_comparison",
+      "funnel": "consideration",
+      "category": "Проекты и планировки",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "одноэтажный или двухэтажный",
+        "vol": 0
+      },
+      "keywords": [],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/projects"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 0,
+        "sourceSeeds": []
+      }
+    },
+    {
+      "id": "kogda-luchshe-nachinat-stroitelstvo-doma",
+      "page": "/journal/kogda-luchshe-nachinat-stroitelstvo-doma",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational",
+      "funnel": "awareness",
+      "category": "Строительство дома",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "когда лучше",
+        "vol": 0
+      },
+      "keywords": [],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 0,
+        "sourceSeeds": []
+      }
+    },
+    {
+      "id": "nuzhna-li-geologiya-uchastka",
+      "page": "/journal/nuzhna-li-geologiya-uchastka",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational",
+      "funnel": "consideration",
+      "category": "Фундамент и участок",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "нужн",
+        "vol": 0
+      },
+      "keywords": [],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/services/fundament"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 0,
+        "sourceSeeds": []
+      }
+    },
+    {
+      "id": "varianty-naruzhnoy-otdelki-doma",
+      "page": "/journal/varianty-naruzhnoy-otdelki-doma",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_comparison",
+      "funnel": "consideration",
+      "category": "Отделка и ремонт",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "чем отделать дом снаружи",
+        "vol": 0
+      },
+      "keywords": [],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/services/otdelka"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 0,
+        "sourceSeeds": []
+      }
+    },
+    {
+      "id": "kak-vybrat-podryadchika-na-stroitelstvo",
+      "page": "/journal/kak-vybrat-podryadchika-na-stroitelstvo",
+      "status": "planned",
+      "pageType": "article",
+      "intent": "informational_commercial",
+      "funnel": "decision",
+      "category": "Выбор подрядчика",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "main": {
+        "q": "подрядчик",
+        "vol": 0
+      },
+      "keywords": [],
+      "priority": 100,
+      "humanReviewRequired": true,
+      "indexingState": "planned",
+      "requiredLinks": [
+        "/"
+      ],
+      "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
+      "volumeEvidence": {
+        "source": "data/soft-clusters-2026-08-27.json",
+        "metric": "max observed row; overlapping Wordstat seeds are not summed",
+        "rowCount": 0,
+        "sourceSeeds": []
+      }
+    }
+  ]
+}

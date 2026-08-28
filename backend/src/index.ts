@@ -151,6 +151,9 @@ interface JournalArticle {
   categoryId: string;
   tags: string[];
   author: string;
+  authorRole: string;
+  authorBio: string;
+  reviewer: string;
   status: JournalArticleStatus;
   featured: boolean;
   relatedProjectIds: string[];
@@ -1377,6 +1380,9 @@ function normalizeJournalArticle(incoming: Partial<JournalArticle>, existing?: J
     categoryId: String(incoming.categoryId ?? existing?.categoryId ?? '').trim(),
     tags: Array.isArray(incoming.tags) ? incoming.tags.map(String).map((item) => item.trim()).filter(Boolean) : (existing?.tags || []),
     author: String(incoming.author ?? existing?.author ?? 'Команда Evtenia').trim(),
+    authorRole: String(incoming.authorRole ?? existing?.authorRole ?? '').trim(),
+    authorBio: String(incoming.authorBio ?? existing?.authorBio ?? '').trim(),
+    reviewer: String(incoming.reviewer ?? existing?.reviewer ?? '').trim(),
     status,
     featured: Boolean(incoming.featured ?? existing?.featured),
     relatedProjectIds: Array.isArray(incoming.relatedProjectIds) ? incoming.relatedProjectIds.map(String) : (existing?.relatedProjectIds || []),

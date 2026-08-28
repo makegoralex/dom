@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "updated": "2026-08-27",
+  "rule": "Do not assign the transactional intent of these pages to a Journal article. Create or improve the landing page instead.",
+  "pages": [
+    { "url": "/", "topic": "строительство домов под ключ в Пензе", "type": "commercial" },
+    { "url": "/projects", "topic": "проекты и каталог домов", "type": "catalog" },
+    { "url": "/projects?type=Каркасные", "recommendedUrl": "/projects/karkasnye-doma", "topic": "каркасные дома под ключ", "type": "commercial_filter" },
+    { "url": "/projects?type=Модульные", "recommendedUrl": "/projects/modulnye-doma", "topic": "модульные дома под ключ", "type": "commercial_filter" },
+    { "url": "/projects?type=Из газобетона", "recommendedUrl": "/projects/doma-iz-gazobetona", "topic": "дома из газобетона под ключ", "type": "commercial_filter" },
+    { "url": "/baths", "topic": "проекты и строительство бань", "type": "catalog" },
+    { "url": "/homes", "topic": "готовые дома", "type": "catalog" },
+    { "url": "/lands", "topic": "земельные участки под строительство", "type": "catalog" },
+    { "url": "/mortgage-calculator", "topic": "расчёт ипотеки", "type": "tool" },
+    { "url": "/services/fundament", "topic": "строительство фундаментов", "type": "service" },
+    { "url": "/services/svai", "topic": "монтаж свай", "type": "service" },
+    { "url": "/services/skvazhiny", "topic": "бурение и обустройство скважин", "type": "service" },
+    { "url": "/services/septik", "topic": "монтаж септиков", "type": "service" },
+    { "url": "/services/zabory", "topic": "установка заборов", "type": "service" },
+    { "url": "/services/mezhevanie", "topic": "межевание земельного участка", "type": "service" },
+    { "url": "/services/ipoteka-oformlenie", "topic": "оформление ипотеки на строительство", "type": "service" },
+    { "url": "/services/dveri", "topic": "двери с монтажом", "type": "service" },
+    { "url": "/services/plastikovye-okna", "topic": "пластиковые окна с монтажом", "type": "service" },
+    { "url": "/services/remont", "topic": "ремонт и отделка дома", "type": "service" },
+    { "url": "/services/lestnitsy", "topic": "лестницы для дома", "type": "service" },
+    { "url": "/services/dizainer", "topic": "дизайн интерьера и экстерьера", "type": "service" },
+    { "url": "/services/landshaftnyy-dizayn", "topic": "ландшафтный дизайн", "type": "service" },
+    { "url": "/services/otsenka-nedvizhimosti", "topic": "оценка недвижимости", "type": "service" },
+    { "url": "/services/styazhka-pola", "topic": "стяжка пола", "type": "service" },
+    { "url": "/services/konditsionery", "topic": "установка кондиционеров", "type": "service" },
+    { "url": "/services/vyvoz-musora", "topic": "вывоз строительного мусора", "type": "service" },
+    { "url": "/services/besedki", "topic": "строительство беседок", "type": "service" },
+    { "url": "/design", "topic": "проектирование и дизайн", "type": "commercial" },
+    { "url": "/furniture", "topic": "мебель для дома", "type": "commercial" },
+    { "url": "/portfolio", "topic": "построенные объекты Evtenia", "type": "trust" }
+  ]
+}
+

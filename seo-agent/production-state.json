@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "updated": "2026-08-28",
+  "clusters": {
+    "modulnye-doma-otzyvy-i-minusy": {
+      "semanticStatus": "reserved",
+      "queueStatus": "draft",
+      "brief": "briefs/modulnye-doma-otzyvy-i-minusy.md",
+      "draft": "drafts/modulnye-doma-otzyvy-i-minusy.json",
+      "reservedAt": "2026-08-28",
+      "notes": "Draft prepared. Publication requires technical director approval, real Evtenia images and related-project selection."
+    }
+  }
+}

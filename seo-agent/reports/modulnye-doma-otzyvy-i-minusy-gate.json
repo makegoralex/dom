@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "checked": "2026-08-28",
+  "clusterId": "modulnye-doma-otzyvy-i-minusy",
+  "result": "review",
+  "summary": "The draft is structurally complete and targets the approved informational cluster without taking over the commercial modular-house intent. Publication remains blocked until company-specific technical review and real Evtenia media are added.",
+  "checks": [
+    {"id":"ownership","result":"pass","evidence":"The article owns /journal/modulnye-doma-otzyvy-i-minusy; transactional queries remain with /projects?type=Модульные."},
+    {"id":"slug","result":"pass","evidence":"Lowercase Latin hyphenated slug."},
+    {"id":"direct_answer","result":"pass","evidence":"The lead answers the main concern before the contents."},
+    {"id":"structure","result":"pass","evidence":"Contents, H2/H3 hierarchy, decision table, checklist, suitability section, FAQ and sources are present."},
+    {"id":"internal_links","result":"pass","evidence":"Contextual links point to the modular catalog, foundation, well and septic commercial owners."},
+    {"id":"external_sources","result":"pass","evidence":"The draft links to two Ministry of Construction publications and one editorial practitioner guide."},
+    {"id":"unsupported_numbers","result":"pass","evidence":"No Evtenia dimensions, prices, durations, material specifications, warranty or operating-cost claims were invented."},
+    {"id":"technical_review","result":"review","evidence":"Technical claims and wording require approval by Олег Иванович Кисляков before publication.","remediation":"Review the brief and HTML draft; record the approver in the CMS reviewer field."},
+    {"id":"company_evidence","result":"review","evidence":"No Evtenia production photos, transport photos, module-joint photos or named completed project are attached.","remediation":"Select 6–8 real images and at least one relevant project from the CMS."},
+    {"id":"cover","result":"review","evidence":"The cover image is intentionally empty to avoid using a generic or misleading image.","remediation":"Upload a real Evtenia modular-house image with descriptive alt text."}
+  ]
+}

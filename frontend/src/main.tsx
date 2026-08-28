@@ -186,6 +186,9 @@ const makeEmptyJournalArticle = (categoryId = ''): Partial<JournalArticle> => ({
   coverImage: '',
   tags: [],
   author: 'Команда Evtenia',
+  authorRole: '',
+  authorBio: '',
+  reviewer: '',
   status: 'draft',
   featured: false,
   relatedProjectIds: [],
@@ -387,14 +390,16 @@ function sanitizeCmsHtml(html: string) {
   const doc = parser.parseFromString(html, 'text/html');
   doc.body.querySelectorAll('script, style, iframe, object, embed, form').forEach((node) => node.remove());
   doc.body.querySelectorAll('*').forEach((node) => {
-    ['style', 'id', 'width', 'height'].forEach((attr) => node.removeAttribute(attr));
+    ['style', 'width', 'height'].forEach((attr) => node.removeAttribute(attr));
+    const id = node.getAttribute('id');
+    if (id && !/^[A-Za-z][A-Za-z0-9_:.-]*$/.test(id)) node.removeAttribute('id');
     [...node.attributes].forEach((attribute) => {
       const name = attribute.name.toLowerCase();
       const value = attribute.value.trim().toLowerCase();
       if (name.startsWith('on') || (['href', 'src'].includes(name) && value.startsWith('javascript:'))) node.removeAttribute(attribute.name);
     });
     const className = node.getAttribute('class') || '';
-    const allowedClasses = ['cms-gallery', 'single', 'cols-2', 'cols-3', 'align-left', 'align-center', 'align-right', 'size-sm', 'size-md', 'cms-image-grid', 'grid2', 'grid3', 'cms-slider', 'cms-slider-track', 'cms-slider-btn', 'prev', 'next'];
+    const allowedClasses = ['cms-gallery', 'single', 'cols-2', 'cols-3', 'align-left', 'align-center', 'align-right', 'size-sm', 'size-md', 'cms-image-grid', 'grid2', 'grid3', 'cms-slider', 'cms-slider-track', 'cms-slider-btn', 'prev', 'next', 'journal-lead', 'journal-toc', 'journal-callout', 'journal-faq'];
     const normalized = className
       .split(' ')
       .filter((item) => allowedClasses.includes(item))
@@ -3362,6 +3367,13 @@ function AdminPage() {
     if (editor) setJournalArticleDraft((current) => ({ ...current, content: sanitizeCmsHtml(editor.innerHTML) }));
   };
 
+  const importJournalHtml = async (file: File) => {
+    const html = await file.text();
+    const content = sanitizeCmsHtml(html);
+    setJournalArticleDraft((current) => ({ ...current, content }));
+    setUploadStatus('HTML статьи импортирован. Проверьте материал и сохраните черновик.');
+  };
+
   const uploadPageImage = async (files: File[]) => {
     if (!files.length || !pageDraft) return;
     setUploadStatus('Загрузка изображения для страницы...');
@@ -4035,6 +4047,11 @@ function AdminPage() {
                 <label>Автор<input value={journalArticleDraft.author || ''} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, author: e.target.value })} /></label>
                 <label>Статус<select value={journalArticleDraft.status || 'draft'} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, status: e.target.value as JournalArticle['status'] })}><option value="draft">Черновик</option><option value="review">На проверке</option><option value="published">Опубликовано</option></select></label>
               </div>
+              <div className="two-cols">
+                <label>Роль автора<input value={journalArticleDraft.authorRole || ''} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, authorRole: e.target.value })} placeholder="Технический директор" /></label>
+                <label>Проверил материал<input value={journalArticleDraft.reviewer || ''} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, reviewer: e.target.value })} placeholder="Имя и роль" /></label>
+              </div>
+              <label>Об авторе<textarea rows={2} value={journalArticleDraft.authorBio || ''} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, authorBio: e.target.value })} placeholder="Опыт и специализация автора — только подтверждённые факты" /></label>
               <label>Теги через запятую<input value={(journalArticleDraft.tags || []).join(', ')} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, tags: e.target.value.split(',').map((item) => item.trim()).filter(Boolean) })} placeholder="Каркасный дом, Пенза, фундамент" /></label>
               <label>URL обложки<input value={journalArticleDraft.coverImage || ''} onChange={(e) => setJournalArticleDraft({ ...journalArticleDraft, coverImage: e.target.value })} /></label>
               <label>Загрузить обложку<input type="file" accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadJournalImage(files, 'cover'); e.currentTarget.value = ''; }} /></label>
@@ -4046,6 +4063,7 @@ function AdminPage() {
                 <button type="button" onClick={() => applyJournalFormat('bold')}>Жирный</button>
                 <button type="button" onClick={() => applyJournalFormat('insertUnorderedList')}>Список</button>
                 <button type="button" onClick={() => applyJournalFormat('formatBlock', 'blockquote')}>Цитата</button>
+                <label>Импорт HTML<input type="file" accept=".html,.htm,text/html" onChange={(e) => { const file = e.target.files?.[0]; if (file) void importJournalHtml(file); e.currentTarget.value = ''; }} /></label>
                 <label>Добавить фото<input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadJournalImage(files, 'content'); e.currentTarget.value = ''; }} /></label>
               </div>
               <div

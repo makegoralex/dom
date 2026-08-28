@@ -1,0 +1,623 @@
+{
+  "version": 2,
+  "updated": "2026-08-27",
+  "status": "wordstat_soft_clustered",
+  "selectionRule": "Ranked only after one-query-one-owner soft clustering. Score combines curated business priority, verified max row demand, funnel proximity, commercial relevance and national modular reach. It does not sum overlapping Wordstat rows.",
+  "source": "data/soft-clusters-2026-08-27.json",
+  "items": [
+    {
+      "rank": 1,
+      "clusterId": "modulnye-doma-otzyvy-i-minusy",
+      "titleIntent": "Модульные дома: отзывы, минусы и подводные камни",
+      "owner": "/journal/modulnye-doma-otzyvy-i-minusy",
+      "region": "Россия",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 6071,
+      "score": 98,
+      "status": "draft",
+      "artifacts": {
+        "brief": "briefs/modulnye-doma-otzyvy-i-minusy.md",
+        "draft": "drafts/modulnye-doma-otzyvy-i-minusy.json"
+      },
+      "blockers": [
+        "evtenia_module_specs",
+        "technical_review"
+      ],
+      "requiredLinks": [
+        "/projects/modulnye-doma"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “модульные дома отзывы”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 2,
+      "clusterId": "kakuyu-tekhnologiyu-doma-vybrat",
+      "titleIntent": "Какую технологию дома выбрать: каркас, газобетон или модуль",
+      "owner": "/journal/kakuyu-tekhnologiyu-doma-vybrat",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 2861,
+      "score": 97,
+      "status": "ready_for_brief",
+      "blockers": [
+        "author_review",
+        "evtenia_examples"
+      ],
+      "requiredLinks": [
+        "/projects/karkasnye-doma",
+        "/projects/modulnye-doma",
+        "/projects/doma-iz-gazobetona"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “какой дом выбрать”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 3,
+      "clusterId": "dostavka-i-montazh-modulnogo-doma",
+      "titleIntent": "Доставка и монтаж модульного дома на участке",
+      "owner": "/journal/dostavka-i-montazh-modulnogo-doma",
+      "region": "Россия",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 1261,
+      "score": 97,
+      "status": "ready_for_brief",
+      "blockers": [
+        "evtenia_module_specs",
+        "technical_review"
+      ],
+      "requiredLinks": [
+        "/projects/modulnye-doma"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “доставка модульных домов”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 4,
+      "clusterId": "modulnyy-dom-s-kommunikaciyami",
+      "titleIntent": "Модульный дом с коммуникациями: что входит в комплектацию",
+      "owner": "/journal/modulnyy-dom-s-kommunikaciyami",
+      "region": "Россия",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 882,
+      "score": 96,
+      "status": "ready_for_brief",
+      "blockers": [
+        "evtenia_module_specs",
+        "technical_review"
+      ],
+      "requiredLinks": [
+        "/projects/modulnye-doma"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “модульный дом с коммуникациями”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 5,
+      "clusterId": "modulnyy-ili-karkasnyy-dom",
+      "titleIntent": "Модульный или каркасный дом: отличия и выбор технологии",
+      "owner": "/journal/modulnyy-ili-karkasnyy-dom",
+      "region": "Россия",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 591,
+      "score": 94,
+      "status": "ready_for_brief",
+      "blockers": [
+        "author_review",
+        "evtenia_examples"
+      ],
+      "requiredLinks": [
+        "/projects/karkasnye-doma",
+        "/projects/modulnye-doma"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “чем отличается каркасный дом от модульного”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 6,
+      "clusterId": "modulnyy-dom-dlya-postoyannogo-prozhivaniya",
+      "titleIntent": "Модульный дом для постоянного проживания: что проверить до заказа",
+      "owner": "/journal/modulnyy-dom-dlya-postoyannogo-prozhivaniya",
+      "region": "Россия",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 734,
+      "score": 91,
+      "status": "ready_for_brief",
+      "blockers": [
+        "evtenia_module_specs",
+        "technical_review"
+      ],
+      "requiredLinks": [
+        "/projects/modulnye-doma"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “минусы модульных домов для постоянного проживания”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 7,
+      "clusterId": "modulnye-bani-otzyvy-i-minusy",
+      "titleIntent": "модульная баня отзывы",
+      "owner": "/journal/modulnye-bani-otzyvy-i-minusy",
+      "region": "Россия",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 507,
+      "score": 90,
+      "status": "ready_for_brief",
+      "blockers": [
+        "author_review",
+        "evtenia_examples"
+      ],
+      "requiredLinks": [
+        "/baths"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “модульная баня отзывы”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 8,
+      "clusterId": "kak-vybrat-vhodnuyu-dver-v-dom",
+      "titleIntent": "Как выбрать входную дверь в частный дом",
+      "owner": "/journal/kak-vybrat-vhodnuyu-dver-v-dom",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 135,
+      "score": 86,
+      "status": "ready_for_brief",
+      "blockers": [
+        "author_review",
+        "evtenia_examples"
+      ],
+      "requiredLinks": [
+        "/services/dveri"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “дверь стекло в частном доме”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 9,
+      "clusterId": "semeynaya-ipoteka-na-stroitelstvo-doma",
+      "titleIntent": "Семейная ипотека на строительство дома: условия и порядок",
+      "owner": "/journal/semeynaya-ipoteka-na-stroitelstvo-doma",
+      "region": "Пензенская область",
+      "author": "Евгения Викторовна Кислякова",
+      "reviewer": null,
+      "verifiedMainVolume": 47,
+      "score": 86,
+      "status": "blocked_for_evidence",
+      "blockers": [
+        "publication_day_official_check",
+        "author_approval"
+      ],
+      "requiredLinks": [
+        "/services/mortgage",
+        "/mortgage-calculator"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “семейная ипотека на строительство дома”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 10,
+      "clusterId": "skolko-stoit-postroit-dom",
+      "titleIntent": "Сколько стоит построить дом в Пензе и из чего складывается смета",
+      "owner": "/journal/skolko-stoit-postroit-dom",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 92,
+      "score": 85,
+      "status": "blocked_for_evidence",
+      "blockers": [
+        "evtenia_current_ranges",
+        "approved_inclusions"
+      ],
+      "requiredLinks": [
+        "/",
+        "/projects"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “сколько стоит дом под ключ”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 11,
+      "clusterId": "usloviya-ipoteki-na-stroitelstvo",
+      "titleIntent": "Ипотека на строительство дома: условия и требования",
+      "owner": "/journal/usloviya-ipoteki-na-stroitelstvo",
+      "region": "Пензенская область",
+      "author": "Евгения Викторовна Кислякова",
+      "reviewer": null,
+      "verifiedMainVolume": 32,
+      "score": 85,
+      "status": "blocked_for_evidence",
+      "blockers": [
+        "publication_day_official_check",
+        "author_approval"
+      ],
+      "requiredLinks": [
+        "/services/mortgage",
+        "/mortgage-calculator"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “ипотека на строительство дома условия”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 12,
+      "clusterId": "planirovka-chastnogo-doma",
+      "titleIntent": "Как выбрать планировку частного дома",
+      "owner": "/journal/kak-vybrat-planirovku-doma",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 1153,
+      "score": 84,
+      "status": "ready_for_brief",
+      "blockers": [
+        "author_review",
+        "evtenia_examples"
+      ],
+      "requiredLinks": [
+        "/projects"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “планировка дома”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 13,
+      "clusterId": "stena-i-uteplenie-karkasnogo-doma",
+      "titleIntent": "Стена каркасного дома: состав и утепление",
+      "owner": "/journal/stena-i-uteplenie-karkasnogo-doma",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 210,
+      "score": 84,
+      "status": "ready_for_brief",
+      "blockers": [
+        "evtenia_wall_assemblies",
+        "technical_review"
+      ],
+      "requiredLinks": [
+        "/projects/karkasnye-doma"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “стена каркасного дома”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 14,
+      "clusterId": "ochistka-vody-iz-skvazhiny",
+      "titleIntent": "Очистка воды из скважины в частном доме",
+      "owner": "/journal/ochistka-vody-iz-skvazhiny",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 59,
+      "score": 83,
+      "status": "ready_for_brief",
+      "blockers": [
+        "site_conditions_examples",
+        "technical_review"
+      ],
+      "requiredLinks": [
+        "/services/skvazhina"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “фильтр для воды из скважины частного дома”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 15,
+      "clusterId": "fundament-dlya-doma-iz-gazobetona",
+      "titleIntent": "Какой фундамент выбрать для дома из газобетона",
+      "owner": "/journal/fundament-dlya-doma-iz-gazobetona",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 55,
+      "score": 83,
+      "status": "ready_for_brief",
+      "blockers": [
+        "local_cases",
+        "technical_review"
+      ],
+      "requiredLinks": [
+        "/projects/doma-iz-gazobetona",
+        "/services/fundament"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “фундамент для дома из газобетона”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 16,
+      "clusterId": "kak-vybrat-septik-dlya-doma",
+      "titleIntent": "Как выбрать септик для частного дома",
+      "owner": "/journal/kak-vybrat-septik-dlya-doma",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 51,
+      "score": 83,
+      "status": "ready_for_brief",
+      "blockers": [
+        "site_conditions_examples",
+        "technical_review"
+      ],
+      "requiredLinks": [
+        "/services/septik"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “септик для частного дома без откачки”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 17,
+      "clusterId": "karkasnyy-dom-dlya-postoyannogo-prozhivaniya",
+      "titleIntent": "Каркасный дом для постоянного проживания: требования к конструкции",
+      "owner": "/journal/karkasnyy-dom-dlya-postoyannogo-prozhivaniya",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 88,
+      "score": 81,
+      "status": "ready_for_brief",
+      "blockers": [
+        "evtenia_wall_assemblies",
+        "technical_review"
+      ],
+      "requiredLinks": [
+        "/projects/karkasnye-doma"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “каркасные дома проживания”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 18,
+      "clusterId": "plyusy-minusy-karkasnogo-doma",
+      "titleIntent": "Плюсы и минусы каркасного дома",
+      "owner": "/journal/plyusy-minusy-karkasnogo-doma",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 68,
+      "score": 80,
+      "status": "ready_for_brief",
+      "blockers": [
+        "evtenia_wall_assemblies",
+        "technical_review"
+      ],
+      "requiredLinks": [
+        "/projects/karkasnye-doma"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “каркасные дома отзывы”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 19,
+      "clusterId": "mezhevanie-pered-stroitelstvom",
+      "titleIntent": "Нужно ли межевание участка перед строительством дома",
+      "owner": "/journal/mezhevanie-pered-stroitelstvom",
+      "region": "Пензенская область",
+      "author": "Евгения Викторовна Кислякова",
+      "reviewer": null,
+      "verifiedMainVolume": 68,
+      "score": 80,
+      "status": "blocked_for_evidence",
+      "blockers": [
+        "current_legal_check",
+        "author_approval"
+      ],
+      "requiredLinks": [
+        "/services/mezhevanie",
+        "/lands"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “межевание границ участка”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 20,
+      "clusterId": "kak-vybrat-skvazhinu-dlya-doma",
+      "titleIntent": "Как выбрать скважину для частного дома",
+      "owner": "/journal/kak-vybrat-skvazhinu-dlya-doma",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 23,
+      "score": 80,
+      "status": "ready_for_brief",
+      "blockers": [
+        "site_conditions_examples",
+        "technical_review"
+      ],
+      "requiredLinks": [
+        "/services/skvazhina"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “какую скважину выбрать для частного дома”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 21,
+      "clusterId": "kak-vybrat-okna-v-chastnyy-dom",
+      "titleIntent": "Как выбрать окна для частного дома",
+      "owner": "/journal/kak-vybrat-okna-v-chastnyy-dom",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 20,
+      "score": 80,
+      "status": "ready_for_brief",
+      "blockers": [
+        "author_review",
+        "evtenia_examples"
+      ],
+      "requiredLinks": [
+        "/services/okna"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “какие окна в частном доме”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 22,
+      "clusterId": "fundament-dlya-karkasnogo-doma",
+      "titleIntent": "Какой фундамент выбрать для каркасного дома",
+      "owner": "/journal/fundament-dlya-karkasnogo-doma",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 17,
+      "score": 79,
+      "status": "ready_for_brief",
+      "blockers": [
+        "local_cases",
+        "technical_review"
+      ],
+      "requiredLinks": [
+        "/projects/karkasnye-doma",
+        "/services/fundament"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “фундамент для каркасного дома”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 23,
+      "clusterId": "etapy-stroitelstva-doma",
+      "titleIntent": "Этапы строительства частного дома",
+      "owner": "/journal/etapy-stroitelstva-doma",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 37,
+      "score": 78,
+      "status": "ready_for_brief",
+      "blockers": [
+        "author_review",
+        "evtenia_examples"
+      ],
+      "requiredLinks": [
+        "/"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “этапы строительства дома”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 24,
+      "clusterId": "kakoy-fundament-vybrat-dlya-doma",
+      "titleIntent": "Какой фундамент выбрать для частного дома",
+      "owner": "/journal/kakoy-fundament-vybrat-dlya-doma",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 13,
+      "score": 78,
+      "status": "ready_for_brief",
+      "blockers": [
+        "local_cases",
+        "technical_review"
+      ],
+      "requiredLinks": [
+        "/services/fundament"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “какой фундамент лучше для дома”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 25,
+      "clusterId": "kak-vybrat-zabor-dlya-uchastka",
+      "titleIntent": "Как выбрать забор для участка",
+      "owner": "/journal/kak-vybrat-zabor-dlya-uchastka",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 10,
+      "score": 77,
+      "status": "ready_for_brief",
+      "blockers": [
+        "author_review",
+        "evtenia_examples"
+      ],
+      "requiredLinks": [
+        "/services/zabory"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “дешевые заборы для участка”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 26,
+      "clusterId": "dokumenty-dlya-ipoteki-na-stroitelstvo",
+      "titleIntent": "Документы для ипотеки на строительство дома",
+      "owner": "/journal/dokumenty-dlya-ipoteki-na-stroitelstvo",
+      "region": "Пензенская область",
+      "author": "Евгения Викторовна Кислякова",
+      "reviewer": null,
+      "verifiedMainVolume": 2,
+      "score": 77,
+      "status": "blocked_for_evidence",
+      "blockers": [
+        "publication_day_official_check",
+        "author_approval"
+      ],
+      "requiredLinks": [
+        "/services/mortgage"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “ипотека на строительство дома документы”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 27,
+      "clusterId": "nuzhno-li-uteplyat-gazobeton",
+      "titleIntent": "Нужно ли утеплять дом из газобетона",
+      "owner": "/journal/nuzhno-li-uteplyat-gazobeton",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 14,
+      "score": 74,
+      "status": "ready_for_brief",
+      "blockers": [
+        "evtenia_assemblies",
+        "technical_review"
+      ],
+      "requiredLinks": [
+        "/projects/doma-iz-gazobetona"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “чем утеплить дом из газобетона”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 28,
+      "clusterId": "plyusy-minusy-doma-iz-gazobetona",
+      "titleIntent": "Плюсы и минусы дома из газобетона",
+      "owner": "/journal/plyusy-minusy-doma-iz-gazobetona",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 14,
+      "score": 74,
+      "status": "ready_for_brief",
+      "blockers": [
+        "evtenia_assemblies",
+        "technical_review"
+      ],
+      "requiredLinks": [
+        "/projects/doma-iz-gazobetona"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “дома из газобетона лучше”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 29,
+      "clusterId": "karkasnyy-ili-gazobetonnyy-dom",
+      "titleIntent": "Каркасный или газобетонный дом: что выбрать",
+      "owner": "/journal/karkasnyy-ili-gazobetonnyy-dom",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 3,
+      "score": 74,
+      "status": "ready_for_brief",
+      "blockers": [
+        "author_review",
+        "evtenia_examples"
+      ],
+      "requiredLinks": [
+        "/projects/karkasnye-doma",
+        "/projects/doma-iz-gazobetona"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “дом из газобетона или каркасный”, collect Evtenia examples, then run the quality gate."
+    },
+    {
+      "rank": 30,
+      "clusterId": "landshaftnyy-dizayn-10-sotok",
+      "titleIntent": "Ландшафтный дизайн участка 10 соток с домом",
+      "owner": "/journal/landshaftnyy-dizayn-uchastka-10-sotok",
+      "region": "Пензенская область",
+      "author": "Олег Иванович Кисляков",
+      "reviewer": null,
+      "verifiedMainVolume": 23,
+      "score": 71,
+      "status": "ready_for_brief",
+      "blockers": [
+        "author_review",
+        "evtenia_examples"
+      ],
+      "requiredLinks": [
+        "/services/landshaft"
+      ],
+      "nextAction": "Prepare a SERP/content brief for “ландшафтный дизайн участка с домом”, collect Evtenia examples, then run the quality gate."
+    }
+  ]
+}

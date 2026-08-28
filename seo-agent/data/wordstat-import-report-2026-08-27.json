@@ -1,0 +1,179 @@
+{
+  "version": 1,
+  "importedAt": "2026-08-27",
+  "source": "data/wordstat-raw-2026-08-27.json",
+  "matchedMainQueries": 28,
+  "unmatchedMainQueries": 0,
+  "matchedSupportingQueries": 5,
+  "matched": [
+    {
+      "id": "stroitelstvo-domov-pod-klyuch-penza",
+      "q": "строительство домов под ключ в Пензе",
+      "vol": 35,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "proekty-domov-penza",
+      "q": "проекты домов в Пензе",
+      "vol": 46,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "karkasnye-doma-penza",
+      "q": "каркасные дома под ключ в Пензе",
+      "vol": 77,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "modulnye-doma-penza",
+      "q": "модульные дома под ключ в Пензе",
+      "vol": 73,
+      "batchId": "russia-modular"
+    },
+    {
+      "id": "doma-iz-gazobetona-penza",
+      "q": "дома из газобетона под ключ в Пензе",
+      "vol": 1,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "fundament-pod-dom-penza",
+      "q": "фундамент под дом в Пензе",
+      "vol": 3,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "ipoteka-na-stroitelstvo-penza",
+      "q": "ипотека на строительство дома в Пензе",
+      "vol": 3,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "zemelnye-uchastki-penza",
+      "q": "земельные участки под строительство дома Пенза",
+      "vol": 14,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "kakuyu-tekhnologiyu-doma-vybrat",
+      "q": "какую технологию строительства дома выбрать",
+      "vol": 2,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "karkasnyy-ili-gazobetonnyy-dom",
+      "q": "каркасный или газобетонный дом что лучше",
+      "vol": 0,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "modulnyy-ili-karkasnyy-dom",
+      "q": "модульный или каркасный дом что лучше",
+      "vol": 415,
+      "batchId": "russia-modular"
+    },
+    {
+      "id": "skolko-stoit-postroit-dom",
+      "q": "сколько стоит построить дом в Пензе",
+      "vol": 38,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "chto-vkhodit-v-dom-pod-klyuch",
+      "q": "что входит в строительство дома под ключ",
+      "vol": 0,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "kakoy-fundament-vybrat-dlya-doma",
+      "q": "какой фундамент выбрать для дома",
+      "vol": 0,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "fundament-dlya-karkasnogo-doma",
+      "q": "какой фундамент лучше для каркасного дома",
+      "vol": 0,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "nuzhna-li-geologiya-uchastka",
+      "q": "нужна ли геология участка перед строительством дома",
+      "vol": 0,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "semeynaya-ipoteka-na-stroitelstvo-doma",
+      "q": "семейная ипотека на строительство дома",
+      "vol": 47,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "dokumenty-dlya-ipoteki-na-stroitelstvo",
+      "q": "документы для ипотеки на строительство дома",
+      "vol": 0,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "kak-vybrat-proekt-doma",
+      "q": "как выбрать проект дома",
+      "vol": 0,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "odnoetazhnyy-ili-dvukhetazhnyy-dom",
+      "q": "одноэтажный или двухэтажный дом что лучше",
+      "vol": 1,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "etapy-stroitelstva-doma",
+      "q": "этапы строительства дома под ключ",
+      "vol": 0,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "kogda-luchshe-nachinat-stroitelstvo-doma",
+      "q": "когда лучше начинать строительство дома",
+      "vol": 0,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "karkasnyy-dom-dlya-postoyannogo-prozhivaniya",
+      "q": "каркасный дом для постоянного проживания",
+      "vol": 47,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "nuzhno-li-uteplyat-gazobeton",
+      "q": "нужно ли утеплять дом из газобетона",
+      "vol": 0,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "modulnyy-dom-dlya-postoyannogo-prozhivaniya",
+      "q": "модульный дом для постоянного проживания",
+      "vol": 2681,
+      "batchId": "russia-modular"
+    },
+    {
+      "id": "podgotovka-uchastka-k-stroitelstvu",
+      "q": "как подготовить участок к строительству дома",
+      "vol": 0,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "mezhevanie-pered-stroitelstvom",
+      "q": "нужно ли межевание перед строительством дома",
+      "vol": 0,
+      "batchId": "penza-core"
+    },
+    {
+      "id": "skvazhina-ili-centralnaya-voda",
+      "q": "скважина или центральный водопровод для частного дома",
+      "vol": 0,
+      "batchId": "penza-core"
+    }
+  ],
+  "unmatched": []
+}

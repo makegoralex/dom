@@ -19,6 +19,9 @@ export type JournalArticle = {
   categoryId: string;
   tags: string[];
   author: string;
+  authorRole: string;
+  authorBio: string;
+  reviewer: string;
   status: 'draft' | 'review' | 'published';
   featured: boolean;
   relatedProjectIds: string[];
@@ -68,6 +71,21 @@ function formatDate(value?: string) {
   return new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(value));
 }
 
+function articleText(html: string) {
+  const doc = new DOMParser().parseFromString(html || '', 'text/html');
+  return (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
+}
+
+function setMeta(selector: string, attribute: 'name' | 'property', key: string, content: string) {
+  let meta = document.querySelector(selector) as HTMLMetaElement | null;
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.setAttribute(attribute, key);
+    document.head.appendChild(meta);
+  }
+  meta.content = content;
+}
+
 function sanitizeArticleHtml(html: string) {
   if (!html) return '';
   const parser = new DOMParser();
@@ -87,7 +105,7 @@ function JournalCard({ article, category, resolveMedia }: { article: JournalArti
   return (
     <article className="journal-card">
       <a className="journal-card-cover" href={`/journal/${article.slug}`}>
-        {article.coverImage ? <img src={resolveMedia(article.coverImage)} alt="" /> : <span>EVTENIA · ЖУРНАЛ</span>}
+        {article.coverImage ? <img src={resolveMedia(article.coverImage)} alt={`Обложка статьи «${article.title}»`} loading="lazy" /> : <span>EVTENIA · ЖУРНАЛ</span>}
       </a>
       <div className="journal-card-body">
         {category ? <a className="journal-category-label" href={`/journal/category/${category.slug}`}>{category.name}</a> : null}
@@ -172,7 +190,7 @@ export function JournalIndexPage({ apiBase, Header, Footer, resolveMedia, catego
             ) : null}
             {featured ? (
               <article className="journal-featured">
-                <a className="journal-featured-cover" href={`/journal/${featured.slug}`}>{featured.coverImage ? <img src={resolveMedia(featured.coverImage)} alt="" /> : <span>Главный материал</span>}</a>
+                <a className="journal-featured-cover" href={`/journal/${featured.slug}`}>{featured.coverImage ? <img src={resolveMedia(featured.coverImage)} alt={`Обложка статьи «${featured.title}»`} /> : <span>Главный материал</span>}</a>
                 <div><span className="journal-category-label">{categories.find((category) => category.id === featured.categoryId)?.name}</span><h2><a href={`/journal/${featured.slug}`}>{featured.title}</a></h2><p>{featured.excerpt}</p><a className="journal-read-link" href={`/journal/${featured.slug}`}>Читать материал →</a></div>
               </article>
             ) : null}
@@ -207,6 +225,8 @@ export function JournalArticlePage({ apiBase, Header, Footer, resolveMedia, slug
 
   const category = categories.find((item) => item.id === article?.categoryId);
   const relatedProjects = useMemo(() => projects.filter((project) => article?.relatedProjectIds.includes(project.id)), [article, projects]);
+  const wordCount = useMemo(() => article ? articleText(article.content).split(/\s+/).filter(Boolean).length : 0, [article]);
+  const readingMinutes = Math.max(1, Math.ceil(wordCount / 180));
 
   useEffect(() => {
     if (!article) return;
@@ -217,15 +237,39 @@ export function JournalArticlePage({ apiBase, Header, Footer, resolveMedia, slug
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.appendChild(canonical); }
     canonical.href = `${window.location.origin}/journal/${article.slug}`;
+    const image = article.coverImage ? resolveMedia(article.coverImage) : `${window.location.origin}/assets/logo_small.png`;
+    setMeta('meta[property="og:type"]', 'property', 'og:type', 'article');
+    setMeta('meta[property="og:title"]', 'property', 'og:title', article.seoTitle || article.title);
+    setMeta('meta[property="og:description"]', 'property', 'og:description', article.seoDescription || article.excerpt);
+    setMeta('meta[property="og:url"]', 'property', 'og:url', canonical.href);
+    setMeta('meta[property="og:image"]', 'property', 'og:image', image);
+    setMeta('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
+    setMeta('meta[name="twitter:title"]', 'name', 'twitter:title', article.seoTitle || article.title);
+    setMeta('meta[name="twitter:description"]', 'name', 'twitter:description', article.seoDescription || article.excerpt);
+    setMeta('meta[name="twitter:image"]', 'name', 'twitter:image', image);
     const previous = document.getElementById('journal-article-schema');
     previous?.remove();
     const schema = document.createElement('script');
     schema.id = 'journal-article-schema';
     schema.type = 'application/ld+json';
-    schema.text = JSON.stringify({ '@context': 'https://schema.org', '@type': 'Article', headline: article.title, description: article.excerpt, image: article.coverImage ? [resolveMedia(article.coverImage)] : undefined, datePublished: article.publishedAt, dateModified: article.updatedAt, author: { '@type': 'Organization', name: article.author || 'Evtenia' }, publisher: { '@type': 'Organization', name: 'Evtenia' }, mainEntityOfPage: canonical.href });
+    schema.text = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@graph': [
+        { '@type': 'WebSite', '@id': `${window.location.origin}/#website`, url: window.location.origin, name: 'Evtenia' },
+        { '@type': 'Organization', '@id': `${window.location.origin}/#organization`, name: 'Evtenia', url: window.location.origin, logo: { '@type': 'ImageObject', url: `${window.location.origin}/assets/logo_small.png` } },
+        { '@type': 'Person', '@id': `${canonical.href}#author`, name: article.author, jobTitle: article.authorRole || undefined, description: article.authorBio || undefined, worksFor: { '@id': `${window.location.origin}/#organization` } },
+        { '@type': 'BreadcrumbList', '@id': `${canonical.href}#breadcrumbs`, itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Главная', item: window.location.origin },
+          { '@type': 'ListItem', position: 2, name: 'Журнал', item: `${window.location.origin}/journal` },
+          ...(category ? [{ '@type': 'ListItem', position: 3, name: category.name, item: `${window.location.origin}/journal/category/${category.slug}` }] : []),
+          { '@type': 'ListItem', position: category ? 4 : 3, name: article.title, item: canonical.href }
+        ] },
+        { '@type': 'Article', '@id': `${canonical.href}#article`, headline: article.title, description: article.excerpt, image: article.coverImage ? { '@type': 'ImageObject', url: image } : undefined, datePublished: article.publishedAt, dateModified: article.updatedAt, author: { '@id': `${canonical.href}#author` }, reviewer: article.reviewer ? { '@type': 'Person', name: article.reviewer } : undefined, publisher: { '@id': `${window.location.origin}/#organization` }, mainEntityOfPage: canonical.href, breadcrumb: { '@id': `${canonical.href}#breadcrumbs` }, wordCount }
+      ]
+    });
     document.head.appendChild(schema);
     return () => schema.remove();
-  }, [article, resolveMedia]);
+  }, [article, category, resolveMedia, wordCount]);
 
   if (missing) return <><Header /><main className="journal-page"><div className="container journal-empty"><h1>Материал не найден</h1><a href="/journal">Вернуться в Журнал</a></div></main><Footer /></>;
   if (!article) return <><Header /><main className="journal-page"><div className="container journal-empty"><strong>Загружаем материал…</strong></div></main><Footer /></>;
@@ -240,15 +284,16 @@ export function JournalArticlePage({ apiBase, Header, Footer, resolveMedia, slug
             {category ? <a className="journal-category-label" href={`/journal/category/${category.slug}`}>{category.name}</a> : null}
             <h1>{article.title}</h1>
             <p>{article.excerpt}</p>
-            <div className="journal-article-meta"><span>{article.author}</span><span>Обновлено {formatDate(article.updatedAt)}</span></div>
+            <div className="journal-article-meta"><span>{article.author}{article.authorRole ? ` · ${article.authorRole}` : ''}</span>{article.publishedAt ? <span>Опубликовано {formatDate(article.publishedAt)}</span> : null}<span>Обновлено {formatDate(article.updatedAt)}</span><span>{readingMinutes} мин чтения</span></div>
           </header>
           {article.coverImage ? <figure className="journal-article-cover"><img src={resolveMedia(article.coverImage)} alt={article.title} /></figure> : null}
           <div className="journal-article-layout">
             <article className="journal-article-content" dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.content) }} />
             <aside className="journal-article-aside"><strong>Планируете строительство?</strong><p>Подберём технологию и проект под участок, бюджет и ипотечную программу.</p><a href={article.ctaHref || '/#lead-form'}>Получить консультацию</a></aside>
           </div>
+          <section className="journal-author-card" aria-label="Об авторе"><div><strong>{article.author}</strong>{article.authorRole ? <span>{article.authorRole}</span> : null}</div>{article.authorBio ? <p>{article.authorBio}</p> : null}{article.reviewer ? <small>Материал проверил: {article.reviewer}</small> : null}</section>
           {article.tags.length ? <div className="journal-tags">{article.tags.map((tag) => <span key={tag}>{tag}</span>)}</div> : null}
-          {relatedProjects.length ? <section className="journal-related"><div className="journal-section-heading"><p>Подходящие решения</p><h2>Проекты по теме</h2></div><div className="journal-project-grid">{relatedProjects.map((project) => <a href={`/project/${project.id}`} key={project.id}><div>{project.coverImage ? <img src={resolveMedia(project.coverImage)} alt="" /> : null}</div><strong>{project.title}</strong><span>{project.area} · {project.priceFrom}</span></a>)}</div></section> : null}
+          {relatedProjects.length ? <section className="journal-related"><div className="journal-section-heading"><p>Подходящие решения</p><h2>Проекты по теме</h2></div><div className="journal-project-grid">{relatedProjects.map((project) => <a href={`/project/${project.id}`} key={project.id}><div>{project.coverImage ? <img src={resolveMedia(project.coverImage)} alt={`Проект дома «${project.title}»`} loading="lazy" /> : null}</div><strong>{project.title}</strong><span>{project.area} · {project.priceFrom}</span></a>)}</div></section> : null}
           {article.relatedServiceSlugs.length ? <section className="journal-related"><div className="journal-section-heading"><p>Можно заказать в Evtenia</p><h2>Услуги по теме</h2></div><div className="journal-service-links">{article.relatedServiceSlugs.map((service) => <a href={`/services/${service}`} key={service}>{SERVICE_NAMES[service] || service.replace(/-/g, ' ')}<span>→</span></a>)}</div></section> : null}
           <section className="journal-final-cta"><div><p>Следующий шаг</p><h2>{article.ctaTitle || 'Поможем выбрать решение'}</h2><span>{article.ctaText}</span></div><a href={article.ctaHref || '/#lead-form'}>Обсудить строительство</a></section>
         </div>
