@@ -841,6 +841,22 @@ const writeData = (data: DataStore): void => {
   fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
 };
 
+const repairManagedJournalDrafts = (): void => {
+  const data = readData();
+  const article = data.journalArticles.find((item) => item.slug === 'modulnye-doma-otzyvy-i-minusy');
+  if (!article || article.content.includes('<h2')) return;
+
+  const sourcePath = path.join(__dirname, '..', '..', 'seo-agent', 'drafts', 'modulnye-doma-otzyvy-i-minusy.html');
+  if (!fs.existsSync(sourcePath)) return;
+
+  article.content = fs.readFileSync(sourcePath, 'utf-8');
+  article.authorRole = article.authorRole || 'Технический директор Evtenia';
+  article.authorBio = article.authorBio || 'Отвечает за техническую часть проектов, строительные технологии, фундаменты, материалы и инженерные решения.';
+  article.updatedAt = new Date().toISOString();
+  writeData(data);
+  console.log('Journal article formatting repaired: modulnye-doma-otzyvy-i-minusy');
+};
+
 const deleteAssetByUrl = (rawUrl: string): boolean => {
   if (!rawUrl) return false;
   try {
@@ -1613,6 +1629,8 @@ if (fs.existsSync(FRONTEND_DIST)) {
   app.use(express.static(FRONTEND_DIST));
   app.get(/^(?!\/api).*/, (_req, res) => res.sendFile(path.join(FRONTEND_DIST, 'index.html')));
 }
+
+repairManagedJournalDrafts();
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
