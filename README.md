@@ -8,3 +8,15 @@ existing `CRM_API_SECRET` value/file.
 
 Submissions enter `pendingHomes` or `pendingLands`. Re-sending the same CRM
 object updates its current pending item instead of creating a duplicate.
+
+## CRM journal integration
+
+The same authenticated integration exposes:
+
+- `GET /api/crm/journal/categories` for the CRM category selector;
+- `PUT /api/crm/journal/articles/:sourceId` for idempotent article publishing.
+
+Set `CRM_SUBMISSION_SECRET` on this backend and
+`DOM_JOURNAL_PUBLICATION_SECRET` on the CRM server to the same value. The CRM
+can reuse its existing `DOM_REALTY_SUBMISSION_SECRET`. Re-publishing an article
+with the same CRM ID updates it instead of creating a duplicate.

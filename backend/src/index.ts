@@ -170,6 +170,8 @@ interface JournalArticle {
   createdAt: string;
   updatedAt: string;
   publishedAt?: string;
+  source?: 'admin' | 'crm';
+  sourceId?: string;
 }
 
 interface DataStore {
@@ -1494,9 +1496,43 @@ function normalizeJournalArticle(incoming: Partial<JournalArticle>, existing?: J
     seoDescription: String(incoming.seoDescription ?? existing?.seoDescription ?? incoming.excerpt ?? existing?.excerpt ?? '').trim(),
     createdAt: existing?.createdAt || now,
     updatedAt: now,
-    publishedAt: status === 'published' ? (existing?.publishedAt || now) : existing?.publishedAt
+    publishedAt: status === 'published' ? (existing?.publishedAt || now) : existing?.publishedAt,
+    source: incoming.source === 'crm' ? 'crm' : (existing?.source || 'admin'),
+    sourceId: String(incoming.sourceId ?? existing?.sourceId ?? '').trim() || undefined
   };
 }
+
+app.get('/api/crm/journal/categories', crmSubmissionAuthMiddleware, (_req, res) => {
+  return res.json([...readData().journalCategories].sort((a, b) => a.order - b.order));
+});
+
+app.put('/api/crm/journal/articles/:sourceId', crmSubmissionAuthMiddleware, (req, res) => {
+  const sourceId = String(req.params.sourceId || '').trim();
+  if (!sourceId) return res.status(400).json({ message: 'Не указан ID статьи в CRM' });
+
+  const data = readData();
+  const index = data.journalArticles.findIndex(
+    (item) => item.source === 'crm' && item.sourceId === sourceId
+  );
+  const article = normalizeJournalArticle(
+    { ...(req.body as Partial<JournalArticle>), source: 'crm', sourceId },
+    index >= 0 ? data.journalArticles[index] : undefined
+  );
+  if (!article.title || !article.slug || !article.categoryId) {
+    return res.status(400).json({ message: 'Укажите заголовок, URL и рубрику' });
+  }
+  if (!data.journalCategories.some((item) => item.id === article.categoryId)) {
+    return res.status(400).json({ message: 'Выберите существующую рубрику' });
+  }
+  if (data.journalArticles.some((item, itemIndex) => itemIndex !== index && item.slug === article.slug)) {
+    return res.status(409).json({ message: 'Статья с таким URL уже есть' });
+  }
+
+  if (index >= 0) data.journalArticles[index] = article;
+  else data.journalArticles.unshift(article);
+  writeData(data);
+  return res.status(index >= 0 ? 200 : 201).json(article);
+});
 
 app.post('/api/admin/journal/articles', authMiddleware, (req, res) => {
   const data = readData();
