@@ -242,6 +242,100 @@ const PROMOTIONS_MENU = [
   { slug: 'vse-akcii', title: 'Все акции', text: 'Здесь публикуем актуальные скидки, акции и специальные предложения.' }
 ];
 
+type ServicePageDetail = {
+  summary: string;
+  scope: string[];
+  result: string;
+};
+
+const SERVICE_PAGE_DETAILS: Record<string, ServicePageDetail> = {
+  fundament: {
+    summary: 'Рассчитаем и устроим надежный фундамент для дома, бани или хозяйственной постройки в Пензе и Пензенской области.',
+    scope: ['Выезд и оценка участка', 'Подбор типа фундамента', 'Разметка и земляные работы', 'Армирование и бетонирование', 'Гидроизоляция и контроль геометрии'],
+    result: 'Готовое основание с понятной сметой, привязанной к проекту, грунтам и нагрузкам.'
+  },
+  besedki: {
+    summary: 'Спроектируем и построим беседку, которая подходит участку по размеру, стилю и сценарию использования.',
+    scope: ['Эскиз и подбор материалов', 'Подготовка основания', 'Изготовление каркаса', 'Кровля и наружная отделка', 'Освещение и дополнительные опции'],
+    result: 'Готовая зона отдыха под ключ — от компактной открытой беседки до утепленного павильона.'
+  },
+  septik: {
+    summary: 'Подберем автономную канализацию под число жильцов, режим проживания и особенности участка в Пензенской области.',
+    scope: ['Расчет производительности', 'Подбор оборудования', 'Подготовка котлована', 'Монтаж и подключение', 'Пусконаладка и рекомендации по эксплуатации'],
+    result: 'Рабочая система отвода стоков с аккуратным монтажом и понятными правилами обслуживания.'
+  },
+  zabory: {
+    summary: 'Установим забор для частного дома, дачи или участка в Пензе и области с учетом рельефа и пожеланий к приватности.',
+    scope: ['Замер периметра', 'Подбор материала и высоты', 'Разметка и монтаж опор', 'Установка секций', 'Ворота, калитка и фурнитура'],
+    result: 'Ровное, надежное ограждение с согласованной комплектацией и аккуратными узлами.'
+  },
+  skvazhiny: {
+    summary: 'Организуем бурение и обустройство скважины для частного дома, бани или дачи в Пензе и Пензенской области.',
+    scope: ['Оценка условий участка', 'Бурение скважины', 'Монтаж обсадной колонны', 'Подбор насоса и автоматики', 'Обустройство ввода воды в дом'],
+    result: 'Автономный источник воды, подготовленный к повседневной эксплуатации.'
+  },
+  'styazhka-pola': {
+    summary: 'Выполним ровную стяжку пола в доме или квартире в Пензе под выбранное финишное покрытие.',
+    scope: ['Проверка основания и уровня', 'Подготовка поверхности', 'Установка маяков', 'Устройство стяжки', 'Контроль плоскости и рекомендации по сушке'],
+    result: 'Прочное ровное основание под плитку, ламинат, паркет или другое покрытие.'
+  },
+  konditsionery: {
+    summary: 'Подберем и установим кондиционер для квартиры, дома или коммерческого помещения в Пензе.',
+    scope: ['Расчет мощности', 'Подбор модели', 'Согласование трассы', 'Монтаж блоков', 'Вакуумирование, запуск и проверка'],
+    result: 'Готовая климатическая система с аккуратным монтажом и инструктажем по использованию.'
+  },
+  'otsenka-nedvizhimosti': {
+    summary: 'Поможем организовать оценку недвижимости в Пензе для сделки, ипотеки, суда или других юридических задач.',
+    scope: ['Уточнение цели оценки', 'Сбор исходных документов', 'Осмотр объекта', 'Анализ рынка', 'Подготовка итогового отчета'],
+    result: 'Оформленный результат оценки для заявленной цели и понятный список необходимых документов.'
+  },
+  'plastikovye-okna': {
+    summary: 'Подберем и установим пластиковые окна в Пензе с учетом теплоизоляции, шума, внешнего вида и бюджета.',
+    scope: ['Точный замер проемов', 'Подбор профиля и стеклопакета', 'Расчет комплектации', 'Доставка и монтаж', 'Отделка откосов и регулировка'],
+    result: 'Теплые и герметичные окна с аккуратным примыканием и настроенной фурнитурой.'
+  },
+  dveri: {
+    summary: 'Подберем входные и межкомнатные двери для дома или квартиры в Пензе и выполним монтаж.',
+    scope: ['Замер проемов', 'Подбор полотен и отделки', 'Комплектация фурнитурой', 'Доставка', 'Монтаж и регулировка'],
+    result: 'Установленные двери, которые подходят интерьеру и корректно работают после монтажа.'
+  },
+  remont: {
+    summary: 'Выполним ремонт дома или квартиры в Пензе — от отдельных помещений до комплексной отделки под ключ.',
+    scope: ['Осмотр и составление сметы', 'Демонтаж и подготовка', 'Инженерные и черновые работы', 'Чистовая отделка', 'Финальная проверка и сдача'],
+    result: 'Готовое пространство с согласованными материалами, этапами и бюджетом.'
+  },
+  lestnitsy: {
+    summary: 'Спроектируем и изготовим лестницу для частного дома в Пензе с учетом проема, безопасности и интерьера.',
+    scope: ['Замер проема', 'Расчет конструкции', 'Подбор материала и отделки', 'Изготовление элементов', 'Монтаж и финишная регулировка'],
+    result: 'Удобная и надежная лестница, рассчитанная под конкретное помещение.'
+  },
+  svai: {
+    summary: 'Выполним монтаж винтовых или железобетонных свай для дома, бани, террасы или другой постройки в Пензенской области.',
+    scope: ['Оценка грунта и нагрузок', 'Подбор типа и длины свай', 'Разметка свайного поля', 'Монтаж', 'Выравнивание и подготовка оголовков'],
+    result: 'Готовое свайное основание с контролем положения и высотных отметок.'
+  },
+  dizainer: {
+    summary: 'Разработаем дизайн интерьера дома или квартиры в Пензе, чтобы заранее согласовать стиль, планировку и материалы.',
+    scope: ['Обмер и бриф', 'Планировочные решения', 'Концепция и коллажи', 'Визуализации', 'Рабочие чертежи и подбор материалов'],
+    result: 'Понятный проект, по которому удобно считать бюджет, закупать материалы и выполнять ремонт.'
+  },
+  'landshaftnyy-dizayn': {
+    summary: 'Спроектируем благоустройство участка в Пензе и области с учетом рельефа, дома и образа жизни семьи.',
+    scope: ['Выезд и анализ участка', 'Функциональное зонирование', 'Дорожки и площадки', 'Озеленение и освещение', 'План реализации и подбор материалов'],
+    result: 'Цельная концепция участка с понятной очередностью работ и составом решений.'
+  },
+  mezhevanie: {
+    summary: 'Поможем провести межевание земельного участка в Пензе и Пензенской области и подготовить необходимые документы.',
+    scope: ['Проверка исходных данных', 'Геодезические измерения', 'Определение границ', 'Согласование при необходимости', 'Подготовка межевого плана'],
+    result: 'Документы для уточнения или постановки границ участка на кадастровый учет.'
+  },
+  'ipoteka-oformlenie': {
+    summary: 'Сопроводим оформление ипотеки на строительство дома в Пензе — от первичного расчета до выхода на сделку.',
+    scope: ['Разбор ситуации и бюджета', 'Подбор подходящих программ', 'Проверка пакета документов', 'Подача заявки', 'Сопровождение согласования и сделки'],
+    result: 'Понятный маршрут оформления без лишних поездок и с контролем каждого этапа.'
+  }
+};
+
 const FURNITURE_STRUCTURE = [
   { title: 'КУХНИ', brands: ['NOBILIA', 'HAECKER'] },
   { title: 'ОБЕДЕННЫЕ ГРУППЫ', brands: ['DRESSY', 'MOBILBERICA', 'FURMAN', 'CAMEL GROUP', 'DRAENERT'] },
@@ -2727,7 +2821,7 @@ function DesignPage() {
   );
 }
 
-function SubsectionPage({ sectionTitle, pageTitle, text, isHtml = false }: { sectionTitle: string; pageTitle: string; text: string; isHtml?: boolean }) {
+function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = false }: { pageSlug: string; sectionTitle: string; pageTitle: string; text: string; isHtml?: boolean }) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [serviceStatus, setServiceStatus] = useState('');
@@ -2735,6 +2829,10 @@ function SubsectionPage({ sectionTitle, pageTitle, text, isHtml = false }: { sec
     document.title = `${pageTitle} — Evtenia`;
   }, [pageTitle]);
   const isService = sectionTitle === 'Услуги';
+  const serviceSlug = pageSlug.startsWith('services-') ? pageSlug.replace('services-', '') : '';
+  const serviceDetail = SERVICE_PAGE_DETAILS[serviceSlug];
+  const isPromotionsPage = pageSlug.startsWith('discounts-');
+  const isAllPromotions = pageSlug === 'discounts-vse-akcii';
 
   const submitServiceLead = async (event: FormEvent) => {
     event.preventDefault();
@@ -2759,6 +2857,117 @@ function SubsectionPage({ sectionTitle, pageTitle, text, isHtml = false }: { sec
     }
   };
 
+  const serviceForm = isService ? (
+    <aside className="service-side">
+      <form className="service-discount-form" onSubmit={submitServiceLead}>
+        <span className="service-form-kicker">Предложение месяца</span>
+        <h3>Скидка 10%</h3>
+        <small>Оставьте номер — уточним задачу, сориентируем по срокам и стоимости. Скидка действует до {monthEndLabel()}.</small>
+        <label>Ваше имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
+        <label>Телефон<input type="tel" placeholder="+7 (___) ___-__-__" value={phone} onChange={(e) => setPhone(formatPhoneMask(e.target.value))} required /></label>
+        <PrivacyConsent />
+        <button type="submit">Получить расчет со скидкой</button>
+        {serviceStatus ? <p>{serviceStatus}</p> : null}
+      </form>
+    </aside>
+  ) : null;
+
+  if (serviceDetail) {
+    return (
+      <div>
+        <InternalHeader />
+        <main className="internal-body service-detail-page">
+          <div className="container">
+            <Breadcrumbs items={["Главная", sectionTitle, pageTitle]} />
+            <section className="service-detail-hero">
+              <div>
+                <span className="page-kicker">Услуги в Пензе и Пензенской области</span>
+                <h1>{pageTitle}</h1>
+                <p>{serviceDetail.summary}</p>
+                <a href="#service-request">Обсудить задачу <span>→</span></a>
+              </div>
+              <ul aria-label="Преимущества">
+                <li><b>01</b><span>Смета до начала работ</span></li>
+                <li><b>02</b><span>Один ответственный подрядчик</span></li>
+                <li><b>03</b><span>Работаем по Пензе и области</span></li>
+              </ul>
+            </section>
+            <div className="service-detail-layout" id="service-request">
+              <div className="service-detail-main">
+                <section className="service-detail-card">
+                  <span className="page-kicker">Что входит в работу</span>
+                  <h2>Берем на себя весь необходимый цикл</h2>
+                  <div className="service-scope-grid">
+                    {serviceDetail.scope.map((item, index) => <article key={item}><b>{String(index + 1).padStart(2, '0')}</b><p>{item}</p></article>)}
+                  </div>
+                </section>
+                <section className="service-result-card"><span>Результат</span><p>{serviceDetail.result}</p></section>
+                <section className="service-how-card">
+                  <span className="page-kicker">Как начинаем</span>
+                  <h2>От заявки до понятного плана — три шага</h2>
+                  <ol>
+                    <li><b>1</b><div><h3>Знакомимся с задачей</h3><p>Уточняем объект, адрес, пожелания и исходные условия.</p></div></li>
+                    <li><b>2</b><div><h3>Считаем решение</h3><p>Определяем состав работ, материалы, ориентировочные сроки и бюджет.</p></div></li>
+                    <li><b>3</b><div><h3>Согласовываем старт</h3><p>Фиксируем договоренности и планируем удобную дату начала.</p></div></li>
+                  </ol>
+                </section>
+                {text ? <section className="service-cms-note"><CmsHtmlContent html={text} /></section> : null}
+              </div>
+              {serviceForm}
+            </div>
+          </div>
+        </main>
+        <SiteFooter />
+      </div>
+    );
+  }
+
+  if (isPromotionsPage) {
+    const offers = isAllPromotions ? [
+      ['10 соток земли', 'в подарок при заказе строительства дома', 'Главное предложение'],
+      ['Подбор участка', 'бесплатно при заказе строительства дома', 'Экономия времени'],
+      ['Оформление ипотеки', 'бесплатное сопровождение при заказе строительства', 'Без лишних поездок'],
+      ['Проект дома', 'в подарок при заказе строительства', 'Готовая основа'],
+      ['Межевание', 'в подарок клиентам на строительство дома', 'Документы участка'],
+      ['Скидка от 10%', 'на другие услуги для клиентов по строительству', 'Комплексная выгода']
+    ] : [
+      ['Семейная ипотека', 'Проверим, подходит ли программа под вашу ситуацию и выбранный дом.', 'Подбор программы'],
+      ['Ипотека на строительство', 'Поможем собрать пакет документов и пройти этапы согласования.', 'Сопровождение'],
+      ['Кредитные решения', 'Сравним доступные варианты финансирования с учетом бюджета.', 'Персональный расчет']
+    ];
+    return (
+      <div>
+        <InternalHeader />
+        <main className="internal-body promotions-page">
+          <div className="container">
+            <Breadcrumbs items={["Главная", sectionTitle, pageTitle]} />
+            <section className="promotions-hero">
+              <span className="page-kicker">Evtenia · Пенза</span>
+              <h1>{isAllPromotions ? 'Строить дом — выгодно' : 'Ипотека на строительство дома'}</h1>
+              <p>{isAllPromotions ? 'Собрали действующие предложения для тех, кто планирует строительство дома в Пензе и Пензенской области.' : 'Поможем разобраться в программах, подготовить документы и пройти путь от расчета до сделки.'}</p>
+              <div><a href="#promotion-request">Получить консультацию</a><a href="/projects">Выбрать проект дома</a></div>
+            </section>
+            <section className="promotions-list">
+              <div className="promotions-heading"><span className="page-kicker">Актуальные предложения</span><h2>{isAllPromotions ? 'Больше возможностей в одном договоре' : 'Подберем подходящий сценарий'}</h2></div>
+              <div className="promotion-card-grid">
+                {offers.map(([title, description, label], index) => <article key={title}><div><span>{label}</span><b>{String(index + 1).padStart(2, '0')}</b></div><h3>{title}</h3><p>{description}</p></article>)}
+              </div>
+            </section>
+            <section className="promotions-note">
+              <div><span className="page-kicker">Важно знать</span><h2>Условия уточним до старта</h2></div>
+              <div className="promotions-cms-copy"><CmsHtmlContent html={text} /><p>Предложения могут зависеть от проекта, участка и выбранной комплектации. Финальные условия фиксируются после консультации.</p></div>
+            </section>
+            <section className="promotions-cta" id="promotion-request">
+              <div><span className="page-kicker">Бесплатная консультация</span><h2>Рассчитаем ваш вариант</h2><p>Расскажите, какой дом планируете. Ответим на вопросы и предложим следующий шаг.</p></div>
+              <div><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a><a href="/#lead-form">Оставить заявку →</a></div>
+            </section>
+          </div>
+        </main>
+        <SiteFooter />
+      </div>
+    );
+  }
+
   return (
     <div>
       <InternalHeader />
@@ -2770,28 +2979,7 @@ function SubsectionPage({ sectionTitle, pageTitle, text, isHtml = false }: { sec
             <div className="internal-text-box">
               {isHtml ? <CmsHtmlContent html={text} /> : <><p>{text}</p><p>Скоро добавим подробное описание услуги и примеры выполненных работ.</p></>}
             </div>
-            {isService ? (
-              <aside className="service-side">
-                <form className="service-discount-form" onSubmit={submitServiceLead}>
-                  <h3>Скидка 10%</h3>
-                  <small>Скидка действует до {monthEndLabel()}.</small>
-                  <label>Имя<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
-                  <label>
-                    Телефон
-                    <input
-                      type="tel"
-                      placeholder="+7 (___) ___-__-__"
-                      value={phone}
-                      onChange={(e) => setPhone(formatPhoneMask(e.target.value))}
-                      required
-                    />
-                  </label>
-                  <PrivacyConsent />
-                  <button type="submit">Заказать услугу со скидкой 10%</button>
-                  {serviceStatus ? <p>{serviceStatus}</p> : null}
-                </form>
-              </aside>
-            ) : null}
+            {serviceForm}
           </div>
         </div>
       </section>
@@ -2811,7 +2999,7 @@ function ManagedTextPage({ slug, fallbackTitle, fallbackContent, sectionTitle }:
       .catch(() => setPage({ slug, title: fallbackTitle, content: fallbackContent }));
   }, [slug, fallbackTitle, fallbackContent]);
 
-  return <SubsectionPage sectionTitle={sectionTitle} pageTitle={page.title} text={page.content} isHtml />;
+  return <SubsectionPage pageSlug={slug} sectionTitle={sectionTitle} pageTitle={page.title} text={page.content} isHtml />;
 }
 
 function AdminPage() {
