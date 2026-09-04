@@ -28,18 +28,20 @@ jobs:
           script: |
             echo "Start deploy on server"
             test -n "$CRM_API_SECRET"
+            git -C /var/www/dom fetch origin main
             runtime_env=/var/www/dom/backend/.env.production
             if [ ! -s "$runtime_env" ]; then
-              old_source=/var/www/dom/backend/src/index.ts
-              test -f "$old_source"
-              admin_login=$(sed -n "s/^const ADMIN_LOGIN = process.env.ADMIN_LOGIN || '\([^']*\)';$/\1/p" "$old_source")
-              admin_password=$(sed -n "s/^const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '\([^']*\)';$/\1/p" "$old_source")
-              admin_token=$(sed -n "s/^const ADMIN_TOKEN = process.env.ADMIN_TOKEN || '\([^']*\)';$/\1/p" "$old_source")
-              max_bot_token=$(sed -n "s/^const MAX_BOT_TOKEN = process.env.MAX_BOT_TOKEN || '\([^']*\)';$/\1/p" "$old_source")
-              test -n "$admin_login"
-              test -n "$admin_password"
-              test -n "$admin_token"
-              test -n "$max_bot_token"
+              old_source=$(mktemp)
+              git -C /var/www/dom show 096bc241c22092c80ffe5d5af73e2dbe633ac9f7:backend/src/index.ts > "$old_source"
+              admin_login=$(awk -F"'" '/^const ADMIN_LOGIN =/{print $2; exit}' "$old_source")
+              admin_password=$(awk -F"'" '/^const ADMIN_PASSWORD =/{print $2; exit}' "$old_source")
+              admin_token=$(awk -F"'" '/^const ADMIN_TOKEN =/{print $2; exit}' "$old_source")
+              max_bot_token=$(awk -F"'" '/^const MAX_BOT_TOKEN =/{print $2; exit}' "$old_source")
+              rm -f "$old_source"
+              test -n "$admin_login" || { echo "ADMIN_LOGIN migration failed"; exit 1; }
+              test -n "$admin_password" || { echo "ADMIN_PASSWORD migration failed"; exit 1; }
+              test -n "$admin_token" || { echo "ADMIN_TOKEN migration failed"; exit 1; }
+              test -n "$max_bot_token" || { echo "MAX_BOT_TOKEN migration failed"; exit 1; }
               umask 077
               {
                 printf 'ADMIN_LOGIN=%s\n' "$admin_login"
@@ -52,8 +54,8 @@ jobs:
             umask 077
             printf '%s' "$CRM_API_SECRET" > /var/www/dom/.crm_api_secret
             umask 022
-            git -C /var/www/dom fetch origin main
             git -C /var/www/dom reset --hard origin/main
             /var/www/dom/deploy.sh
             echo "Deploy finished"
+
 
