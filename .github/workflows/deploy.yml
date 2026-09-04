@@ -28,6 +28,27 @@ jobs:
           script: |
             echo "Start deploy on server"
             test -n "$CRM_API_SECRET"
+            runtime_env=/var/www/dom/backend/.env.production
+            if [ ! -s "$runtime_env" ]; then
+              old_source=/var/www/dom/backend/src/index.ts
+              test -f "$old_source"
+              admin_login=$(sed -n "s/^const ADMIN_LOGIN = process.env.ADMIN_LOGIN || '\([^']*\)';$/\1/p" "$old_source")
+              admin_password=$(sed -n "s/^const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '\([^']*\)';$/\1/p" "$old_source")
+              admin_token=$(sed -n "s/^const ADMIN_TOKEN = process.env.ADMIN_TOKEN || '\([^']*\)';$/\1/p" "$old_source")
+              max_bot_token=$(sed -n "s/^const MAX_BOT_TOKEN = process.env.MAX_BOT_TOKEN || '\([^']*\)';$/\1/p" "$old_source")
+              test -n "$admin_login"
+              test -n "$admin_password"
+              test -n "$admin_token"
+              test -n "$max_bot_token"
+              umask 077
+              {
+                printf 'ADMIN_LOGIN=%s\n' "$admin_login"
+                printf 'ADMIN_PASSWORD=%s\n' "$admin_password"
+                printf 'ADMIN_TOKEN=%s\n' "$admin_token"
+                printf 'MAX_BOT_TOKEN=%s\n' "$max_bot_token"
+              } > "$runtime_env"
+              echo "Migrated runtime credentials out of source code"
+            fi
             umask 077
             printf '%s' "$CRM_API_SECRET" > /var/www/dom/.crm_api_secret
             umask 022

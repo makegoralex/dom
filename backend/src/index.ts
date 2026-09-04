@@ -5,6 +5,9 @@ import path from 'path';
 import nodemailer from 'nodemailer';
 import multer from 'multer';
 import sharp from 'sharp';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: path.join(__dirname, '..', '.env.production') });
 
 interface HouseProject {
   id: string;
@@ -54,6 +57,11 @@ interface LandPlot {
   sewerage?: string;
   accessRoad?: string;
   relief?: string;
+  sellerName?: string;
+  sellerPhone?: string;
+  submissionCreatedAt?: string;
+  source?: 'site' | 'crm';
+  sourceRealtyId?: string;
 }
 
 interface PendingLandPlot extends LandPlot {
@@ -90,6 +98,11 @@ interface HouseListing {
   sewerage?: string;
   electricity?: string;
   gas?: string;
+  sellerName?: string;
+  sellerPhone?: string;
+  submissionCreatedAt?: string;
+  source?: 'site' | 'crm';
+  sourceRealtyId?: string;
 }
 
 interface PendingHouseListing extends HouseListing {
@@ -201,9 +214,9 @@ interface DataStore {
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, '..', 'data.json');
-const ADMIN_LOGIN = process.env.ADMIN_LOGIN || 'admin_dom';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'DomPenza2026!';
-const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'hidden-admin-token-penza';
+const ADMIN_LOGIN = process.env.ADMIN_LOGIN || '';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN || '';
 const FRONTEND_DIST = path.join(__dirname, '..', '..', 'frontend', 'dist');
 const ASSETS_DIR = path.join(__dirname, '..', '..', 'assets');
 const PROJECTS_ASSETS_DIR = path.join(ASSETS_DIR, 'projects');
@@ -213,7 +226,7 @@ const SMTP_PORT = Number(process.env.SMTP_PORT || 587);
 const SMTP_USER = process.env.SMTP_USER || '';
 const SMTP_PASS = process.env.SMTP_PASS || '';
 const SMTP_FROM = process.env.SMTP_FROM || SMTP_USER || CALLBACK_RECEIVER;
-const MAX_BOT_TOKEN = process.env.MAX_BOT_TOKEN || 'f9LHodD0cOJgTouupLUHk-9x_6WPxh5mFpY61H_hXQAs90iZlxFbTTY874ImDgGp53fS9MCY9SRpOxQoqaQU';
+const MAX_BOT_TOKEN = process.env.MAX_BOT_TOKEN || '';
 const MAX_CALLBACK_CHAT_ID = Number(process.env.MAX_CALLBACK_CHAT_ID || '-76263328333110');
 const CRM_API_URL = process.env.CRM_API_URL || 'https://crm.evtenia.ru/site-lead/create';
 const CRM_API_SECRET_FILE = process.env.CRM_API_SECRET_FILE || '/var/www/dom/.crm_api_secret';
@@ -719,7 +732,12 @@ function normalizeLandPlot(incoming: Partial<LandPlot> & { image?: string }, fal
     waterSupply: String(incoming.waterSupply || '').trim(),
     sewerage: String(incoming.sewerage || '').trim(),
     accessRoad: String(incoming.accessRoad || '').trim(),
-    relief: String(incoming.relief || '').trim()
+    relief: String(incoming.relief || '').trim(),
+    sellerName: String(incoming.sellerName || '').trim() || undefined,
+    sellerPhone: String(incoming.sellerPhone || '').trim() || undefined,
+    submissionCreatedAt: String(incoming.submissionCreatedAt || '').trim() || undefined,
+    source: incoming.source,
+    sourceRealtyId: String(incoming.sourceRealtyId || '').trim() || undefined
   };
 }
 
@@ -749,13 +767,24 @@ function normalizeHouseListing(incoming: Partial<HouseListing> & { image?: strin
     waterSupply: String(incoming.waterSupply || '').trim(),
     sewerage: String(incoming.sewerage || '').trim(),
     electricity: String(incoming.electricity || '').trim(),
-    gas: String(incoming.gas || '').trim()
+    gas: String(incoming.gas || '').trim(),
+    sellerName: String(incoming.sellerName || '').trim() || undefined,
+    sellerPhone: String(incoming.sellerPhone || '').trim() || undefined,
+    submissionCreatedAt: String(incoming.submissionCreatedAt || '').trim() || undefined,
+    source: incoming.source,
+    sourceRealtyId: String(incoming.sourceRealtyId || '').trim() || undefined
   };
 }
 
-/** Keep the cadastral number in persistent storage, but never expose it publicly. */
+/** Keep internal seller/submission data in storage, but never expose it publicly. */
 function toPublicLandPlot(land: LandPlot): LandPlot {
-  return { ...land, cadastralNumber: 'По запросу' };
+  const { sellerName: _sellerName, sellerPhone: _sellerPhone, submissionCreatedAt: _submissionCreatedAt, source: _source, sourceRealtyId: _sourceRealtyId, ...publicLand } = land;
+  return { ...publicLand, cadastralNumber: 'По запросу' };
+}
+
+function toPublicHouseListing(home: HouseListing): HouseListing {
+  const { sellerName: _sellerName, sellerPhone: _sellerPhone, submissionCreatedAt: _submissionCreatedAt, source: _source, sourceRealtyId: _sourceRealtyId, ...publicHome } = home;
+  return publicHome;
 }
 
 const ensureDataFile = (): void => {
@@ -949,11 +978,11 @@ app.get('/api/lands/:id', (req, res) => {
   if (!land) return res.status(404).json({ message: 'Участок не найден' });
   return res.json(toPublicLandPlot(land));
 });
-app.get('/api/homes', (_req, res) => res.json(readData().homes || seedHomes));
+app.get('/api/homes', (_req, res) => res.json((readData().homes || seedHomes).map(toPublicHouseListing)));
 app.get('/api/homes/:id', (req, res) => {
   const home = (readData().homes || seedHomes).find((item) => item.id === req.params.id);
   if (!home) return res.status(404).json({ message: 'Дом не найден' });
-  return res.json(home);
+  return res.json(toPublicHouseListing(home));
 });
 app.post('/api/crm/realty-submissions', crmSubmissionAuthMiddleware, (req, res) => {
   const incoming = req.body as Record<string, unknown>;
@@ -1366,7 +1395,15 @@ app.post('/api/admin/pending-lands/:id/approve', authMiddleware, (req, res) => {
   const data = readData();
   const pending = data.pendingLands.find((item) => item.id === id);
   if (!pending) return res.status(404).json({ message: 'Заявка не найдена' });
-  const land = normalizeLandPlot({ ...pending, id: `land_${Date.now()}` });
+  const land = normalizeLandPlot({
+    ...pending,
+    id: `land_${Date.now()}`,
+    sellerName: pending.sellerName,
+    sellerPhone: pending.sellerPhone,
+    submissionCreatedAt: pending.createdAt,
+    source: pending.source || 'site',
+    sourceRealtyId: pending.sourceRealtyId
+  });
   data.lands.unshift(land);
   data.pendingLands = data.pendingLands.filter((item) => item.id !== id);
   writeData(data);
@@ -1404,7 +1441,15 @@ app.post('/api/admin/pending-homes/:id/approve', authMiddleware, (req, res) => {
   const data = readData();
   const pending = data.pendingHomes.find((item) => item.id === id);
   if (!pending) return res.status(404).json({ message: 'Заявка не найдена' });
-  const home = normalizeHouseListing({ ...pending, id: `home_${Date.now()}` });
+  const home = normalizeHouseListing({
+    ...pending,
+    id: `home_${Date.now()}`,
+    sellerName: pending.sellerName,
+    sellerPhone: pending.sellerPhone,
+    submissionCreatedAt: pending.createdAt,
+    source: pending.source || 'site',
+    sourceRealtyId: pending.sourceRealtyId
+  });
   data.homes.unshift(home);
   data.pendingHomes = data.pendingHomes.filter((item) => item.id !== id);
   writeData(data);

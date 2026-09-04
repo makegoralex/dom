@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 73476)
+Total output lines: 4707
+
 import React, { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles.css';
@@ -42,6 +45,11 @@ type LandPlot = {
   sewerage?: string;
   accessRoad?: string;
   relief?: string;
+  sellerName?: string;
+  sellerPhone?: string;
+  submissionCreatedAt?: string;
+  source?: 'site' | 'crm';
+  sourceRealtyId?: string;
 };
 
 const landFacts = (land: LandPlot) => [
@@ -83,6 +91,21 @@ type Lead = {
   sourceTitle?: string;
   createdAt: string;
 };
+
+const LEAD_CATEGORY_ORDER = ['Продажа домов', 'Продажа участков', 'Готовые дома', 'Строительство и проекты', 'Услуги', 'Ипотека и акции', 'Посёлки', 'Прочие'] as const;
+type LeadCategory = (typeof LEAD_CATEGORY_ORDER)[number];
+
+function getLeadCategory(lead: Lead): LeadCategory {
+  const text = `${lead.sourceTitle || ''} ${lead.message || ''}`.toLowerCase();
+  if (/дом на модерац|предлож.*дом|продаж.*дом/.test(text)) return 'Продажа домов';
+  if (/участок на модерац|земл.*модерац|предлож.*участ|продаж.*участ/.test(text)) return 'Продажа участков';
+  if (/готов.*дом|просмотр дома|подбор.*дом/.test(text)) return 'Готовые дома';
+  if (/ипотек|акци|скидк|подар/.test(text)) return 'Ипотека и акции';
+  if (/лесн.*озер|пос[её]лок|участок в жк/.test(text)) return 'Посёлки';
+  if (/услуг|фундамент|септик|скважин|забор|ремонт|двер|окн|кондиционер|дизайн/.test(text)) return 'Услуги';
+  if (/проект|строитель|заказать дом|стать клиент/.test(text)) return 'Строительство и проекты';
+  return 'Прочие';
+}
 
 type ContentPage = {
   slug: string;
@@ -621,7 +644,7 @@ function HeaderNav({
       services: { label: 'УСЛУГИ', active: currentPath.startsWith('/services/') || currentPath === '/design', children: [{ label: 'Проектирование', href: '/design' }, ...serviceColumns.flatMap((column) => column.map((item) => ({ label: item.title, href: `/services/${item.slug}` })))] },
       furniture: { label: 'МЕБЕЛЬ', href: '/furniture', active: currentPath === '/furniture' || currentPath.startsWith('/furniture/'), children: FURNITURE_MENU_CHILDREN },
       promotions: { label: 'ИПОТЕКА И АКЦИИ', active: currentPath.startsWith('/discounts/') || currentPath === '/mortgage-calculator', children: [{ label: 'Ипотечный калькулятор', href: '/mortgage-calculator' }, ...PROMOTIONS_MENU.map((item) => ({ label: item.title, href: `/discounts/${item.slug}` }))] },
-      journal: { label: 'ЖУРНАЛ', href: '/journal', active: currentPath === '/journal' || currentPath.startsWith('/journal/') },
+      journal: { label: 'ЖУРНАЛ EVTENIA', href: '/journal', active: currentPath === '/journal' || currentPath.startsWith('/journal/') },
       contacts: { label: 'КОНТАКТЫ', href: '/contacts', active: currentPath === '/contacts' }
     };
     return menuOrder.map((key) => all[key]).filter(Boolean);
@@ -2068,6 +2091,7 @@ function LandCardImageSlider({ land, href }: { land: LandPlot; href?: string }) 
   return (
     <div className="land-image-slider">
       {href ? <a className="land-image-click-target" href={href} aria-label={`Открыть участок ${land.area}`}><div className="project-image" style={{ backgroundImage: `url(${safeImage})` }} /></a> : <div className="project-image" style={{ backgroundImage: `url(${safeImage})` }} />}
+      <img className="evtenia-watermark" src={resolveMediaUrl('/assets/logo_small.png')} alt="" aria-hidden="true" />
       <span className="land-image-status">Земельный участок</span>
       <span className="land-photo-count" aria-label={`Фото ${activeIndex + 1} из ${images.length}`}>{activeIndex + 1} / {images.length}</span>
       {hasMultiple ? (
@@ -2086,6 +2110,7 @@ function LandDetailGallery({ land }: { land: LandPlot }) {
   return <div className="land-detail-gallery-shell">
     <div className="land-detail-main-photo">
       <img src={resolveMediaUrl(images[activeIndex] || LAND_IMAGE_FALLBACK)} alt={`Участок ${land.area}, фото ${activeIndex + 1}`} />
+      <img className="evtenia-watermark" src={resolveMediaUrl('/assets/logo_small.png')} alt="" aria-hidden="true" />
       <span>{activeIndex + 1} из {images.length}</span>
       {images.length > 1 ? <div className="land-detail-gallery-nav"><button type="button" onClick={() => setActiveIndex((activeIndex - 1 + images.length) % images.length)} aria-label="Предыдущее фото">‹</button><button type="button" onClick={() => setActiveIndex((activeIndex + 1) % images.length)} aria-label="Следующее фото">›</button></div> : null}
     </div>
@@ -2368,244 +2393,7 @@ function LandsPage() {
               </div>
               <div className="lands-filter-help">
                 <span aria-hidden="true">?</span>
-                <p><strong>Не нашли подходящий?</strong><small>Расскажите, что ищете, и мы проверим закрытую базу.</small></p>
-                <button type="button" onClick={() => setOpenSelection(true)}>Оставить заявку</button>
-              </div>
-            </aside>
-            <div className="lands-results">
-              <div className="lands-results-toolbar">
-                <p>Найдено <strong>{filtered.length} {resultLabel}</strong></p>
-                <label>
-                  <span>Сортировка</span>
-                  <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value as typeof sortOrder)}>
-                    <option value="default">По умолчанию</option>
-                    <option value="price-asc">Сначала дешевле</option>
-                    <option value="price-desc">Сначала дороже</option>
-                  </select>
-                </label>
-              </div>
-              <div className="catalog-grid lands-grid">
-              {filtered.map((item) => (
-                <article className="land-card" key={item.id}>
-                  <div className="land-card-visual"><LandCardImageSlider land={item} href={`/lands/${encodeURIComponent(item.id)}`} /></div>
-                  <div className="land-card-content">
-                    <div className="land-card-heading">
-                      <div><p className="land-location"><span aria-hidden="true">⌖</span>{item.district}</p><h3><a href={`/lands/${encodeURIComponent(item.id)}`}>Участок {item.area}</a></h3></div>
-                      <span className="land-verified"><b aria-hidden="true">✓</b> Проверен</span>
-                    </div>
-                    <div className="land-card-facts">
-                      {landFacts(item).filter(([label]) => ['Площадь', 'Назначение', 'Электричество', 'Газ', 'Подъезд', 'Кадастровый номер'].includes(label)).slice(0, 6).map(([label, value]) => <span key={label}><small>{label === 'Кадастровый номер' ? 'Кадастровый №' : label}</small><strong>{value}</strong></span>)}
-                    </div>
-                    {item.description ? <p className="project-desc land-card-description">{item.description}</p> : null}
-                    <div className="land-card-bottom">
-                      <div><small>Стоимость участка</small><strong className="land-card-price">{item.price}</strong></div>
-                      <small>Поможем проверить документы</small>
-                    </div>
-                    <div className="land-card-actions">
-                      <a href={`/lands/${encodeURIComponent(item.id)}`}>Смотреть участок <span aria-hidden="true">→</span></a>
-                      <button type="button" onClick={() => setActiveLand(item)}>Узнать подробности</button>
-                    </div>
-                    {item.mapUrl ? <a className="land-map-link" href={item.mapUrl} target="_blank" rel="noreferrer">Посмотреть на карте ↗</a> : null}
-                  </div>
-                </article>
-              ))}
-              </div>
-              {!filtered.length ? (
-                <div className="lands-empty">
-                  <span aria-hidden="true">⌕</span>
-                  <h3>По этим параметрам участков пока нет</h3>
-                  <p>Сбросьте фильтры или оставьте заявку — предложим варианты из закрытой базы.</p>
-                  <button type="button" onClick={resetFilters}>Сбросить фильтры</button>
-                </div>
-              ) : null}
-            </div>
-            </div>
-          </section>
-        </div>
-      </section>
-      <SiteFooter />
-      <PromoLeadModal
-        open={Boolean(activeLand) || openSelection}
-        onClose={() => { setActiveLand(null); setOpenSelection(false); }}
-        title={activeLand ? `Заявка на участок ${activeLand.cadastralNumber}` : 'Подобрать участок'}
-        promoText={activeLand ? `Участок ${activeLand.area}, ${activeLand.district}, ${activeLand.price}` : 'Подберём варианты под ваш бюджет и задачу'}
-        messagePrefix={activeLand ? `Заявка на участок ${activeLand.cadastralNumber}` : 'Заявка на персональный подбор участка'}
-        sourceTitle={activeLand ? `Земельный участок: ${activeLand.cadastralNumber}` : 'Персональный подбор участка'}
-      />
-      {openSellLand ? (
-        <div className="modal-backdrop" onMouseDown={() => setOpenSellLand(false)}>
-          <div
-            className="modal-card sell-land-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="sell-land-modal-title"
-            onMouseDown={(e) => e.stopPropagation()}
-          >
-            <div className="modal-card-header">
-              <h3 id="sell-land-modal-title">Продать свою землю</h3>
-              <button className="modal-close-button" type="button" aria-label="Закрыть форму" onClick={() => setOpenSellLand(false)}>×</button>
-            </div>
-            <form className="sell-land-form" onSubmit={submitSellLand}>
-              <label>Контактное лицо<input value={sellerName} onChange={(e) => setSellerName(e.target.value)} required /></label>
-              <label>
-                Телефон
-                <input
-                  type="tel"
-                  placeholder="+7 (___) ___-__-__"
-                  value={sellerPhone}
-                  onChange={(e) => setSellerPhone(formatPhoneMask(e.target.value))}
-                  required
-                />
-              </label>
-              <label>Кадастровый номер<input value={sellerCadastralNumber} onChange={(e) => setSellerCadastralNumber(e.target.value)} required /></label>
-              <label>Площадь<input value={sellerArea} onChange={(e) => setSellerArea(e.target.value)} required /></label>
-              <label>Цена<input value={sellerPrice} onChange={(e) => setSellerPrice(e.target.value)} required /></label>
-              <label>Район<input value={sellerDistrict} onChange={(e) => setSellerDistrict(e.target.value)} required /></label>
-              <label>Описание<textarea value={sellerDescription} onChange={(e) => setSellerDescription(e.target.value)} rows={3} required /></label>
-              <label>Карта: ссылка<input value={sellerMapUrl} onChange={(e) => setSellerMapUrl(e.target.value)} /></label>
-              <label>Фото участка<input type="file" multiple accept="image/jpeg,image/png,image/webp" onChange={(e) => setSellerPhotos(Array.from(e.target.files || []))} required /></label>
-              {sellerPhotos.length ? <small>Выбрано фото: {sellerPhotos.length} из {SELL_LAND_MAX_PHOTOS}</small> : <small>До {SELL_LAND_MAX_PHOTOS} фото в формате JPG, PNG или WebP.</small>}
-              <PrivacyConsent />
-              <button type="submit" disabled={sellerSubmitting}>{sellerSubmitting ? 'Отправляем...' : 'Отправить заявку'}</button>
-              {sellerStatus ? <small className="sell-land-status" role="status" aria-live="polite">{sellerStatus}</small> : null}
-            </form>
-          </div>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function ProjectDetailPage() {
-  const projectId = window.location.pathname.replace('/project/', '');
-  const [projects, setProjects] = useState<HouseProject[]>(FALLBACK_PROJECTS);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [openRequest, setOpenRequest] = useState(false);
-
-  useEffect(() => {
-    fetch(`${API_BASE}/api/projects`)
-      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no api'))))
-      .then((data: HouseProject[]) => setProjects(data))
-      .catch(() => setProjects(FALLBACK_PROJECTS));
-  }, []);
-
-  const project = projects.find((item) => item.id === projectId) || FALLBACK_PROJECTS[0];
-  const gallery = [project.coverImage, ...(project.images || [])].filter(Boolean).map((img) => resolveMediaUrl(img));
-  const safeActiveImage = gallery[activeImageIndex] || gallery[0] || '';
-
-  useEffect(() => {
-    setActiveImageIndex(0);
-  }, [project.id]);
-
-  const showPrevImage = () => {
-    if (gallery.length <= 1) return;
-    setActiveImageIndex((prev) => (prev - 1 + gallery.length) % gallery.length);
-  };
-
-  const showNextImage = () => {
-    if (gallery.length <= 1) return;
-    setActiveImageIndex((prev) => (prev + 1) % gallery.length);
-  };
-
-  useEffect(() => {
-    document.title = `${project.title} — Evtenia`;
-  }, [project.title]);
-
-  return (
-    <div>
-      <InternalHeader />
-      <section className="internal-body">
-        <div className="container">
-          <Breadcrumbs items={["Главная", project.category === 'bath' ? "Бани" : "Проекты домов", project.title]} />
-          <h1>{project.title}</h1>
-          <div className="project-detail-layout">
-            <div>
-              <div className="project-detail-slider">
-                <div className="project-detail-main-image" style={{ backgroundImage: `url(${safeActiveImage})` }} />
-                {gallery.length > 1 ? (
-                  <div className="project-slider-controls">
-                    <button type="button" onClick={showPrevImage} aria-label="Предыдущее фото">‹</button>
-                    <span>{activeImageIndex + 1} / {gallery.length}</span>
-                    <button type="button" onClick={showNextImage} aria-label="Следующее фото">›</button>
-                  </div>
-                ) : null}
-              </div>
-              <div className="project-detail-thumbs">
-                {gallery.map((img, index) => (
-                  <button
-                    type="button"
-                    key={`${img}_${index}`}
-                    className={`project-thumb ${index === activeImageIndex ? 'active' : ''}`}
-                    style={{ backgroundImage: `url(${img})` }}
-                    onClick={() => setActiveImageIndex(index)}
-                    aria-label={`Фото ${index + 1}`}
-                  />
-                ))}
-              </div>
-              <div className="project-detail-description">
-                <h3>Особенности проекта</h3>
-                <p>{project.fullDescription || project.shortDescription}</p>
-              </div>
-            </div>
-            <aside className="project-detail-side">
-              <h3>Характеристики</h3>
-              <div className="detail-row"><span>Общая площадь</span><b>{project.area}</b></div>
-              <div className="detail-row"><span>Комнаты</span><b>{project.bedrooms}</b></div>
-              <div className="detail-row"><span>Этажность</span><b>{project.floors}</b></div>
-              <div className="detail-row"><span>Тип строительства</span><b>{project.constructionType}</b></div>
-              <div className="detail-row"><span>Стиль</span><b>{project.style || 'Современный'}</b></div>
-              <strong className="detail-price">{normalizePrice(project.priceFrom)}</strong>
-              <button className="detail-btn" onClick={() => setOpenRequest(true)}>Заявка на просчет дома</button>
-            </aside>
-          </div>
-        </div>
-      </section>
-      <SiteFooter />
-      <PromoLeadModal
-        open={openRequest}
-        onClose={() => setOpenRequest(false)}
-        title={`Заявка: ${project.title}`}
-        promoText="🎁 Проект дома в подарок"
-        messagePrefix={`Заявка на просчет дома: ${project.title}`}
-        sourceTitle={`Проект дома: ${project.title}`}
-      />
-    </div>
-  );
-}
-
-function ContactsPage() {
-  const [siteSettings, setSiteSettings] = useState<SiteSettings>({ logoUrl: DEFAULT_LOGO_URL, ...DEFAULT_CONTACT_PROFILE });
-  useEffect(() => {
-    document.title = 'Контакты — Evtenia';
-    fetch(`${API_BASE}/api/site-settings`)
-      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no site settings'))))
-      .then((payload: SiteSettings) => setSiteSettings({ ...DEFAULT_CONTACT_PROFILE, ...payload }))
-      .catch(() => setSiteSettings({ logoUrl: DEFAULT_LOGO_URL, ...DEFAULT_CONTACT_PROFILE }));
-  }, []);
-
-  return (
-    <div>
-      <InternalHeader />
-      <section className="internal-body">
-        <div className="container">
-          <Breadcrumbs items={["Главная", "Контакты"]} />
-          <h1>КОНТАКТЫ</h1>
-          <div className="contacts-box">
-            <div className="contacts-info">
-              <div className="contacts-person">
-                <img src={CONTACT_PAGE_PHOTO_URL} alt="Менеджер" />
-                <div>
-                  <strong>{DEFAULT_CONTACT_PROFILE.contactName}</strong>
-                  <small>{DEFAULT_CONTACT_PROFILE.contactPosition}</small>
-                </div>
-              </div>
-              <h3>Телефоны:</h3>
-              <p><a href={CONTACTS.mainPhoneHref}>{siteSettings.contactPhone || DEFAULT_CONTACT_PROFILE.contactPhone}</a></p>
-              <p><a href={CONTACTS.extraPhoneHref}>{siteSettings.contactCityPhone || DEFAULT_CONTACT_PROFILE.contactCityPhone}</a></p>
-
-              <h3>Время работы:</h3>
-              <p>🕘 Без выходных: 9:00–18:00</p>
-              <h3>Адрес:</h3>
+                <p><strong>Не нашли подходящий?</strong><small>Расскажите, что ищете, и мы прове…3476 tokens truncated…рес:</h3>
               <p>{OFFICE_ADDRESS}</p>
 
               <h3>Почта:</h3>
@@ -3037,6 +2825,26 @@ function AdminPage() {
   const [imageAlign, setImageAlign] = useState<'left' | 'center' | 'right'>('center');
   const [imageSize, setImageSize] = useState<'sm' | 'md'>('sm');
   const [siteSettingsDraft, setSiteSettingsDraft] = useState<SiteSettings>({ logoUrl: DEFAULT_LOGO_URL, ...DEFAULT_CONTACT_PROFILE });
+  const [homeSearch, setHomeSearch] = useState('');
+  const [landSearch, setLandSearch] = useState('');
+
+  const filteredAdminHomes = useMemo(() => {
+    const query = homeSearch.trim().toLowerCase();
+    if (!query) return homes;
+    return homes.filter((home) => [home.title, home.address, home.district, home.area, home.price, home.sellerName, home.sellerPhone]
+      .some((value) => String(value || '').toLowerCase().includes(query)));
+  }, [homes, homeSearch]);
+
+  const filteredAdminLands = useMemo(() => {
+    const query = landSearch.trim().toLowerCase();
+    if (!query) return lands;
+    return lands.filter((land) => [land.cadastralNumber, land.district, land.area, land.price, land.description, land.sellerName, land.sellerPhone]
+      .some((value) => String(value || '').toLowerCase().includes(query)));
+  }, [lands, landSearch]);
+
+  const groupedLeads = useMemo(() => LEAD_CATEGORY_ORDER
+    .map((category) => ({ category, items: leads.filter((lead) => getLeadCategory(lead) === category) }))
+    .filter((group) => group.items.length), [leads]);
 
   const adminHeaders = useMemo(
     () => ({
@@ -3845,6 +3653,10 @@ function AdminPage() {
     setUploadStatus('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+  const scrollToAdminEditor = () => requestAnimationFrame(() => {
+    document.querySelector('.admin-workspace > .admin-grid > section:first-child, .admin-workspace > section')
+      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 
   return (
     <div className="admin-cms">
@@ -3999,7 +3811,7 @@ function AdminPage() {
                   <p>{normalizePrice(project.priceFrom)}</p>
                 </div>
                 <div className="actions">
-                  <button onClick={() => setDraft(project)}>Изменить</button>
+                  <button onClick={() => { setDraft(project); scrollToAdminEditor(); }}>Изменить</button>
                   <button onClick={() => removeProject(project.id)}>Удалить</button>
                 </div>
               </div>
@@ -4032,14 +3844,17 @@ function AdminPage() {
           <input placeholder="Канализация" value={homeDraft.sewerage || ''} onChange={(e) => setHomeDraft({ ...homeDraft, sewerage: e.target.value })} />
           <input placeholder="Электричество" value={homeDraft.electricity || ''} onChange={(e) => setHomeDraft({ ...homeDraft, electricity: e.target.value })} />
           <input placeholder="Газ" value={homeDraft.gas || ''} onChange={(e) => setHomeDraft({ ...homeDraft, gas: e.target.value })} />
+          <h3>Контакт владельца (виден только в админке)</h3>
+          <input placeholder="Имя владельца" value={homeDraft.sellerName || ''} onChange={(e) => setHomeDraft({ ...homeDraft, sellerName: e.target.value })} />
+          <input placeholder="Телефон владельца" value={homeDraft.sellerPhone || ''} onChange={(e) => setHomeDraft({ ...homeDraft, sellerPhone: e.target.value })} />
           <textarea rows={5} placeholder="Описание" value={homeDraft.description || ''} onChange={(e) => setHomeDraft({ ...homeDraft, description: e.target.value })} />
           <textarea rows={2} placeholder="Ссылки на фото через запятую" value={(homeDraft.images || []).join(', ')} onChange={(e) => setHomeDraft({ ...homeDraft, images: e.target.value.split(',').map((value) => value.trim()).filter(Boolean) })} />
           <label>Загрузить фотографии<input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadHomeImages(files); e.currentTarget.value = ''; }} /></label>
-          {(homeDraft.images || []).length ? <div className="admin-images-grid">{(homeDraft.images || []).map((image, index) => <div className="admin-image-card" key={`${image}_${index}`}><img src={resolveMediaUrl(image)} alt={`Фото дома ${index + 1}`} /><div className="admin-image-actions"><button type="button" onClick={() => setHomeDraft({ ...homeDraft, images: (homeDraft.images || []).filter((_, itemIndex) => itemIndex !== index) })}>Удалить</button></div></div>)}</div> : null}
+          {(homeDraft.images || []).length ? <div className="admin-images-grid">{(homeDraft.images || []).map((image, index) => <div className="admin-image-card" key={`${image}_${index}`}><a className="admin-image-open" href={resolveMediaUrl(image)} target="_blank" rel="noreferrer" title="Открыть фото полностью"><img src={resolveMediaUrl(image)} alt={`Фото дома ${index + 1}`} /></a><div className="admin-image-actions"><button type="button" onClick={() => setHomeDraft({ ...homeDraft, images: (homeDraft.images || []).filter((_, itemIndex) => itemIndex !== index) })}>Удалить</button></div></div>)}</div> : null}
           <button onClick={saveHome}>{homeDraft.id ? 'Сохранить изменения' : 'Добавить дом'}</button>
           {homeDraft.id ? <button onClick={() => setHomeDraft({ marketType: 'new', images: [] })}>Отменить</button> : null}
         </div>
-      </section><section><h2>Дома в каталоге ({homes.length})</h2><div className="list">{homes.map((home) => <div className="list-item" key={home.id}><div><strong>{home.title}</strong><p>{home.marketType === 'new' ? 'Новый дом' : 'Вторичное жильё'} • {home.area} • {home.price}</p><small>{home.address}</small></div><div className="actions"><button onClick={() => setHomeDraft(home)}>Изменить</button><button onClick={() => removeHome(home.id)}>Удалить</button></div></div>)}</div></section></div> : null}
+      </section><section><h2>Дома в каталоге ({homes.length})</h2><label className="admin-live-search">Поиск по размещённым домам<input type="search" value={homeSearch} onChange={(event) => setHomeSearch(event.target.value)} placeholder="Название, адрес, район, цена или владелец" /></label><div className="admin-search-result-count">Найдено: {filteredAdminHomes.length}</div><div className="list">{filteredAdminHomes.map((home) => <div className="list-item" key={home.id}><div><strong>{home.title}</strong><p>{home.marketType === 'new' ? 'Новый дом' : 'Вторичное жильё'} • {home.area} • {home.price}</p><small>{home.address}</small>{home.sellerName || home.sellerPhone ? <small className="admin-owner-contact">Владелец: {home.sellerName || 'имя не указано'} · {home.sellerPhone || 'телефон не указан'}</small> : null}</div><div className="actions"><button onClick={() => { setHomeDraft(home); scrollToAdminEditor(); }}>Изменить</button><button onClick={() => removeHome(home.id)}>Удалить</button></div></div>)}</div></section></div> : null}
 
       {activeTab === 'homeRequests' ? <div className="admin-grid"><section><h2>Дома на модерации ({pendingHomes.length})</h2><div className="list">{pendingHomes.length ? pendingHomes.map((home) => <div className="list-item" key={home.id}><div><strong>{home.title}</strong><p>{home.area} • {home.district} • {home.price}</p><p>Продавец: {home.sellerName}, {home.sellerPhone}</p>{home.source === 'crm' ? <small>Источник: CRM, объект #{home.sourceRealtyId}</small> : null}<small>Фото: {(home.images || []).length}</small></div><div className="actions"><button onClick={() => setPendingHomeDraft(home)}>Подробнее / изменить</button><button onClick={() => rejectPendingHome(home.id)}>Отклонить</button></div></div>) : <div className="admin-empty"><span>✓</span><strong>Очередь пуста</strong><p>Новых домов для проверки пока нет.</p></div>}</div></section><section><h2>{pendingHomeDraft ? 'Проверка объявления' : 'Выберите заявку'}</h2>{pendingHomeDraft ? <div className="admin-form">
         <input placeholder="Продавец" value={pendingHomeDraft.sellerName} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, sellerName: e.target.value })} /><input placeholder="Телефон" value={pendingHomeDraft.sellerPhone} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, sellerPhone: e.target.value })} />
@@ -4047,7 +3862,7 @@ function AdminPage() {
         <input placeholder="Площадь дома" value={pendingHomeDraft.area} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, area: e.target.value })} /><input placeholder="Площадь участка" value={pendingHomeDraft.landArea} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, landArea: e.target.value })} /><input placeholder="Цена" value={pendingHomeDraft.price} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, price: e.target.value })} /><input placeholder="Район" value={pendingHomeDraft.district} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, district: e.target.value })} /><input placeholder="Адрес" value={pendingHomeDraft.address} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, address: e.target.value })} /><input placeholder="Этажность" value={pendingHomeDraft.floors} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, floors: e.target.value })} /><input placeholder="Спальни" value={pendingHomeDraft.bedrooms} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, bedrooms: e.target.value })} /><input placeholder="Год постройки" value={pendingHomeDraft.yearBuilt} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, yearBuilt: e.target.value })} />
         <h3>Дополнительные характеристики</h3><input placeholder="Жилая площадь" value={pendingHomeDraft.livingArea || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, livingArea: e.target.value })} /><input placeholder="Площадь кухни" value={pendingHomeDraft.kitchenArea || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, kitchenArea: e.target.value })} /><input placeholder="Санузлы" value={pendingHomeDraft.bathrooms || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, bathrooms: e.target.value })} /><input placeholder="Материал стен" value={pendingHomeDraft.wallMaterial || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, wallMaterial: e.target.value })} /><input placeholder="Ремонт / состояние" value={pendingHomeDraft.renovation || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, renovation: e.target.value })} /><input placeholder="Отопление" value={pendingHomeDraft.heating || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, heating: e.target.value })} /><input placeholder="Водоснабжение" value={pendingHomeDraft.waterSupply || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, waterSupply: e.target.value })} /><input placeholder="Канализация" value={pendingHomeDraft.sewerage || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, sewerage: e.target.value })} /><input placeholder="Электричество" value={pendingHomeDraft.electricity || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, electricity: e.target.value })} /><input placeholder="Газ" value={pendingHomeDraft.gas || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, gas: e.target.value })} /><textarea rows={5} placeholder="Описание" value={pendingHomeDraft.description} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, description: e.target.value })} />
         <label>Добавить фотографии<input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadHomeImages(files, true); e.currentTarget.value = ''; }} /></label>
-        {(pendingHomeDraft.images || []).length ? <div className="admin-images-grid">{pendingHomeDraft.images.map((image, index) => <div className="admin-image-card" key={`${image}_${index}`}><img src={resolveMediaUrl(image)} alt={`Фото заявки ${index + 1}`} /><div className="admin-image-actions"><button type="button" onClick={() => setPendingHomeDraft({ ...pendingHomeDraft, images: pendingHomeDraft.images.filter((_, itemIndex) => itemIndex !== index) })}>Удалить</button></div></div>)}</div> : null}
+        {(pendingHomeDraft.images || []).length ? <div className="admin-images-grid">{pendingHomeDraft.images.map((image, index) => <div className="admin-image-card" key={`${image}_${index}`}><a className="admin-image-open" href={resolveMediaUrl(image)} target="_blank" rel="noreferrer" title="Открыть фото полностью"><img src={resolveMediaUrl(image)} alt={`Фото заявки ${index + 1}`} /></a><div className="admin-image-actions"><button type="button" onClick={() => setPendingHomeDraft({ ...pendingHomeDraft, images: pendingHomeDraft.images.filter((_, itemIndex) => itemIndex !== index) })}>Удалить</button></div></div>)}</div> : null}
         <button onClick={savePendingHome}>Сохранить изменения</button><button onClick={approvePendingHome}>Одобрить и опубликовать</button><button onClick={() => rejectPendingHome(pendingHomeDraft.id)}>Отклонить</button><button onClick={() => setPendingHomeDraft(null)}>Закрыть</button>
       </div> : <p>Откройте заявку, чтобы проверить описание и фотографии перед публикацией.</p>}</section></div> : null}
 
@@ -4067,6 +3882,9 @@ function AdminPage() {
           <input placeholder="Канализация" value={landDraft.sewerage || ''} onChange={(e) => setLandDraft({ ...landDraft, sewerage: e.target.value })} />
           <input placeholder="Подъезд к участку" value={landDraft.accessRoad || ''} onChange={(e) => setLandDraft({ ...landDraft, accessRoad: e.target.value })} />
           <input placeholder="Рельеф / форма участка" value={landDraft.relief || ''} onChange={(e) => setLandDraft({ ...landDraft, relief: e.target.value })} />
+          <h3>Контакт владельца (виден только в админке)</h3>
+          <input placeholder="Имя владельца" value={landDraft.sellerName || ''} onChange={(e) => setLandDraft({ ...landDraft, sellerName: e.target.value })} />
+          <input placeholder="Телефон владельца" value={landDraft.sellerPhone || ''} onChange={(e) => setLandDraft({ ...landDraft, sellerPhone: e.target.value })} />
           <textarea rows={3} placeholder="Описание" value={landDraft.description || ''} onChange={(e) => setLandDraft({ ...landDraft, description: e.target.value })} />
           <input placeholder="Карта: ссылка" value={landDraft.mapUrl || ''} onChange={(e) => setLandDraft({ ...landDraft, mapUrl: e.target.value })} />
           <textarea
@@ -4099,17 +3917,20 @@ function AdminPage() {
       </section>
       <section>
         <h2>Участки ({lands.length})</h2>
+        <label className="admin-live-search">Поиск по размещённым участкам<input type="search" value={landSearch} onChange={(event) => setLandSearch(event.target.value)} placeholder="Кадастровый номер, район, цена или владелец" /></label>
+        <div className="admin-search-result-count">Найдено: {filteredAdminLands.length}</div>
         <div className="list">
-          {lands.map((item) => (
+          {filteredAdminLands.map((item) => (
             <div key={item.id} className="list-item">
               <div>
                 <strong>{item.cadastralNumber}</strong>
                 <p>{item.area} • {item.district} • {item.price}</p>
                 {item.description ? <small>{item.description}</small> : null}
                 {item.mapUrl ? <small>Карта: {item.mapUrl}</small> : null}
+                {item.sellerName || item.sellerPhone ? <small className="admin-owner-contact">Владелец: {item.sellerName || 'имя не указано'} · {item.sellerPhone || 'телефон не указан'}</small> : null}
               </div>
               <div className="actions">
-                <button onClick={() => setLandDraft(item)}>Изменить</button>
+                <button onClick={() => { setLandDraft(item); scrollToAdminEditor(); }}>Изменить</button>
                 <button onClick={() => removeLand(item.id)}>Удалить</button>
               </div>
             </div>
@@ -4143,7 +3964,7 @@ function AdminPage() {
           {lesnoeOzeroPlotDraft.id ? <span style={{ left: `${lesnoeOzeroPlotDraft.position?.x ?? 50}%`, top: `${lesnoeOzeroPlotDraft.position?.y ?? 50}%` }}>{lesnoeOzeroPlotDraft.id}</span> : null}
         </div>
         <div className="list">
-          {lesnoeOzeroPlots.map((item) => <div key={item.id} className="list-item"><div><strong>№{item.id} · {item.areaSotka} сот.</strong><p>{LESNOE_OZERO_PHASES[item.phase].shortLabel} · {item.status} · {item.price || 'цена по запросу'}</p></div><div className="actions"><button type="button" onClick={() => setLesnoeOzeroPlotDraft(item)}>Изменить</button><button type="button" onClick={() => removeLesnoeOzeroPlot(item.id)}>Удалить</button></div></div>)}
+          {lesnoeOzeroPlots.map((item) => <div key={item.id} className="list-item"><div><strong>№{item.id} · {item.areaSotka} сот.</strong><p>{LESNOE_OZERO_PHASES[item.phase].shortLabel} · {item.status} · {item.price || 'цена по запросу'}</p></div><div className="actions"><button type="button" onClick={() => { setLesnoeOzeroPlotDraft(item); scrollToAdminEditor(); }}>Изменить</button><button type="button" onClick={() => removeLesnoeOzeroPlot(item.id)}>Удалить</button></div></div>)}
         </div>
       </section></div> : null}
 
@@ -4203,7 +4024,7 @@ function AdminPage() {
                 <div className="admin-images-grid">
                   {(pendingLandDraft.images || []).map((img, index) => (
                     <div key={`${img}_${index}`} className="admin-image-card">
-                      <img src={resolveMediaUrl(img)} alt={`Фото заявки ${index + 1}`} />
+                      <a className="admin-image-open" href={resolveMediaUrl(img)} target="_blank" rel="noreferrer" title="Открыть фото полностью"><img src={resolveMediaUrl(img)} alt={`Фото заявки ${index + 1}`} /></a>
                       <div className="admin-image-actions">
                         <button type="button" onClick={() => movePendingLandImage(index, -1)}>←</button>
                         <button type="button" onClick={() => movePendingLandImage(index, 1)}>→</button>
@@ -4298,7 +4119,7 @@ function AdminPage() {
           <section>
             <h2>Статьи ({journalArticles.length})</h2>
             <div className="journal-admin-filters"><span>Черновики: {journalArticles.filter((article) => article.status === 'draft').length}</span><span>На проверке: {journalArticles.filter((article) => article.status === 'review').length}</span><span>Опубликовано: {journalArticles.filter((article) => article.status === 'published').length}</span></div>
-            <div className="list journal-article-list">{journalArticles.length ? journalArticles.map((article) => <div className="list-item" key={article.id}><div><span className={`journal-status is-${article.status}`}>{article.status === 'published' ? 'Опубликовано' : article.status === 'review' ? 'На проверке' : 'Черновик'}</span><strong>{article.title}</strong><p>{journalCategories.find((category) => category.id === article.categoryId)?.name || 'Без рубрики'}</p><small>Обновлено {new Date(article.updatedAt).toLocaleDateString('ru-RU')}</small></div><div className="actions"><button type="button" onClick={() => setJournalArticleDraft(article)}>Изменить</button><button type="button" onClick={() => removeJournalArticle(article.id)}>Удалить</button></div></div>) : <div className="admin-empty"><span>Ж</span><strong>Статей пока нет</strong><p>Создайте первый материал и сохраните его черновиком.</p></div>}</div>
+            <div className="list journal-article-list">{journalArticles.length ? journalArticles.map((article) => <div className="list-item" key={article.id}><div><span className={`journal-status is-${article.status}`}>{article.status === 'published' ? 'Опубликовано' : article.status === 'review' ? 'На проверке' : 'Черновик'}</span><strong>{article.title}</strong><p>{journalCategories.find((category) => category.id === article.categoryId)?.name || 'Без рубрики'}</p><small>Обновлено {new Date(article.updatedAt).toLocaleDateString('ru-RU')}</small></div><div className="actions"><button type="button" onClick={() => { setJournalArticleDraft(article); scrollToAdminEditor(); }}>Изменить</button><button type="button" onClick={() => removeJournalArticle(article.id)}>Удалить</button></div></div>) : <div className="admin-empty"><span>Ж</span><strong>Статей пока нет</strong><p>Создайте первый материал и сохраните его черновиком.</p></div>}</div>
           </section>
         </div>
 
@@ -4312,7 +4133,7 @@ function AdminPage() {
               <input type="number" placeholder="Порядок" value={journalCategoryDraft.order || ''} onChange={(e) => setJournalCategoryDraft({ ...journalCategoryDraft, order: Number(e.target.value) })} />
               <div className="actions"><button type="button" onClick={saveJournalCategory}>Сохранить рубрику</button>{journalCategoryDraft.id ? <button type="button" onClick={() => setJournalCategoryDraft({})}>Отмена</button> : null}</div>
             </div>
-            <div className="list">{journalCategories.map((category) => <div className="list-item" key={category.id}><div><strong>{category.name}</strong><p>{category.description}</p><small>/journal/category/{category.slug}</small></div><div className="actions"><button type="button" onClick={() => setJournalCategoryDraft(category)}>Изменить</button><button type="button" onClick={() => removeJournalCategory(category.id)}>Удалить</button></div></div>)}</div>
+            <div className="list">{journalCategories.map((category) => <div className="list-item" key={category.id}><div><strong>{category.name}</strong><p>{category.description}</p><small>/journal/category/{category.slug}</small></div><div className="actions"><button type="button" onClick={() => { setJournalCategoryDraft(category); scrollToAdminEditor(); }}>Изменить</button><button type="button" onClick={() => removeJournalCategory(category.id)}>Удалить</button></div></div>)}</div>
           </div>
         </section>
       </> : null}
@@ -4476,7 +4297,7 @@ function AdminPage() {
                   <p>{item.boxPrice}</p>
                 </div>
                 <div className="actions">
-                  <button onClick={() => setPortfolioDraft(item)}>Изменить</button>
+                  <button onClick={() => { setPortfolioDraft(item); scrollToAdminEditor(); }}>Изменить</button>
                   <button onClick={() => removePortfolio(item.id)}>Удалить</button>
                 </div>
               </div>
@@ -4487,19 +4308,21 @@ function AdminPage() {
 
       {activeTab === 'leads' ? <section>
         <h2>Заявки ({leads.length})</h2>
-        <div className="list">
-          {leads.length ? leads.map((lead) => (
-            <div key={lead.id} className="list-item">
-              <div>
-                <strong>
-                  {lead.name} — {lead.phone}
-                </strong>
-                <p>{lead.message || 'Без комментария'}</p>
+        {groupedLeads.length ? <div className="admin-lead-groups">{groupedLeads.map((group) => (
+          <details className="admin-lead-group" key={group.category} open>
+            <summary><span>{group.category}</span><strong>{group.items.length}</strong></summary>
+            <div className="list">{group.items.map((lead) => (
+              <div key={lead.id} className="list-item">
+                <div>
+                  <strong>{lead.name} — {lead.phone}</strong>
+                  {lead.sourceTitle ? <small className="admin-lead-source">{lead.sourceTitle}</small> : null}
+                  <p>{lead.message || 'Без комментария'}</p>
+                </div>
+                <small>{new Date(lead.createdAt).toLocaleString('ru-RU')}</small>
               </div>
-              <small>{new Date(lead.createdAt).toLocaleString('ru-RU')}</small>
-            </div>
-          )) : <div className="admin-empty"><span>✉</span><strong>Заявок пока нет</strong><p>Новые обращения с сайта появятся в этом разделе.</p></div>}
-        </div>
+            ))}</div>
+          </details>
+        ))}</div> : <div className="admin-empty"><span>✉</span><strong>Заявок пока нет</strong><p>Новые обращения с сайта появятся в этом разделе.</p></div>}
       </section> : null}
         </div>
         <footer className="admin-footer">CMS Evtenia · изменения публикуются на сайте после сохранения</footer>

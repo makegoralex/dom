@@ -27,6 +27,11 @@ export type HouseListing = {
   sewerage?: string;
   electricity?: string;
   gas?: string;
+  sellerName?: string;
+  sellerPhone?: string;
+  submissionCreatedAt?: string;
+  source?: 'site' | 'crm';
+  sourceRealtyId?: string;
 };
 
 type SharedProps = {
@@ -97,6 +102,7 @@ function HouseGallery({ home, resolveMedia }: { home: HouseListing; resolveMedia
   return (
     <div className="home-gallery">
       <img src={resolveMedia(images[active] || FALLBACK_IMAGE)} alt={`${home.title}, фото ${active + 1}`} />
+      <img className="evtenia-watermark" src={resolveMedia('/assets/logo_small.png')} alt="" aria-hidden="true" />
       <span className={`home-market-badge ${home.marketType}`}>{MARKET_LABELS[home.marketType]}</span>
       <span className="home-photo-count">▧ {images.length}</span>
       {images.length > 1 ? <div className="home-gallery-controls"><button type="button" onClick={() => setActive((active - 1 + images.length) % images.length)}>←</button><button type="button" onClick={() => setActive((active + 1) % images.length)}>→</button></div> : null}
