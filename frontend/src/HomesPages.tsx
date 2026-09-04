@@ -47,6 +47,18 @@ const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1600585154340-be6161a5
 const MARKET_LABELS: Record<HouseMarketType, string> = { new: 'Новый дом', secondary: 'Вторичное жильё' };
 const parseNumber = (value: string) => Number(String(value || '').replace(/[^\d]/g, '') || 0);
 
+function listingExcerpt(value: string, maxLength = 190) {
+  const cleaned = String(value || '')
+    .replace(/[•–—-]\s*/g, ' · ')
+    .replace(/\s+/g, ' ')
+    .replace(/(?:\s*·\s*)+/g, ' · ')
+    .trim();
+  if (cleaned.length <= maxLength) return cleaned;
+  const shortened = cleaned.slice(0, maxLength);
+  const lastSpace = shortened.lastIndexOf(' ');
+  return `${shortened.slice(0, lastSpace > maxLength * .7 ? lastSpace : maxLength).replace(/[\s,.;:·]+$/, '')}…`;
+}
+
 const houseFacts = (home: HouseListing) => [
   ['Площадь дома', home.area],
   ['Площадь участка', home.landArea],
@@ -209,7 +221,7 @@ export function HomesPage({ apiBase, Header, Footer, LeadModal, formatPhone, res
             </aside>
             <div className="homes-results">
               <div className="homes-toolbar"><p>Найдено <strong>{filtered.length} {declension(filtered.length, ['объявление', 'объявления', 'объявлений'])}</strong></p><select aria-label="Сортировка" value={sort} onChange={(event) => setSort(event.target.value as typeof sort)}><option value="default">Сначала актуальные</option><option value="price-asc">Сначала дешевле</option><option value="price-desc">Сначала дороже</option></select></div>
-              <div className="homes-grid">{filtered.map((home) => <article className="home-card" key={home.id}><a href={`/homes/${encodeURIComponent(home.id)}`}><HouseGallery home={home} resolveMedia={resolveMedia} /></a><div className="home-card-body"><h3><a href={`/homes/${encodeURIComponent(home.id)}`}>{home.title}</a></h3><p className="home-address">⌖ {home.address || home.district}</p><div className="home-card-facts">{houseFacts(home).filter(([label]) => ['Площадь дома', 'Площадь участка', 'Этажность', 'Спальни', 'Материал стен', 'Год постройки'].includes(label)).slice(0, 6).map(([label, value]) => <span key={label}><small>{label}</small><strong>{value}</strong></span>)}</div>{home.description ? <p className="home-card-description">{home.description}</p> : null}<strong className="home-price">{home.price}</strong><a className="home-card-link" href={`/homes/${encodeURIComponent(home.id)}`}>Подробнее о доме <span>→</span></a></div></article>)}</div>
+              <div className="homes-grid">{filtered.map((home) => <article className="home-card" key={home.id}><a className="home-card-visual" href={`/homes/${encodeURIComponent(home.id)}`}><HouseGallery home={home} resolveMedia={resolveMedia} /></a><div className="home-card-body"><div className="home-card-heading"><div><span>{MARKET_LABELS[home.marketType]}</span><h3><a href={`/homes/${encodeURIComponent(home.id)}`}>{home.title}</a></h3></div></div><p className="home-address">⌖ {home.address || home.district}</p><div className="home-card-facts">{houseFacts(home).filter(([label]) => ['Площадь дома', 'Площадь участка', 'Этажность', 'Спальни', 'Материал стен', 'Год постройки'].includes(label)).slice(0, 6).map(([label, value]) => <span key={label}><small>{label}</small><strong>{value}</strong></span>)}</div>{home.description ? <div className="home-card-description"><span>Главное о доме</span><p>{listingExcerpt(home.description)}</p></div> : null}<div className="home-card-offer"><div><small>Стоимость дома</small><strong className="home-price">{home.price}</strong></div><small><b aria-hidden="true">✓</b> Поможем с просмотром и документами</small></div><a className="home-card-link" href={`/homes/${encodeURIComponent(home.id)}`}>Смотреть дом <span>→</span></a></div></article>)}</div>
               {!filtered.length ? <div className="homes-empty"><h3>Подходящих домов пока нет</h3><p>Измените параметры или оставьте заявку — мы найдём варианты под ваш запрос.</p><button type="button" onClick={reset}>Сбросить фильтры</button></div> : null}
             </div>
           </div>

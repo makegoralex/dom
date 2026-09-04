@@ -1,5 +1,6 @@
 import React, { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom/client';
+import { createPortal } from 'react-dom';
 import './styles.css';
 import './journal.css';
 import { LesnoeOzeroPage } from './LesnoeOzeroPage';
@@ -2101,6 +2102,63 @@ function LandCardImageSlider({ land, href }: { land: LandPlot; href?: string }) 
   );
 }
 
+function listingExcerpt(value: string, maxLength = 190) {
+  const cleaned = String(value || '')
+    .replace(/[•–—-]\s*/g, ' · ')
+    .replace(/\s+/g, ' ')
+    .replace(/(?:\s*·\s*)+/g, ' · ')
+    .trim();
+  if (cleaned.length <= maxLength) return cleaned;
+  const shortened = cleaned.slice(0, maxLength);
+  const lastSpace = shortened.lastIndexOf(' ');
+  return `${shortened.slice(0, lastSpace > maxLength * .7 ? lastSpace : maxLength).replace(/[\s,.;:·]+$/, '')}…`;
+}
+
+function AdminGalleryImage({ images, index, alt }: { images: string[]; index: number; alt: string }) {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const resolvedImages = images.map(resolveMediaUrl);
+  const close = () => setActiveIndex(null);
+  const previous = () => setActiveIndex((current) => current === null ? null : (current - 1 + resolvedImages.length) % resolvedImages.length);
+  const next = () => setActiveIndex((current) => current === null ? null : (current + 1) % resolvedImages.length);
+
+  useEffect(() => {
+    if (activeIndex === null) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') close();
+      if (event.key === 'ArrowLeft' && resolvedImages.length > 1) previous();
+      if (event.key === 'ArrowRight' && resolvedImages.length > 1) next();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleKey);
+    };
+  }, [activeIndex, resolvedImages.length]);
+
+  return (
+    <>
+      <button className="admin-image-open" type="button" onClick={() => setActiveIndex(index)} title="Открыть галерею">
+        <img src={resolvedImages[index]} alt={alt} />
+        <span aria-hidden="true">Увеличить</span>
+      </button>
+      {activeIndex !== null ? createPortal(
+        <div className="admin-gallery-modal" role="dialog" aria-modal="true" aria-label="Просмотр фотографий" onClick={close}>
+          <div className="admin-gallery-stage" onClick={(event) => event.stopPropagation()}>
+            <button className="admin-gallery-close" type="button" onClick={close} aria-label="Закрыть">×</button>
+            {resolvedImages.length > 1 ? <button className="admin-gallery-arrow is-prev" type="button" onClick={previous} aria-label="Предыдущее фото">‹</button> : null}
+            <img src={resolvedImages[activeIndex]} alt={`Фото ${activeIndex + 1} из ${resolvedImages.length}`} />
+            {resolvedImages.length > 1 ? <button className="admin-gallery-arrow is-next" type="button" onClick={next} aria-label="Следующее фото">›</button> : null}
+            <div className="admin-gallery-footer"><span>{activeIndex + 1} / {resolvedImages.length}</span><small>← → для листания · Esc для закрытия</small></div>
+          </div>
+        </div>,
+        document.body
+      ) : null}
+    </>
+  );
+}
+
 function LandDetailGallery({ land }: { land: LandPlot }) {
   const images = land.images?.length ? land.images : [LAND_IMAGE_FALLBACK];
   const [activeIndex, setActiveIndex] = useState(0);
@@ -2418,10 +2476,10 @@ function LandsPage() {
                     <div className="land-card-facts">
                       {landFacts(item).filter(([label]) => ['Площадь', 'Назначение', 'Электричество', 'Газ', 'Подъезд', 'Кадастровый номер'].includes(label)).slice(0, 6).map(([label, value]) => <span key={label}><small>{label === 'Кадастровый номер' ? 'Кадастровый №' : label}</small><strong>{value}</strong></span>)}
                     </div>
-                    {item.description ? <p className="project-desc land-card-description">{item.description}</p> : null}
+                    {item.description ? <div className="land-card-description"><span>Главное об участке</span><p>{listingExcerpt(item.description)}</p></div> : null}
                     <div className="land-card-bottom">
                       <div><small>Стоимость участка</small><strong className="land-card-price">{item.price}</strong></div>
-                      <small>Поможем проверить документы</small>
+                      <small><b aria-hidden="true">✓</b> Проверим документы и организуем просмотр</small>
                     </div>
                     <div className="land-card-actions">
                       <a href={`/lands/${encodeURIComponent(item.id)}`}>Смотреть участок <span aria-hidden="true">→</span></a>
@@ -4084,7 +4142,7 @@ function AdminPage() {
           <textarea rows={5} placeholder="Описание" value={homeDraft.description || ''} onChange={(e) => setHomeDraft({ ...homeDraft, description: e.target.value })} />
           <textarea rows={2} placeholder="Ссылки на фото через запятую" value={(homeDraft.images || []).join(', ')} onChange={(e) => setHomeDraft({ ...homeDraft, images: e.target.value.split(',').map((value) => value.trim()).filter(Boolean) })} />
           <label>Загрузить фотографии<input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadHomeImages(files); e.currentTarget.value = ''; }} /></label>
-          {(homeDraft.images || []).length ? <div className="admin-images-grid">{(homeDraft.images || []).map((image, index) => <div className="admin-image-card" key={`${image}_${index}`}><a className="admin-image-open" href={resolveMediaUrl(image)} target="_blank" rel="noreferrer" title="Открыть фото полностью"><img src={resolveMediaUrl(image)} alt={`Фото дома ${index + 1}`} /></a><div className="admin-image-actions"><button type="button" onClick={() => setHomeDraft({ ...homeDraft, images: (homeDraft.images || []).filter((_, itemIndex) => itemIndex !== index) })}>Удалить</button></div></div>)}</div> : null}
+          {(homeDraft.images || []).length ? <div className="admin-images-grid">{(homeDraft.images || []).map((image, index) => <div className="admin-image-card" key={`${image}_${index}`}><AdminGalleryImage images={homeDraft.images || []} index={index} alt={`Фото дома ${index + 1}`} /><div className="admin-image-actions"><button type="button" onClick={() => setHomeDraft({ ...homeDraft, images: (homeDraft.images || []).filter((_, itemIndex) => itemIndex !== index) })}>Удалить</button></div></div>)}</div> : null}
           <button onClick={saveHome}>{homeDraft.id ? 'Сохранить изменения' : 'Добавить дом'}</button>
           {homeDraft.id ? <button onClick={() => setHomeDraft({ marketType: 'new', images: [] })}>Отменить</button> : null}
         </div>
@@ -4096,7 +4154,7 @@ function AdminPage() {
         <input placeholder="Площадь дома" value={pendingHomeDraft.area} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, area: e.target.value })} /><input placeholder="Площадь участка" value={pendingHomeDraft.landArea} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, landArea: e.target.value })} /><input placeholder="Цена" value={pendingHomeDraft.price} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, price: e.target.value })} /><input placeholder="Район" value={pendingHomeDraft.district} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, district: e.target.value })} /><input placeholder="Адрес" value={pendingHomeDraft.address} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, address: e.target.value })} /><input placeholder="Этажность" value={pendingHomeDraft.floors} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, floors: e.target.value })} /><input placeholder="Спальни" value={pendingHomeDraft.bedrooms} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, bedrooms: e.target.value })} /><input placeholder="Год постройки" value={pendingHomeDraft.yearBuilt} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, yearBuilt: e.target.value })} />
         <h3>Дополнительные характеристики</h3><input placeholder="Жилая площадь" value={pendingHomeDraft.livingArea || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, livingArea: e.target.value })} /><input placeholder="Площадь кухни" value={pendingHomeDraft.kitchenArea || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, kitchenArea: e.target.value })} /><input placeholder="Санузлы" value={pendingHomeDraft.bathrooms || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, bathrooms: e.target.value })} /><input placeholder="Материал стен" value={pendingHomeDraft.wallMaterial || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, wallMaterial: e.target.value })} /><input placeholder="Ремонт / состояние" value={pendingHomeDraft.renovation || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, renovation: e.target.value })} /><input placeholder="Отопление" value={pendingHomeDraft.heating || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, heating: e.target.value })} /><input placeholder="Водоснабжение" value={pendingHomeDraft.waterSupply || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, waterSupply: e.target.value })} /><input placeholder="Канализация" value={pendingHomeDraft.sewerage || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, sewerage: e.target.value })} /><input placeholder="Электричество" value={pendingHomeDraft.electricity || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, electricity: e.target.value })} /><input placeholder="Газ" value={pendingHomeDraft.gas || ''} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, gas: e.target.value })} /><textarea rows={5} placeholder="Описание" value={pendingHomeDraft.description} onChange={(e) => setPendingHomeDraft({ ...pendingHomeDraft, description: e.target.value })} />
         <label>Добавить фотографии<input type="file" multiple accept="image/*" onChange={(e) => { const files = Array.from(e.target.files || []); if (files.length) uploadHomeImages(files, true); e.currentTarget.value = ''; }} /></label>
-        {(pendingHomeDraft.images || []).length ? <div className="admin-images-grid">{pendingHomeDraft.images.map((image, index) => <div className="admin-image-card" key={`${image}_${index}`}><a className="admin-image-open" href={resolveMediaUrl(image)} target="_blank" rel="noreferrer" title="Открыть фото полностью"><img src={resolveMediaUrl(image)} alt={`Фото заявки ${index + 1}`} /></a><div className="admin-image-actions"><button type="button" onClick={() => setPendingHomeDraft({ ...pendingHomeDraft, images: pendingHomeDraft.images.filter((_, itemIndex) => itemIndex !== index) })}>Удалить</button></div></div>)}</div> : null}
+        {(pendingHomeDraft.images || []).length ? <div className="admin-images-grid">{pendingHomeDraft.images.map((image, index) => <div className="admin-image-card" key={`${image}_${index}`}><AdminGalleryImage images={pendingHomeDraft.images} index={index} alt={`Фото заявки ${index + 1}`} /><div className="admin-image-actions"><button type="button" onClick={() => setPendingHomeDraft({ ...pendingHomeDraft, images: pendingHomeDraft.images.filter((_, itemIndex) => itemIndex !== index) })}>Удалить</button></div></div>)}</div> : null}
         <button onClick={savePendingHome}>Сохранить изменения</button><button onClick={approvePendingHome}>Одобрить и опубликовать</button><button onClick={() => rejectPendingHome(pendingHomeDraft.id)}>Отклонить</button><button onClick={() => setPendingHomeDraft(null)}>Закрыть</button>
       </div> : <p>Откройте заявку, чтобы проверить описание и фотографии перед публикацией.</p>}</section></div> : null}
 
@@ -4258,7 +4316,7 @@ function AdminPage() {
                 <div className="admin-images-grid">
                   {(pendingLandDraft.images || []).map((img, index) => (
                     <div key={`${img}_${index}`} className="admin-image-card">
-                      <a className="admin-image-open" href={resolveMediaUrl(img)} target="_blank" rel="noreferrer" title="Открыть фото полностью"><img src={resolveMediaUrl(img)} alt={`Фото заявки ${index + 1}`} /></a>
+                      <AdminGalleryImage images={pendingLandDraft.images || []} index={index} alt={`Фото заявки ${index + 1}`} />
                       <div className="admin-image-actions">
                         <button type="button" onClick={() => movePendingLandImage(index, -1)}>←</button>
                         <button type="button" onClick={() => movePendingLandImage(index, 1)}>→</button>

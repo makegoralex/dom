@@ -213,7 +213,7 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .land-slider-controls{position:absolute; inset:auto auto 14px 14px; z-index:2; display:flex; gap:6px;}
 .land-slider-controls button{display:grid; place-items:center; border:1px solid rgba(255,255,255,.72); border-radius:50%; background:rgba(5,35,26,.7); color:#fff; width:34px; height:34px; cursor:pointer; backdrop-filter:blur(5px);}
 .land-card-visual{display:block; overflow:hidden; color:inherit; text-decoration:none;}
-.land-card-content{display:grid; gap:15px; padding:22px;}
+.land-card-content{display:grid; gap:16px; padding:24px;}
 .land-card-heading{display:flex; align-items:start; justify-content:space-between; gap:14px;}
 .land-card-heading h3{margin:5px 0 0; color:#173c2f; font-family:Georgia,serif; font-size:25px; font-weight:500; line-height:1.1;}
 .land-card-heading h3 a{color:inherit; text-decoration:none;}
@@ -229,10 +229,13 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .land-card-facts span:nth-child(n+4){border-bottom:0;}
 .land-card-facts small,.land-card-bottom small{color:#7a877f; font-size:10px; text-transform:uppercase; letter-spacing:.035em;}
 .land-card-facts strong{overflow:hidden; color:#263b31; font-size:13px; text-overflow:ellipsis; white-space:nowrap;}
-.land-card-description{display:-webkit-box; overflow:hidden; -webkit-box-orient:vertical; -webkit-line-clamp:3; line-clamp:3; min-height:4.35em; margin:0; color:#647068; font-size:14px; line-height:1.45; overflow-wrap:anywhere;}
-.land-card-bottom{display:flex; align-items:end; justify-content:space-between; gap:12px; border-top:1px solid #e4e8e5; padding-top:16px;}
+.land-card-description{position:relative; display:grid; gap:7px; min-height:88px; margin:0; border-left:3px solid #d7b779; border-radius:0 12px 12px 0; padding:14px 16px; color:#52645c; background:linear-gradient(100deg,#f5f2e9,#fafbf8); overflow-wrap:anywhere;}
+.land-card-description span{color:#8c6a38; font-size:10px; font-weight:850; letter-spacing:.09em; text-transform:uppercase;}
+.land-card-description p{display:-webkit-box; overflow:hidden; margin:0; font-size:14px; line-height:1.5; -webkit-box-orient:vertical; -webkit-line-clamp:3; line-clamp:3;}
+.land-card-bottom{display:flex; align-items:end; justify-content:space-between; gap:16px; border-top:1px solid #e4e8e5; padding-top:17px;}
 .land-card-bottom>div{display:grid; gap:3px;}
-.land-card-bottom>small{max-width:135px; text-align:right; line-height:1.35; text-transform:none; letter-spacing:0;}
+.land-card-bottom>small{max-width:165px; color:#567066; text-align:right; line-height:1.4; text-transform:none; letter-spacing:0;}
+.land-card-bottom>small b{display:inline-grid; width:17px; height:17px; margin-right:4px; place-items:center; border-radius:50%; color:#fff; background:#397356; font-size:10px;}
 .land-card-price{color:#173f32; font-family:Georgia,serif; font-size:25px; font-weight:700; line-height:1.1; white-space:nowrap;}
 .land-card-actions{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
 .land-card-actions a,.land-card-actions button{display:flex; align-items:center; justify-content:center; min-height:44px; border:1px solid #173f32; border-radius:10px; padding:10px 12px; font:inherit; font-size:12px; font-weight:800; cursor:pointer; text-decoration:none;}
@@ -707,6 +710,20 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .admin-images-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px;}
 .admin-image-card{border:1px solid #d7deea; border-radius:8px; padding:8px; background:#fff; display:grid; gap:8px;}
 .admin-image-card img{width:100%; height:110px; object-fit:cover; border-radius:6px; background:#eef1f6;}
+.admin-image-open{position:relative; display:block; width:100%; overflow:hidden; border:0; border-radius:7px; padding:0; background:#e8edf0; cursor:zoom-in;}
+.admin-image-open>span{position:absolute; right:7px; bottom:7px; border-radius:999px; padding:5px 8px; color:#fff; background:rgba(8,28,22,.75); font-size:10px; font-weight:800; pointer-events:none;}
+.admin-gallery-modal{position:fixed; inset:0; z-index:5000; display:grid; place-items:center; padding:22px; background:rgba(4,13,10,.94); backdrop-filter:blur(8px);}
+.admin-gallery-stage{position:relative; display:grid; width:min(1180px,calc(100vw - 44px)); height:min(850px,calc(100vh - 44px)); place-items:center;}
+.admin-gallery-stage>img{display:block; max-width:100%; max-height:calc(100% - 58px); border-radius:12px; object-fit:contain; box-shadow:0 24px 80px rgba(0,0,0,.48);}
+.admin-gallery-close,.admin-gallery-arrow{position:absolute; z-index:2; display:grid; place-items:center; border:1px solid rgba(255,255,255,.24); border-radius:50%; color:#fff; background:rgba(255,255,255,.12); cursor:pointer; transition:background .18s ease,transform .18s ease;}
+.admin-gallery-close:hover,.admin-gallery-arrow:hover{background:rgba(255,255,255,.24);}
+.admin-gallery-close{top:0; right:0; width:46px; height:46px; font-size:31px;}
+.admin-gallery-arrow{top:50%; width:52px; height:52px; transform:translateY(-50%); font-size:42px;}
+.admin-gallery-arrow:hover{transform:translateY(-50%) scale(1.05);}
+.admin-gallery-arrow.is-prev{left:0;}.admin-gallery-arrow.is-next{right:0;}
+.admin-gallery-footer{position:absolute; bottom:0; left:50%; display:flex; align-items:center; gap:12px; transform:translateX(-50%); color:#fff; white-space:nowrap;}
+.admin-gallery-footer span{border-radius:999px; padding:7px 12px; background:rgba(255,255,255,.14); font-weight:800;}
+.admin-gallery-footer small{color:rgba(255,255,255,.62);}
 .admin-image-open{position:relative;display:block;overflow:hidden;border-radius:6px;cursor:zoom-in;}
 .admin-image-open:after{content:"Открыть полностью ↗";position:absolute;right:7px;bottom:7px;padding:5px 7px;border-radius:6px;background:rgba(19,34,47,.78);color:#fff;font-size:10px;font-weight:700;opacity:0;transition:opacity .16s ease;}
 .admin-image-open:hover:after,.admin-image-open:focus-visible:after{opacity:1;}
@@ -1442,4 +1459,14 @@ body { background: var(--ev-paper); color: var(--ev-ink); }
   .footer-links { display: grid; grid-template-columns: 1fr 1fr; }
   .footer-mobile-accordion details { border-color: rgba(255,255,255,.12); color: rgba(255,255,255,.72); background: rgba(255,255,255,.04); }
   .footer-mobile-accordion a { color: rgba(255,255,255,.65); }
+}
+
+/* One clean sans-serif family across the entire site, matching Lesnoe Ozero. */
+html body, html body * { font-family: Arial, Helvetica, sans-serif !important; }
+
+@media (max-width: 680px){
+  .admin-gallery-modal{padding:10px;}
+  .admin-gallery-stage{width:calc(100vw - 20px); height:calc(100vh - 20px);}
+  .admin-gallery-arrow{width:44px; height:44px; font-size:34px; background:rgba(8,28,22,.68);}
+  .admin-gallery-footer small{display:none;}
 }
