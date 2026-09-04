@@ -30,14 +30,15 @@ jobs:
             test -n "$CRM_API_SECRET"
             git -C /var/www/dom fetch origin main
             runtime_env=/var/www/dom/backend/.env.production
+            legacy_backend=$(mktemp)
+            legacy_frontend=$(mktemp)
+            git -C /var/www/dom show 096bc241c22092c80ffe5d5af73e2dbe633ac9f7:backend/src/index.ts > "$legacy_backend"
+            git -C /var/www/dom show 096bc241c22092c80ffe5d5af73e2dbe633ac9f7:frontend/src/main.tsx > "$legacy_frontend"
             if [ ! -s "$runtime_env" ]; then
-              old_source=$(mktemp)
-              git -C /var/www/dom show 096bc241c22092c80ffe5d5af73e2dbe633ac9f7:backend/src/index.ts > "$old_source"
-              admin_login=$(awk -F"'" '/^const ADMIN_LOGIN =/{print $2; exit}' "$old_source")
-              admin_password=$(awk -F"'" '/^const ADMIN_PASSWORD =/{print $2; exit}' "$old_source")
-              admin_token=$(awk -F"'" '/^const ADMIN_TOKEN =/{print $2; exit}' "$old_source")
-              max_bot_token=$(awk -F"'" '/^const MAX_BOT_TOKEN =/{print $2; exit}' "$old_source")
-              rm -f "$old_source"
+              admin_login=$(awk -F"'" '/^const ADMIN_LOGIN =/{print $2; exit}' "$legacy_backend")
+              admin_password=$(awk -F"'" '/^const ADMIN_PASSWORD =/{print $2; exit}' "$legacy_backend")
+              admin_token=$(awk -F"'" '/^const ADMIN_TOKEN =/{print $2; exit}' "$legacy_backend")
+              max_bot_token=$(awk -F"'" '/^const MAX_BOT_TOKEN =/{print $2; exit}' "$legacy_backend")
               test -n "$admin_login" || { echo "ADMIN_LOGIN migration failed"; exit 1; }
               test -n "$admin_password" || { echo "ADMIN_PASSWORD migration failed"; exit 1; }
               test -n "$admin_token" || { echo "ADMIN_TOKEN migration failed"; exit 1; }
@@ -51,11 +52,32 @@ jobs:
               } > "$runtime_env"
               echo "Migrated runtime credentials out of source code"
             fi
+            if ! grep -q '^MAX_CALLBACK_CHAT_ID=' "$runtime_env"; then
+              max_callback_chat_id=$(awk -F"'" '/^const MAX_CALLBACK_CHAT_ID =/{print $2; exit}' "$legacy_backend")
+              test -n "$max_callback_chat_id" || { echo "MAX_CALLBACK_CHAT_ID migration failed"; exit 1; }
+              printf 'MAX_CALLBACK_CHAT_ID=%s\n' "$max_callback_chat_id" >> "$runtime_env"
+            fi
+            frontend_env=/var/www/dom/frontend/.env.production
+            if [ ! -s "$frontend_env" ]; then
+              admin_path=$(awk -F"'" '/^const ADMIN_PATH =/{print $2; exit}' "$legacy_frontend")
+              admin_key=$(awk -F"'" '/^const ADMIN_KEY =/{print $2; exit}' "$legacy_frontend")
+              test -n "$admin_path" || { echo "VITE_ADMIN_PATH migration failed"; exit 1; }
+              test -n "$admin_key" || { echo "VITE_ADMIN_KEY migration failed"; exit 1; }
+              umask 077
+              {
+                printf 'VITE_ADMIN_PATH=%s\n' "$admin_path"
+                printf 'VITE_ADMIN_KEY=%s\n' "$admin_key"
+              } > "$frontend_env"
+            fi
+            admin_path=$(awk -F= '/^VITE_ADMIN_PATH=/{print $2; exit}' "$frontend_env")
+            if ! grep -q '^ADMIN_PATH=' "$runtime_env"; then
+              printf 'ADMIN_PATH=%s\n' "$admin_path" >> "$runtime_env"
+            fi
+            rm -f "$legacy_backend" "$legacy_frontend"
             umask 077
             printf '%s' "$CRM_API_SECRET" > /var/www/dom/.crm_api_secret
             umask 022
             git -C /var/www/dom reset --hard origin/main
             /var/www/dom/deploy.sh
             echo "Deploy finished"
-
 

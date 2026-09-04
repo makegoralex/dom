@@ -227,7 +227,8 @@ const SMTP_USER = process.env.SMTP_USER || '';
 const SMTP_PASS = process.env.SMTP_PASS || '';
 const SMTP_FROM = process.env.SMTP_FROM || SMTP_USER || CALLBACK_RECEIVER;
 const MAX_BOT_TOKEN = process.env.MAX_BOT_TOKEN || '';
-const MAX_CALLBACK_CHAT_ID = Number(process.env.MAX_CALLBACK_CHAT_ID || '-76263328333110');
+const MAX_CALLBACK_CHAT_ID = Number(process.env.MAX_CALLBACK_CHAT_ID || '');
+const ADMIN_PATH = process.env.ADMIN_PATH || '/admin';
 const CRM_API_URL = process.env.CRM_API_URL || 'https://crm.evtenia.ru/site-lead/create';
 const CRM_API_SECRET_FILE = process.env.CRM_API_SECRET_FILE || '/var/www/dom/.crm_api_secret';
 const CRM_API_SECRET = process.env.CRM_API_SECRET || (() => {
@@ -1085,7 +1086,7 @@ app.post('/api/land-submissions', upload.array('images', 20), async (req, res) =
       id: `lead_${Date.now()}`,
       name: sellerName,
       phone: sellerPhone,
-      message: `Новый участок ожидает модерации в админке: ${req.protocol}://${req.get('host')}/catalog-control-7f3a. Кадастровый номер: ${cadastralNumber}. Площадь: ${area}. Район: ${district}. Цена: ${price}. Описание: ${description}`,
+      message: `Новый участок ожидает модерации в админке: ${req.protocol}://${req.get('host')}${ADMIN_PATH}. Кадастровый номер: ${cadastralNumber}. Площадь: ${area}. Район: ${district}. Цена: ${price}. Описание: ${description}`,
       sourceTitle: `Участок на модерацию: ${cadastralNumber}`,
       createdAt: pendingLand.createdAt
     });
@@ -1132,7 +1133,7 @@ app.post('/api/home-submissions', upload.array('images', 20), async (req, res) =
       id: `lead_${Date.now()}`,
       name: sellerName,
       phone: sellerPhone,
-      message: `Новый дом ожидает модерации в админке: ${req.protocol}://${req.get('host')}/catalog-control-7f3a. ${title}, ${area}, ${district}, ${price}. Адрес: ${address}.`,
+      message: `Новый дом ожидает модерации в админке: ${req.protocol}://${req.get('host')}${ADMIN_PATH}. ${title}, ${area}, ${district}, ${price}. Адрес: ${address}.`,
       sourceTitle: `Дом на модерацию: ${title}`,
       createdAt: pendingHome.createdAt
     };

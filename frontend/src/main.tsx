@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 73476)
-Total output lines: 4707
-
 import React, { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles.css';
@@ -174,8 +171,8 @@ const API_ORIGIN = API_BASE ? new URL(API_BASE, window.location.origin).origin :
 const loadMoreRef: { current: HTMLDivElement | null } = { current: null };
 const pageNumbers: number[] = [];
 const totalPages = 1;
-const ADMIN_PATH = '/catalog-control-7f3a';
-const ADMIN_KEY = 'catalog-control-7f3a';
+const ADMIN_PATH = import.meta.env.VITE_ADMIN_PATH || '/admin';
+const ADMIN_KEY = import.meta.env.VITE_ADMIN_KEY || '';
 const CONTACTS = {
   mainPhoneDisplay: '8-902-209-01-79',
   mainPhoneHref: 'tel:+79022090179',
@@ -2393,7 +2390,244 @@ function LandsPage() {
               </div>
               <div className="lands-filter-help">
                 <span aria-hidden="true">?</span>
-                <p><strong>Не нашли подходящий?</strong><small>Расскажите, что ищете, и мы прове…3476 tokens truncated…рес:</h3>
+                <p><strong>Не нашли подходящий?</strong><small>Расскажите, что ищете, и мы проверим закрытую базу.</small></p>
+                <button type="button" onClick={() => setOpenSelection(true)}>Оставить заявку</button>
+              </div>
+            </aside>
+            <div className="lands-results">
+              <div className="lands-results-toolbar">
+                <p>Найдено <strong>{filtered.length} {resultLabel}</strong></p>
+                <label>
+                  <span>Сортировка</span>
+                  <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value as typeof sortOrder)}>
+                    <option value="default">По умолчанию</option>
+                    <option value="price-asc">Сначала дешевле</option>
+                    <option value="price-desc">Сначала дороже</option>
+                  </select>
+                </label>
+              </div>
+              <div className="catalog-grid lands-grid">
+              {filtered.map((item) => (
+                <article className="land-card" key={item.id}>
+                  <div className="land-card-visual"><LandCardImageSlider land={item} href={`/lands/${encodeURIComponent(item.id)}`} /></div>
+                  <div className="land-card-content">
+                    <div className="land-card-heading">
+                      <div><p className="land-location"><span aria-hidden="true">⌖</span>{item.district}</p><h3><a href={`/lands/${encodeURIComponent(item.id)}`}>Участок {item.area}</a></h3></div>
+                      <span className="land-verified"><b aria-hidden="true">✓</b> Проверен</span>
+                    </div>
+                    <div className="land-card-facts">
+                      {landFacts(item).filter(([label]) => ['Площадь', 'Назначение', 'Электричество', 'Газ', 'Подъезд', 'Кадастровый номер'].includes(label)).slice(0, 6).map(([label, value]) => <span key={label}><small>{label === 'Кадастровый номер' ? 'Кадастровый №' : label}</small><strong>{value}</strong></span>)}
+                    </div>
+                    {item.description ? <p className="project-desc land-card-description">{item.description}</p> : null}
+                    <div className="land-card-bottom">
+                      <div><small>Стоимость участка</small><strong className="land-card-price">{item.price}</strong></div>
+                      <small>Поможем проверить документы</small>
+                    </div>
+                    <div className="land-card-actions">
+                      <a href={`/lands/${encodeURIComponent(item.id)}`}>Смотреть участок <span aria-hidden="true">→</span></a>
+                      <button type="button" onClick={() => setActiveLand(item)}>Узнать подробности</button>
+                    </div>
+                    {item.mapUrl ? <a className="land-map-link" href={item.mapUrl} target="_blank" rel="noreferrer">Посмотреть на карте ↗</a> : null}
+                  </div>
+                </article>
+              ))}
+              </div>
+              {!filtered.length ? (
+                <div className="lands-empty">
+                  <span aria-hidden="true">⌕</span>
+                  <h3>По этим параметрам участков пока нет</h3>
+                  <p>Сбросьте фильтры или оставьте заявку — предложим варианты из закрытой базы.</p>
+                  <button type="button" onClick={resetFilters}>Сбросить фильтры</button>
+                </div>
+              ) : null}
+            </div>
+            </div>
+          </section>
+        </div>
+      </section>
+      <SiteFooter />
+      <PromoLeadModal
+        open={Boolean(activeLand) || openSelection}
+        onClose={() => { setActiveLand(null); setOpenSelection(false); }}
+        title={activeLand ? `Заявка на участок ${activeLand.cadastralNumber}` : 'Подобрать участок'}
+        promoText={activeLand ? `Участок ${activeLand.area}, ${activeLand.district}, ${activeLand.price}` : 'Подберём варианты под ваш бюджет и задачу'}
+        messagePrefix={activeLand ? `Заявка на участок ${activeLand.cadastralNumber}` : 'Заявка на персональный подбор участка'}
+        sourceTitle={activeLand ? `Земельный участок: ${activeLand.cadastralNumber}` : 'Персональный подбор участка'}
+      />
+      {openSellLand ? (
+        <div className="modal-backdrop" onMouseDown={() => setOpenSellLand(false)}>
+          <div
+            className="modal-card sell-land-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="sell-land-modal-title"
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <div className="modal-card-header">
+              <h3 id="sell-land-modal-title">Продать свою землю</h3>
+              <button className="modal-close-button" type="button" aria-label="Закрыть форму" onClick={() => setOpenSellLand(false)}>×</button>
+            </div>
+            <form className="sell-land-form" onSubmit={submitSellLand}>
+              <label>Контактное лицо<input value={sellerName} onChange={(e) => setSellerName(e.target.value)} required /></label>
+              <label>
+                Телефон
+                <input
+                  type="tel"
+                  placeholder="+7 (___) ___-__-__"
+                  value={sellerPhone}
+                  onChange={(e) => setSellerPhone(formatPhoneMask(e.target.value))}
+                  required
+                />
+              </label>
+              <label>Кадастровый номер<input value={sellerCadastralNumber} onChange={(e) => setSellerCadastralNumber(e.target.value)} required /></label>
+              <label>Площадь<input value={sellerArea} onChange={(e) => setSellerArea(e.target.value)} required /></label>
+              <label>Цена<input value={sellerPrice} onChange={(e) => setSellerPrice(e.target.value)} required /></label>
+              <label>Район<input value={sellerDistrict} onChange={(e) => setSellerDistrict(e.target.value)} required /></label>
+              <label>Описание<textarea value={sellerDescription} onChange={(e) => setSellerDescription(e.target.value)} rows={3} required /></label>
+              <label>Карта: ссылка<input value={sellerMapUrl} onChange={(e) => setSellerMapUrl(e.target.value)} /></label>
+              <label>Фото участка<input type="file" multiple accept="image/jpeg,image/png,image/webp" onChange={(e) => setSellerPhotos(Array.from(e.target.files || []))} required /></label>
+              {sellerPhotos.length ? <small>Выбрано фото: {sellerPhotos.length} из {SELL_LAND_MAX_PHOTOS}</small> : <small>До {SELL_LAND_MAX_PHOTOS} фото в формате JPG, PNG или WebP.</small>}
+              <PrivacyConsent />
+              <button type="submit" disabled={sellerSubmitting}>{sellerSubmitting ? 'Отправляем...' : 'Отправить заявку'}</button>
+              {sellerStatus ? <small className="sell-land-status" role="status" aria-live="polite">{sellerStatus}</small> : null}
+            </form>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function ProjectDetailPage() {
+  const projectId = window.location.pathname.replace('/project/', '');
+  const [projects, setProjects] = useState<HouseProject[]>(FALLBACK_PROJECTS);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [openRequest, setOpenRequest] = useState(false);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/projects`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no api'))))
+      .then((data: HouseProject[]) => setProjects(data))
+      .catch(() => setProjects(FALLBACK_PROJECTS));
+  }, []);
+
+  const project = projects.find((item) => item.id === projectId) || FALLBACK_PROJECTS[0];
+  const gallery = [project.coverImage, ...(project.images || [])].filter(Boolean).map((img) => resolveMediaUrl(img));
+  const safeActiveImage = gallery[activeImageIndex] || gallery[0] || '';
+
+  useEffect(() => {
+    setActiveImageIndex(0);
+  }, [project.id]);
+
+  const showPrevImage = () => {
+    if (gallery.length <= 1) return;
+    setActiveImageIndex((prev) => (prev - 1 + gallery.length) % gallery.length);
+  };
+
+  const showNextImage = () => {
+    if (gallery.length <= 1) return;
+    setActiveImageIndex((prev) => (prev + 1) % gallery.length);
+  };
+
+  useEffect(() => {
+    document.title = `${project.title} — Evtenia`;
+  }, [project.title]);
+
+  return (
+    <div>
+      <InternalHeader />
+      <section className="internal-body">
+        <div className="container">
+          <Breadcrumbs items={["Главная", project.category === 'bath' ? "Бани" : "Проекты домов", project.title]} />
+          <h1>{project.title}</h1>
+          <div className="project-detail-layout">
+            <div>
+              <div className="project-detail-slider">
+                <div className="project-detail-main-image" style={{ backgroundImage: `url(${safeActiveImage})` }} />
+                {gallery.length > 1 ? (
+                  <div className="project-slider-controls">
+                    <button type="button" onClick={showPrevImage} aria-label="Предыдущее фото">‹</button>
+                    <span>{activeImageIndex + 1} / {gallery.length}</span>
+                    <button type="button" onClick={showNextImage} aria-label="Следующее фото">›</button>
+                  </div>
+                ) : null}
+              </div>
+              <div className="project-detail-thumbs">
+                {gallery.map((img, index) => (
+                  <button
+                    type="button"
+                    key={`${img}_${index}`}
+                    className={`project-thumb ${index === activeImageIndex ? 'active' : ''}`}
+                    style={{ backgroundImage: `url(${img})` }}
+                    onClick={() => setActiveImageIndex(index)}
+                    aria-label={`Фото ${index + 1}`}
+                  />
+                ))}
+              </div>
+              <div className="project-detail-description">
+                <h3>Особенности проекта</h3>
+                <p>{project.fullDescription || project.shortDescription}</p>
+              </div>
+            </div>
+            <aside className="project-detail-side">
+              <h3>Характеристики</h3>
+              <div className="detail-row"><span>Общая площадь</span><b>{project.area}</b></div>
+              <div className="detail-row"><span>Комнаты</span><b>{project.bedrooms}</b></div>
+              <div className="detail-row"><span>Этажность</span><b>{project.floors}</b></div>
+              <div className="detail-row"><span>Тип строительства</span><b>{project.constructionType}</b></div>
+              <div className="detail-row"><span>Стиль</span><b>{project.style || 'Современный'}</b></div>
+              <strong className="detail-price">{normalizePrice(project.priceFrom)}</strong>
+              <button className="detail-btn" onClick={() => setOpenRequest(true)}>Заявка на просчет дома</button>
+            </aside>
+          </div>
+        </div>
+      </section>
+      <SiteFooter />
+      <PromoLeadModal
+        open={openRequest}
+        onClose={() => setOpenRequest(false)}
+        title={`Заявка: ${project.title}`}
+        promoText="🎁 Проект дома в подарок"
+        messagePrefix={`Заявка на просчет дома: ${project.title}`}
+        sourceTitle={`Проект дома: ${project.title}`}
+      />
+    </div>
+  );
+}
+
+function ContactsPage() {
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>({ logoUrl: DEFAULT_LOGO_URL, ...DEFAULT_CONTACT_PROFILE });
+  useEffect(() => {
+    document.title = 'Контакты — Evtenia';
+    fetch(`${API_BASE}/api/site-settings`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no site settings'))))
+      .then((payload: SiteSettings) => setSiteSettings({ ...DEFAULT_CONTACT_PROFILE, ...payload }))
+      .catch(() => setSiteSettings({ logoUrl: DEFAULT_LOGO_URL, ...DEFAULT_CONTACT_PROFILE }));
+  }, []);
+
+  return (
+    <div>
+      <InternalHeader />
+      <section className="internal-body">
+        <div className="container">
+          <Breadcrumbs items={["Главная", "Контакты"]} />
+          <h1>КОНТАКТЫ</h1>
+          <div className="contacts-box">
+            <div className="contacts-info">
+              <div className="contacts-person">
+                <img src={CONTACT_PAGE_PHOTO_URL} alt="Менеджер" />
+                <div>
+                  <strong>{DEFAULT_CONTACT_PROFILE.contactName}</strong>
+                  <small>{DEFAULT_CONTACT_PROFILE.contactPosition}</small>
+                </div>
+              </div>
+              <h3>Телефоны:</h3>
+              <p><a href={CONTACTS.mainPhoneHref}>{siteSettings.contactPhone || DEFAULT_CONTACT_PROFILE.contactPhone}</a></p>
+              <p><a href={CONTACTS.extraPhoneHref}>{siteSettings.contactCityPhone || DEFAULT_CONTACT_PROFILE.contactCityPhone}</a></p>
+
+              <h3>Время работы:</h3>
+              <p>🕘 Без выходных: 9:00–18:00</p>
+              <h3>Адрес:</h3>
               <p>{OFFICE_ADDRESS}</p>
 
               <h3>Почта:</h3>
