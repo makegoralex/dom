@@ -15,7 +15,7 @@
       "reviewer": null,
       "verifiedMainVolume": 6071,
       "score": 98,
-      "status": "draft",
+      "status": "published",
       "artifacts": {
         "brief": "briefs/modulnye-doma-otzyvy-i-minusy.md",
         "draft": "drafts/modulnye-doma-otzyvy-i-minusy.json"
@@ -39,15 +39,19 @@
       "reviewer": null,
       "verifiedMainVolume": 2861,
       "score": 97,
-      "status": "ready_for_brief",
+      "status": "published",
+      "artifacts": {
+        "brief": "briefs/kakuyu-tekhnologiyu-doma-vybrat.md",
+        "draft": "drafts/kakuyu-tekhnologiyu-doma-vybrat.json"
+      },
       "blockers": [
         "author_review",
         "evtenia_examples"
       ],
       "requiredLinks": [
-        "/projects/karkasnye-doma",
-        "/projects/modulnye-doma",
-        "/projects/doma-iz-gazobetona"
+        "/projects?type=Каркасные",
+        "/projects?type=Модульные",
+        "/projects?type=Из%20газобетона"
       ],
       "nextAction": "Prepare a SERP/content brief for “какой дом выбрать”, collect Evtenia examples, then run the quality gate."
     },

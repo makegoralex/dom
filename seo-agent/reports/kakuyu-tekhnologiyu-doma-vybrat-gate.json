@@ -1,0 +1,18 @@
+{
+  "clusterId": "kakuyu-tekhnologiyu-doma-vybrat",
+  "checkedAt": "2026-09-20",
+  "result": "pass",
+  "checks": {
+    "clusterOwnership": "pass",
+    "slug": "pass",
+    "requiredFields": "pass",
+    "singleH1": "pass",
+    "unsafeHtml": "pass",
+    "requiredInternalLinks": "pass",
+    "directAnswer": "pass",
+    "tradeoffs": "pass",
+    "sources": "pass",
+    "ctaMatch": "pass"
+  },
+  "notes": "Published without project-specific prices, terms or specifications. Technical choices remain subject to project and site data."
+}

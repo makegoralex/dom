@@ -882,20 +882,42 @@ const writeData = (data: DataStore): void => {
   fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
 };
 
-const repairManagedJournalDrafts = (): void => {
+const syncManagedJournalArticles = (): void => {
   const data = readData();
-  const article = data.journalArticles.find((item) => item.slug === 'modulnye-doma-otzyvy-i-minusy');
-  if (!article || article.content.includes('<h2')) return;
+  const draftsDir = path.join(__dirname, '..', '..', 'seo-agent', 'drafts');
+  const managed = [
+    { slug: 'modulnye-doma-otzyvy-i-minusy', repairMalformed: true },
+    { slug: 'kakuyu-tekhnologiyu-doma-vybrat', repairMalformed: false }
+  ];
+  let changed = false;
 
-  const sourcePath = path.join(__dirname, '..', '..', 'seo-agent', 'drafts', 'modulnye-doma-otzyvy-i-minusy.html');
-  if (!fs.existsSync(sourcePath)) return;
+  for (const item of managed) {
+    const jsonPath = path.join(draftsDir, `${item.slug}.json`);
+    const htmlPath = path.join(draftsDir, `${item.slug}.html`);
+    if (!fs.existsSync(jsonPath) || !fs.existsSync(htmlPath)) continue;
 
-  article.content = fs.readFileSync(sourcePath, 'utf-8');
-  article.authorRole = article.authorRole || 'Технический директор Evtenia';
-  article.authorBio = article.authorBio || 'Отвечает за техническую часть проектов, строительные технологии, фундаменты, материалы и инженерные решения.';
-  article.updatedAt = new Date().toISOString();
-  writeData(data);
-  console.log('Journal article formatting repaired: modulnye-doma-otzyvy-i-minusy');
+    const draft = JSON.parse(fs.readFileSync(jsonPath, 'utf-8')) as Partial<JournalArticle>;
+    const content = fs.readFileSync(htmlPath, 'utf-8');
+    const existing = data.journalArticles.find((article) => article.slug === item.slug);
+
+    if (!existing) {
+      data.journalArticles.unshift(normalizeJournalArticle({ ...draft, content }));
+      changed = true;
+      console.log(`Managed Journal article created: ${item.slug}`);
+      continue;
+    }
+
+    if (item.repairMalformed && !existing.content.includes('<h2')) {
+      existing.content = content;
+      existing.authorRole = existing.authorRole || String(draft.authorRole || '');
+      existing.authorBio = existing.authorBio || String(draft.authorBio || '');
+      existing.updatedAt = new Date().toISOString();
+      changed = true;
+      console.log(`Managed Journal article formatting repaired: ${item.slug}`);
+    }
+  }
+
+  if (changed) writeData(data);
 };
 
 const deleteAssetByUrl = (rawUrl: string): boolean => {
@@ -1796,7 +1818,7 @@ if (fs.existsSync(FRONTEND_DIST)) {
   app.get(/^(?!\/api).*/, (_req, res) => res.sendFile(path.join(FRONTEND_DIST, 'index.html')));
 }
 
-repairManagedJournalDrafts();
+syncManagedJournalArticles();
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

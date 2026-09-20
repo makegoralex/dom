@@ -374,7 +374,7 @@
     {
       "id": "modulnye-doma-otzyvy-i-minusy",
       "page": "/journal/modulnye-doma-otzyvy-i-minusy",
-      "status": "reserved",
+      "status": "published",
       "pageType": "article",
       "intent": "informational_investigation",
       "funnel": "consideration",
@@ -630,7 +630,7 @@
     {
       "id": "kakuyu-tekhnologiyu-doma-vybrat",
       "page": "/journal/kakuyu-tekhnologiyu-doma-vybrat",
-      "status": "planned",
+      "status": "published",
       "pageType": "article",
       "intent": "informational_comparison",
       "funnel": "consideration",
@@ -654,11 +654,11 @@
       ],
       "priority": 100,
       "humanReviewRequired": true,
-      "indexingState": "planned",
+      "indexingState": "indexable",
       "requiredLinks": [
-        "/projects/karkasnye-doma",
-        "/projects/modulnye-doma",
-        "/projects/doma-iz-gazobetona"
+        "/projects?type=Каркасные",
+        "/projects?type=Модульные",
+        "/projects?type=Из%20газобетона"
       ],
       "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
       "volumeEvidence": {

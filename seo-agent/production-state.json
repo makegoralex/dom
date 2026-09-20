@@ -1,14 +1,24 @@
 {
   "version": 1,
-  "updated": "2026-08-28",
+  "updated": "2026-09-20",
   "clusters": {
     "modulnye-doma-otzyvy-i-minusy": {
       "semanticStatus": "reserved",
-      "queueStatus": "draft",
+      "queueStatus": "published",
       "brief": "briefs/modulnye-doma-otzyvy-i-minusy.md",
       "draft": "drafts/modulnye-doma-otzyvy-i-minusy.json",
       "reservedAt": "2026-08-28",
-      "notes": "Draft prepared. Publication requires technical director approval, real Evtenia images and related-project selection."
+      "publishedAt": "2026-08-28",
+      "notes": "Published in Journal."
+    },
+    "kakuyu-tekhnologiyu-doma-vybrat": {
+      "semanticStatus": "reserved",
+      "queueStatus": "published",
+      "brief": "briefs/kakuyu-tekhnologiyu-doma-vybrat.md",
+      "draft": "drafts/kakuyu-tekhnologiyu-doma-vybrat.json",
+      "reservedAt": "2026-09-20",
+      "publishedAt": "2026-09-20",
+      "notes": "Second Journal article. Published through managed production sync."
     }
   }
 }
