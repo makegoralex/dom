@@ -1201,6 +1201,45 @@ app.get('/api/journal/articles/:slug', (req, res) => {
   return res.json(article);
 });
 
+const escapeXml = (value: string): string => value
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&apos;');
+
+app.get('/sitemap.xml', (req, res) => {
+  const data = readData();
+  const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+  const entries: Array<{ path: string; lastmod?: string }> = [
+    { path: '/' },
+    { path: '/projects' },
+    { path: '/baths' },
+    { path: '/homes' },
+    { path: '/lands' },
+    { path: '/journal' },
+    ...data.projects.map((project) => ({ path: `/project/${encodeURIComponent(project.id)}` })),
+    ...data.homes.map((home) => ({ path: `/homes/${encodeURIComponent(home.id)}` })),
+    ...data.lands.map((land) => ({ path: `/lands/${encodeURIComponent(land.id)}` })),
+    ...data.journalCategories.map((category) => ({ path: `/journal/category/${encodeURIComponent(category.slug)}` })),
+    ...data.journalArticles
+      .filter((article) => article.status === 'published')
+      .map((article) => ({ path: `/journal/${encodeURIComponent(article.slug)}`, lastmod: article.updatedAt }))
+  ];
+  const urls = entries.map((entry) => {
+    const lastmod = entry.lastmod ? `<lastmod>${escapeXml(entry.lastmod.slice(0, 10))}</lastmod>` : '';
+    return `<url><loc>${escapeXml(`${origin}${entry.path}`)}</loc>${lastmod}</url>`;
+  }).join('');
+  res.set('Cache-Control', 'public, max-age=900');
+  return res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`);
+});
+
+app.get('/robots.txt', (req, res) => {
+  const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+  res.set('Cache-Control', 'public, max-age=3600');
+  return res.type('text/plain').send(`User-agent: *\nAllow: /\nDisallow: /catalog-control-7f3a\nSitemap: ${origin}/sitemap.xml\n`);
+});
+
 app.get('/api/pages/:slug', (req, res) => {
   const page = readData().pages[req.params.slug];
   if (!page) return res.status(404).json({ message: 'Страница не найдена' });
