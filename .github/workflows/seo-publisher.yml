@@ -29,8 +29,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      CRM_API_SECRET: ${{ secrets.CRM_API_SECRET }}
       SEO_SCHEDULED_RUN: ${{ github.event_name == 'schedule' || inputs.scheduled }}
 
     steps:
@@ -53,6 +51,9 @@ jobs:
 
       - name: Generate and publish one article
         if: ${{ github.event_name == 'schedule' || inputs.paid_run }}
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          CRM_API_SECRET: ${{ secrets.CRM_API_SECRET }}
         run: |
           if [ "$SEO_SCHEDULED_RUN" = "true" ]; then
             node seo-agent/scripts/run-automation.mjs --scheduled
