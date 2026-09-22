@@ -1,0 +1,135 @@
+{
+  "version": 1,
+  "siteUrl": "https://dom.evtenia.ru",
+  "timezone": "Europe/Moscow",
+  "enabled": false,
+  "publicationMode": "hybrid",
+  "articlesPerRun": 1,
+  "maxArticlesPerMonth": 8,
+  "monthlyBudgetUsd": null,
+  "maxEstimatedCostPerRunUsd": null,
+  "minimumBodyCharacters": 3500,
+  "minimumH2Count": 4,
+  "maxApiCallsPerRun": 4,
+  "maxTextOutputTokensPerRun": 60000,
+  "maxBackgroundWaitMinutes": 45,
+  "pollIntervalSeconds": 10,
+  "models": {
+    "draft": "gpt-5.6-terra",
+    "review": "gpt-5.6-terra"
+  },
+  "pricingSnapshot": {
+    "verifiedAt": "2026-09-22",
+    "currency": "USD",
+    "modelsPerMillionTokens": {
+      "gpt-5.6-terra": {
+        "input": 2,
+        "output": 12
+      }
+    },
+    "webSearchPerThousandCalls": 10
+  },
+  "limits": {
+    "draftMaxOutputTokens": 30000,
+    "reviewMaxOutputTokens": 22000,
+    "maxWebSearchCallsPerResponse": 4
+  },
+  "scheduleMoscow": [
+    "Tuesday 09:17",
+    "Friday 09:17"
+  ],
+  "queueEligibleStatuses": [
+    "ready_for_brief",
+    "planned"
+  ],
+  "authors": {
+    "Евгения Викторовна Кислякова": {
+      "role": "генеральный директор",
+      "reviewAttributionApproved": true,
+      "topics": [
+        "ипотека",
+        "участки",
+        "документы",
+        "оформление",
+        "межевание"
+      ]
+    },
+    "Олег Иванович Кисляков": {
+      "role": "технический директор",
+      "reviewAttributionApproved": true,
+      "topics": [
+        "технологии домов",
+        "проекты",
+        "фундаменты",
+        "строительство",
+        "материалы",
+        "инженерные системы"
+      ]
+    }
+  },
+  "categoryMap": {
+    "Технологии домов": "journal-category-technologies",
+    "Модульные дома": "journal-category-technologies",
+    "Каркасные дома": "journal-category-technologies",
+    "Газобетонные дома": "journal-category-technologies",
+    "Проекты и планировки": "journal-category-projects",
+    "Фундамент и участок": "journal-category-foundation",
+    "Участок и оформление": "journal-category-foundation",
+    "Строительство дома": "journal-category-construction",
+    "Инженерные системы": "journal-category-construction",
+    "Бани и дополнительные строения": "journal-category-construction",
+    "Выбор подрядчика": "journal-category-construction",
+    "Ипотека и документы": "journal-category-finance",
+    "Стоимость и бюджет": "journal-category-finance",
+    "Отделка и ремонт": "journal-category-finishing",
+    "Благоустройство участка": "journal-category-finishing"
+  },
+  "automaticPublication": {
+    "blockedIntentFragments": [
+      "finance",
+      "legal",
+      "safety",
+      "structural"
+    ],
+    "blockedTopicFragments": [
+      "ипотек",
+      "цен",
+      "стоимост",
+      "документ",
+      "межеван",
+      "оформлен",
+      "фундамент",
+      "геологи",
+      "гаранти",
+      "срок"
+    ]
+  },
+  "research": {
+    "allowedDomains": [
+      "dom.evtenia.ru",
+      "government.ru",
+      "publication.pravo.gov.ru",
+      "rosreestr.gov.ru",
+      "minstroyrf.gov.ru",
+      "docs.cntd.ru",
+      "rskrf.ru",
+      "xn--80apaohbc3aw9e.xn--p1ai"
+    ],
+    "competitorDomainsForIntentOnly": [
+      "kvadratdom.ru",
+      "karkas58.ru",
+      "sdp58.ru",
+      "tmdom.ru",
+      "pnz.grouphe.ru"
+    ]
+  },
+  "cms": {
+    "categoriesPath": "/api/crm/journal/categories",
+    "articlePathTemplate": "/api/crm/journal/articles/{sourceId}",
+    "secretHeader": "x-evtenia-webhook-token"
+  },
+  "images": {
+    "enabled": false,
+    "reason": "Waiting for approved visual style and explicit image budget."
+  }
+}

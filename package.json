@@ -1,5 +1,10 @@
 {
   "name": "dom",
   "version": "1.0.0",
-  "private": true
+  "private": true,
+  "scripts": {
+    "seo:validate": "node seo-agent/scripts/validate-automation.mjs && node seo-agent/scripts/validate.mjs",
+    "seo:dry-run": "node seo-agent/scripts/run-automation.mjs --dry-run",
+    "seo:run": "node seo-agent/scripts/run-automation.mjs"
+  }
 }

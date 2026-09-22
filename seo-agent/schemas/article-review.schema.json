@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "decision": { "type": "string", "enum": ["pass", "review", "fail"] },
+    "summary": { "type": "string" },
+    "issues": { "type": "array", "items": { "type": "string" } },
+    "unsupportedClaims": { "type": "array", "items": { "type": "string" } },
+    "requiredCorrections": { "type": "array", "items": { "type": "string" } },
+    "humanReviewRequired": { "type": "boolean" }
+  },
+  "required": [
+    "decision",
+    "summary",
+    "issues",
+    "unsupportedClaims",
+    "requiredCorrections",
+    "humanReviewRequired"
+  ]
+}

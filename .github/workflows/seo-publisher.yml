@@ -1,0 +1,86 @@
+name: SEO Journal Publisher
+
+on:
+  schedule:
+    # Moscow is UTC+3 year-round: 09:17 MSK = 06:17 UTC.
+    - cron: '17 6 * * 2,5'
+  workflow_dispatch:
+    inputs:
+      paid_run:
+        description: Call the OpenAI API and create one Journal article
+        required: true
+        default: false
+        type: boolean
+      scheduled:
+        description: Apply the one-successful-run-per-day guard
+        required: true
+        default: false
+        type: boolean
+
+concurrency:
+  group: seo-journal-publisher
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      CRM_API_SECRET: ${{ secrets.CRM_API_SECRET }}
+      SEO_SCHEDULED_RUN: ${{ github.event_name == 'schedule' || inputs.scheduled }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate SEO source of truth
+        run: npm run seo:validate
+
+      - name: Run protected dry-run
+        if: ${{ github.event_name == 'workflow_dispatch' && !inputs.paid_run }}
+        run: npm run seo:dry-run
+
+      - name: Generate and publish one article
+        if: ${{ github.event_name == 'schedule' || inputs.paid_run }}
+        run: |
+          if [ "$SEO_SCHEDULED_RUN" = "true" ]; then
+            node seo-agent/scripts/run-automation.mjs --scheduled
+          else
+            node seo-agent/scripts/run-automation.mjs
+          fi
+
+      - name: Validate generated artifacts
+        if: ${{ github.event_name == 'schedule' || inputs.paid_run }}
+        run: |
+          npm run seo:validate
+          npm --prefix backend ci
+          npm --prefix backend run build
+          npm --prefix frontend ci
+          npm --prefix frontend run build
+          git diff --check
+
+      - name: Commit successful state transition
+        if: ${{ github.event_name == 'schedule' || inputs.paid_run }}
+        run: |
+          if git diff --quiet; then
+            echo "No repository changes to commit"
+            exit 0
+          fi
+          git config user.name "evtenia-seo-bot"
+          git config user.email "seo-bot@users.noreply.github.com"
+          git add seo-agent
+          git commit -m "Publish next automated Journal article"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main

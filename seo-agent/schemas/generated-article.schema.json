@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "title": { "type": "string" },
+    "slug": { "type": "string" },
+    "excerpt": { "type": "string" },
+    "contentHtml": { "type": "string" },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "seoTitle": { "type": "string" },
+    "seoDescription": { "type": "string" },
+    "ctaTitle": { "type": "string" },
+    "ctaText": { "type": "string" },
+    "ctaHref": { "type": "string" },
+    "relatedProjectIds": { "type": "array", "items": { "type": "string" } },
+    "relatedServiceSlugs": { "type": "array", "items": { "type": "string" } },
+    "sourceUrls": { "type": "array", "items": { "type": "string" } },
+    "claimsNeedingHumanReview": { "type": "array", "items": { "type": "string" } },
+    "humanReviewRequired": { "type": "boolean" }
+  },
+  "required": [
+    "title",
+    "slug",
+    "excerpt",
+    "contentHtml",
+    "tags",
+    "seoTitle",
+    "seoDescription",
+    "ctaTitle",
+    "ctaText",
+    "ctaHref",
+    "relatedProjectIds",
+    "relatedServiceSlugs",
+    "sourceUrls",
+    "claimsNeedingHumanReview",
+    "humanReviewRequired"
+  ]
+}

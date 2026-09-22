@@ -24,6 +24,26 @@ Before approving a new cluster, check both `protected-pages.json` and `semantic-
 
 `semantic map -> queue -> brief -> draft -> fact-check -> quality gate -> CMS draft -> human review -> publish -> indexing -> monitoring`
 
+## Automated runner
+
+The reusable runner lives in `scripts/run-automation.mjs` and publishes through the existing Journal CMS API. It uses the OpenAI Responses API in background mode, validates structured output, performs a separate editorial review, and writes queue/state changes only after the CMS accepts the article.
+
+Safe local checks never call the OpenAI API or the CMS:
+
+```bash
+npm run seo:validate
+npm run seo:dry-run
+```
+
+Paid automation is deliberately disabled until both `monthlyBudgetUsd` and `maxEstimatedCostPerRunUsd` are approved and `enabled` is set to `true` in `automation-config.json`. The GitHub workflow also defaults its manual dispatch to a dry-run. Never put `OPENAI_API_KEY` or `CRM_API_SECRET` in this directory; they belong in GitHub Actions secrets.
+
+Publication policy is hybrid:
+
+- ordinary low-risk informational material may be published after both gates pass;
+- finance, legal, cadastral, pricing, structural, foundation and other sensitive material is sent to the Journal admin with status `review`;
+- one run handles at most one article, and successful scheduled runs are limited to one per Moscow calendar day;
+- the CMS endpoint is idempotent by cluster ID, so a state-commit retry updates the same article instead of creating a duplicate.
+
 The CMS adapter is site-specific. Everything before the adapter should remain reusable for another service or domain.
 
 Validate the source of truth before every production run:
