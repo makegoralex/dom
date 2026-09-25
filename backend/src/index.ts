@@ -887,7 +887,8 @@ const syncManagedJournalArticles = (): void => {
   const draftsDir = path.join(__dirname, '..', '..', 'seo-agent', 'drafts');
   const managed = [
     { slug: 'modulnye-doma-otzyvy-i-minusy', repairMalformed: true },
-    { slug: 'kakuyu-tekhnologiyu-doma-vybrat', repairMalformed: false }
+    { slug: 'kakuyu-tekhnologiyu-doma-vybrat', repairMalformed: false },
+    { slug: 'dostavka-i-montazh-modulnogo-doma', repairMalformed: false }
   ];
   let changed = false;
 

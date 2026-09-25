@@ -17,10 +17,13 @@ const routedClusters = config.definitions.map((definition) => {
   const rows = evidence?.rows || [];
   const main = evidence?.main?.q ? evidence.main : {q: definition.includeAny?.[0] || definition.includeAll?.join(' ') || definition.id, vol: 0};
   const keywords = rows.filter((row) => row.q !== main.q).slice(0, 12).map((row) => ({q: row.q, vol: row.count}));
+  const semanticStatus = definition.ownerType === 'protected'
+    ? 'published'
+    : (productionState.clusters?.[definition.id]?.semanticStatus || 'planned');
   return {
     id: definition.id,
     page: definition.owner,
-    status: definition.ownerType === 'protected' ? 'published' : (productionState.clusters?.[definition.id]?.semanticStatus || 'planned'),
+    status: semanticStatus,
     pageType: definition.pageType,
     intent: definition.intent,
     funnel: definition.funnel,
@@ -32,7 +35,9 @@ const routedClusters = config.definitions.map((definition) => {
     keywords,
     priority: Math.min(100, definition.priority),
     humanReviewRequired: definition.ownerType !== 'protected',
-    indexingState: definition.ownerType === 'protected' ? 'live_or_recommended_owner' : 'planned',
+    indexingState: definition.ownerType === 'protected'
+      ? 'live_or_recommended_owner'
+      : (semanticStatus === 'published' ? 'published' : semanticStatus),
     requiredLinks: definition.requiredLinks || [],
     notes: definition.ownerType === 'protected'
       ? 'Protected commercial owner. An article must not target the same transactional intent.'

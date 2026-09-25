@@ -438,7 +438,7 @@
       ],
       "priority": 100,
       "humanReviewRequired": true,
-      "indexingState": "planned",
+      "indexingState": "published",
       "requiredLinks": [
         "/projects/modulnye-doma"
       ],
@@ -654,11 +654,11 @@
       ],
       "priority": 100,
       "humanReviewRequired": true,
-      "indexingState": "indexable",
+      "indexingState": "published",
       "requiredLinks": [
-        "/projects?type=Каркасные",
-        "/projects?type=Модульные",
-        "/projects?type=Из%20газобетона"
+        "/projects/karkasnye-doma",
+        "/projects/modulnye-doma",
+        "/projects/doma-iz-gazobetona"
       ],
       "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
       "volumeEvidence": {
@@ -791,7 +791,7 @@
     {
       "id": "dostavka-i-montazh-modulnogo-doma",
       "page": "/journal/dostavka-i-montazh-modulnogo-doma",
-      "status": "planned",
+      "status": "published",
       "pageType": "article",
       "intent": "informational_commercial",
       "funnel": "consideration",
@@ -855,9 +855,9 @@
       ],
       "priority": 100,
       "humanReviewRequired": true,
-      "indexingState": "planned",
+      "indexingState": "published",
       "requiredLinks": [
-        "/projects/modulnye-doma"
+        "/projects?type=Модульные"
       ],
       "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
       "volumeEvidence": {

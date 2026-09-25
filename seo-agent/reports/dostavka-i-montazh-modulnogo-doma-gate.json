@@ -1,0 +1,16 @@
+{
+  "clusterId": "dostavka-i-montazh-modulnogo-doma",
+  "checkedAt": "2026-09-25",
+  "result": "pass",
+  "rules": [
+    {"id": "ownership", "result": "pass", "evidence": "The informational logistics intent is assigned to this Journal URL; the modular project catalogue remains the commercial owner."},
+    {"id": "answer-first", "result": "pass", "evidence": "The lead explains that the full route and mounting conditions, not distance alone, determine feasibility."},
+    {"id": "sources", "result": "pass", "evidence": "Definitions, road-permit principle, lifting safety context and construction organization use primary or standards sources checked on publication day."},
+    {"id": "unsupported-numbers", "result": "pass", "evidence": "No universal road dimensions, transport weights, prices, deadlines or crane capacities are claimed."},
+    {"id": "internal-links", "result": "pass", "evidence": "The article links to modular projects, foundation service and the existing modular-home risks article."},
+    {"id": "human-review", "result": "pass", "evidence": "Technical author and reviewer attribution to Oleg Ivanovich Kislyakov is approved by the site owner."},
+    {"id": "conversion", "result": "pass", "evidence": "CTA requests route and site assessment before production and links to the modular catalogue."},
+    {"id": "metadata", "result": "pass", "evidence": "Title, slug, excerpt, category, author, reviewer, SEO title and description are complete."}
+  ],
+  "publicationBlockers": []
+}

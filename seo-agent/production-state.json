@@ -1,9 +1,9 @@
 {
   "version": 1,
-  "updated": "2026-09-20",
+  "updated": "2026-09-25",
   "clusters": {
     "modulnye-doma-otzyvy-i-minusy": {
-      "semanticStatus": "reserved",
+      "semanticStatus": "published",
       "queueStatus": "published",
       "brief": "briefs/modulnye-doma-otzyvy-i-minusy.md",
       "draft": "drafts/modulnye-doma-otzyvy-i-minusy.json",
@@ -12,13 +12,23 @@
       "notes": "Published in Journal."
     },
     "kakuyu-tekhnologiyu-doma-vybrat": {
-      "semanticStatus": "reserved",
+      "semanticStatus": "published",
       "queueStatus": "published",
       "brief": "briefs/kakuyu-tekhnologiyu-doma-vybrat.md",
       "draft": "drafts/kakuyu-tekhnologiyu-doma-vybrat.json",
       "reservedAt": "2026-09-20",
       "publishedAt": "2026-09-20",
       "notes": "Second Journal article. Published through managed production sync."
+    },
+    "dostavka-i-montazh-modulnogo-doma": {
+      "semanticStatus": "published",
+      "queueStatus": "published",
+      "brief": "briefs/dostavka-i-montazh-modulnogo-doma.md",
+      "draft": "drafts/dostavka-i-montazh-modulnogo-doma.json",
+      "report": "reports/dostavka-i-montazh-modulnogo-doma-gate.json",
+      "reservedAt": "2026-09-25",
+      "publishedAt": "2026-09-25",
+      "notes": "Third Journal article. Prepared manually and published through managed production sync."
     }
   }
 }

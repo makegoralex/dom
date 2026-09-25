@@ -49,9 +49,9 @@
         "evtenia_examples"
       ],
       "requiredLinks": [
-        "/projects?type=Каркасные",
-        "/projects?type=Модульные",
-        "/projects?type=Из%20газобетона"
+        "/projects/karkasnye-doma",
+        "/projects/modulnye-doma",
+        "/projects/doma-iz-gazobetona"
       ],
       "nextAction": "Prepare a SERP/content brief for “какой дом выбрать”, collect Evtenia examples, then run the quality gate."
     },
@@ -65,13 +65,17 @@
       "reviewer": null,
       "verifiedMainVolume": 1261,
       "score": 97,
-      "status": "ready_for_brief",
+      "status": "published",
+      "artifacts": {
+        "brief": "briefs/dostavka-i-montazh-modulnogo-doma.md",
+        "draft": "drafts/dostavka-i-montazh-modulnogo-doma.json"
+      },
       "blockers": [
         "evtenia_module_specs",
         "technical_review"
       ],
       "requiredLinks": [
-        "/projects/modulnye-doma"
+        "/projects?type=Модульные"
       ],
       "nextAction": "Prepare a SERP/content brief for “доставка модульных домов”, collect Evtenia examples, then run the quality gate."
     },
