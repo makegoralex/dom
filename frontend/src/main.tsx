@@ -242,6 +242,8 @@ const SERVICES_MENU = [
   { slug: 'septik', title: 'Септик', text: 'Подбираем и монтируем септики с учетом объема стоков и участка.' },
   { slug: 'zabory', title: 'Заборы', text: 'Устанавливаем заборы разных типов: профлист, евроштакетник, дерево.' },
   { slug: 'skvazhiny', title: 'Скважины', text: 'Бурим и обустраиваем скважины под дом и баню с подбором оборудования.' },
+  { slug: 'elektromontazh', title: 'Электромонтаж', text: 'Проектируем и монтируем электрику для домов и квартир: от щита до розеток и освещения.' },
+  { slug: 'umnyy-dom', title: 'Умный дом', text: 'Подбираем и настраиваем управление освещением, климатом и другими системами дома под ваши привычки.' },
   { slug: 'vyvoz-musora', title: 'Вывоз мусора', text: 'Организуем оперативный вывоз строительного и бытового мусора с объекта.' },
   { slug: 'styazhka-pola', title: 'Стяжка пола', text: 'Делаем полусухую и бетонную стяжку с соблюдением уровня и сроков набора прочности.' },
   { slug: 'konditsionery', title: 'Кондиционеры', text: 'Подбираем, устанавливаем и обслуживаем кондиционеры для дома и бани.' },
@@ -294,6 +296,16 @@ const SERVICE_PAGE_DETAILS: Record<string, ServicePageDetail> = {
     summary: 'Организуем бурение и обустройство скважины для частного дома, бани или дачи в Пензе и Пензенской области.',
     scope: ['Оценка условий участка', 'Бурение скважины', 'Монтаж обсадной колонны', 'Подбор насоса и автоматики', 'Обустройство ввода воды в дом'],
     result: 'Автономный источник воды, подготовленный к повседневной эксплуатации.'
+  },
+  elektromontazh: {
+    summary: 'Выполним электромонтаж в доме или квартире в Пензе: продумаем расположение точек и соберем надежную систему под ваши задачи.',
+    scope: ['Обсуждение нагрузки и планировки', 'Схема линий и подбор материалов', 'Прокладка кабеля и монтаж электрощита', 'Установка розеток, выключателей и освещения', 'Проверка соединений и работы системы'],
+    result: 'Удобная электросеть с понятным расположением линий, подготовленная к подключению бытовой техники и освещения.'
+  },
+  'umnyy-dom': {
+    summary: 'Поможем сделать дом удобнее: подберем сценарии автоматизации и объединим нужные устройства в понятное управление.',
+    scope: ['Определение задач и сценариев', 'Подбор совместимых устройств', 'Подготовка электрики и сети', 'Монтаж и настройка оборудования', 'Проверка сценариев и обучение управлению'],
+    result: 'Настроенные сценарии для освещения, климата и других выбранных систем, которыми удобно управлять дома и удаленно.'
   },
   'styazhka-pola': {
     summary: 'Выполним ровную стяжку пола в доме или квартире в Пензе под выбранное финишное покрытие.',
@@ -887,7 +899,7 @@ function resolveMediaUrl(url?: string) {
   if (value.startsWith('http://') || value.startsWith('https://')) {
     try {
       const parsed = new URL(value);
-      const safeProtocol = window.location.protocol === 'https:' && parsed.protocol === 'http:' ? 'https:' : parsed.protocol;
+      const safeProtocol = parsed.protocol === 'http:' && (window.location.protocol === 'https:' || API_ORIGIN.startsWith('https://')) ? 'https:' : parsed.protocol;
       if (parsed.pathname.startsWith('/assets/')) {
         return `${safeProtocol}//${parsed.host}/api${parsed.pathname}`;
       }
@@ -1038,13 +1050,34 @@ function PromoLeadModal({
   );
 }
 
-function ProjectTile({ project, onRequest }: { project: HouseProject; onRequest?: (project: HouseProject) => void }) {
-  const imageUrl = resolveMediaUrl(project.coverImage || project.images?.[0] || '');
-  const [openRequest, setOpenRequest] = useState(false);
+function ProjectTile({ project, onRequest, showGallery = false }: { project: HouseProject; onRequest?: (project: HouseProject) => void; showGallery?: boolean }) {
+  const images = [...new Set([project.coverImage, ...(project.images || [])].filter(Boolean).map((image) => resolveMediaUrl(image)))];
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const imageUrl = images[activeImageIndex] || images[0] || '';
+  const hasGallery = showGallery && images.length > 1;
+
+  const changeImage = (direction: -1 | 1) => {
+    setActiveImageIndex((index) => (index + direction + images.length) % images.length);
+  };
+
   return (
     <article className="project-card">
+      {showGallery ? (
+        <div className="project-card-gallery">
+          <a className="project-card-photo-link" href={`/project/${project.id}`} aria-label={`Открыть проект ${project.title}`}>
+            <div className="project-image" style={{ backgroundImage: imageUrl ? `url("${imageUrl}")` : undefined }} />
+          </a>
+          {hasGallery ? (
+            <>
+              <button className="project-card-gallery-arrow previous" type="button" onClick={() => changeImage(-1)} aria-label={`Предыдущее фото проекта ${project.title}`}>‹</button>
+              <button className="project-card-gallery-arrow next" type="button" onClick={() => changeImage(1)} aria-label={`Следующее фото проекта ${project.title}`}>›</button>
+              <span className="project-card-gallery-count" aria-live="polite">{activeImageIndex + 1} / {images.length}</span>
+            </>
+          ) : null}
+        </div>
+      ) : null}
       <a className="project-card-link" href={`/project/${project.id}`}>
-      <div className="project-image" style={{ backgroundImage: `url(${imageUrl})` }} />
+      {!showGallery ? <div className="project-image" style={{ backgroundImage: imageUrl ? `url("${imageUrl}")` : undefined }} /> : null}
       <div className="project-content">
         <p className="project-desc">{project.shortDescription}</p>
         <h3>{project.title}</h3>
@@ -1278,6 +1311,8 @@ function PublicPage() {
                 <a href="/services/fundament">Фундамент</a>
                 <a href="/services/skvazhiny">Скважины</a>
                 <a href="/services/remont">Ремонт</a>
+                <a href="/services/elektromontazh">Электромонтаж</a>
+                <a href="/services/umnyy-dom">Умный дом</a>
               </div>
             </article>
             <article className="offer-card" style={offerImage(4) ? { backgroundImage: `url('${offerImage(4)}')` } : undefined}>
@@ -1313,7 +1348,7 @@ function PublicPage() {
             ))}
           </div>
           <div className="catalog-grid home-project-grid">
-            {catalogProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
+            {catalogProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} showGallery />)}
           </div>
           <div className="show-all-wrap"><a href="/projects" className="show-all-link">Показать все проекты</a></div>
         </div>
