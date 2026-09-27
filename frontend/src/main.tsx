@@ -1065,7 +1065,7 @@ function ProjectTile({ project, onRequest, showGallery = false }: { project: Hou
       {showGallery ? (
         <div className="project-card-gallery">
           <a className="project-card-photo-link" href={`/project/${project.id}`} aria-label={`Открыть проект ${project.title}`}>
-            <div className="project-image" style={{ backgroundImage: imageUrl ? `url("${imageUrl}")` : undefined }} />
+            <div className="project-image" style={{ backgroundImage: imageUrl ? `url(${imageUrl})` : undefined }} />
           </a>
           {hasGallery ? (
             <>
@@ -1077,7 +1077,7 @@ function ProjectTile({ project, onRequest, showGallery = false }: { project: Hou
         </div>
       ) : null}
       <a className="project-card-link" href={`/project/${project.id}`}>
-      {!showGallery ? <div className="project-image" style={{ backgroundImage: imageUrl ? `url("${imageUrl}")` : undefined }} /> : null}
+      {!showGallery ? <div className="project-image" style={{ backgroundImage: imageUrl ? `url(${imageUrl})` : undefined }} /> : null}
       <div className="project-content">
         <p className="project-desc">{project.shortDescription}</p>
         <h3>{project.title}</h3>
