@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-09-25",
+  "updated": "2026-09-29",
   "clusters": {
     "modulnye-doma-otzyvy-i-minusy": {
       "semanticStatus": "published",
@@ -29,6 +29,16 @@
       "reservedAt": "2026-09-25",
       "publishedAt": "2026-09-25",
       "notes": "Third Journal article. Prepared manually and published through managed production sync."
+    },
+    "modulnyy-dom-s-kommunikaciyami": {
+      "semanticStatus": "published",
+      "queueStatus": "published",
+      "brief": "briefs/modulnyy-dom-s-kommunikaciyami.md",
+      "draft": "drafts/modulnyy-dom-s-kommunikaciyami.json",
+      "report": "reports/modulnyy-dom-s-kommunikaciyami-gate.json",
+      "reservedAt": "2026-09-29",
+      "publishedAt": "2026-09-29",
+      "notes": "Fourth Journal article. Prepared manually and published through managed production sync."
     }
   }
 }

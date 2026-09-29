@@ -1037,14 +1037,14 @@
     {
       "id": "modulnyy-dom-s-kommunikaciyami",
       "page": "/journal/modulnyy-dom-s-kommunikaciyami",
-      "status": "planned",
+      "status": "published",
       "pageType": "article",
       "intent": "informational_commercial",
       "funnel": "consideration",
       "category": "Модульные дома",
       "region": "Россия",
       "author": "Олег Иванович Кисляков",
-      "reviewer": null,
+      "reviewer": "Олег Иванович Кисляков, технический директор",
       "main": {
         "q": "модульный дом с коммуникациями",
         "vol": 882
@@ -1065,9 +1065,9 @@
       ],
       "priority": 100,
       "humanReviewRequired": true,
-      "indexingState": "planned",
+      "indexingState": "published",
       "requiredLinks": [
-        "/projects/modulnye-doma"
+        "/projects?type=Модульные"
       ],
       "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
       "volumeEvidence": {

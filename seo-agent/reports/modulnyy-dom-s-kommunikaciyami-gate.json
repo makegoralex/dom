@@ -1,0 +1,16 @@
+{
+  "clusterId": "modulnyy-dom-s-kommunikaciyami",
+  "checkedAt": "2026-09-29",
+  "result": "pass",
+  "rules": [
+    {"id": "ownership", "result": "pass", "evidence": "The informational package-comparison intent belongs to the Journal URL; the modular catalogue remains the transactional owner."},
+    {"id": "answer-first", "result": "pass", "evidence": "The lead immediately separates internal factory-installed systems from sources and external networks on the plot."},
+    {"id": "sources", "result": "pass", "evidence": "Definitions and engineering domains rely on current Rosstandart and Minstroy materials checked on 2026-09-29."},
+    {"id": "company-claims", "result": "pass", "evidence": "The article does not invent a standard Evtenia package, price, deadline, equipment brand or technical figure."},
+    {"id": "internal-links", "result": "pass", "evidence": "The article links to modular projects, well and septic services, and the delivery guide."},
+    {"id": "human-review", "result": "pass", "evidence": "Technical author and reviewer attribution to Oleg Ivanovich Kislyakov is approved by the site owner."},
+    {"id": "conversion", "result": "pass", "evidence": "The CTA asks to compare the project package with the actual plot utilities before production."},
+    {"id": "metadata", "result": "pass", "evidence": "Title, slug, excerpt, category, author, reviewer, SEO title and description are complete."}
+  ],
+  "publicationBlockers": []
+}

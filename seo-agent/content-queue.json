@@ -86,16 +86,20 @@
       "owner": "/journal/modulnyy-dom-s-kommunikaciyami",
       "region": "Россия",
       "author": "Олег Иванович Кисляков",
-      "reviewer": null,
+      "reviewer": "Олег Иванович Кисляков, технический директор",
       "verifiedMainVolume": 882,
       "score": 96,
-      "status": "ready_for_brief",
+      "status": "published",
+      "artifacts": {
+        "brief": "briefs/modulnyy-dom-s-kommunikaciyami.md",
+        "draft": "drafts/modulnyy-dom-s-kommunikaciyami.json"
+      },
       "blockers": [
         "evtenia_module_specs",
         "technical_review"
       ],
       "requiredLinks": [
-        "/projects/modulnye-doma"
+        "/projects?type=Модульные"
       ],
       "nextAction": "Prepare a SERP/content brief for “модульный дом с коммуникациями”, collect Evtenia examples, then run the quality gate."
     },
