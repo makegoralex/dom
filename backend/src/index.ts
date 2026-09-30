@@ -1227,9 +1227,16 @@ app.get('/sitemap.xml', (req, res) => {
     { path: '/' },
     { path: '/projects' },
     { path: '/baths' },
+    { path: '/design' },
     { path: '/homes' },
     { path: '/lands' },
     { path: '/journal' },
+    ...[
+      'fundament', 'besedki', 'septik', 'zabory', 'skvazhiny', 'elektromontazh', 'umnyy-dom',
+      'vyvoz-musora', 'styazhka-pola', 'konditsionery', 'interernoe-ozelenenie', 'otsenka-nedvizhimosti',
+      'plastikovye-okna', 'dveri', 'remont', 'lestnitsy', 'svai', 'dizainer', 'landshaftnyy-dizayn',
+      'mezhevanie', 'ipoteka-oformlenie'
+    ].map((slug) => ({ path: `/services/${slug}` })),
     ...data.projects.map((project) => ({ path: `/project/${encodeURIComponent(project.id)}` })),
     ...data.homes.map((home) => ({ path: `/homes/${encodeURIComponent(home.id)}` })),
     ...data.lands.map((land) => ({ path: `/lands/${encodeURIComponent(land.id)}` })),
@@ -1860,6 +1867,59 @@ app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
   }
 
   return res.status(500).json({ message: 'Неизвестная ошибка загрузки файла.' });
+});
+
+const escapeHtml = (value: string): string => value
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;');
+
+const renderSeoDocument = (html: string, title: string, description: string, canonicalUrl: string): string => {
+  const safeTitle = escapeHtml(title);
+  const safeDescription = escapeHtml(description);
+  const safeCanonical = escapeHtml(canonicalUrl);
+  let result = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${safeTitle}</title>`);
+  result = result.replace(/<meta\s+name=["']description["'][^>]*\/?\s*>/i, `<meta name="description" content="${safeDescription}" />`);
+  const socialTags = [
+    `<link rel="canonical" href="${safeCanonical}" />`,
+    `<meta property="og:title" content="${safeTitle}" />`,
+    `<meta property="og:description" content="${safeDescription}" />`,
+    `<meta property="og:type" content="website" />`,
+    `<meta property="og:url" content="${safeCanonical}" />`,
+    `<meta property="og:site_name" content="Evtenia" />`
+  ].join('');
+  return result.replace(/<\/head>/i, `${socialTags}</head>`);
+};
+
+app.get('/services/:slug', (req, res, next) => {
+  const indexPath = path.join(FRONTEND_DIST, 'index.html');
+  if (!fs.existsSync(indexPath)) return next();
+  const slug = String(req.params.slug || '');
+  const page = readData().pages[`services-${slug}`];
+  if (!page) return next();
+  const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+  const canonical = `${origin}/services/${encodeURIComponent(slug)}`;
+  const title = `${page.title} в Пензе — стоимость и сроки | Evtenia`;
+  const description = `Услуга «${page.title}» в Пензе и Пензенской области: описание работ, ориентировочные цены и сроки. Оставьте заявку на предварительный расчет от Evtenia.`;
+  const html = renderSeoDocument(fs.readFileSync(indexPath, 'utf8'), title, description, canonical);
+  res.set('Cache-Control', 'public, max-age=300');
+  return res.type('html').send(html);
+});
+
+app.get('/design', (req, res, next) => {
+  const indexPath = path.join(FRONTEND_DIST, 'index.html');
+  if (!fs.existsSync(indexPath)) return next();
+  const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+  const html = renderSeoDocument(
+    fs.readFileSync(indexPath, 'utf8'),
+    'Проектирование домов в Пензе — архитектура и конструктив | Evtenia',
+    'Проектирование частных домов и коттеджей в Пензе и области. Эскизные, архитектурные и конструктивные решения; состав и сроки согласуем по задаче.',
+    `${origin}/design`
+  );
+  res.set('Cache-Control', 'public, max-age=300');
+  return res.type('html').send(html);
 });
 
 app.use('/assets', express.static(ASSETS_DIR));
