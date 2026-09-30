@@ -280,7 +280,7 @@ type ServicePageDetail = {
   faq: { question: string; answer: string }[];
 };
 
-const servicePhoto = (name: string) => `/assets/services/${name}.jpg`;
+const servicePhoto = (name: string) => `${API_BASE}/api/assets/services/${name}.jpg`;
 
 const SERVICE_PAGE_DETAILS: Record<string, ServicePageDetail> = {
   fundament: {
