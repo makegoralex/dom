@@ -1133,7 +1133,7 @@ function HeaderNav({
   menuOrder?: NavMenuKey[];
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [openDesktopMenu, setOpenDesktopMenu] = useState<string | null>(null);
+  const [openDesktopMenu, setOpenDesktopMenu] = useState<{ label: string; left: number; width: number } | null>(null);
   const desktopMenuCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [mobileStack, setMobileStack] = useState<Array<{ title: string; items: MenuChildItem[] }>>([]);
 
@@ -1144,9 +1144,16 @@ function HeaderNav({
     }
   };
 
-  const openDesktopMenuFor = (label: string) => {
+  const openDesktopMenuFor = (label: string, trigger: HTMLElement) => {
     cancelDesktopMenuClose();
-    setOpenDesktopMenu(label);
+    const nav = trigger.closest<HTMLElement>('.hero-nav');
+    const preferredWidth = label === 'ПРОЕКТЫ ДОМОВ' ? 420 : ['О КОМПАНИИ', 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ'].includes(label) ? 320 : 1000;
+    const width = Math.min(preferredWidth, window.innerWidth - 32);
+    const triggerRect = trigger.getBoundingClientRect();
+    const navRect = nav?.getBoundingClientRect();
+    const targetCenter = triggerRect.left + triggerRect.width / 2;
+    const safeCenter = Math.min(Math.max(targetCenter, width / 2 + 16), window.innerWidth - width / 2 - 16);
+    setOpenDesktopMenu({ label, left: navRect ? safeCenter - navRect.left : safeCenter, width });
   };
 
   const scheduleDesktopMenuClose = () => {
@@ -1234,7 +1241,11 @@ function HeaderNav({
         {menuItems.map((item, index) => (
           <React.Fragment key={item.label}>
             {item.children ? (
-              <div className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'О КОМПАНИИ' ? 'menu-about' : item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'menu-settlements' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : item.label === 'МЕБЕЛЬ' ? 'menu-furniture' : ''}`} onMouseEnter={() => openDesktopMenuFor(item.label)}>
+              <div
+                className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'О КОМПАНИИ' ? 'menu-about' : item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'menu-settlements' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : item.label === 'МЕБЕЛЬ' ? 'menu-furniture' : ''}`}
+                onMouseEnter={(event) => openDesktopMenuFor(item.label, event.currentTarget)}
+                onFocus={(event) => openDesktopMenuFor(item.label, event.currentTarget)}
+              >
                 {item.href ? (
                   <a href={item.href} className={`menu-link ${item.active ? 'active' : ''}`}>{item.label} ▾</a>
                 ) : (
@@ -1242,8 +1253,8 @@ function HeaderNav({
                 )}
                 <div
                   className={item.label === 'ПРОЕКТЫ ДОМОВ' || item.label === 'О КОМПАНИИ' || item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'projects-dropdown' : 'services-dropdown'}
-                  style={openDesktopMenu === item.label ? { display: 'grid' } : undefined}
-                  onMouseEnter={() => openDesktopMenuFor(item.label)}
+                  style={openDesktopMenu?.label === item.label ? { display: 'grid', left: `${openDesktopMenu.left}px`, width: `${openDesktopMenu.width}px`, transform: 'translateX(-50%)' } : undefined}
+                  onMouseEnter={cancelDesktopMenuClose}
                   onMouseLeave={scheduleDesktopMenuClose}
                 >
                   {item.children.map((child, idx) => (
