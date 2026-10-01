@@ -259,7 +259,8 @@ const SERVICES_MENU = [
   { slug: 'dizainer', title: 'Дизайнер', text: 'Разрабатываем дизайн-концепцию интерьеров и экстерьеров.' },
   { slug: 'landshaftnyy-dizayn', title: 'Ландшафтный дизайн', text: 'Проектируем благоустройство участка и озеленение территории.' },
   { slug: 'mezhevanie', title: 'Межевание', text: 'Готовим документы и выполняем межевание земельных участков.' },
-  { slug: 'ipoteka-oformlenie', title: 'Ипотека. Оформление', text: 'Помогаем с подбором банка, программой, пакетом документов и сопровождением сделки.' }
+  { slug: 'ipoteka-oformlenie', title: 'Ипотека. Оформление', text: 'Помогаем с подбором банка, программой, пакетом документов и сопровождением сделки.' },
+  { slug: 'strahovanie', title: 'Страхование', text: 'Помогаем сравнить варианты страхования дома, квартиры, имущества и ответственности от ведущих страховых компаний.' }
 ];
 
 const PROMOTIONS_MENU = [
@@ -273,6 +274,8 @@ type ServicePageDetail = {
   intro: string[];
   scope: ServiceDetailPoint[];
   pricing: { item: string; value: string; note: string }[];
+  pricingKicker?: string;
+  pricingDisclaimer?: string;
   duration: string;
   result: string;
   photo?: string;
@@ -811,6 +814,40 @@ const SERVICE_PAGE_DETAILS: Record<string, ServicePageDetail> = {
       { question: 'Какие программы сейчас действуют?', answer: 'Программы и ставки меняются. Мы проверяем доступные варианты на дату обращения и рекомендуем подтвердить условия непосредственно у банка перед подачей.' },
       { question: 'Помогаете оформить ипотеку без выбранного проекта дома?', answer: 'Да, на первой консультации можно обсудить бюджет и собрать требования к проекту; банк может запросить конкретный комплект до принятия решения.' }
     ]
+  },
+  strahovanie: {
+    summary: 'Подберём страхование дома, квартиры, дачи или имущества в Пензе и области: сопоставим предложения ведущих страховых компаний и поможем разобраться в покрытии до оформления полиса.',
+    intro: [
+      'Полис полезен не сам по себе, а когда его условия подходят объекту и возможным расходам. Вместе определим, что важно защитить: конструктив дома или квартиры, внутреннюю отделку, инженерное оборудование, домашнее имущество, гражданскую ответственность перед соседями либо объект, который требует застраховать банк по ипотеке.',
+      'Сравним доступные варианты ведущих страховых компаний, с которыми работаем, по ключевым условиям: страховым суммам, перечню рисков, исключениям, франшизе, сроку и способу оформления. Доступность конкретной программы зависит от типа объекта, его состояния, адреса и правил страховщика. Окончательные обязанности сторон и порядок урегулирования определяются договором страхования.'
+    ],
+    scope: [
+      { title: 'Разбираем задачу и объект', description: 'Уточняем, что страхуем и зачем: дом для постоянного проживания или дачу, квартиру, отделку, имущество, ответственность или объект в ипотеке.' },
+      { title: 'Собираем исходные данные', description: 'Для предварительного расчёта могут понадобиться адрес, тип и площадь объекта, материал стен, год постройки, страховая сумма и требования банка, если они есть.' },
+      { title: 'Сравниваем предложения', description: 'Показываем доступные программы ведущих страховых компаний и различия в покрытии, исключениях, лимитах, франшизе и порядке оценки ущерба.' },
+      { title: 'Проверяем условия до оплаты', description: 'Помогаем сверить ФИО, адрес, состав имущества, выгодоприобретателя и выбранные риски. Отдельно обращаем внимание на ограничения и документы, которые могут потребоваться при страховом событии.' },
+      { title: 'Сопровождаем оформление', description: 'Подсказываем, какие сведения и документы передать, помогаем пройти оформление выбранного варианта и сохранить полис с правилами страхования.' }
+    ],
+    pricing: [
+      { item: 'Страхование квартиры, отделки и домашнего имущества', value: 'Рассчитывается по тарифу страховщика', note: 'На стоимость влияют страховая сумма, выбранные риски, лимиты, франшиза и параметры квартиры.' },
+      { item: 'Страхование частного дома, дачи или коттеджа', value: 'Индивидуальный расчёт', note: 'Страховщик оценивает адрес, материал, площадь, год постройки, состояние, состав строения и желаемое покрытие.' },
+      { item: 'Ипотечное страхование и ответственность', value: 'По требованиям банка и условиям полиса', note: 'Набор обязательных и добровольных видов страхования зависит от кредитного договора и выбранного предложения.' }
+    ],
+    pricingKicker: 'Стоимость полиса · Пенза и область',
+    pricingDisclaimer: 'Единого тарифа для всех объектов нет: цену определяет выбранная страховая компания по своим правилам и данным об объекте. Предварительный расчёт не является офертой и не заменяет чтение договора и правил страхования. До оплаты проверьте страховую сумму, риски, исключения, франшизу, срок действия и порядок обращения при страховом событии.',
+    duration: 'Типовой объект с готовыми данными можно предварительно посчитать в день обращения. Если страховщику нужны документы, осмотр, оценка объекта или согласование с банком, срок увеличивается; дата начала покрытия указывается в полисе.',
+    result: 'Сопоставимые предложения по вашему объекту и понимание того, что именно застраховано, на какую сумму и при каких ограничениях.',
+    photo: servicePhoto('project-consultation'), photoAlt: 'Консультация по выбору условий и оформлению страхования недвижимости',
+    seoTitle: 'Страхование дома и квартиры в Пензе — подбор полиса | Evtenia',
+    seoDescription: 'Подбор страхования дома, дачи, квартиры, имущества и ответственности в Пензе и области. Сравним предложения ведущих страховых компаний, объясним покрытие и поможем оформить полис.',
+    faq: [
+      { question: 'Сколько стоит застраховать дом или квартиру в Пензе?', answer: 'Стоимость рассчитывает выбранная страховая компания. На неё влияют тип, адрес, площадь и состояние объекта, страховая сумма, риски, лимиты и франшиза. После короткого опроса подготовим доступные варианты для сравнения.' },
+      { question: 'Какие риски можно включить в страхование жилья?', answer: 'В зависимости от программы можно выбрать защиту конструктивных элементов, отделки, инженерного оборудования, домашнего имущества и гражданской ответственности. Перечень событий, исключения и лимиты различаются — их нужно сверить в правилах и договоре конкретного страховщика.' },
+      { question: 'Можно ли застраховать строящийся или незарегистрированный дом?', answer: 'Это зависит от стадии строительства и правил конкретной страховой компании. Некоторые программы принимают только завершённые и зарегистрированные строения; возможность страхования незавершённого объекта нужно подтвердить до расчёта.' },
+      { question: 'Какие документы нужны для оформления?', answer: 'Состав документов зависит от продукта. Для первичного подбора обычно достаточно адреса, площади, типа и материала объекта и желаемой страховой суммы; для заключения договора страховщик может запросить документы на объект, данные собственника, фотографии или осмотр.' },
+      { question: 'Кто принимает решение о выплате при страховом событии?', answer: 'Решение принимает страховая компания на основании договора, правил страхования и документов по событию. Мы помогаем разобраться в условиях до оформления; размер и возможность выплаты определяются страховщиком.' },
+      { question: 'Вы работаете только с одной страховой компанией?', answer: 'Нет. Мы помогаем сравнить предложения ведущих страховых компаний, с которыми работаем, чтобы можно было сопоставить покрытие и условия, а не ориентироваться только на цену.' }
+    ]
   }
 };
 
@@ -1096,6 +1133,7 @@ function HeaderNav({
   menuOrder?: NavMenuKey[];
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [openDesktopMenu, setOpenDesktopMenu] = useState<string | null>(null);
   const [mobileStack, setMobileStack] = useState<Array<{ title: string; items: MenuChildItem[] }>>([]);
 
   useEffect(() => {
@@ -1159,17 +1197,17 @@ function HeaderNav({
           ☰
         </button>
       </div>
-      <nav className="hero-nav">
+      <nav className="hero-nav" onMouseLeave={() => setOpenDesktopMenu(null)}>
         {menuItems.map((item, index) => (
           <React.Fragment key={item.label}>
             {item.children ? (
-              <div className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'О КОМПАНИИ' ? 'menu-about' : item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'menu-settlements' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : item.label === 'МЕБЕЛЬ' ? 'menu-furniture' : ''}`}>
+              <div className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'О КОМПАНИИ' ? 'menu-about' : item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'menu-settlements' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : item.label === 'МЕБЕЛЬ' ? 'menu-furniture' : ''}`} onMouseEnter={() => setOpenDesktopMenu(item.label)}>
                 {item.href ? (
                   <a href={item.href} className={`menu-link ${item.active ? 'active' : ''}`}>{item.label} ▾</a>
                 ) : (
                   <button type="button" className={`menu-link menu-link-btn ${item.active ? 'active' : ''}`}>{item.label} ▾</button>
                 )}
-                <div className={item.label === 'ПРОЕКТЫ ДОМОВ' || item.label === 'О КОМПАНИИ' || item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'projects-dropdown' : 'services-dropdown'}>
+                <div className={item.label === 'ПРОЕКТЫ ДОМОВ' || item.label === 'О КОМПАНИИ' || item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'projects-dropdown' : 'services-dropdown'} style={openDesktopMenu === item.label ? { display: 'grid' } : undefined}>
                   {item.children.map((child, idx) => (
                     child.children ? (
                       <div className="dropdown-col" key={`${child.label}_${idx}`}>
@@ -2069,9 +2107,32 @@ function InternalHeader() {
 
 function AboutPage() {
   const [page, setPage] = useState<ContentPage>({ slug: 'about', title: 'О компании', content: 'Загрузка...' });
+  const directorPhoto = `${API_BASE}/api/assets/about/director-evgeniya.webp`;
 
   useEffect(() => {
-    document.title = 'О компании — Evtenia';
+    writePageSEO({
+      title: 'О компании Evtenia — строительство домов в Пензе с 2014 года',
+      description: 'Строительная компания Evtenia в Пензе и области: проектирование и строительство домов, фундаменты, инженерные системы и отделка. Узнайте о подходе компании и руководителе.',
+      path: '/about',
+      image: directorPhoto,
+      schema: {
+        '@context': 'https://schema.org',
+        '@type': 'AboutPage',
+        name: 'О компании Evtenia',
+        url: `${window.location.origin}/about`,
+        about: {
+          '@type': 'Organization',
+          name: 'Evtenia',
+          url: window.location.origin,
+          foundingDate: '2014',
+          image: `${window.location.origin}${directorPhoto}`,
+          telephone: CONTACTS.mainPhoneDisplay,
+          email: CONTACTS.email,
+          address: { '@type': 'PostalAddress', addressLocality: 'Пенза', streetAddress: 'ул. Гоголя, 41', addressCountry: 'RU' },
+          areaServed: { '@type': 'AdministrativeArea', name: 'Пенза и Пензенская область' }
+        }
+      }
+    });
     fetch(`${API_BASE}/api/pages/about`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('not found'))))
       .then((payload: ContentPage) => setPage(payload))
@@ -2096,7 +2157,7 @@ function AboutPage() {
           <header className="about-hero">
             <span>Строительная компания в Пензе</span>
             <h1>Строим пространство, которое становится домом</h1>
-            <p>Evtenia объединяет проектирование, строительство и обустройство участка в одном понятном процессе — с договором, прозрачной сметой и ответственностью за результат.</p>
+            <p>Строим дома в Пензе и Пензенской области с 2014 года. Объединяем проектирование, подбор решений для участка, строительство и обустройство в понятный маршрут — от первого обсуждения бюджета до приемки работ.</p>
             <div><a href="/projects">Выбрать проект</a><a href="/contacts">Обсудить строительство</a></div>
           </header>
           <div className="about-stats" aria-label="Компания в цифрах">
@@ -2108,10 +2169,22 @@ function AboutPage() {
             <div><span className="about-label">О компании</span><h2>Дом начинается с доверия</h2></div>
             <div className="about-cms-copy"><CmsHtmlContent html={sanitizeCmsHtml(page.content.replace(/TMдом/gi, 'Evtenia'))} /></div>
           </section>
+          <section className="about-company-details">
+            <div className="about-section-heading"><span className="about-label">Кто мы и чем полезны</span><h2>Не просто коробка, а продуманный путь к своему дому</h2><p>Помогаем разобраться с решениями до того, как они превратятся в дорогие переделки на площадке.</p></div>
+            <div className="about-detail-grid">
+              <article><span>01 · до стройки</span><h3>Проект и участок</h3><p>Обсуждаем состав семьи, нужные помещения, желаемую площадь и бюджет. Помогаем подобрать проект, проверить его применимость к участку и определить, какие исходные данные нужны для точного расчёта.</p></article>
+              <article><span>02 · стройка</span><h3>Основание и дом</h3><p>Сопоставляем проект, нагрузки и условия площадки. До начала работ фиксируем комплектацию, границы этапов, ориентир стоимости и последовательность действий — чтобы заказчик понимал, что именно входит в договор.</p></article>
+              <article><span>03 · инженерия и готовность</span><h3>Системы и отделка</h3><p>Продумываем инженерные решения, электрику и внутренние работы в связке с планировкой. Можно проходить этапы последовательно и заранее понимать, что потребуется для следующего шага.</p></article>
+            </div>
+          </section>
           <section className="about-principles">
             <article><b>01</b><h3>Прозрачность</h3><p>Фиксируем состав работ, стоимость и сроки. Клиент понимает, за что платит и что получит на каждом этапе.</p></article>
             <article><b>02</b><h3>Комплексный подход</h3><p>Проект, фундамент, инженерные сети, отделка и благоустройство участка связаны в единую систему.</p></article>
             <article><b>03</b><h3>Практичные решения</h3><p>Подбираем технологию и комплектацию под образ жизни семьи, особенности участка и реальный бюджет.</p></article>
+          </section>
+          <section className="about-director" aria-labelledby="about-director-title">
+            <figure className="about-director-visual"><img src={directorPhoto} alt="Кислякова Евгения Викторовна, генеральный директор Evtenia" width="1100" height="1030" fetchPriority="high" /><figcaption>Строительная компания Evtenia · Пенза</figcaption></figure>
+            <div className="about-director-copy"><span className="about-label">Руководство компании</span><h2 id="about-director-title">Кислякова Евгения Викторовна</h2><strong>Генеральный директор Evtenia</strong><p>Компания строится на понятных договорённостях и внимании к деталям. Руководитель координирует работу Evtenia и помогает сохранять единый подход на всём пути — от первой консультации до завершения согласованных этапов.</p><p>Для клиента это означает конкретный план, возможность заранее обсудить спорные вопросы и ясную точку контакта по проекту. Мы не подменяем индивидуальный расчёт общими обещаниями: каждое решение сверяется с задачей, участком, комплектом работ и бюджетом семьи.</p><ul><li>обсуждаем задачу и ожидания до начала работ;</li><li>объясняем состав предложения и границы сметы;</li><li>согласуем изменения и следующие шаги заранее.</li></ul><a href="/contacts">Связаться с Evtenia <span>→</span></a></div>
           </section>
           <section id="about-team" className="about-directions">
             <div className="about-section-heading"><span className="about-label">Что мы делаем</span><h2>Всё необходимое для загородной жизни</h2><p>Можно заказать отдельный этап или доверить Evtenia весь путь до переезда.</p></div>
@@ -2120,15 +2193,27 @@ function AboutPage() {
               <a href="/services/fundament"><span>◇</span><h3>Фундаменты</h3><p>Основание с учётом проекта, грунта и условий участка.</p><b>Подробнее →</b></a>
               <a href="/lands"><span>⌖</span><h3>Земельные участки</h3><p>Подбор земли и оценка пригодности под строительство.</p><b>Выбрать участок →</b></a>
               <a href="/services/remont"><span>↯</span><h3>Инженерия и отделка</h3><p>Коммуникации, внутренние работы и подготовка дома к жизни.</p><b>Подробнее →</b></a>
+              <a href="/services/strahovanie"><span>◇</span><h3>Страхование</h3><p>Помогаем сопоставить условия страхования дома, квартиры и имущества.</p><b>Подобрать полис →</b></a>
+              <a href="/dveri"><span>▤</span><h3>Двери и комплектация</h3><p>Каталог дверей и решения для завершения интерьера нового дома.</p><b>Открыть каталог →</b></a>
             </div>
           </section>
           <section id="about-partners" className="about-process">
             <div className="about-section-heading"><span className="about-label">Как мы работаем</span><h2>Понятный путь к готовому дому</h2></div>
-            <ol><li><b>1</b><div><h3>Знакомимся с задачей</h3><p>Обсуждаем состав семьи, участок, пожелания и бюджет.</p></div></li><li><b>2</b><div><h3>Готовим решение</h3><p>Подбираем проект, технологию, комплектацию и рассчитываем смету.</p></div></li><li><b>3</b><div><h3>Заключаем договор</h3><p>Фиксируем объём работ, стоимость и этапы реализации.</p></div></li><li><b>4</b><div><h3>Строим и сдаём</h3><p>Организуем работы и передаём готовый результат клиенту.</p></div></li></ol>
+            <ol><li><b>1</b><div><h3>Знакомимся с задачей</h3><p>Обсуждаем состав семьи, участок, пожелания, сроки и бюджет. Если проект уже есть, изучаем его; если нет — помогаем понять, с чего начать.</p></div></li><li><b>2</b><div><h3>Готовим решение</h3><p>Подбираем проект, технологию и комплектацию, уточняем исходные данные и рассчитываем согласованный объём работ.</p></div></li><li><b>3</b><div><h3>Фиксируем договорённости</h3><p>До начала работ согласуем смету, этапы, сроки, состав материалов и порядок взаимодействия.</p></div></li><li><b>4</b><div><h3>Выполняем и принимаем этапы</h3><p>Организуем работы по согласованному плану, обсуждаем изменения заранее и передаём результат по завершении этапа.</p></div></li></ol>
+          </section>
+          <section className="about-questions">
+            <div className="about-section-heading"><span className="about-label">Перед обращением</span><h2>Частые вопросы о строительстве с Evtenia</h2><p>На первой встрече разберём детали именно вашего объекта; ниже — ответы на то, с чего обычно начинается разговор.</p></div>
+            <div className="about-question-list">
+              <details><summary>С чего начать, если участок уже есть, а проекта ещё нет?</summary><p>Начните с консультации и исходных данных по участку: адреса или кадастрового номера, размеров, рельефа и ограничений. Обсудим состав дома и бюджет, после чего предложим последовательность подготовки проекта и расчёта.</p></details>
+              <details><summary>Можно ли заказать только отдельный этап?</summary><p>Да. Можно обратиться за проектированием, фундаментом, инженерными работами, отделкой или другой отдельной услугой. Сначала согласуем границы этапа и что понадобится от смежных специалистов, чтобы решение было совместимо с остальным домом.</p></details>
+              <details><summary>Когда становится известна окончательная стоимость?</summary><p>Предварительный ориентир можно обсудить по исходным данным. Итоговую смету подтверждаем после уточнения проекта, состава работ, комплектации, участка и логистики; дополнительные работы согласуются отдельно до выполнения.</p></details>
+              <details><summary>Где работает Evtenia?</summary><p>Основной регион работы — Пенза и Пензенская область. Возможность выезда, доставка и организация работ в конкретном населённом пункте уточняются при обращении.</p></details>
+              <details><summary>Можно ли получить консультацию до решения о строительстве?</summary><p>Да. Расскажите, что уже известно о проекте и участке, — поможем определить ближайший практичный шаг и перечень данных, которые стоит подготовить для расчёта.</p></details>
+            </div>
           </section>
           <section id="about-agency" className="about-cta">
-            <div><span className="about-label">Начнём с разговора</span><h2>Расскажите, какой дом вам нужен</h2><p>Поможем соотнести пожелания, участок и бюджет и предложим следующий практичный шаг.</p></div>
-            <div><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a><a href="/contacts">Все контакты →</a></div>
+            <div><span className="about-label">Начнём с разговора</span><h2>Расскажите, какой дом вам нужен</h2><p>Поможем соотнести пожелания, участок и бюджет, ответим на первые вопросы и подскажем следующий шаг — без необходимости заранее знать все строительные термины.</p></div>
+            <div><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a><a href="/#lead-form">Оставить заявку →</a><a href="/contacts">Все контакты →</a></div>
           </section>
         </div>
       </section>
@@ -2198,7 +2283,7 @@ function SiteFooter() {
           <div className="footer-columns">
             <div><h4>Проекты домов</h4><a href="/projects?type=Модульные">Модульные</a><a href="/projects?type=Каркасные">Каркасные</a><a href="/projects?type=Из%20газобетона">Из газобетона</a></div>
             <div><h4>Бани</h4><a href="/baths?type=Модульные">Модульные</a><a href="/baths?type=Каркасные">Каркасные</a></div>
-            <div><h4>Услуги</h4><a href="/services/fundament">Фундамент</a><a href="/services/skvazhiny">Скважины</a><a href="/services/remont">Ремонт</a><a href="/services/dizainer">Дизайнер</a></div>
+            <div><h4>Услуги</h4><a href="/services/fundament">Фундамент</a><a href="/services/skvazhiny">Скважины</a><a href="/services/remont">Ремонт</a><a href="/services/dizainer">Дизайнер</a><a href="/services/strahovanie">Страхование</a></div>
             <div><h4>Разделы сайта</h4><a href="/design">Проектирование</a><a href="/portfolio">Портфолио</a><a href="/discounts/vse-akcii">Ипотека и акции</a><a href="/contacts">Контакты</a></div>
           </div>
           <div className="footer-mobile-accordion">
@@ -2218,6 +2303,7 @@ function SiteFooter() {
               <a href="/services/fundament">Фундамент</a>
               <a href="/services/skvazhiny">Скважины</a>
               <a href="/services/remont">Ремонт</a>
+              <a href="/services/strahovanie">Страхование</a>
             </details>
           </div>
           <div className="footer-requisites">
@@ -3523,14 +3609,14 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
   const serviceForm = isService ? (
     <aside className="service-side">
       <form className="service-lead-form" onSubmit={submitServiceLead}>
-        <span className="service-form-kicker">Первичная консультация</span>
-        <h3>Обсудим вашу задачу</h3>
-        <small>Оставьте контакты — уточним исходные данные и подготовим предварительный расчет по Пензе или области.</small>
+        <span className="service-form-kicker">{serviceSlug === 'strahovanie' ? 'Подбор страхования' : 'Первичная консультация'}</span>
+        <h3>{serviceSlug === 'strahovanie' ? 'Сравним условия по вашему объекту' : 'Обсудим вашу задачу'}</h3>
+        <small>{serviceSlug === 'strahovanie' ? 'Оставьте телефон и тип объекта — уточним данные и подготовим доступные варианты страхования.' : 'Оставьте контакты — уточним исходные данные и подготовим предварительный расчет по Пензе или области.'}</small>
         <label>Ваше имя<input autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} required /></label>
         <label>Телефон<input autoComplete="tel" type="tel" placeholder="+7 (___) ___-__-__" value={phone} onChange={(e) => setPhone(formatPhoneMask(e.target.value))} required /></label>
-        <label>Коротко об объекте<textarea value={requestMessage} onChange={(e) => setRequestMessage(e.target.value)} rows={3} placeholder="Район, площадь или что нужно сделать — по желанию" /></label>
+        <label>{serviceSlug === 'strahovanie' ? 'Объект и пожелания' : 'Коротко об объекте'}<textarea value={requestMessage} onChange={(e) => setRequestMessage(e.target.value)} rows={3} placeholder={serviceSlug === 'strahovanie' ? 'Дом, квартира, площадь, ипотека — по желанию' : 'Район, площадь или что нужно сделать — по желанию'} /></label>
         <PrivacyConsent />
-        <button type="submit">Запросить предварительный расчет</button>
+        <button type="submit">{serviceSlug === 'strahovanie' ? 'Подобрать варианты страхования' : 'Запросить предварительный расчет'}</button>
         <a className="service-lead-phone" href={CONTACTS.mainPhoneHref}>Или позвоните {CONTACTS.mainPhoneDisplay}</a>
         {serviceStatus ? <p role="status">{serviceStatus}</p> : null}
       </form>
@@ -3584,12 +3670,12 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
                 </section>
                 <section className="service-result-card"><span>Результат</span><p>{serviceDetail.result}</p></section>
                 <section className="service-detail-card service-pricing-card">
-                  <span className="page-kicker">Цены в Пензе · предварительный ориентир</span>
+                  <span className="page-kicker">{serviceDetail.pricingKicker || 'Цены в Пензе · предварительный ориентир'}</span>
                   <h2>Из чего складывается стоимость</h2>
                   <div className="service-pricing-list">
                     {serviceDetail.pricing.map((price) => <article key={price.item}><div><h3>{price.item}</h3><strong>{price.value}</strong></div><p>{price.note}</p></article>)}
                   </div>
-                  <p className="service-price-disclaimer">Цены приведены для предварительной оценки по открытым предложениям рынка Пензы на момент подготовки страницы, не являются публичной офертой или обещанием фиксированной стоимости. Итоговая смета зависит от объема, материалов, состояния и доступности объекта; перед заказом ее нужно подтвердить.</p>
+                  <p className="service-price-disclaimer">{serviceDetail.pricingDisclaimer || 'Цены приведены для предварительной оценки по открытым предложениям рынка Пензы на момент подготовки страницы, не являются публичной офертой или обещанием фиксированной стоимости. Итоговая смета зависит от объема, материалов, состояния и доступности объекта; перед заказом ее нужно подтвердить.'}</p>
                   <a className="service-inline-cta" href="#service-request">Рассчитать мой объект <span>→</span></a>
                 </section>
                 <section className="service-how-card">

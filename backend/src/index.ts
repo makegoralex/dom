@@ -571,6 +571,7 @@ const seedPages: Record<string, ContentPage> = {
   'services-landshaftnyy-dizayn': { slug: 'services-landshaftnyy-dizayn', title: 'Ландшафтный дизайн', content: '<p>Проектируем благоустройство участка и озеленение территории.</p>' },
   'services-mezhevanie': { slug: 'services-mezhevanie', title: 'Межевание', content: '<p>Готовим документы и выполняем межевание земельных участков.</p>' },
   'services-ipoteka-oformlenie': { slug: 'services-ipoteka-oformlenie', title: 'Ипотека. Оформление', content: '<p>Помогаем с подбором банка, программой, пакетом документов и сопровождением сделки.</p>' },
+  'services-strahovanie': { slug: 'services-strahovanie', title: 'Страхование', content: '<p>Помогаем сравнить варианты страхования дома, квартиры, дачи, имущества и гражданской ответственности от ведущих страховых компаний, с которыми работаем.</p><h2>Подбор условий под объект</h2><p>Уточняем задачу, собираем исходные данные, сопоставляем страховые суммы, выбранные риски, исключения, лимиты и франшизу. Доступность программы и окончательную стоимость подтверждает страховая компания.</p><h2>Что можно обсудить</h2><ul><li>страхование частного дома, дачи или квартиры;</li><li>отделку, инженерное оборудование и домашнее имущество;</li><li>гражданскую ответственность и требования по ипотеке.</li></ul><p>Перед оплатой проверяйте договор и правила страхования: они определяют покрытие, исключения, срок и порядок обращения при страховом событии.</p>' },
   ...Object.fromEntries(furnitureLeafPages.map((page) => [page.slug, page]))
 };
 
@@ -1242,12 +1243,13 @@ app.get('/sitemap.xml', (req, res) => {
     { path: '/design' },
     { path: '/homes' },
     { path: '/lands' },
+    { path: '/about' },
     { path: '/journal' },
     ...[
       'fundament', 'besedki', 'septik', 'zabory', 'skvazhiny', 'elektromontazh', 'umnyy-dom',
       'vyvoz-musora', 'styazhka-pola', 'konditsionery', 'interernoe-ozelenenie', 'otsenka-nedvizhimosti',
       'plastikovye-okna', 'dveri', 'remont', 'lestnitsy', 'svai', 'dizainer', 'landshaftnyy-dizayn',
-      'mezhevanie', 'ipoteka-oformlenie'
+      'mezhevanie', 'ipoteka-oformlenie', 'strahovanie'
     ].map((slug) => ({ path: `/services/${slug}` })),
     ...data.projects.map((project) => ({ path: `/project/${encodeURIComponent(project.id)}` })),
     ...data.homes.map((home) => ({ path: `/homes/${encodeURIComponent(home.id)}` })),
@@ -1950,6 +1952,40 @@ app.get(['/dveri', '/chany'], (req, res, next) => {
   return res.type('html').send(html);
 });
 
+app.get('/about', (req, res, next) => {
+  const indexPath = path.join(FRONTEND_DIST, 'index.html');
+  if (!fs.existsSync(indexPath)) return next();
+  const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+  const image = `${origin}/api/assets/about/director-evgeniya.webp`;
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    name: 'О компании Evtenia',
+    url: `${origin}/about`,
+    about: {
+      '@type': 'Organization',
+      name: 'Evtenia',
+      url: origin,
+      foundingDate: '2014',
+      image,
+      telephone: DEFAULT_CONTACTS.contactPhone,
+      email: DEFAULT_CONTACTS.contactEmail,
+      address: { '@type': 'PostalAddress', addressLocality: 'Пенза', streetAddress: 'ул. Гоголя, 41', addressCountry: 'RU' },
+      areaServed: { '@type': 'AdministrativeArea', name: 'Пенза и Пензенская область' }
+    }
+  };
+  const html = renderSeoDocument(
+    fs.readFileSync(indexPath, 'utf8'),
+    'О компании Evtenia — строительство домов в Пензе с 2014 года',
+    'Строительная компания Evtenia в Пензе и области: проектирование и строительство домов, фундаменты, инженерные системы и отделка. Узнайте о подходе компании и руководителе.',
+    `${origin}/about`,
+    schema,
+    image
+  );
+  res.set('Cache-Control', 'public, max-age=300');
+  return res.type('html').send(html);
+});
+
 app.get('/services/:slug', (req, res, next) => {
   const indexPath = path.join(FRONTEND_DIST, 'index.html');
   if (!fs.existsSync(indexPath)) return next();
@@ -1958,9 +1994,25 @@ app.get('/services/:slug', (req, res, next) => {
   if (!page) return next();
   const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
   const canonical = `${origin}/services/${encodeURIComponent(slug)}`;
-  const title = `${page.title} в Пензе — стоимость и сроки | Evtenia`;
-  const description = `Услуга «${page.title}» в Пензе и Пензенской области: описание работ, ориентировочные цены и сроки. Оставьте заявку на предварительный расчет от Evtenia.`;
-  const html = renderSeoDocument(fs.readFileSync(indexPath, 'utf8'), title, description, canonical);
+  const isInsurance = slug === 'strahovanie';
+  const title = isInsurance
+    ? 'Страхование дома и квартиры в Пензе — подбор полиса | Evtenia'
+    : `${page.title} в Пензе — стоимость и сроки | Evtenia`;
+  const description = isInsurance
+    ? 'Подбор страхования дома, дачи, квартиры, имущества и ответственности в Пензе и области. Сравним предложения ведущих страховых компаний, объясним покрытие и поможем оформить полис.'
+    : `Услуга «${page.title}» в Пензе и Пензенской области: описание работ, ориентировочные цены и сроки. Оставьте заявку на предварительный расчет от Evtenia.`;
+  const schema = isInsurance ? {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: 'Подбор страхования недвижимости в Пензе',
+    serviceType: 'Сопоставление предложений страхования жилья и имущества',
+    description,
+    areaServed: { '@type': 'AdministrativeArea', name: 'Пенза и Пензенская область' },
+    provider: { '@type': 'Organization', name: 'Evtenia', url: origin, telephone: DEFAULT_CONTACTS.contactPhone },
+    url: canonical
+  } : undefined;
+  const image = isInsurance ? `${origin}/api/assets/services/project-consultation.jpg` : undefined;
+  const html = renderSeoDocument(fs.readFileSync(indexPath, 'utf8'), title, description, canonical, schema, image);
   res.set('Cache-Control', 'public, max-age=300');
   return res.type('html').send(html);
 });

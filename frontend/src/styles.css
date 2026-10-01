@@ -1540,11 +1540,61 @@ html body, html body * { font-family: Arial, Helvetica, sans-serif !important; }
 
 /* Catalog landing pages for doors and outdoor bathing products. */
 @media (min-width: 1101px) {
-  .hero-nav { display: grid; width: max-content; max-width: 100%; margin-inline: auto; grid-template-columns: repeat(7, max-content); grid-auto-flow: row; justify-content: center; gap: 5px 8px; padding: 9px 12px; }
+  .hero-nav { position: relative; display: grid; width: max-content; max-width: 100%; margin-inline: auto; grid-template-columns: repeat(7, max-content); grid-auto-flow: row; justify-content: center; gap: 5px 8px; padding: 9px 12px; }
   .hero-nav > span { display: none; }
   .hero-nav > *, .hero-nav .menu-services { width: max-content; min-width: max-content; justify-content: center; }
+  .hero-nav > .menu-services { position: static; }
   .hero-nav .menu-link,
   .hero-nav .menu-link-btn { width: auto; min-height: 40px; justify-content: center; padding: 0 11px; white-space: nowrap; text-align: center; line-height: 1.1; font-size: 11px; }
+  .hero-nav .projects-dropdown { width: min(420px, calc(100vw - 32px)); max-width: calc(100vw - 32px); min-width: 0; }
+  .hero-nav .services-dropdown { width: min(1000px, calc(100vw - 32px)); max-width: calc(100vw - 32px); }
+}
+
+.internal-body { padding-top: 42px; }
+.service-detail-page, .promotions-page, .design-service-page { padding-top: 42px; }
+.hero-nav .projects-dropdown, .hero-nav .services-dropdown { left: 50%; right: auto; transform: translateX(-50%); }
+.about-company-details, .about-director, .about-questions { margin-bottom: 76px; }
+.about-detail-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.about-detail-grid article { min-height: 245px; padding: 26px; border: 1px solid #ded8cc; border-radius: 18px; background: #fff; }
+.about-detail-grid article > span { color: #9b7a43; font-size: 10px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+.about-detail-grid h3 { margin: 42px 0 10px; color: var(--about-green); font-family: Georgia, serif; font-size: 25px; font-weight: 500; }
+.about-detail-grid p { margin: 0; color: #68766f; font-size: 14px; line-height: 1.65; }
+.about-director { display: grid; grid-template-columns: minmax(300px, .8fr) minmax(0, 1.2fr); gap: clamp(28px, 5vw, 70px); align-items: center; padding: clamp(24px, 5vw, 62px); border: 1px solid #ded8cc; border-radius: 24px; background: #fff; }
+.about-director-visual { position: relative; overflow: hidden; min-height: 430px; margin: 0; border-radius: 20px; aspect-ratio: .94; background: radial-gradient(ellipse at 52% 25%, rgba(214, 179, 110, .22), transparent 45%), linear-gradient(145deg, #0b3024, #1e5941); }
+.about-director-visual img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; }
+.about-director-visual figcaption { position: absolute; right: 14px; bottom: 14px; left: 14px; border: 1px solid rgba(255,255,255,.18); border-radius: 10px; padding: 10px 12px; color: rgba(255,255,255,.8); background: rgba(6,29,21,.62); font-size: 11px; backdrop-filter: blur(8px); }
+.about-director-copy h2 { max-width: 620px; margin: 11px 0 10px; color: var(--about-green); font-family: Georgia, serif; font-size: clamp(34px, 4vw, 52px); font-weight: 500; letter-spacing: -.035em; line-height: 1.02; }
+.about-director-copy > strong { color: #9a7337; font-size: 13px; }
+.about-director-copy p { color: #64736b; font-size: 15px; line-height: 1.72; }
+.about-director-copy ul { display: grid; gap: 9px; margin: 20px 0 26px; padding: 0; color: #53645b; font-size: 13px; line-height: 1.5; list-style: none; }
+.about-director-copy li { position: relative; padding-left: 22px; }
+.about-director-copy li::before { position: absolute; top: 0; left: 0; color: #a17a3d; content: '✓'; font-weight: 850; }
+.about-director-copy > a { display: inline-flex; align-items: center; gap: 20px; border-radius: 999px; padding: 13px 20px; color: #fff; background: var(--about-green); font-size: 13px; font-weight: 800; text-decoration: none; }
+.about-question-list { display: grid; gap: 9px; }
+.about-question-list details { border: 1px solid #ded8cc; border-radius: 13px; padding: 17px 20px; background: #fff; }
+.about-question-list summary { display: flex; align-items: center; justify-content: space-between; gap: 18px; color: var(--about-green); font-weight: 750; cursor: pointer; list-style: none; }
+.about-question-list summary::-webkit-details-marker { display: none; }
+.about-question-list summary::after { color: #9a7337; content: '+'; font-size: 20px; }
+.about-question-list details[open] summary::after { content: '−'; }
+.about-question-list p { margin: 13px 0 0; color: #68766f; font-size: 14px; line-height: 1.65; }
+.about-cta > div:last-child a:not(:first-child) { color: #fff; font-size: 13px; font-weight: 800; text-underline-offset: 4px; }
+
+@media (max-width: 992px) {
+  .about-detail-grid { grid-template-columns: 1fr; }
+  .about-detail-grid article { min-height: 0; }
+  .about-detail-grid h3 { margin-top: 23px; }
+  .about-director { grid-template-columns: minmax(240px, .8fr) minmax(0, 1.2fr); gap: 26px; padding: 28px; }
+  .about-director-visual { min-height: 360px; }
+}
+@media (max-width: 720px) {
+  .internal-body { padding-top: 24px; }
+  .service-detail-page, .promotions-page, .design-service-page { padding-top: 24px; }
+  .about-company-details, .about-director, .about-questions { margin-bottom: 48px; }
+  .about-director { grid-template-columns: 1fr; gap: 24px; padding: 20px; }
+  .about-director-visual { width: min(100%, 440px); min-height: 0; aspect-ratio: 1 / 1.05; }
+  .about-director-copy h2 { font-size: 37px; }
+  .about-detail-grid article { padding: 22px; }
+  .about-question-list details { padding: 15px 16px; }
 }
 
 .catalog-page { --catalog-ink: #173c2f; --catalog-ink-deep: #0a291f; --catalog-gold: #d8b76f; --catalog-paper: #fffdf8; --catalog-sand: #f4f1e9; --catalog-line: #e3e7e1; color: var(--catalog-ink); background: var(--catalog-paper); }
