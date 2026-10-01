@@ -8,6 +8,7 @@ import { MortgageCalculatorPage } from './MortgageCalculatorPage';
 import { LESNOE_OZERO_PHASES, LesnoeOzeroPlot } from './lesnoeOzeroPlots';
 import { HomeDetailPage, HomesPage, HouseListing } from './HomesPages';
 import { JournalArticle, JournalArticlePage, JournalCategory, JournalIndexPage } from './JournalPages';
+import { ChanyCatalogPage, DoorsCatalogPage } from './CatalogPages';
 
 type HouseProject = {
   id: string;
@@ -90,7 +91,7 @@ type Lead = {
   createdAt: string;
 };
 
-const LEAD_CATEGORY_ORDER = ['Продажа домов', 'Продажа участков', 'Готовые дома', 'Строительство и проекты', 'Услуги', 'Ипотека и акции', 'Посёлки', 'Прочие'] as const;
+const LEAD_CATEGORY_ORDER = ['Продажа домов', 'Продажа участков', 'Готовые дома', 'Строительство и проекты', 'Услуги', 'Каталоги: двери и чаны', 'Ипотека и акции', 'Посёлки', 'Прочие'] as const;
 type LeadCategory = (typeof LEAD_CATEGORY_ORDER)[number];
 
 function getLeadCategory(lead: Lead): LeadCategory {
@@ -100,6 +101,7 @@ function getLeadCategory(lead: Lead): LeadCategory {
   if (/готов.*дом|просмотр дома|подбор.*дом/.test(text)) return 'Готовые дома';
   if (/ипотек|акци|скидк|подар/.test(text)) return 'Ипотека и акции';
   if (/лесн.*озер|пос[её]лок|участок в жк/.test(text)) return 'Посёлки';
+  if (/каталог.*двер|чан|купел/.test(text)) return 'Каталоги: двери и чаны';
   if (/услуг|фундамент|септик|скважин|забор|ремонт|двер|окн|кондиционер|дизайн/.test(text)) return 'Услуги';
   if (/проект|строитель|заказать дом|стать клиент/.test(text)) return 'Строительство и проекты';
   return 'Прочие';
@@ -898,12 +900,23 @@ function chunkBy<T>(items: T[], size: number) {
   return chunks;
 }
 
-const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'homes', 'lands', 'settlements', 'services', 'furniture', 'promotions', 'journal', 'contacts'] as const;
+const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'doors', 'chany', 'homes', 'lands', 'settlements', 'services', 'furniture', 'promotions', 'journal', 'contacts'] as const;
 type NavMenuKey = (typeof NAV_MENU_DEFAULT_ORDER)[number];
 
 function normalizeMenuOrder(order?: string[]) {
   const incoming = Array.isArray(order) ? order.filter((item): item is NavMenuKey => NAV_MENU_DEFAULT_ORDER.includes(item as NavMenuKey)) : [];
-  return [...incoming, ...NAV_MENU_DEFAULT_ORDER.filter((item) => !incoming.includes(item))];
+  const normalized = [...incoming, ...NAV_MENU_DEFAULT_ORDER.filter((item) => !incoming.includes(item))];
+  for (const key of ['doors', 'chany'] as const) {
+    if (!incoming.includes(key)) normalized.splice(normalized.indexOf(key), 1);
+  }
+  let insertAfter = 'projects';
+  for (const key of ['doors', 'chany'] as const) {
+    if (incoming.includes(key)) { insertAfter = key; continue; }
+    const index = normalized.indexOf(insertAfter);
+    normalized.splice(index + 1, 0, key);
+    insertAfter = key;
+  }
+  return normalized;
 }
 
 function formatPhoneMask(value: string) {
@@ -1119,6 +1132,8 @@ function HeaderNav({
         ]
       },
       projects: { label: 'ПРОЕКТЫ ДОМОВ', href: '/projects', active: currentPath === '/projects' || currentPath === '/baths', children: projectsChildren },
+      doors: { label: 'ДВЕРИ', href: '/dveri', active: currentPath === '/dveri' },
+      chany: { label: 'ЧАНЫ', href: '/chany', active: currentPath === '/chany' },
       homes: { label: 'ГОТОВЫЕ ДОМА', href: '/homes', active: currentPath === '/homes' || currentPath.startsWith('/homes/') },
       lands: { label: 'ЗЕМЛЯ', href: '/lands', active: currentPath === '/lands' || (currentPath.startsWith('/lands/') && currentPath !== '/lands/lesnoe-ozero') },
       settlements: {
@@ -2003,6 +2018,7 @@ function InternalTextBlock({ title, content }: { title: string; content: string 
 }
 
 function InternalHeader() {
+  const isProductCatalogHeader = ['/dveri', '/chany'].includes(window.location.pathname.replace(/\/+$/, ''));
   const serviceColumns = chunkBy(SERVICES_MENU, 6);
   const [menuOrder, setMenuOrder] = useState<NavMenuKey[]>([...NAV_MENU_DEFAULT_ORDER]);
   const [logoUrl, setLogoUrl] = useState(DEFAULT_LOGO_URL);
@@ -2033,16 +2049,16 @@ function InternalHeader() {
       className="hero hero-exact internal-header"
       style={headerImage ? { backgroundImage: `linear-gradient(rgba(17, 30, 39, .58), rgba(10, 18, 24, .74)), url('${headerImage}')` } : undefined}
     >
-      <div className="promo-strip">
+      {!isProductCatalogHeader ? <div className="promo-strip">
         <div className="container promo-inner">
           <strong><a href="/discounts/vse-akcii">🎁 10 СОТОК ЗЕМЛИ В ПОДАРОК ПРИ СТРОИТЕЛЬСТВЕ ДОМА</a></strong>
           <div className="promo-right"><a className="promo-btn" href="/discounts/vse-akcii">Все акции <span>»</span></a><div className="top-contacts"><a href={CONTACTS.vk} target="_blank" rel="noreferrer">VK</a><a href={CONTACTS.rutube} target="_blank" rel="noreferrer">Rutube</a><a href={CONTACTS.max} target="_blank" rel="noreferrer">MAX</a></div></div>
         </div>
-      </div>
+      </div> : null}
       <div className="container hero-main">
         <div className="hero-upper-row">
           <a href="/" className="brand-line"><div className="logo-badge"><img src={logoUrl} alt="Evtenia" /></div><div className="brand-text"><div className="brand-logo">Evtenia</div><p>Строительная компания</p></div></a>
-          <div className="hero-contact-line"><span className="hero-help-text">Нужен просчет дома? Поможем по телефону за 5 минут.</span><div className="phone-block"><span className="phone-icon-wrap"><svg className="phone-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 4.5c-.6.2-1.4 1-1.8 2.1-.7 2.1.1 4.9 2.3 7.1 2.2 2.2 5 3 7.1 2.3 1.1-.4 1.9-1.2 2.1-1.8l-2.5-2.4c-.3-.3-.8-.4-1.2-.2l-1.2.6a1 1 0 0 1-1.1-.2L10 10.8a1 1 0 0 1-.2-1.1l.6-1.2c.2-.4.1-.9-.2-1.2L8 4.5Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg></span><div className="phone-lines"><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><strong><a className="city-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a></strong></div><small>с 9:00 до 19:00</small></div><button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button></div>
+          <div className="hero-contact-line"><span className="hero-help-text">{isProductCatalogHeader ? 'Подберём решение и рассчитаем стоимость под вашу задачу.' : 'Нужен просчет дома? Поможем по телефону за 5 минут.'}</span><div className="phone-block"><span className="phone-icon-wrap"><svg className="phone-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 4.5c-.6.2-1.4 1-1.8 2.1-.7 2.1.1 4.9 2.3 7.1 2.2 2.2 5 3 7.1 2.3 1.1-.4 1.9-1.2 2.1-1.8l-2.5-2.4c-.3-.3-.8-.4-1.2-.2l-1.2.6a1 1 0 0 1-1.1-.2L10 10.8a1 1 0 0 1-.2-1.1l.6-1.2c.2-.4.1-.9-.2-1.2L8 4.5Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg></span><div className="phone-lines"><strong><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></strong><strong><a className="city-phone-link" href={CONTACTS.extraPhoneHref}>{CONTACTS.extraPhoneDisplay}</a></strong></div><small>с 9:00 до 19:00</small></div><button className="call-btn" onClick={() => setOpenCallback(true)}>Заказать звонок</button></div>
         </div>
         <HeaderNav serviceColumns={serviceColumns} currentPath={window.location.pathname} menuOrder={menuOrder} />
       </div>
@@ -5278,7 +5294,7 @@ function AppLayout({ children }: { children: ReactNode }) {
 
 function App() {
   const url = new URL(window.location.href);
-  const pathname = normalizePathname(window.location.pathname);
+  const pathname = normalizePathname(window.location.pathname).replace(/\/+$/, '') || '/';
   const serviceSlug = pathname.startsWith('/services/') ? pathname.replace('/services/', '') : '';
   const discountSlug = pathname.startsWith('/discounts/') ? pathname.replace('/discounts/', '') : '';
   const furniturePage = FURNITURE_LEAF_PAGES.find((item) => item.href === pathname);
@@ -5337,6 +5353,8 @@ function App() {
   if (pathname.startsWith('/journal/category/')) return <AppLayout><JournalIndexPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} resolveMedia={resolveMediaUrl} categorySlug={pathname.replace('/journal/category/', '')} /></AppLayout>;
   if (pathname.startsWith('/journal/')) return <AppLayout><JournalArticlePage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} resolveMedia={resolveMediaUrl} slug={pathname.replace('/journal/', '')} /></AppLayout>;
   if (pathname === '/design') return <AppLayout><DesignPage /></AppLayout>;
+  if (pathname === '/dveri') return <AppLayout><DoorsCatalogPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} formatPhone={formatPhoneMask} /></AppLayout>;
+  if (pathname === '/chany') return <AppLayout><ChanyCatalogPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} formatPhone={formatPhoneMask} /></AppLayout>;
   if (servicePage) return <AppLayout><ManagedTextPage slug={`services-${servicePage.slug}`} fallbackTitle={servicePage.title} fallbackContent={servicePage.text} sectionTitle="Услуги" /></AppLayout>;
   if (discountPage) return <AppLayout><ManagedTextPage slug={`discounts-${discountPage.slug}`} fallbackTitle={discountPage.title} fallbackContent={discountPage.text} sectionTitle="Ипотека и акции" /></AppLayout>;
   if (furniturePage) {

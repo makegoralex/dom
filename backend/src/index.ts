@@ -384,11 +384,21 @@ const FURNITURE_STRUCTURE = [
   { title: 'КАБИНЕТЫ', brands: ['CAMEL GROUP', 'PROFOFFICE'] },
   { title: 'МАТРАСЫ', brands: ['HUKLA'] }
 ];
-const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'homes', 'lands', 'settlements', 'services', 'furniture', 'promotions', 'journal', 'contacts'];
+const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'doors', 'chany', 'homes', 'lands', 'settlements', 'services', 'furniture', 'promotions', 'journal', 'contacts'];
 
 function normalizeMenuOrder(order?: string[]) {
   const incoming = Array.isArray(order) ? order.filter((item) => NAV_MENU_DEFAULT_ORDER.includes(item)) : [];
-  return [...incoming, ...NAV_MENU_DEFAULT_ORDER.filter((item) => !incoming.includes(item))];
+  const normalized = [...incoming, ...NAV_MENU_DEFAULT_ORDER.filter((item) => !incoming.includes(item))];
+  for (const key of ['doors', 'chany']) {
+    if (!incoming.includes(key)) normalized.splice(normalized.indexOf(key), 1);
+  }
+  let insertAfter = 'projects';
+  for (const key of ['doors', 'chany']) {
+    if (incoming.includes(key)) { insertAfter = key; continue; }
+    normalized.splice(normalized.indexOf(insertAfter) + 1, 0, key);
+    insertAfter = key;
+  }
+  return normalized;
 }
 const DEFAULT_LOGO_URL = '/assets/logo_small.png';
 const DEFAULT_CONTACTS = {
@@ -1225,6 +1235,8 @@ app.get('/sitemap.xml', (req, res) => {
   const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
   const entries: Array<{ path: string; lastmod?: string }> = [
     { path: '/' },
+    { path: '/dveri' },
+    { path: '/chany' },
     { path: '/projects' },
     { path: '/baths' },
     { path: '/design' },
@@ -1876,7 +1888,7 @@ const escapeHtml = (value: string): string => value
   .replace(/"/g, '&quot;')
   .replace(/'/g, '&#39;');
 
-const renderSeoDocument = (html: string, title: string, description: string, canonicalUrl: string): string => {
+const renderSeoDocument = (html: string, title: string, description: string, canonicalUrl: string, schema?: unknown, imageUrl?: string): string => {
   const safeTitle = escapeHtml(title);
   const safeDescription = escapeHtml(description);
   const safeCanonical = escapeHtml(canonicalUrl);
@@ -1888,10 +1900,55 @@ const renderSeoDocument = (html: string, title: string, description: string, can
     `<meta property="og:description" content="${safeDescription}" />`,
     `<meta property="og:type" content="website" />`,
     `<meta property="og:url" content="${safeCanonical}" />`,
-    `<meta property="og:site_name" content="Evtenia" />`
+    `<meta property="og:site_name" content="Evtenia" />`,
+    `<meta property="og:locale" content="ru_RU" />`,
+    `<meta name="twitter:card" content="summary_large_image" />`,
+    `<meta name="twitter:title" content="${safeTitle}" />`,
+    `<meta name="twitter:description" content="${safeDescription}" />`,
+    imageUrl ? `<meta property="og:image" content="${escapeHtml(imageUrl)}" /><meta name="twitter:image" content="${escapeHtml(imageUrl)}" />` : '',
+    schema ? `<script id="catalog-jsonld" type="application/ld+json">${JSON.stringify(schema).replace(/</g, '\\u003c')}</script>` : ''
   ].join('');
   return result.replace(/<\/head>/i, `${socialTags}</head>`);
 };
+
+app.get(['/dveri', '/chany'], (req, res, next) => {
+  const indexPath = path.join(FRONTEND_DIST, 'index.html');
+  if (!fs.existsSync(indexPath)) return next();
+  const doorsPage = req.path.replace(/\/+$/, '') === '/dveri';
+  const pagePath = doorsPage ? '/dveri' : '/chany';
+  const title = doorsPage
+    ? 'Межкомнатные двери в Пензе — каталог и цены | Evtenia'
+    : 'Банные чаны в Пензе — модели и цены | Evtenia';
+  const description = doorsPage
+    ? 'Подбор межкомнатных дверей в Пензе и Пензенской области: коллекции, размеры, отделка, коробки, фурнитура и монтаж. Рассчитаем цену комплекта под ваши проёмы.'
+    : 'Банные чаны и купели для дачи в Пензе и области: модели от 250 000 ₽, комплектации, сталь, доставка и монтаж. Подбор и расчёт от Evtenia.';
+  const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+  const itemNames = doorsPage
+    ? ['Соул', 'Сицилия', 'Соло', 'Лайн', 'Юкон', 'Эрика', 'Дизайн', 'Модерн', 'Неоклассика', 'Классика', 'Эко', 'ЭкоГранд']
+    : ['Чан «Лайт»', 'Чан с печью-подставкой', 'Чан «Гранд»', 'Чан «Кубок»', 'Чан «Кубок Гранд»', 'Встраиваемый чан в террасу', 'Ледяная купель', 'Купель «Квадро»', 'Купель «Квадро XL»'];
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Service',
+        name: doorsPage ? 'Подбор и заказ межкомнатных дверей' : 'Подбор банного чана или купели',
+        serviceType: doorsPage ? 'Подбор дверей, комплектации и монтажа' : 'Подбор комплектации, заказа и установки банного чана',
+        areaServed: ['Пенза', 'Пензенская область'],
+        provider: { '@type': 'Organization', name: 'Evtenia', url: `${origin}/` },
+        url: `${origin}${pagePath}`
+      },
+      {
+        '@type': 'ItemList',
+        name: doorsPage ? 'Коллекции межкомнатных дверей' : 'Банные чаны и купели',
+        itemListElement: itemNames.map((name, index) => ({ '@type': 'ListItem', position: index + 1, name }))
+      }
+    ]
+  };
+  const heroImage = `${origin}/api/assets/catalog/${doorsPage ? 'doors/soul' : 'chany/ready-4'}.webp`;
+  const html = renderSeoDocument(fs.readFileSync(indexPath, 'utf8'), title, description, `${origin}${pagePath}`, schema, heroImage);
+  res.set('Cache-Control', 'public, max-age=300');
+  return res.type('html').send(html);
+});
 
 app.get('/services/:slug', (req, res, next) => {
   const indexPath = path.join(FRONTEND_DIST, 'index.html');
