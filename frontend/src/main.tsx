@@ -946,7 +946,7 @@ function normalizeMenuOrder(order?: string[]) {
   for (const key of ['doors', 'chany'] as const) {
     if (!incoming.includes(key)) normalized.splice(normalized.indexOf(key), 1);
   }
-  let insertAfter = 'projects';
+  let insertAfter: NavMenuKey = 'projects';
   for (const key of ['doors', 'chany'] as const) {
     if (incoming.includes(key)) { insertAfter = key; continue; }
     const index = normalized.indexOf(insertAfter);
@@ -1134,7 +1134,30 @@ function HeaderNav({
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openDesktopMenu, setOpenDesktopMenu] = useState<string | null>(null);
+  const desktopMenuCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [mobileStack, setMobileStack] = useState<Array<{ title: string; items: MenuChildItem[] }>>([]);
+
+  const cancelDesktopMenuClose = () => {
+    if (desktopMenuCloseTimer.current) {
+      clearTimeout(desktopMenuCloseTimer.current);
+      desktopMenuCloseTimer.current = null;
+    }
+  };
+
+  const openDesktopMenuFor = (label: string) => {
+    cancelDesktopMenuClose();
+    setOpenDesktopMenu(label);
+  };
+
+  const scheduleDesktopMenuClose = () => {
+    cancelDesktopMenuClose();
+    desktopMenuCloseTimer.current = setTimeout(() => {
+      setOpenDesktopMenu(null);
+      desktopMenuCloseTimer.current = null;
+    }, 750);
+  };
+
+  useEffect(() => () => cancelDesktopMenuClose(), []);
 
   useEffect(() => {
     if (!mobileMenuOpen) {
@@ -1197,17 +1220,32 @@ function HeaderNav({
           ☰
         </button>
       </div>
-      <nav className="hero-nav" onMouseLeave={() => setOpenDesktopMenu(null)}>
+      <nav
+        className="hero-nav"
+        onMouseEnter={cancelDesktopMenuClose}
+        onMouseLeave={scheduleDesktopMenuClose}
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') {
+            cancelDesktopMenuClose();
+            setOpenDesktopMenu(null);
+          }
+        }}
+      >
         {menuItems.map((item, index) => (
           <React.Fragment key={item.label}>
             {item.children ? (
-              <div className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'О КОМПАНИИ' ? 'menu-about' : item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'menu-settlements' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : item.label === 'МЕБЕЛЬ' ? 'menu-furniture' : ''}`} onMouseEnter={() => setOpenDesktopMenu(item.label)}>
+              <div className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'О КОМПАНИИ' ? 'menu-about' : item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'menu-settlements' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : item.label === 'МЕБЕЛЬ' ? 'menu-furniture' : ''}`} onMouseEnter={() => openDesktopMenuFor(item.label)}>
                 {item.href ? (
                   <a href={item.href} className={`menu-link ${item.active ? 'active' : ''}`}>{item.label} ▾</a>
                 ) : (
                   <button type="button" className={`menu-link menu-link-btn ${item.active ? 'active' : ''}`}>{item.label} ▾</button>
                 )}
-                <div className={item.label === 'ПРОЕКТЫ ДОМОВ' || item.label === 'О КОМПАНИИ' || item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'projects-dropdown' : 'services-dropdown'} style={openDesktopMenu === item.label ? { display: 'grid' } : undefined}>
+                <div
+                  className={item.label === 'ПРОЕКТЫ ДОМОВ' || item.label === 'О КОМПАНИИ' || item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'projects-dropdown' : 'services-dropdown'}
+                  style={openDesktopMenu === item.label ? { display: 'grid' } : undefined}
+                  onMouseEnter={() => openDesktopMenuFor(item.label)}
+                  onMouseLeave={scheduleDesktopMenuClose}
+                >
                   {item.children.map((child, idx) => (
                     child.children ? (
                       <div className="dropdown-col" key={`${child.label}_${idx}`}>
