@@ -1222,14 +1222,14 @@
     {
       "id": "modulnyy-ili-karkasnyy-dom",
       "page": "/journal/modulnyy-ili-karkasnyy-dom",
-      "status": "planned",
+      "status": "published",
       "pageType": "article",
       "intent": "informational_comparison",
       "funnel": "consideration",
       "category": "Технологии домов",
       "region": "Россия",
       "author": "Олег Иванович Кисляков",
-      "reviewer": null,
+      "reviewer": "Олег Иванович Кисляков, технический директор",
       "main": {
         "q": "чем отличается каркасный дом от модульного",
         "vol": 591
@@ -1242,10 +1242,10 @@
       ],
       "priority": 100,
       "humanReviewRequired": true,
-      "indexingState": "planned",
+      "indexingState": "published",
       "requiredLinks": [
-        "/projects/karkasnye-doma",
-        "/projects/modulnye-doma"
+        "/projects?type=Каркасные",
+        "/projects?type=Модульные"
       ],
       "notes": "Soft cluster from Wordstat. Validate facts and live SERP before publication.",
       "volumeEvidence": {

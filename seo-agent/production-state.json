@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-09-29",
+  "updated": "2026-10-02",
   "clusters": {
     "modulnye-doma-otzyvy-i-minusy": {
       "semanticStatus": "published",
@@ -39,6 +39,16 @@
       "reservedAt": "2026-09-29",
       "publishedAt": "2026-09-29",
       "notes": "Fourth Journal article. Prepared manually and published through managed production sync."
+    },
+    "modulnyy-ili-karkasnyy-dom": {
+      "semanticStatus": "published",
+      "queueStatus": "published",
+      "brief": "briefs/modulnyy-ili-karkasnyy-dom.md",
+      "draft": "drafts/modulnyy-ili-karkasnyy-dom.json",
+      "report": "reports/modulnyy-ili-karkasnyy-dom-gate.json",
+      "reservedAt": "2026-10-02",
+      "publishedAt": "2026-10-02",
+      "notes": "Fifth Journal article. Prepared manually and published through managed production sync."
     }
   }
 }

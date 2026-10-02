@@ -1,0 +1,16 @@
+{
+  "clusterId": "modulnyy-ili-karkasnyy-dom",
+  "checkedAt": "2026-10-02",
+  "result": "pass",
+  "rules": [
+    {"id": "ownership", "result": "pass", "evidence": "The page owns the detailed modular-versus-frame comparison; the broad three-technology guide and commercial catalogues keep their separate intents."},
+    {"id": "answer-first", "result": "pass", "evidence": "The lead explains that frame is a structural scheme while modularity is a production and assembly format."},
+    {"id": "sources", "result": "pass", "evidence": "Definitions and technical context rely on current Rosstandart standard and code cards checked on 2026-10-02."},
+    {"id": "unsupported-claims", "result": "pass", "evidence": "No universal prices, schedules, service-life figures, wall thicknesses or superiority claims are used."},
+    {"id": "internal-links", "result": "pass", "evidence": "The article links to both project catalogues and three relevant Journal guides."},
+    {"id": "human-review", "result": "pass", "evidence": "Technical author and reviewer attribution to Oleg Ivanovich Kislyakov is approved by the site owner."},
+    {"id": "conversion", "result": "pass", "evidence": "The CTA offers a site-specific comparison of both formats rather than pushing one universal solution."},
+    {"id": "metadata", "result": "pass", "evidence": "Title, slug, excerpt, category, author, reviewer, SEO title and description are complete."}
+  ],
+  "publicationBlockers": []
+}

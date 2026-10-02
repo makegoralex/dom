@@ -110,17 +110,21 @@
       "owner": "/journal/modulnyy-ili-karkasnyy-dom",
       "region": "Россия",
       "author": "Олег Иванович Кисляков",
-      "reviewer": null,
+      "reviewer": "Олег Иванович Кисляков, технический директор",
       "verifiedMainVolume": 591,
       "score": 94,
-      "status": "ready_for_brief",
+      "status": "published",
+      "artifacts": {
+        "brief": "briefs/modulnyy-ili-karkasnyy-dom.md",
+        "draft": "drafts/modulnyy-ili-karkasnyy-dom.json"
+      },
       "blockers": [
         "author_review",
         "evtenia_examples"
       ],
       "requiredLinks": [
-        "/projects/karkasnye-doma",
-        "/projects/modulnye-doma"
+        "/projects?type=Каркасные",
+        "/projects?type=Модульные"
       ],
       "nextAction": "Prepare a SERP/content brief for “чем отличается каркасный дом от модульного”, collect Evtenia examples, then run the quality gate."
     },

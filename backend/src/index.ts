@@ -910,7 +910,8 @@ const syncManagedJournalArticles = (): void => {
     { slug: 'modulnye-doma-otzyvy-i-minusy', repairMalformed: true },
     { slug: 'kakuyu-tekhnologiyu-doma-vybrat', repairMalformed: false },
     { slug: 'dostavka-i-montazh-modulnogo-doma', repairMalformed: false },
-    { slug: 'modulnyy-dom-s-kommunikaciyami', repairMalformed: false }
+    { slug: 'modulnyy-dom-s-kommunikaciyami', repairMalformed: false },
+    { slug: 'modulnyy-ili-karkasnyy-dom', repairMalformed: false }
   ];
   let changed = false;
 
