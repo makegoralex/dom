@@ -848,13 +848,23 @@ const readData = (): DataStore => {
   const projects = [...(parsed.projects || seedProjects)];
   const projectIds = new Set(projects.map((project) => project.id));
   for (const project of gasblockCatalogProjects) {
-    if (!projectIds.has(project.id)) {
+    const existingIndex = projects.findIndex((existing) => existing.id === project.id);
+    if (existingIndex >= 0 && project.catalogProject) {
+      projects[existingIndex] = {
+        ...projects[existingIndex],
+        coverImage: project.coverImage,
+        images: project.images
+      };
+    } else if (!projectIds.has(project.id)) {
       projects.push(project);
       projectIds.add(project.id);
     }
   }
   for (const project of bathCatalogProjects) {
-    if (!projectIds.has(project.id)) {
+    const existingIndex = projects.findIndex((existing) => existing.id === project.id);
+    if (existingIndex >= 0 && projects[existingIndex].category === 'bath' && projects[existingIndex].isIllustrative) {
+      projects[existingIndex] = { ...projects[existingIndex], ...project };
+    } else if (!projectIds.has(project.id)) {
       projects.push(project);
       projectIds.add(project.id);
     }
@@ -1303,7 +1313,7 @@ app.get('/sitemap.xml', (req, res) => {
 app.get('/robots.txt', (req, res) => {
   const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
   res.set('Cache-Control', 'public, max-age=3600');
-  return res.type('text/plain').send(`User-agent: *\nAllow: /\nDisallow: /catalog-control-7f3a\nSitemap: ${origin}/sitemap.xml\n`);
+  return res.type('text/plain').send(`User-agent: Yandex\nAllow: /\nDisallow: /catalog-control-7f3a\nClean-param: type&page\nClean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&utm_id&yclid&gclid\nSitemap: ${origin}/sitemap.xml\n\nUser-agent: *\nAllow: /\nDisallow: /catalog-control-7f3a\nSitemap: ${origin}/sitemap.xml\n`);
 });
 
 app.get('/api/pages/:slug', (req, res) => {
@@ -2136,6 +2146,24 @@ app.get('/', (req, res, next) => {
   return res.type('html').send(html);
 });
 
+const formatSeoPrice = (value: unknown, startsFrom = false): string => {
+  const raw = String(value ?? '').trim();
+  if (!raw || /по\s+запросу/i.test(raw)) return 'по запросу';
+  const amount = Number(raw.replace(/\D/g, ''));
+  if (!Number.isFinite(amount) || amount <= 0) return raw;
+  const prefix = startsFrom || /^от\b/i.test(raw) ? 'от ' : '';
+  return `${prefix}${amount.toLocaleString('ru-RU').replace(/\u00a0/g, ' ')} ₽`;
+};
+
+const composeSeoDescription = (summary: string, details: string, maxLength = 160): string => {
+  const cleanSummary = summary.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  const summaryLimit = Math.max(36, maxLength - details.length - 1);
+  const excerpt = cleanSummary.length > summaryLimit
+    ? `${cleanSummary.slice(0, Math.max(1, summaryLimit - 1)).replace(/\s+\S*$/, '').trim()}…`
+    : cleanSummary;
+  return `${excerpt} ${details}`.trim().slice(0, maxLength);
+};
+
 app.get('/project/:slug', (req, res, next) => {
   const data = readData();
   const project = data.projects.find((item) => item.id === req.params.slug || getProjectSlug(item, data.projects) === req.params.slug);
@@ -2162,8 +2190,15 @@ app.get('/project/:slug', (req, res, next) => {
   const parentSection = isBathProject ? 'baths' : 'projects';
   const areaText = project.area?.trim() || '';
   const areaLabel = areaText && /(?:м2|м²|кв\.?\s*м)$/i.test(areaText) ? areaText : areaText ? `${areaText} м²` : '';
-  const descriptionText = `${project.shortDescription || project.fullDescription || `Проект ${projectKind} «${project.title}»`}`.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-  const description = `${descriptionText.slice(0, 210)}${descriptionText.length > 210 ? '…' : ''} Площадь — ${project.area || 'уточняется'}, этажность — ${project.floors || 'по проекту'}, ${material}. Стоимость и комплектацию ${projectKind} в Пензе рассчитаем индивидуально.`;
+  const descriptionText = `${project.shortDescription || project.fullDescription || `Проект ${projectKind} «${project.title}»`}`;
+  const priceLabel = formatSeoPrice(project.priceFrom, true);
+  const titleKind = isBathProject ? 'баня' : 'дом';
+  const titleBase = /дом|бан/i.test(project.title) ? project.title : `${project.title} — ${titleKind}`;
+  const seoTitle = `${titleBase}${areaLabel ? ` ${areaLabel}` : ''}, ${priceLabel} | Evtenia`;
+  const description = composeSeoDescription(
+    descriptionText,
+    `Площадь ${project.area || 'уточняется'}, ${project.floors || 'этажность по проекту'}; цена ${priceLabel}. Пенза и область.`
+  );
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -2195,7 +2230,7 @@ app.get('/project/:slug', (req, res, next) => {
   const image = project.coverImage?.startsWith('http') ? project.coverImage.replace(/^http:/, 'https:') : `${origin}${project.coverImage || ''}`;
   const html = renderSeoDocument(
     fs.readFileSync(indexPath, 'utf8'),
-    `${project.title} — проект ${projectKind}${areaLabel ? ` ${areaLabel}` : ''} ${materialClause} | Evtenia`,
+    seoTitle,
     description,
     canonical,
     schema,
@@ -2252,7 +2287,18 @@ if (fs.existsSync(FRONTEND_DIST)) {
     }
     if (!valid && /^\/lands\/[^/]+$/.test(pathname)) {
       const land = data.lands.find((item) => item.id === pathname.slice('/lands/'.length));
-      if (land) { valid = true; page = { title: `Участок ${land.area} в ${land.district} — Evtenia`, description: `${land.description || 'Земельный участок'} Площадь ${land.area}, район ${land.district}, ориентир цены ${land.price}. Условия уточняйте перед просмотром.` }; }
+      if (land) {
+        const rawArea = land.area.trim();
+        const areaLabel = /^\d+(?:[.,]\d+)?$/.test(rawArea) ? `${rawArea.replace(',', '.')} соток` : rawArea;
+        const landText = land.description || '';
+        const purpose = land.purpose?.trim() || land.landCategory?.trim() || (/\bлпх\b/i.test(landText) ? 'ЛПХ' : /\b500\s*кв\.?\s*м\b/i.test(landText) ? '500 м²' : '');
+        const qualifier = purpose ? ` ${purpose}` : '';
+        valid = true;
+        page = {
+          title: `Участок ${areaLabel}${qualifier} в ${land.district} — ${land.price} | Evtenia`,
+          description: composeSeoDescription(landText || 'Земельный участок в Пензе и Пензенской области.', `Участок ${areaLabel}; назначение ${purpose || 'уточняется'}; цена ${land.price}. Уточните актуальность перед просмотром.`)
+        };
+      }
     }
     if (!valid && pathname.startsWith('/journal/category/')) {
       const slug = pathname.slice('/journal/category/'.length);

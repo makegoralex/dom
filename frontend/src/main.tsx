@@ -180,9 +180,6 @@ const ADMIN_TAB_META: Record<AdminTab, { label: string; eyebrow: string; descrip
 
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 const API_ORIGIN = API_BASE ? new URL(API_BASE, window.location.origin).origin : '';
-const loadMoreRef: { current: HTMLDivElement | null } = { current: null };
-const pageNumbers: number[] = [];
-const totalPages = 1;
 const ADMIN_PATH = import.meta.env.VITE_ADMIN_PATH || '/admin';
 const ADMIN_KEY = import.meta.env.VITE_ADMIN_KEY || '';
 const CONTACTS = {
@@ -1208,7 +1205,14 @@ function HeaderNav({
         ]
       },
       projects: { label: 'ПРОЕКТЫ ДОМОВ', href: '/projects', active: currentPath === '/projects', children: projectsChildren },
-      baths: { label: 'БАНИ', href: '/baths', active: currentPath === '/baths' },
+      baths: {
+        label: 'БАНИ', href: '/baths', active: currentPath === '/baths', children: [
+          { label: 'Все проекты бань', href: '/baths' },
+          { label: 'Каркасные бани', href: `/baths?type=${encodeURIComponent('Каркасные')}` },
+          { label: 'Из профилированного бруса', href: `/baths?type=${encodeURIComponent('Профилированный брус')}` },
+          { label: 'Из оцилиндрованного бревна', href: `/baths?type=${encodeURIComponent('Оцилиндрованное бревно')}` }
+        ]
+      },
       doors: { label: 'ДВЕРИ', href: '/dveri', active: currentPath === '/dveri' },
       chany: { label: 'ЧАНЫ', href: '/chany', active: currentPath === '/chany' },
       homes: { label: 'ГОТОВЫЕ ДОМА', href: '/homes', active: currentPath === '/homes' || currentPath.startsWith('/homes/') },
@@ -1251,7 +1255,7 @@ function HeaderNav({
           <React.Fragment key={item.label}>
             {item.children ? (
               <div
-                className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'О КОМПАНИИ' ? 'menu-about' : item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'menu-settlements' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : item.label === 'МЕБЕЛЬ' ? 'menu-furniture' : ''}`}
+                className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'БАНИ' ? 'menu-baths' : item.label === 'О КОМПАНИИ' ? 'menu-about' : item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'menu-settlements' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : item.label === 'МЕБЕЛЬ' ? 'menu-furniture' : ''}`}
                 data-open={openDesktopMenu === item.label ? 'true' : undefined}
                 onMouseEnter={() => openDesktopMenuFor(item.label)}
                 onFocus={() => openDesktopMenuFor(item.label)}
@@ -1262,7 +1266,7 @@ function HeaderNav({
                   <button type="button" className={`menu-link menu-link-btn ${item.active ? 'active' : ''}`}>{item.label} ▾</button>
                 )}
                 <div
-                  className={item.label === 'ПРОЕКТЫ ДОМОВ' || item.label === 'О КОМПАНИИ' || item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'projects-dropdown' : 'services-dropdown'}
+                  className={item.label === 'ПРОЕКТЫ ДОМОВ' || item.label === 'БАНИ' || item.label === 'О КОМПАНИИ' || item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'projects-dropdown' : 'services-dropdown'}
                   style={openDesktopMenu === item.label ? { display: 'grid' } : undefined}
                   onMouseEnter={cancelDesktopMenuClose}
                   onMouseLeave={scheduleDesktopMenuClose}
@@ -1409,52 +1413,53 @@ const FALLBACK_PROJECTS: HouseProject[] = [
     category: 'house'
   },
   {
-    id: 'bath-compact-12',
-    title: 'Компакт 12',
-    area: '12 м²',
-    floors: '1 этаж',
-    bedrooms: '3 зоны',
-    shortDescription: 'Небольшая каркасная баня с парной, моечной и предбанником.',
-    fullDescription: 'Типовая иллюстративная идея для небольшой дачи. Планировка, комплектация и цена уточняются после обсуждения участка.',
-    coverImage: '/api/assets/projects/catalog/bath-compact.webp',
-    images: ['/api/assets/projects/catalog/bath-compact.webp'],
-    priceFrom: 'от 750 000 ₽',
-    constructionType: 'Каркасные',
-    style: 'Компактный',
-    category: 'bath',
-    isIllustrative: true
+    id: 'bath-compact-12', title: 'Компакт 12', area: '12 м²', floors: '1 этаж', bedrooms: 'Парная · моечная · предбанник',
+    shortDescription: 'Компактная каркасная баня 3 × 4 м: парная, моечная и предбанник.',
+    fullDescription: 'Иллюстративная планировка; комплектация, цена и устройство основания уточняются индивидуально.',
+    coverImage: '/api/assets/projects/catalog/bath-compact-v2.webp', images: ['/api/assets/projects/catalog/bath-compact-v2.webp'],
+    priceFrom: 'от 550 000 ₽', constructionType: 'Каркасные', style: 'Компактный', category: 'bath', isIllustrative: true
   },
   {
-    id: 'bath-family-20',
-    title: 'Семейная 20',
-    area: '20 м²',
-    floors: '1 этаж',
-    bedrooms: '3 зоны',
-    shortDescription: 'Парная, душевая и отдельная комната отдыха.',
-    fullDescription: 'Типовая иллюстративная идея бани для регулярного семейного отдыха. Точная планировка и комплектация подбираются индивидуально.',
-    coverImage: '/api/assets/projects/catalog/bath-family.webp',
-    images: ['/api/assets/projects/catalog/bath-family.webp'],
-    priceFrom: 'от 930 000 ₽',
-    constructionType: 'Каркасные',
-    style: 'С комнатой отдыха',
-    category: 'bath',
-    isIllustrative: true
+    id: 'bath-country-16', title: 'Дачная 16', area: '16 м²', floors: '1 этаж', bedrooms: 'Парная · моечная · отдых',
+    shortDescription: 'Каркасная баня 4 × 4 м с парной, моечной и комнатой отдыха.',
+    fullDescription: 'Иллюстративная планировка; печь, фундамент, доставка и отделка рассчитываются по выбранной комплектации.',
+    coverImage: '/api/assets/projects/catalog/bath-country-v2.webp', images: ['/api/assets/projects/catalog/bath-country-v2.webp'],
+    priceFrom: 'от 700 000 ₽', constructionType: 'Каркасные', style: 'Компактный', category: 'bath', isIllustrative: true
   },
   {
-    id: 'bath-log-36',
-    title: 'Банный дом 36',
-    area: '36 м²',
-    floors: '1 этаж',
-    bedrooms: '3 зоны',
-    shortDescription: 'Просторный деревянный вариант с большой комнатой отдыха.',
-    fullDescription: 'Типовая иллюстративная идея для бани и отдыха на участке. Дерево, основание, печь и доставка рассчитываются по исходным условиям.',
-    coverImage: '/api/assets/projects/catalog/bath-log.webp',
-    images: ['/api/assets/projects/catalog/bath-log.webp'],
-    priceFrom: 'от 2 350 000 ₽',
-    constructionType: 'Оцилиндрованное бревно',
-    style: 'Деревянная',
-    category: 'bath',
-    isIllustrative: true
+    id: 'bath-family-20', title: 'Семейная 20', area: '20 м²', floors: '1 этаж', bedrooms: 'Парная · моечная · отдых',
+    shortDescription: 'Планировка 4 × 5 м с парной, моечной и отдельной комнатой отдыха.',
+    fullDescription: 'Иллюстративная идея семейной бани; точная стоимость зависит от основания, инженерии, печи и отделки.',
+    coverImage: '/api/assets/projects/catalog/bath-family-v2.webp', images: ['/api/assets/projects/catalog/bath-family-v2.webp'],
+    priceFrom: 'от 850 000 ₽', constructionType: 'Каркасные', style: 'С комнатой отдыха', category: 'bath', isIllustrative: true
+  },
+  {
+    id: 'bath-terrace-24', title: 'С террасой 24', area: '24 м²', floors: '1 этаж', bedrooms: 'Парная · моечная · отдых · терраса',
+    shortDescription: 'Каркасная баня 4 × 6 м с комнатой отдыха и открытой террасой.',
+    fullDescription: 'Иллюстративный вариант; размеры террасы, фундамент, коммуникации, печь и чистовая отделка уточняются отдельно.',
+    coverImage: '/api/assets/projects/catalog/bath-terrace-v2.webp', images: ['/api/assets/projects/catalog/bath-terrace-v2.webp'],
+    priceFrom: 'от 1 050 000 ₽', constructionType: 'Каркасные', style: 'С террасой', category: 'bath', isIllustrative: true
+  },
+  {
+    id: 'bath-timber-24', title: 'Брусовая 24', area: '24 м²', floors: '1 этаж', bedrooms: 'Парная · моечная · отдых · веранда',
+    shortDescription: 'Баня 4 × 6 м из профилированного бруса с верандой.',
+    fullDescription: 'Иллюстративный вариант; цену определяют характеристики бруса, усадка, основание, печь, инженерия и отделка.',
+    coverImage: '/api/assets/projects/catalog/bath-timber-v2.webp', images: ['/api/assets/projects/catalog/bath-timber-v2.webp'],
+    priceFrom: 'от 1 450 000 ₽', constructionType: 'Профилированный брус', style: 'Деревянная', category: 'bath', isIllustrative: true
+  },
+  {
+    id: 'bath-log-36', title: 'Банный дом 36', area: '36 м²', floors: '1 этаж', bedrooms: 'Парная · моечная · отдых · веранда',
+    shortDescription: 'Бревенчатая баня 6 × 6 м с комнатой отдыха и верандой.',
+    fullDescription: 'Иллюстративный проектный ориентир; диаметр бревна, усадка и состав работ влияют на смету и сроки.',
+    coverImage: '/api/assets/projects/catalog/bath-log-v2.webp', images: ['/api/assets/projects/catalog/bath-log-v2.webp'],
+    priceFrom: 'от 1 950 000 ₽', constructionType: 'Оцилиндрованное бревно', style: 'Деревянная', category: 'bath', isIllustrative: true
+  },
+  {
+    id: 'bath-guest-48', title: 'Баня-гостевой дом 48', area: '48 м²', floors: '1–2 этажа', bedrooms: 'Банный блок · отдых · гостевая зона',
+    shortDescription: 'Банный дом 6 × 8 м с просторной комнатой отдыха и гостевой зоной.',
+    fullDescription: 'Иллюстративная концепция; стоимость — по запросу после уточнения конструкции и инженерных систем.',
+    coverImage: '/api/assets/projects/catalog/bath-guest-v2.webp', images: ['/api/assets/projects/catalog/bath-guest-v2.webp'],
+    priceFrom: 'по запросу', constructionType: 'Деревянная', style: 'Гостевой формат', category: 'bath', isIllustrative: true
   },
   {
     id: 'demo8',
@@ -1679,7 +1684,7 @@ function ProjectTile({ project, onRequest, showGallery = false }: { project: Hou
         <div className="project-meta">
           <span><small>Площадь:</small><strong>{project.area}</strong></span>
           <span><small>Этажность:</small><strong>{project.floors}</strong></span>
-          <span><small>Комнат:</small><strong>{project.bedrooms}</strong></span>
+          <span><small>{project.category === 'bath' ? 'Помещения:' : 'Комнат:'}</small><strong>{project.bedrooms}</strong></span>
         </div>
         <strong className="project-price">{normalizePrice(project.priceFrom)}</strong>
       </div>
@@ -2451,7 +2456,6 @@ function DualRangeSlider({
 function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; sectionTitle: string }) {
   const params = new URLSearchParams(window.location.search);
   const type = params.get('type') || 'Все типы';
-  const initialPage = Math.max(1, Number(params.get('page') || '1') || 1);
   const [projects, setProjects] = useState<HouseProject[]>([]);
   const [selectedFloors, setSelectedFloors] = useState<string[]>([]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
@@ -2462,8 +2466,6 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const [minPrice, setMinPrice] = useState<number | null>(null);
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [requestProject, setRequestProject] = useState<HouseProject | null>(null);
-  const [page, setPage] = useState(initialPage);
-  const isFirstPageSync = useRef(true);
 
   useEffect(() => {
     document.title = category === 'bath'
@@ -2612,7 +2614,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                   disabled={!maxAreaLimit}
                 />
               </div>
-              <div className="filter-block">
+              {!isBathCatalog ? <div className="filter-block">
                 <h4>Комнаты: {(minRooms ?? minRoomsLimit)} — {(maxRooms ?? maxRoomsLimit)}</h4>
                 <DualRangeSlider
                   min={minRoomsLimit || 0}
@@ -2623,7 +2625,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                   onChangeMax={(value) => setMaxRooms(Math.max(value, minRooms ?? minRoomsLimit))}
                   disabled={!maxRoomsLimit}
                 />
-              </div>
+              </div> : null}
               <div className="filter-block">
                 <h4>Цена: {(minPrice ?? minPriceLimit).toLocaleString('ru-RU')} — {(maxPrice ?? maxPriceLimit).toLocaleString('ru-RU')} ₽</h4>
                 <DualRangeSlider
@@ -2650,99 +2652,31 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                 {filteredProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
               </div>
               {!filteredProjects.length ? <div className="bath-catalog-empty"><h2>Подходящих вариантов пока нет</h2><p>Расскажите, какая площадь и планировка вам нужны — подготовим индивидуальный ориентир.</p><a href="tel:+79022090179">Позвонить в Evtenia</a></div> : null}
-              <div className="catalog-pagination">
-                {page <= 1 ? <span className="disabled">←</span> : <a href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${Math.max(page - 1, 1)}`}>←</a>}
-                {pageNumbers.map((num) => (
-                  <a
-                    key={num}
-                    className={num === page ? 'active' : ''}
-                    href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${num}`}
-                  >
-                    {num}
-                  </a>
-                ))}
-                {page >= totalPages ? <span className="disabled">→</span> : <a href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${Math.min(page + 1, totalPages)}`}>→</a>}
-              </div>
-              <div className="catalog-pagination">
-                {page <= 1 ? <span className="disabled">←</span> : <a href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${Math.max(page - 1, 1)}`}>←</a>}
-                {pageNumbers.map((num) => (
-                  <a
-                    key={num}
-                    className={num === page ? 'active' : ''}
-                    href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${num}`}
-                  >
-                    {num}
-                  </a>
-                ))}
-                {page >= totalPages ? <span className="disabled">→</span> : <a href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${Math.min(page + 1, totalPages)}`}>→</a>}
-              </div>
-              <div className="catalog-pagination">
-                <a
-                  className={page <= 1 ? 'disabled' : ''}
-                  href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${Math.max(page - 1, 1)}`}
-                  onClick={(e) => { if (page <= 1) { e.preventDefault(); return; } e.preventDefault(); setPage((prev) => Math.max(prev - 1, 1)); }}
-                >←</a>
-                {pageNumbers.map((num) => (
-                  <a
-                    key={num}
-                    className={num === page ? 'active' : ''}
-                    href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${num}`}
-                    onClick={(e) => { e.preventDefault(); setPage(num); }}
-                  >
-                    {num}
-                  </a>
-                ))}
-                <a
-                  className={page >= totalPages ? 'disabled' : ''}
-                  href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${Math.min(page + 1, totalPages)}`}
-                  onClick={(e) => { if (page >= totalPages) { e.preventDefault(); return; } e.preventDefault(); setPage((prev) => Math.min(prev + 1, totalPages)); }}
-                >→</a>
-              </div>
-              <div className="catalog-pagination">
-                <button type="button" onClick={() => setPage((prev) => Math.max(prev - 1, 1))} disabled={page <= 1}>←</button>
-                {pageNumbers.map((num) => (
-                  <button
-                    type="button"
-                    key={num}
-                    className={num === page ? 'active' : ''}
-                    onClick={() => setPage(num)}
-                  >
-                    {num}
-                  </button>
-                ))}
-                <button type="button" onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))} disabled={page >= totalPages}>→</button>
-              </div>
-              <div className="catalog-pagination">
-                <button type="button" onClick={() => setPage((prev) => Math.max(prev - 1, 1))} disabled={page <= 1}>←</button>
-                {pageNumbers.map((num) => (
-                  <button
-                    type="button"
-                    key={num}
-                    className={num === page ? 'active' : ''}
-                    onClick={() => setPage(num)}
-                  >
-                    {num}
-                  </button>
-                ))}
-                <button type="button" onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))} disabled={page >= totalPages}>→</button>
-              </div>
-              <div className="catalog-pagination">
-                <button type="button" onClick={() => setPage((prev) => Math.max(prev - 1, 1))} disabled={page <= 1}>←</button>
-                {pageNumbers.map((num) => (
-                  <button
-                    type="button"
-                    key={num}
-                    className={num === page ? 'active' : ''}
-                    onClick={() => setPage(num)}
-                  >
-                    {num}
-                  </button>
-                ))}
-                <button type="button" onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))} disabled={page >= totalPages}>→</button>
-              </div>
-              <div ref={loadMoreRef} style={{ display: 'none' }} />
             </div>
           </div>
+          {isBathCatalog ? <section className="bath-catalog-guide" aria-labelledby="bath-catalog-guide-title">
+            <div className="bath-catalog-guide-heading">
+              <span>Строительство бань в Пензе и области</span>
+              <h2 id="bath-catalog-guide-title">Подберём баню под участок, привычки и бюджет</h2>
+              <p>Представленные проекты — типовые идеи для первого выбора. Мы уточним, сколько человек будет пользоваться баней, нужна ли отдельная комната отдыха, планируется ли зимняя эксплуатация и какие ограничения есть на участке.</p>
+            </div>
+            <div className="bath-catalog-guide-grid">
+              <article><h3>Небольшая дачная баня</h3><p>Площадь 12–16 м²: компактные парная и моечная, предбанник или небольшая зона отдыха. Подходит, когда важны простая планировка и небольшой занимаемый участок.</p></article>
+              <article><h3>Баня для семьи и гостей</h3><p>Площадь 20–24 м²: к парной и моечной добавляется отдельная комната отдыха, а при необходимости — терраса или веранда. Вариант для более длительных встреч.</p></article>
+              <article><h3>Банный дом</h3><p>Площадь от 36 м²: можно предусмотреть просторную комнату отдыха и гостевую зону. Для круглогодичного использования отдельно рассчитываются отопление, вентиляция и водоотведение.</p></article>
+            </div>
+            <div className="bath-catalog-guide-details">
+              <div><h3>Что влияет на стоимость</h3><p>В стартовый ориентир может входить только базовая комплектация строения. На окончательную цену влияют материал и сечение стен, утепление, основание, кровля, отделка парной, печь и дымоход, доставка, монтаж и подключение инженерных систем. Поэтому в карточках стоят цены «от», а для сложных вариантов — «по запросу».</p></div>
+              <div><h3>Как проходит расчёт</h3><ol><li>Уточняем размеры, сценарий использования и пожелания к помещениям.</li><li>Проверяем участок, подъезд и возможность подвести коммуникации.</li><li>Согласуем материал, комплектацию и состав работ.</li><li>Готовим предварительную смету и сроки; финальные условия фиксируем до начала работ.</li></ol></div>
+            </div>
+            <div className="bath-catalog-faq">
+              <h3>Частые вопросы</h3>
+              <details><summary>Это готовые проекты с утверждённой сметой?</summary><p>Нет. Это типовые концепции для подбора площади, материалов и состава помещений. Рабочее решение, основание и смета уточняются после проверки участка и комплектации.</p></details>
+              <details><summary>Что означает цена «от»?</summary><p>Это ориентировочная начальная стоимость базового варианта. Печь, дымоход, фундамент, доставка и дополнительные инженерные работы могут считаться отдельно — точный состав указываем в расчёте.</p></details>
+              <details><summary>Вы строите только в Пензе?</summary><p>Рассматриваем заявки по Пензе и Пензенской области. Возможность и стоимость доставки за пределы города зависят от адреса, подъездной дороги и выбранной технологии.</p></details>
+            </div>
+            <div className="bath-catalog-guide-cta"><div><strong>Нужен свой размер или планировка?</strong><span>Опишите задачу — подготовим ориентир по комплектации, срокам и стоимости.</span></div><button type="button" disabled={!categoryScopedProjects.length} onClick={() => categoryScopedProjects[0] && setRequestProject(categoryScopedProjects[0])}>Получить расчёт бани <span aria-hidden="true">→</span></button></div>
+          </section> : null}
         </div>
       </section>
       <SiteFooter />
@@ -2885,8 +2819,12 @@ function LandDetailPage() {
   useEffect(() => {
     if (!land) return undefined;
     const previousTitle = document.title;
-    const title = `Земельный участок ${land.area} в ${land.district} — Evtenia`;
-    const description = `${land.area}, ${land.district}. Цена ${land.price}. Подбор земли и строительство дома в Пензе.`;
+    const rawArea = land.area.trim();
+    const areaLabel = /^\d+(?:[.,]\d+)?$/.test(rawArea) ? `${rawArea.replace(',', '.')} соток` : rawArea;
+    const landText = land.description || '';
+    const purpose = land.purpose?.trim() || land.landCategory?.trim() || (/\bлпх\b/i.test(landText) ? 'ЛПХ' : /\b500\s*кв\.?\s*м\b/i.test(landText) ? '500 м²' : '');
+    const title = `Участок ${areaLabel}${purpose ? ` ${purpose}` : ''} в ${land.district} — ${land.price} | Evtenia`;
+    const description = `${landText || 'Земельный участок в Пензе и Пензенской области.'} Площадь ${areaLabel}; назначение ${purpose || 'уточняется'}; цена ${land.price}. Уточните актуальность и условия просмотра.`;
     document.title = title;
     let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
     if (!meta) { meta = document.createElement('meta'); meta.name = 'description'; document.head.appendChild(meta); }
@@ -3285,10 +3223,11 @@ function ProjectDetailPage() {
   useEffect(() => {
     const isBathProject = project.category === 'bath';
     const projectNoun = isBathProject ? 'бани' : 'дома';
-    const description = `${project.shortDescription || `Проект ${projectNoun} «${project.title}»`}. Площадь ${project.area || 'уточняется'}, ${project.floors || 'этажность по проекту'}, тип строительства — ${project.constructionType} в Пензе и области. ${project.isIllustrative ? 'Иллюстративный вариант; стоимость предварительная.' : 'Получите индивидуальный расчёт комплектации и сроков.'}`;
+    const description = `${project.shortDescription || `Проект ${projectNoun} «${project.title}»`}. Площадь ${project.area || 'уточняется'}, ${project.floors || 'этажность по проекту'}, тип строительства — ${project.constructionType}; ориентир цены ${project.priceFrom || 'уточняется'} в Пензе и области. ${project.isIllustrative ? 'Иллюстративный вариант; цена предварительная.' : 'Получите индивидуальный расчёт комплектации и сроков.'}`;
     const areaText = project.area?.trim() || '';
     const areaLabel = areaText && /(?:м2|м²|кв\.?\s*м)$/i.test(areaText) ? areaText : areaText ? `${areaText} м²` : '';
-    document.title = `${project.title} — проект ${projectNoun}${areaLabel ? ` ${areaLabel}` : ''} | Evtenia`;
+    const titleBase = /дом|бан/i.test(project.title) ? project.title : `${project.title} — ${isBathProject ? 'баня' : 'дом'}`;
+    document.title = `${titleBase}${areaLabel ? ` ${areaLabel}` : ''}, ${project.priceFrom || 'цена по запросу'} | Evtenia`;
     const descriptionTag = document.querySelector<HTMLMetaElement>('meta[name="description"]');
     if (descriptionTag) descriptionTag.content = description;
     let canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
