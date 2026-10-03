@@ -2291,12 +2291,13 @@ if (fs.existsSync(FRONTEND_DIST)) {
         const rawArea = land.area.trim();
         const areaLabel = /^\d+(?:[.,]\d+)?$/.test(rawArea) ? `${rawArea.replace(',', '.')} соток` : rawArea;
         const landText = land.description || '';
-        const purpose = land.purpose?.trim() || land.landCategory?.trim() || (/\bлпх\b/i.test(landText) ? 'ЛПХ' : /\b500\s*кв\.?\s*м\b/i.test(landText) ? '500 м²' : '');
+        const purpose = land.purpose?.trim() || land.landCategory?.trim() || (/лпх/i.test(landText) ? 'ЛПХ' : /500\s*кв\.?\s*м/i.test(landText) ? '500 м²' : '');
+        const landPrice = formatSeoPrice(land.price);
         const qualifier = purpose ? ` ${purpose}` : '';
         valid = true;
         page = {
-          title: `Участок ${areaLabel}${qualifier} в ${land.district} — ${land.price} | Evtenia`,
-          description: composeSeoDescription(landText || 'Земельный участок в Пензе и Пензенской области.', `Участок ${areaLabel}; назначение ${purpose || 'уточняется'}; цена ${land.price}. Уточните актуальность перед просмотром.`)
+          title: `Участок ${areaLabel}${qualifier} в ${land.district} — ${landPrice} | Evtenia`,
+          description: composeSeoDescription(landText || 'Земельный участок в Пензе и Пензенской области.', `Участок ${areaLabel}; назначение ${purpose || 'уточняется'}; цена ${landPrice}. Уточните актуальность перед просмотром.`)
         };
       }
     }

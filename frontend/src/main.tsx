@@ -2822,9 +2822,12 @@ function LandDetailPage() {
     const rawArea = land.area.trim();
     const areaLabel = /^\d+(?:[.,]\d+)?$/.test(rawArea) ? `${rawArea.replace(',', '.')} соток` : rawArea;
     const landText = land.description || '';
-    const purpose = land.purpose?.trim() || land.landCategory?.trim() || (/\bлпх\b/i.test(landText) ? 'ЛПХ' : /\b500\s*кв\.?\s*м\b/i.test(landText) ? '500 м²' : '');
-    const title = `Участок ${areaLabel}${purpose ? ` ${purpose}` : ''} в ${land.district} — ${land.price} | Evtenia`;
-    const description = `${landText || 'Земельный участок в Пензе и Пензенской области.'} Площадь ${areaLabel}; назначение ${purpose || 'уточняется'}; цена ${land.price}. Уточните актуальность и условия просмотра.`;
+    const purpose = land.purpose?.trim() || land.landCategory?.trim() || (/лпх/i.test(landText) ? 'ЛПХ' : /500\s*кв\.?\s*м/i.test(landText) ? '500 м²' : '');
+    const rawPrice = String(land.price || '').trim();
+    const priceAmount = Number(rawPrice.replace(/\D/g, ''));
+    const landPrice = priceAmount > 0 ? `${priceAmount.toLocaleString('ru-RU').replace(/\u00a0/g, ' ')} ₽` : rawPrice;
+    const title = `Участок ${areaLabel}${purpose ? ` ${purpose}` : ''} в ${land.district} — ${landPrice} | Evtenia`;
+    const description = `${landText || 'Земельный участок в Пензе и Пензенской области.'} Площадь ${areaLabel}; назначение ${purpose || 'уточняется'}; цена ${landPrice}. Уточните актуальность и условия просмотра.`;
     document.title = title;
     let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
     if (!meta) { meta = document.createElement('meta'); meta.name = 'description'; document.head.appendChild(meta); }
