@@ -55,6 +55,12 @@ function compactListingPrice(value: string) {
   return `${new Intl.NumberFormat('ru-RU').format(amount)} ₽`;
 }
 
+function listingArea(value: string) {
+  const area = String(value || '').trim().replace(/(\d)\.(\d)/g, '$1,$2');
+  if (!area) return 'площадь уточняется';
+  return /(?:м2|м²|кв\.?\s*м)$/i.test(area) ? area.replace(/м2/gi, 'м²').replace(/кв\.?\s*м/gi, 'м²') : `${area} м²`;
+}
+
 function listingExcerpt(value: string, maxLength = 190) {
   const cleaned = String(value || '')
     .replace(/[•–—-]\s*/g, ' · ')
@@ -250,7 +256,7 @@ export function HomeDetailPage({ apiBase, Header, Footer, LeadModal, resolveMedi
   const [notFound, setNotFound] = useState(false);
   const [requestOpen, setRequestOpen] = useState(false);
   useEffect(() => { fetch(`${apiBase}/api/homes/${encodeURIComponent(id)}`).then((response) => response.ok ? response.json() : Promise.reject()).then(setHome).catch(() => setNotFound(true)); }, [apiBase, id]);
-  useEffect(() => { if (home) document.title = `Готовый дом, ${home.area || 'площадь уточняется'} — ${compactListingPrice(home.price)} | Evtenia`; }, [home]);
+  useEffect(() => { if (home) document.title = `Готовый дом, ${listingArea(home.area)} — ${compactListingPrice(home.price)} | Evtenia`; }, [home]);
   if (notFound) return <><Header /><main className="internal-body"><div className="container homes-not-found"><h1>Дом не найден</h1><a href="/homes">Вернуться в каталог</a></div></main><Footer /></>;
   if (!home) return <><Header /><main className="internal-body"><div className="container"><p>Загружаем дом…</p></div></main><Footer /></>;
   const schema = { '@context': 'https://schema.org', '@type': 'SingleFamilyResidence', name: home.title, description: home.description, image: home.images, address: home.address, floorSize: home.area, offers: { '@type': 'Offer', priceCurrency: 'RUB', price: parseNumber(home.price), availability: 'https://schema.org/InStock' } };

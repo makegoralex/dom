@@ -2191,6 +2191,24 @@ app.get('/', (req, res, next) => {
   return res.type('html').send(html);
 });
 
+const formatSeoArea = (value: unknown): string => {
+  const raw = String(value ?? '').trim();
+  if (!raw) return '';
+  const decimal = (text: string) => text.replace(/(\d)\.(\d)/g, '$1,$2');
+  if (/^\d+(?:[.,]\d+)?$/.test(raw)) return `${decimal(raw)} м²`;
+  return decimal(raw).replace(/\bм2\b/gi, 'м²').replace(/кв\.?\s*м/gi, 'м²');
+};
+
+const formatSeoFloors = (value: unknown): string => {
+  const raw = String(value ?? '').trim();
+  if (!raw) return 'этажность уточняется';
+  if (!/^\d+$/.test(raw)) return raw;
+  const count = Number(raw);
+  if (count % 10 === 1 && count % 100 !== 11) return `${count} этаж`;
+  if ([2, 3, 4].includes(count % 10) && ![12, 13, 14].includes(count % 100)) return `${count} этажа`;
+  return `${count} этажей`;
+};
+
 const formatSeoPrice = (value: unknown, startsFrom = false): string => {
   const raw = String(value ?? '').trim();
   if (!raw || /по\s+запросу/i.test(raw)) return 'по запросу';
@@ -2258,16 +2276,17 @@ app.get('/project/:slug', (req, res, next) => {
   const isBathProject = project.category === 'bath';
   const projectKind = isBathProject ? 'бани' : 'дома';
   const parentSection = isBathProject ? 'baths' : 'projects';
-  const areaText = project.area?.trim() || '';
-  const areaLabel = areaText && /(?:м2|м²|кв\.?\s*м)$/i.test(areaText) ? areaText : areaText ? `${areaText} м²` : '';
+  const areaLabel = formatSeoArea(project.area);
   const priceLabel = formatSeoPrice(project.priceFrom, true);
   const titleKind = isBathProject ? 'баня' : 'дом';
   const cleanTitle = project.title.replace(/[_-]+/g, ' ').trim();
-  const titleBase = /дом|бан/i.test(cleanTitle) ? cleanTitle : `${titleKind === 'баня' ? 'Баня' : 'Дом'} «${cleanTitle}»`;
+  const titleBase = isBathProject
+    ? (/бан/i.test(cleanTitle) ? cleanTitle : `Баня «${cleanTitle}»`)
+    : (/дом/i.test(cleanTitle) ? cleanTitle : `Проект дома «${cleanTitle}»`);
   const seoTitle = `${titleBase}${areaLabel ? `, ${areaLabel}` : ''} — ${formatSeoPriceCompact(project.priceFrom, true)} | Evtenia`;
   const description = composeSeoDescription(
     `${titleKind === 'баня' ? 'Баня' : 'Дом'} «${cleanTitle}»`,
-    `${areaLabel || 'площадь уточняется'}, ${project.floors || 'этажность по проекту'}; ${material.toLowerCase()}; цена ${priceLabel}. Пенза и область — расчёт комплектации.`
+    `${areaLabel || 'площадь уточняется'}, ${formatSeoFloors(project.floors)}; ${material.toLowerCase()}; цена ${priceLabel}. Пенза и область — расчёт комплектации.`
   );
   const schema = {
     '@context': 'https://schema.org',
@@ -2354,13 +2373,13 @@ if (fs.existsSync(FRONTEND_DIST)) {
     if (!valid && /^\/homes\/[^/]+$/.test(pathname)) {
       const home = data.homes.find((item) => item.id === pathname.slice('/homes/'.length));
       if (home) {
-        const area = home.area?.trim() || 'уточняется';
+        const area = formatSeoArea(home.area) || 'уточняется';
         const price = formatSeoPrice(home.price);
         const place = home.district?.trim() || 'Пензе и области';
         valid = true;
         page = {
           title: `Готовый дом, ${area} — ${formatSeoPriceCompact(home.price)} | Evtenia`,
-          description: composeSeoDescription(`Готовый дом в ${place}.`, `Площадь ${area}; ${home.floors || 'этажность уточняется'}; цена ${price}. Уточните наличие и запишитесь на просмотр.`)
+          description: composeSeoDescription(`Готовый дом в ${place}.`, `Площадь ${area}; ${formatSeoFloors(home.floors)}; цена ${price}. Уточните наличие и запишитесь на просмотр.`)
         };
       }
     }
