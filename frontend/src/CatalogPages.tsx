@@ -9,8 +9,12 @@ type CatalogPageProps = {
 };
 
 type DoorCollection = {
+  slug: string;
   name: string;
   image: string;
+  images?: string[];
+  models?: string[];
+  productCutout?: boolean;
   description: string;
   style: 'Современный стиль' | 'Классика' | 'Текстура дерева';
 };
@@ -27,18 +31,23 @@ type ChanyModel = {
 };
 
 const DOORS: DoorCollection[] = [
-  { name: 'Соул', image: 'soul', description: 'Ровная геометрия и спокойная отделка — для интерьеров, где важны чистые линии и визуальная лёгкость.', style: 'Современный стиль' },
-  { name: 'Сицилия', image: 'sicily', description: 'Мягкая классическая филёнка и аккуратный рельеф: выразительно, но без тяжеловесного декора.', style: 'Классика' },
-  { name: 'Соло', image: 'solo', description: 'Лаконичное полотно без лишних деталей, которое легко сочетать с разными цветами стен и пола.', style: 'Современный стиль' },
-  { name: 'Лайн', image: 'line', description: 'Горизонтальные линии добавляют ритм и поддерживают современную архитектуру комнаты.', style: 'Современный стиль' },
-  { name: 'Юкон', image: 'yukon', description: 'Сдержанная фактура и простая форма — практичная основа для спокойного домашнего интерьера.', style: 'Текстура дерева' },
-  { name: 'Эрика', image: 'erika', description: 'Объёмные контуры и декоративная пластика для интерьеров с более мягким, классическим настроением.', style: 'Классика' },
-  { name: 'Дизайн', image: 'design', description: 'Детали и комбинации отделки помогают сделать дверь заметным, но гармоничным акцентом.', style: 'Современный стиль' },
-  { name: 'Модерн', image: 'modern', description: 'Графичные вставки и строгие пропорции для современных квартир и загородных домов.', style: 'Современный стиль' },
-  { name: 'Неоклассика', image: 'neoclassic', description: 'Симметрия и деликатная профилировка сочетают традиционный рисунок с лёгким современным видом.', style: 'Классика' },
-  { name: 'Классика', image: 'classic', description: 'Рельефные панели и привычные пропорции, которые уместны в традиционном интерьере.', style: 'Классика' },
-  { name: 'Эко', image: 'eco', description: 'Тёплый древесный рисунок и выразительная фактура для уютных натуральных интерьеров.', style: 'Текстура дерева' },
-  { name: 'ЭкоГранд', image: 'eco-grand', description: 'Древесная фактура с более заметным рисунком полотна — для тех, кто хочет подчеркнуть материал.', style: 'Текстура дерева' }
+  { slug: 'soul', name: 'Соул', image: 'soul', description: 'Ровная геометрия и спокойная отделка — для интерьеров, где важны чистые линии и визуальная лёгкость.', style: 'Современный стиль' },
+  { slug: 'siciliya', name: 'Сицилия', image: 'sicily', description: 'Мягкая классическая филёнка и аккуратный рельеф: выразительно, но без тяжеловесного декора.', style: 'Классика' },
+  { slug: 'solo', name: 'Соло', image: 'solo', description: 'Лаконичное полотно без лишних деталей, которое легко сочетать с разными цветами стен и пола.', style: 'Современный стиль' },
+  { slug: 'line', name: 'Лайн', image: 'line', description: 'Горизонтальные линии добавляют ритм и поддерживают современную архитектуру комнаты.', style: 'Современный стиль' },
+  { slug: 'yukon', name: 'Юкон', image: 'yukon', description: 'Сдержанная фактура и простая форма — практичная основа для спокойного домашнего интерьера.', style: 'Текстура дерева' },
+  { slug: 'erika', name: 'Эрика', image: 'erika', description: 'Объёмные контуры и декоративная пластика для интерьеров с более мягким, классическим настроением.', style: 'Классика' },
+  { slug: 'dizayn', name: 'Дизайн', image: 'design', description: 'Детали и комбинации отделки помогают сделать дверь заметным, но гармоничным акцентом.', style: 'Современный стиль' },
+  { slug: 'modern', name: 'Модерн', image: 'modern', description: 'Графичные вставки и строгие пропорции для современных квартир и загородных домов.', style: 'Современный стиль' },
+  { slug: 'neoklassika', name: 'Неоклассика', image: 'neoclassic', description: 'Симметрия и деликатная профилировка сочетают традиционный рисунок с лёгким современным видом.', style: 'Классика' },
+  { slug: 'klassika', name: 'Классика', image: 'classic', description: 'Рельефные панели и привычные пропорции, которые уместны в традиционном интерьере.', style: 'Классика' },
+  { slug: 'eko', name: 'Эко', image: 'eco', description: 'Тёплый древесный рисунок и выразительная фактура для уютных натуральных интерьеров.', style: 'Текстура дерева' },
+  { slug: 'ekogrand', name: 'ЭкоГранд', image: 'eco-grand', description: 'Древесная фактура с более заметным рисунком полотна — для тех, кто хочет подчеркнуть материал.', style: 'Текстура дерева' },
+  { slug: 'kaliforniya', name: 'Калифорния', image: 'california-1', images: ['california-1', 'california-2', 'california-3'], models: ['М451', 'М452', 'М453'], productCutout: true, description: 'Рельефная фрезеровка повторяет силуэт арок и создаёт выразительный рисунок полотна.', style: 'Классика' },
+  { slug: 'minimal', name: 'Минимал', image: 'minimal-1', images: ['minimal-1', 'minimal-2', 'minimal-3'], models: ['Минимал 1', 'Минимал 2', 'Минимал 4'], productCutout: true, description: 'Лаконичные гладкие полотна для жилых и коммерческих интерьеров, где важны простота и спокойный фон.', style: 'Современный стиль' },
+  { slug: 'notte', name: 'Ноттэ', image: 'notte-1', images: ['notte-1', 'notte-2'], models: ['М371', 'М372'], productCutout: true, description: 'Вертикальная фрезеровка с ритмом, напоминающим спокойную водную гладь; отдельные варианты допускают декоративные вставки.', style: 'Современный стиль' },
+  { slug: 'smart', name: 'Смарт', image: 'smart-1', images: ['smart-1', 'smart-2', 'smart-3', 'smart-4', 'smart-5'], models: ['Смарт 01', 'Смарт 02', 'Смарт 03', 'Смарт 04', 'Смарт 05'], productCutout: true, description: 'Каркасно-щитовые полотна с актуальным рисунком и доступными вариантами отделки.', style: 'Современный стиль' },
+  { slug: 'toskana', name: 'Тоскана', image: 'toscana-1', images: ['toscana-1', 'toscana-2', 'toscana-3', 'toscana-4'], models: ['М411', 'М412', 'М421', 'М422'], productCutout: true, description: 'Коллекция с гармоничными линиями и выразительным характером для интерьера с тёплыми акцентами.', style: 'Классика' }
 ];
 
 const CHANY: ChanyModel[] = [
@@ -186,7 +195,7 @@ export function DoorsCatalogPage({ apiBase, Header, Footer, PrivacyConsent, form
       schema: {
         '@context': 'https://schema.org', '@graph': [
           { '@type': 'Service', name: 'Подбор и заказ межкомнатных дверей', serviceType: 'Подбор дверей, комплектации и монтажа', areaServed: ['Пенза', 'Пензенская область'], provider: { '@type': 'Organization', name: 'Evtenia', url: 'https://dom.evtenia.ru/' }, url: 'https://dom.evtenia.ru/dveri' },
-          { '@type': 'ItemList', name: 'Коллекции межкомнатных дверей', itemListElement: DOORS.map((item, index) => ({ '@type': 'ListItem', position: index + 1, name: item.name, image: `https://dom.evtenia.ru/api/assets/catalog/doors/${item.image}.webp`, description: item.description })) },
+          { '@type': 'ItemList', name: 'Коллекции межкомнатных дверей', itemListElement: DOORS.map((item, index) => ({ '@type': 'ListItem', position: index + 1, name: item.name, url: `https://dom.evtenia.ru/dveri/${item.slug}`, image: `https://dom.evtenia.ru/api/assets/catalog/doors/${item.image}.webp`, description: item.description })) },
           { '@type': 'FAQPage', mainEntity: faq }
         ]
       }
@@ -226,8 +235,8 @@ export function DoorsCatalogPage({ apiBase, Header, Footer, PrivacyConsent, form
             </div>
             <div className="catalog-door-grid">
               {visible.map((item) => <article className="catalog-door-card" key={item.name}>
-                <img src={asset(apiBase, 'doors', item.image)} alt={`Коллекция межкомнатных дверей «${item.name}»`} loading="lazy" width="700" height="1000" />
-                <div className="catalog-door-card-copy"><span>{item.style}</span><h3>{item.name}</h3><p>{item.description}</p><button type="button" onClick={() => requestSelection(item.name)}>Узнать комплектацию <span aria-hidden="true">→</span></button></div>
+                <img className={item.productCutout ? 'product-cutout' : ''} src={asset(apiBase, 'doors', item.image)} alt={`Межкомнатная дверь коллекции «${item.name}»`} loading="lazy" width="700" height="1000" />
+                <div className="catalog-door-card-copy"><span>{item.style}</span><h3><a href={`/dveri/${item.slug}`}>{item.name}</a></h3><p>{item.description}</p><a className="door-collection-link" href={`/dveri/${item.slug}`}>Смотреть коллекцию <span aria-hidden="true">→</span></a><button type="button" onClick={() => requestSelection(item.name)}>Запросить комплектацию</button></div>
               </article>)}
             </div>
             <p className="catalog-disclaimer">Фотографии показывают варианты исполнения. Оттенок покрытия на экране может отличаться; окончательный выбор делаем по образцам и доступным вариантам выбранной коллекции.</p>
@@ -260,9 +269,94 @@ export function DoorsCatalogPage({ apiBase, Header, Footer, PrivacyConsent, form
         <section id="doors-request" className="catalog-request-section">
           <div className="catalog-container catalog-request-grid">
             <div><span className="catalog-eyebrow">Заявка на подбор</span><h2>Поможем собрать комплект дверей под ваши проёмы</h2><p>Оставьте телефон и выберите коллекцию или вариант помощи. Менеджер Evtenia уточнит количество дверей, комплектацию и удобный следующий шаг.</p><div className="catalog-phone-card"><span>Можно позвонить напрямую</span><a href="tel:+79022090179">8 902 209-01-79</a><small>Ежедневно с 9:00 до 19:00</small></div></div>
-            <CatalogLeadForm apiBase={apiBase} formatPhone={formatPhone} PrivacyConsent={PrivacyConsent} section="doors" sectionTitle="Двери" options={DOORS.map((item) => item.name).concat(['Замер и подбор комплекта', 'Монтаж межкомнатных дверей'])} initialSelection={selected} />
+            <CatalogLeadForm key={selected} apiBase={apiBase} formatPhone={formatPhone} PrivacyConsent={PrivacyConsent} section="doors" sectionTitle="Двери" options={DOORS.map((item) => item.name).concat(['Замер и подбор комплекта', 'Монтаж межкомнатных дверей'])} initialSelection={selected} />
           </div>
         </section>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+export function DoorCollectionPage({ slug, apiBase, Header, Footer, PrivacyConsent, formatPhone }: CatalogPageProps & { slug: string }) {
+  const collection = DOORS.find((item) => item.slug === slug);
+  const [selected, setSelected] = useState(collection?.name || '');
+  const title = collection ? `Межкомнатные двери «${collection.name}» в Пензе — каталог и подбор | Evtenia` : 'Коллекция дверей не найдена — Evtenia';
+  const description = collection ? `${collection.description} Подбор дверей, отделки и комплектации в Пензе и Пензенской области.` : 'Запрошенная коллекция дверей не найдена. Посмотрите каталог межкомнатных дверей Evtenia.';
+
+  useEffect(() => {
+    if (!collection) return;
+    writeCatalogSEO({
+      title,
+      description,
+      path: `/dveri/${collection.slug}`,
+      image: `/api/assets/catalog/doors/${collection.image}.webp`,
+      schema: {
+        '@context': 'https://schema.org',
+        '@graph': [
+          { '@type': 'CollectionPage', name: `Коллекция дверей «${collection.name}»`, description, url: `https://dom.evtenia.ru/dveri/${collection.slug}`, image: `https://dom.evtenia.ru/api/assets/catalog/doors/${collection.image}.webp`, mainEntity: { '@type': 'ItemList', itemListElement: (collection.models || []).map((name, index) => ({ '@type': 'ListItem', position: index + 1, name })) } },
+          { '@type': 'Service', name: `Подбор дверей коллекции «${collection.name}»`, areaServed: ['Пенза', 'Пензенская область'], provider: { '@type': 'Organization', name: 'Evtenia', url: 'https://dom.evtenia.ru/' } }
+        ]
+      }
+    });
+  }, [apiBase, collection, description, title]);
+
+  if (!collection) return <div className="catalog-page doors-catalog"><Header /><main className="catalog-container page-not-found"><p>404 · Коллекция не найдена</p><h1>Такой коллекции нет в каталоге</h1><a href="/dveri">Посмотреть все двери</a></main><Footer /></div>;
+
+  const images = collection.images?.length ? collection.images : [collection.image];
+  const chooseModel = (model: string) => {
+    setSelected(model);
+    document.getElementById('door-detail-request')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  return (
+    <div className="catalog-page doors-catalog door-collection-page">
+      <Header />
+      <main>
+        <section className="catalog-hero door-collection-hero">
+          <div className="catalog-container">
+            <CatalogBreadcrumb current={collection.name} />
+            <div className="door-collection-hero-grid">
+              <div>
+                <span className="catalog-eyebrow">Коллекция межкомнатных дверей</span>
+                <h1>Двери «{collection.name}» в Пензе</h1>
+                <p>{collection.description}</p>
+                <p>Поможем сверить размеры проёмов, подобрать покрытие и собрать комплект с коробкой, наличниками и фурнитурой. Итоговую стоимость и сроки подтвердим после выбора конкретной модели и параметров объекта.</p>
+                <a className="catalog-button" href="#door-detail-request">Узнать стоимость и наличие</a>
+              </div>
+              <img className={collection.productCutout ? 'product-cutout' : ''} src={asset(apiBase, 'doors', collection.image)} alt={`Межкомнатная дверь коллекции «${collection.name}»`} width="860" height="860" fetchPriority="high" />
+            </div>
+          </div>
+        </section>
+
+        <section className="catalog-section">
+          <div className="catalog-container">
+            <div className="catalog-section-heading"><div><span className="catalog-eyebrow">Варианты исполнения</span><h2>Модели коллекции «{collection.name}»</h2></div><p>Внешний вид и оттенок на экране могут отличаться от образца. Уточним доступные исполнения, размеры и комплектующие перед заказом.</p></div>
+            <div className="door-model-grid">
+              {images.map((image, index) => {
+                const model = collection.models?.[index] || `Вариант ${index + 1}`;
+                return <article className="door-model-card" key={image}><img src={asset(apiBase, 'doors', image)} alt={`Межкомнатная дверь «${collection.name}», модель ${model}`} loading={index === 0 ? 'eager' : 'lazy'} width="860" height="860" /><div><span>{collection.name}</span><h3>{model}</h3><button type="button" onClick={() => chooseModel(`${collection.name} — ${model}`)}>Запросить цену и наличие</button></div></article>;
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="catalog-section catalog-section-muted">
+          <div className="catalog-container">
+            <div className="catalog-section-heading"><div><span className="catalog-eyebrow">Комплектация</span><h2>Учтём не только полотно</h2></div><p>Проверим проём и согласуем комплект, чтобы после доставки не пришлось отдельно искать подходящие детали.</p></div>
+            <div className="catalog-check-grid"><article><b>01</b><h3>Замер проёма</h3><p>Сверим ширину, высоту, толщину стены и сторону открывания. Замер согласуем отдельно.</p></article><article><b>02</b><h3>Коробка и наличники</h3><p>Подберём комплектующие под толщину стены и способ оформления проёма.</p></article><article><b>03</b><h3>Отделка и фурнитура</h3><p>Уточним доступные цвета и варианты стекла, ручек, петель и защёлок.</p></article><article><b>04</b><h3>Доставка и установка</h3><p>Проверим доступность доставки и монтажа в Пензе или вашем населённом пункте области.</p></article></div>
+            <p className="catalog-disclaimer">Ориентир по размерному ряду из каталога — ширина 600, 700, 800 или 900 мм и высота 2000 мм; фактические размеры и доступность проверяются для выбранной модели. Цена зависит от комплекта и работ.</p>
+          </div>
+        </section>
+
+        <section id="door-detail-request" className="catalog-request-section">
+          <div className="catalog-container catalog-request-grid">
+            <div><span className="catalog-eyebrow">Расчёт заказа</span><h2>Подберём двери «{collection.name}» под ваши проёмы</h2><p>Оставьте телефон и нужную модель. Специалист Evtenia уточнит размеры, варианты комплектации, актуальную цену и следующий шаг.</p><div className="catalog-phone-card"><span>Можно позвонить напрямую</span><a href="tel:+79022090179">8 902 209-01-79</a><small>Ежедневно с 9:00 до 19:00</small></div></div>
+            <CatalogLeadForm key={selected} apiBase={apiBase} formatPhone={formatPhone} PrivacyConsent={PrivacyConsent} section="doors" sectionTitle={`Двери — ${collection.name}`} options={[collection.name, ...(collection.models || []), 'Замер и подбор комплекта', 'Монтаж межкомнатных дверей']} initialSelection={selected} />
+          </div>
+        </section>
+
+        <section className="catalog-section door-other-collections"><div className="catalog-container"><span className="catalog-eyebrow">Ещё в каталоге</span><h2>Посмотрите другие коллекции</h2><div>{DOORS.filter((item) => item.slug !== collection.slug).map((item) => <a key={item.slug} href={`/dveri/${item.slug}`}>{item.name}<span aria-hidden="true">→</span></a>)}</div></div></section>
       </main>
       <Footer />
     </div>

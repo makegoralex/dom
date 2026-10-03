@@ -8,10 +8,11 @@ import { MortgageCalculatorPage } from './MortgageCalculatorPage';
 import { LESNOE_OZERO_PHASES, LesnoeOzeroPlot } from './lesnoeOzeroPlots';
 import { HomeDetailPage, HomesPage, HouseListing } from './HomesPages';
 import { JournalArticle, JournalArticlePage, JournalCategory, JournalIndexPage } from './JournalPages';
-import { ChanyCatalogPage, DoorsCatalogPage } from './CatalogPages';
+import { ChanyCatalogPage, DoorCollectionPage, DoorsCatalogPage } from './CatalogPages';
 
 type HouseProject = {
   id: string;
+  slug?: string;
   title: string;
   shortDescription: string;
   fullDescription: string;
@@ -25,6 +26,14 @@ type HouseProject = {
   category: 'house' | 'bath';
   badge?: string;
   style?: string;
+  catalogProject?: boolean;
+  projectCode?: string;
+  livingArea?: string;
+  buildingFootprint?: string;
+  catalogFacade?: string;
+  catalogFoundation?: string;
+  catalogRoof?: string;
+  isIllustrative?: boolean;
 };
 
 type LandPlot = {
@@ -192,8 +201,13 @@ const PROJECT_GROUPS: ProjectGroupColumn[] = [
   {
     title: 'Проекты домов',
     groups: [
-      { label: 'Дома', items: ['Модульные', 'Каркасные', 'Из газобетона'] },
-      { label: 'Бани', items: ['Каркасные', 'Модульные'] }
+      { label: 'Дома', items: ['Модульные', 'Каркасные', 'Из газобетона'] }
+    ]
+  },
+  {
+    title: 'Проекты бань',
+    groups: [
+      { label: 'Бани', items: ['Каркасные', 'Профилированный брус', 'Оцилиндрованное бревно'] }
     ]
   }
 ];
@@ -875,6 +889,10 @@ function journalSlugify(value: string) {
   return value.toLowerCase().split('').map((letter) => translit[letter] ?? letter).join('').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
+function getProjectPath(project: HouseProject) {
+  return `/project/${project.slug || journalSlugify(project.title) || project.id}`;
+}
+
 function writePageSEO({ title, description, path, image, schema }: { title: string; description: string; path: string; image?: string; schema?: unknown }) {
   document.title = title;
   const setMeta = (key: string, content: string, property = false) => {
@@ -937,17 +955,17 @@ function chunkBy<T>(items: T[], size: number) {
   return chunks;
 }
 
-const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'doors', 'chany', 'homes', 'lands', 'settlements', 'services', 'furniture', 'promotions', 'journal', 'contacts'] as const;
+const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'baths', 'doors', 'chany', 'homes', 'lands', 'settlements', 'services', 'furniture', 'promotions', 'journal', 'contacts'] as const;
 type NavMenuKey = (typeof NAV_MENU_DEFAULT_ORDER)[number];
 
 function normalizeMenuOrder(order?: string[]) {
   const incoming = Array.isArray(order) ? order.filter((item): item is NavMenuKey => NAV_MENU_DEFAULT_ORDER.includes(item as NavMenuKey)) : [];
   const normalized = [...incoming, ...NAV_MENU_DEFAULT_ORDER.filter((item) => !incoming.includes(item))];
-  for (const key of ['doors', 'chany'] as const) {
+  for (const key of ['baths', 'doors', 'chany'] as const) {
     if (!incoming.includes(key)) normalized.splice(normalized.indexOf(key), 1);
   }
   let insertAfter: NavMenuKey = 'projects';
-  for (const key of ['doors', 'chany'] as const) {
+  for (const key of ['baths', 'doors', 'chany'] as const) {
     if (incoming.includes(key)) { insertAfter = key; continue; }
     const index = normalized.indexOf(insertAfter);
     normalized.splice(index + 1, 0, key);
@@ -1176,10 +1194,7 @@ function HeaderNav({
       { label: 'Проекты домов', heading: true },
       { label: 'Каркасные', href: `/projects?type=${encodeURIComponent('Каркасные')}` },
       { label: 'Модульные', href: `/projects?type=${encodeURIComponent('Модульные')}` },
-      { label: 'Газобетонные', href: `/projects?type=${encodeURIComponent('Из газобетона')}` },
-      { label: 'Проекты бань', heading: true },
-      { label: 'Модульные', href: `/baths?type=${encodeURIComponent('Модульные')}` },
-      { label: 'Каркасные', href: `/baths?type=${encodeURIComponent('Каркасные')}` }
+      { label: 'Газобетонные', href: `/projects?type=${encodeURIComponent('Из газобетона')}` }
     ];
     const all: Record<NavMenuKey, MenuItem> = {
       home: { label: 'ГЛАВНАЯ', href: '/', active: currentPath === '/' },
@@ -1192,7 +1207,8 @@ function HeaderNav({
           { label: 'Портфолио', href: '/portfolio' }
         ]
       },
-      projects: { label: 'ПРОЕКТЫ ДОМОВ', href: '/projects', active: currentPath === '/projects' || currentPath === '/baths', children: projectsChildren },
+      projects: { label: 'ПРОЕКТЫ ДОМОВ', href: '/projects', active: currentPath === '/projects', children: projectsChildren },
+      baths: { label: 'БАНИ', href: '/baths', active: currentPath === '/baths' },
       doors: { label: 'ДВЕРИ', href: '/dveri', active: currentPath === '/dveri' },
       chany: { label: 'ЧАНЫ', href: '/chany', active: currentPath === '/chany' },
       homes: { label: 'ГОТОВЫЕ ДОМА', href: '/homes', active: currentPath === '/homes' || currentPath.startsWith('/homes/') },
@@ -1393,49 +1409,52 @@ const FALLBACK_PROJECTS: HouseProject[] = [
     category: 'house'
   },
   {
-    id: 'demo5',
-    title: 'Баня Ладога 36',
+    id: 'bath-compact-12',
+    title: 'Компакт 12',
+    area: '12 м²',
+    floors: '1 этаж',
+    bedrooms: '3 зоны',
+    shortDescription: 'Небольшая каркасная баня с парной, моечной и предбанником.',
+    fullDescription: 'Типовая иллюстративная идея для небольшой дачи. Планировка, комплектация и цена уточняются после обсуждения участка.',
+    coverImage: '/api/assets/projects/catalog/bath-compact.webp',
+    images: ['/api/assets/projects/catalog/bath-compact.webp'],
+    priceFrom: 'от 750 000 ₽',
+    constructionType: 'Каркасные',
+    style: 'Компактный',
+    category: 'bath',
+    isIllustrative: true
+  },
+  {
+    id: 'bath-family-20',
+    title: 'Семейная 20',
+    area: '20 м²',
+    floors: '1 этаж',
+    bedrooms: '3 зоны',
+    shortDescription: 'Парная, душевая и отдельная комната отдыха.',
+    fullDescription: 'Типовая иллюстративная идея бани для регулярного семейного отдыха. Точная планировка и комплектация подбираются индивидуально.',
+    coverImage: '/api/assets/projects/catalog/bath-family.webp',
+    images: ['/api/assets/projects/catalog/bath-family.webp'],
+    priceFrom: 'от 930 000 ₽',
+    constructionType: 'Каркасные',
+    style: 'С комнатой отдыха',
+    category: 'bath',
+    isIllustrative: true
+  },
+  {
+    id: 'bath-log-36',
+    title: 'Банный дом 36',
     area: '36 м²',
     floors: '1 этаж',
-    bedrooms: '2 комнаты',
-    shortDescription: 'Модульная баня с комнатой отдыха и панорамным остеклением.',
-    fullDescription: 'Полное описание проекта.',
-    coverImage: 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1200&q=80',
-    images: ['https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1200&q=80'],
-    priceFrom: '2 190 000 ₽',
-    constructionType: 'Модульные',
-    style: 'Современный',
-    category: 'bath'
-  },
-  {
-    id: 'demo6',
-    title: 'Баня Вологда 48',
-    area: '48 м²',
-    floors: '1 этаж',
-    bedrooms: '3 комнаты',
-    shortDescription: 'Каркасная баня с террасой, парной и большой зоной отдыха.',
-    fullDescription: 'Полное описание проекта.',
-    coverImage: 'https://images.unsplash.com/photo-1605146769289-440113cc3d00?auto=format&fit=crop&w=1200&q=80',
-    images: ['https://images.unsplash.com/photo-1605146769289-440113cc3d00?auto=format&fit=crop&w=1200&q=80'],
-    priceFrom: '2 840 000 ₽',
-    constructionType: 'Каркасные',
-    style: 'Русский',
-    category: 'bath'
-  },
-  {
-    id: 'demo7',
-    title: 'Баня Тихвин 54',
-    area: '54 м²',
-    floors: '2 этажа',
-    bedrooms: '3 комнаты',
-    shortDescription: 'Двухэтажная баня с гостевой комнатой и балконом.',
-    fullDescription: 'Полное описание проекта.',
-    coverImage: 'https://images.unsplash.com/photo-1600047509782-20d39509f26d?auto=format&fit=crop&w=1200&q=80',
-    images: ['https://images.unsplash.com/photo-1600047509782-20d39509f26d?auto=format&fit=crop&w=1200&q=80'],
-    priceFrom: '3 160 000 ₽',
-    constructionType: 'Каркасные',
-    style: 'Классический',
-    category: 'bath'
+    bedrooms: '3 зоны',
+    shortDescription: 'Просторный деревянный вариант с большой комнатой отдыха.',
+    fullDescription: 'Типовая иллюстративная идея для бани и отдыха на участке. Дерево, основание, печь и доставка рассчитываются по исходным условиям.',
+    coverImage: '/api/assets/projects/catalog/bath-log.webp',
+    images: ['/api/assets/projects/catalog/bath-log.webp'],
+    priceFrom: 'от 2 350 000 ₽',
+    constructionType: 'Оцилиндрованное бревно',
+    style: 'Деревянная',
+    category: 'bath',
+    isIllustrative: true
   },
   {
     id: 'demo8',
@@ -1457,6 +1476,7 @@ const FALLBACK_PROJECTS: HouseProject[] = [
 function normalizePrice(price: unknown) {
   const value = String(price ?? '').trim();
   if (!value) return 'Цена по запросу';
+  if (/по\s+запросу/i.test(value)) return 'Цена по запросу';
   const formattedDigits = value.replace(/\d{4,}/g, (chunk) => Number(chunk).toLocaleString('ru-RU'));
   const withPrefix = formattedDigits.toLowerCase().startsWith('от') ? formattedDigits : `от ${formattedDigits}`;
   const hasRuble = /₽|руб\.?/i.test(withPrefix);
@@ -1635,8 +1655,10 @@ function ProjectTile({ project, onRequest, showGallery = false }: { project: Hou
     <article className="project-card">
       {showGallery ? (
         <div className="project-card-gallery">
-          <a className="project-card-photo-link" href={`/project/${project.id}`} aria-label={`Открыть проект ${project.title}`}>
-            <div className="project-image" style={{ backgroundImage: imageUrl ? `url(${imageUrl})` : undefined }} />
+          <a className="project-card-photo-link" href={getProjectPath(project)} aria-label={`Открыть проект ${project.title}`}>
+            <div className={`project-image${project.catalogProject || project.isIllustrative ? ' project-image-catalog' : ''}`} style={{ backgroundImage: imageUrl ? `url(${imageUrl})` : undefined }}>
+              {project.catalogProject || project.isIllustrative ? <span className="catalog-illustration-label">Иллюстрация</span> : null}
+            </div>
           </a>
           {hasGallery ? (
             <>
@@ -1647,8 +1669,10 @@ function ProjectTile({ project, onRequest, showGallery = false }: { project: Hou
           ) : null}
         </div>
       ) : null}
-      <a className="project-card-link" href={`/project/${project.id}`}>
-      {!showGallery ? <div className="project-image" style={{ backgroundImage: imageUrl ? `url(${imageUrl})` : undefined }} /> : null}
+      <a className="project-card-link" href={getProjectPath(project)}>
+      {!showGallery ? <div className={`project-image${project.catalogProject || project.isIllustrative ? ' project-image-catalog' : ''}`} style={{ backgroundImage: imageUrl ? `url(${imageUrl})` : undefined }}>
+        {project.catalogProject || project.isIllustrative ? <span className="catalog-illustration-label">Иллюстрация</span> : null}
+      </div> : null}
       <div className="project-content">
         <p className="project-desc">{project.shortDescription}</p>
         <h3>{project.title}</h3>
@@ -1660,7 +1684,7 @@ function ProjectTile({ project, onRequest, showGallery = false }: { project: Hou
         <strong className="project-price">{normalizePrice(project.priceFrom)}</strong>
       </div>
       </a>
-      <button className="project-cta" onClick={() => onRequest?.(project)}>Заявка на просчет дома</button>
+      <button className="project-cta" onClick={() => onRequest?.(project)}>Заявка на расчёт {project.category === 'bath' ? 'бани' : 'дома'}</button>
     </article>
   );
 }
@@ -1710,14 +1734,14 @@ function PublicPage() {
   }, []);
 
 
-  const filteredProjects = useMemo(() => projects.filter((p) => p.constructionType === selectedType), [projects, selectedType]);
+  const filteredProjects = useMemo(() => projects.filter((p) => p.category !== 'bath' && p.constructionType === selectedType), [projects, selectedType]);
 
   const catalogProjects = useMemo(() => filteredProjects.slice(0, 9), [filteredProjects]);
-  const homepageProjects = projects.length ? projects : FALLBACK_PROJECTS;
+  const homepageProjects = (projects.length ? projects : FALLBACK_PROJECTS).filter((project) => project.category !== 'bath');
   const heroImage = resolveMediaUrl(homepageProjects[0]?.coverImage || homepageProjects[0]?.images?.[0] || '');
   const offerTypes = ['Модульные', 'Каркасные', 'Из газобетона'] as const;
   const offerProjects = useMemo(() => {
-    const groupedByType = offerTypes.map((type) => homepageProjects.filter((project) => project.constructionType === type));
+    const groupedByType = offerTypes.map((type) => homepageProjects.filter((project) => project.category !== 'bath' && project.constructionType === type));
     const selected: HouseProject[] = [];
     const usedIds = new Set<string>();
     let cursor = 0;
@@ -1799,7 +1823,7 @@ function PublicPage() {
       <header
         className="hero hero-exact"
         style={heroImage ? {
-          backgroundImage: `linear-gradient(rgba(17, 30, 39, .45), rgba(10, 18, 24, .65)), url('${heroImage}')`
+          backgroundImage: `linear-gradient(rgba(30, 73, 56, .28), rgba(18, 54, 41, .52)), url('${heroImage}')`
         } : undefined}
       >
         <div className="promo-strip">
@@ -1867,8 +1891,10 @@ function PublicPage() {
             <article className="offer-card" style={offerImage(1) ? { backgroundImage: `url('${offerImage(1)}')` } : undefined}>
               <div className="offer-overlay">
                 <h3>Бани</h3>
-                <a href="/baths?type=Модульные">Модульные</a>
                 <a href="/baths?type=Каркасные">Каркасные</a>
+                <a href="/baths?type=Профилированный%20брус">Из бруса</a>
+                <a href="/baths?type=Оцилиндрованное%20бревно">Из бревна</a>
+                <a href="/baths">Смотреть все проекты бань</a>
               </div>
             </article>
             <article className="offer-card" style={offerImage(2) ? { backgroundImage: `url('${offerImage(2)}')` } : undefined}>
@@ -2128,7 +2154,7 @@ function InternalHeader() {
   return (
     <header
       className="hero hero-exact internal-header"
-      style={headerImage ? { backgroundImage: `linear-gradient(rgba(17, 30, 39, .58), rgba(10, 18, 24, .74)), url('${headerImage}')` } : undefined}
+      style={headerImage ? { backgroundImage: `linear-gradient(rgba(30, 73, 56, .32), rgba(18, 54, 41, .56)), url('${headerImage}')` } : undefined}
     >
       {!isProductCatalogHeader ? <div className="promo-strip">
         <div className="container promo-inner">
@@ -2325,7 +2351,7 @@ function SiteFooter() {
           </div>
           <div className="footer-columns">
             <div><h4>Проекты домов</h4><a href="/projects?type=Модульные">Модульные</a><a href="/projects?type=Каркасные">Каркасные</a><a href="/projects?type=Из%20газобетона">Из газобетона</a></div>
-            <div><h4>Бани</h4><a href="/baths?type=Модульные">Модульные</a><a href="/baths?type=Каркасные">Каркасные</a></div>
+            <div><h4>Бани</h4><a href="/baths?type=Каркасные">Каркасные</a><a href="/baths?type=Профилированный%20брус">Из профилированного бруса</a><a href="/baths?type=Оцилиндрованное%20бревно">Из оцилиндрованного бревна</a></div>
             <div><h4>Услуги</h4><a href="/services/fundament">Фундамент</a><a href="/services/skvazhiny">Скважины</a><a href="/services/remont">Ремонт</a><a href="/services/dizainer">Дизайнер</a><a href="/services/strahovanie">Страхование</a></div>
             <div><h4>Разделы сайта</h4><a href="/design">Проектирование</a><a href="/portfolio">Портфолио</a><a href="/discounts/vse-akcii">Ипотека и акции</a><a href="/contacts">Контакты</a></div>
           </div>
@@ -2338,8 +2364,9 @@ function SiteFooter() {
             </details>
             <details>
               <summary>Бани</summary>
-              <a href="/baths?type=Модульные">Модульные</a>
               <a href="/baths?type=Каркасные">Каркасные</a>
+              <a href="/baths?type=Профилированный%20брус">Из профилированного бруса</a>
+              <a href="/baths?type=Оцилиндрованное%20бревно">Из оцилиндрованного бревна</a>
             </details>
             <details>
               <summary>Услуги</summary>
@@ -2439,7 +2466,9 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const isFirstPageSync = useRef(true);
 
   useEffect(() => {
-    document.title = `${sectionTitle} — Evtenia`;
+    document.title = category === 'bath'
+      ? 'Проекты бань в Пензе — планировки и ориентир цен | Evtenia'
+      : 'Проекты домов в Пензе — каталог и цены | Evtenia';
     fetch(`${API_BASE}/api/projects`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no api'))))
       .then((data: HouseProject[]) => setProjects(Array.isArray(data) && data.length ? data : FALLBACK_PROJECTS))
@@ -2473,14 +2502,13 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   };
 
   const isBathCatalog = category === 'bath';
-  const byCategory = isBathCatalog
-    ? projects.filter((item) => normalizeCategory(item) === 'bath')
-    : projects;
-  const categoryScopedProjects = byCategory.length ? byCategory : projects;
+  const byCategory = projects.filter((item) => normalizeCategory(item) === (isBathCatalog ? 'bath' : 'house'));
+  const categoryScopedProjects = byCategory;
   const floorOptions = Array.from(new Set(categoryScopedProjects.map((item) => item.floors))).filter(Boolean);
   const typeOptions = Array.from(new Set(categoryScopedProjects.map((item) => item.constructionType))).filter(Boolean);
   const effectiveType = typeOptions.includes(type) || type === 'Все типы' ? type : 'Все типы';
   const styleOptions = Array.from(new Set(categoryScopedProjects.map((item) => (item.style || '').trim()).filter(Boolean)));
+  const styleOptionsKey = styleOptions.join('\u0000');
   const parseNum = (value: unknown) => {
     const digits = String(value ?? '').match(/\d+/);
     const parsed = Number(digits?.[0] || '0');
@@ -2501,8 +2529,11 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const maxPriceLimit = priceValues.length ? Math.max(...priceValues) : 0;
 
   useEffect(() => {
-    setSelectedStyles((prev) => prev.filter((style) => styleOptions.includes(style)));
-  }, [styleOptions]);
+    setSelectedStyles((prev) => {
+      const next = prev.filter((style) => styleOptions.includes(style));
+      return next.length === prev.length ? prev : next;
+    });
+  }, [styleOptionsKey]);
   useEffect(() => {
     setMinArea(minAreaLimit);
     setMaxArea(maxAreaLimit);
@@ -2538,7 +2569,12 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
       <section className="internal-body">
         <div className="container">
           <Breadcrumbs items={["Главная", sectionTitle, effectiveType]} />
-          <h1>{sectionTitle}</h1>
+          <h1>{isBathCatalog ? 'Проекты бань в Пензе' : sectionTitle}</h1>
+          {isBathCatalog ? <div className="bath-catalog-intro">
+            <p>Типовые идеи бань для дачи и загородного участка в Пензе и Пензенской области: от компактных каркасных решений до просторных деревянных банных домов.</p>
+            <p>Карточки помогают выбрать площадь и состав помещений. Изображения — иллюстрации вариантов, а не фотографии построенных объектов. Цены указаны ориентировочно «от»; точный расчёт зависит от основания, печи и дымохода, отделки, инженерии, доставки и особенностей участка.</p>
+            <a href="tel:+79022090179">Обсудить баню с менеджером <span aria-hidden="true">→</span></a>
+          </div> : null}
           <div className="catalog-layout">
             <aside className="catalog-filters">
               <div className="filter-block">
@@ -2613,6 +2649,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
               <div className="catalog-grid">
                 {filteredProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
               </div>
+              {!filteredProjects.length ? <div className="bath-catalog-empty"><h2>Подходящих вариантов пока нет</h2><p>Расскажите, какая площадь и планировка вам нужны — подготовим индивидуальный ориентир.</p><a href="tel:+79022090179">Позвонить в Evtenia</a></div> : null}
               <div className="catalog-pagination">
                 {page <= 1 ? <span className="disabled">←</span> : <a href={`${window.location.pathname}?type=${encodeURIComponent(effectiveType)}&page=${Math.max(page - 1, 1)}`}>←</a>}
                 {pageNumbers.map((num) => (
@@ -2713,9 +2750,9 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
         open={Boolean(requestProject)}
         onClose={() => setRequestProject(null)}
         title={requestProject ? `Заявка: ${requestProject.title}` : 'Заявка'}
-        promoText="🎁 Проект дома в подарок"
-        messagePrefix={requestProject ? `Заявка на просчет дома: ${requestProject.title}` : ''}
-        sourceTitle={requestProject ? `Проект дома: ${requestProject.title}` : 'Заявка на просчет дома'}
+        promoText={isBathCatalog ? 'Получите ориентировочный расчёт бани' : '🎁 Проект дома в подарок'}
+        messagePrefix={requestProject ? `Заявка на расчёт ${requestProject.category === 'bath' ? 'бани' : 'дома'}: ${requestProject.title}` : ''}
+        sourceTitle={requestProject ? `Проект ${requestProject.category === 'bath' ? 'бани' : 'дома'}: ${requestProject.title}` : `Заявка на расчёт ${isBathCatalog ? 'бани' : 'дома'}`}
       />
     </div>
   );
@@ -3212,8 +3249,9 @@ function LandsPage() {
 }
 
 function ProjectDetailPage() {
-  const projectId = window.location.pathname.replace('/project/', '');
+  const projectSlug = decodeURIComponent(window.location.pathname.replace('/project/', ''));
   const [projects, setProjects] = useState<HouseProject[]>(FALLBACK_PROJECTS);
+  const [projectsLoaded, setProjectsLoaded] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [openRequest, setOpenRequest] = useState(false);
 
@@ -3221,10 +3259,12 @@ function ProjectDetailPage() {
     fetch(`${API_BASE}/api/projects`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no api'))))
       .then((data: HouseProject[]) => setProjects(data))
-      .catch(() => setProjects(FALLBACK_PROJECTS));
+      .catch(() => setProjects(FALLBACK_PROJECTS))
+      .finally(() => setProjectsLoaded(true));
   }, []);
 
-  const project = projects.find((item) => item.id === projectId) || FALLBACK_PROJECTS[0];
+  const matchedProject = projects.find((item) => item.id === projectSlug || item.slug === projectSlug || getProjectPath(item) === `/project/${projectSlug}`);
+  const project = matchedProject || FALLBACK_PROJECTS[0];
   const gallery = [project.coverImage, ...(project.images || [])].filter(Boolean).map((img) => resolveMediaUrl(img));
   const safeActiveImage = gallery[activeImageIndex] || gallery[0] || '';
 
@@ -3243,8 +3283,28 @@ function ProjectDetailPage() {
   };
 
   useEffect(() => {
-    document.title = `${project.title} — Evtenia`;
-  }, [project.title]);
+    const isBathProject = project.category === 'bath';
+    const projectNoun = isBathProject ? 'бани' : 'дома';
+    const description = `${project.shortDescription || `Проект ${projectNoun} «${project.title}»`}. Площадь ${project.area || 'уточняется'}, ${project.floors || 'этажность по проекту'}, тип строительства — ${project.constructionType} в Пензе и области. ${project.isIllustrative ? 'Иллюстративный вариант; стоимость предварительная.' : 'Получите индивидуальный расчёт комплектации и сроков.'}`;
+    const areaText = project.area?.trim() || '';
+    const areaLabel = areaText && /(?:м2|м²|кв\.?\s*м)$/i.test(areaText) ? areaText : areaText ? `${areaText} м²` : '';
+    document.title = `${project.title} — проект ${projectNoun}${areaLabel ? ` ${areaLabel}` : ''} | Evtenia`;
+    const descriptionTag = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+    if (descriptionTag) descriptionTag.content = description;
+    let canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.appendChild(canonical); }
+    canonical.href = `${window.location.origin}${getProjectPath(project)}`;
+  }, [project]);
+
+  if (!matchedProject) {
+    if (!projectsLoaded) return <div><InternalHeader /><main className="project-loading" aria-live="polite">Загружаем проект…</main><SiteFooter /></div>;
+    return <NotFoundPage />;
+  }
+
+  const isGasConcrete = /газобетон/i.test(project.constructionType);
+  const isBathProject = project.category === 'bath';
+  const priceText = normalizePrice(project.priceFrom);
+  const shownTitle = project.title.replace(/[_-]+/g, ' ').trim();
 
   return (
     <div>
@@ -3252,11 +3312,17 @@ function ProjectDetailPage() {
       <section className="internal-body">
         <div className="container">
           <Breadcrumbs items={["Главная", project.category === 'bath' ? "Бани" : "Проекты домов", project.title]} />
-          <h1>{project.title}</h1>
+          <h1 className="project-page-title">{shownTitle}</h1>
+          <p className="project-detail-lead">{project.catalogProject
+            ? `Каталожный проект №${project.projectCode} из газобетона, ${project.floors.toLowerCase()}, общей площадью ${project.area}${project.livingArea ? ` и жилой площадью ${project.livingArea}` : ''}. Иллюстрация показывает общий характер дома, а не точную визуализацию проекта. Обсудим адаптацию под участок и состав семьи в Пензе и области.`
+            : isBathProject
+              ? `Типовой иллюстративный вариант бани площадью ${project.area || 'по индивидуальному расчёту'} из материала «${project.constructionType}». Изображение показывает направление решения, а не реализованный объект. Планировку и состав комплектации адаптируем под участок, сезонность использования и бюджет в Пензе и области.`
+              : `Проект дома площадью ${project.area?.replace(/\s*(м2|м²)$/i, '') || 'по индивидуальному расчёту'} м² из материала «${project.constructionType}». Подскажем, как адаптировать планировку и комплектацию под участок, состав семьи и бюджет в Пензе и Пензенской области.`}</p>
           <div className="project-detail-layout">
             <div>
               <div className="project-detail-slider">
-                <div className="project-detail-main-image" style={{ backgroundImage: `url(${safeActiveImage})` }} />
+                {safeActiveImage ? <img className="project-detail-main-image" src={safeActiveImage} alt={project.catalogProject ? `${shownTitle} — иллюстрация к каталожному проекту дома из газобетона` : `${shownTitle} — ${isBathProject ? 'иллюстрация проекта бани' : 'фото и визуализация проекта дома'}`} fetchPriority="high" /> : <div className="project-detail-main-image project-detail-image-empty" aria-label="Изображение проекта временно недоступно" />}
+                {project.catalogProject || project.isIllustrative ? <span className="project-illustration-note">Иллюстрация · не фотография построенного объекта</span> : null}
                 {gallery.length > 1 ? (
                   <div className="project-slider-controls">
                     <button type="button" onClick={showPrevImage} aria-label="Предыдущее фото">‹</button>
@@ -3278,20 +3344,52 @@ function ProjectDetailPage() {
                 ))}
               </div>
               <div className="project-detail-description">
-                <h3>Особенности проекта</h3>
-                <p>{project.fullDescription || project.shortDescription}</p>
+                <h2>О проекте «{shownTitle}»</h2>
+                <p>{project.fullDescription || project.shortDescription || `Проект частного дома из материала «${project.constructionType}». Планировку, габариты и состав работ можно уточнить у специалиста.`}</p>
               </div>
             </div>
             <aside className="project-detail-side">
               <h3>Характеристики</h3>
               <div className="detail-row"><span>Общая площадь</span><b>{project.area}</b></div>
-              <div className="detail-row"><span>Комнаты</span><b>{project.bedrooms}</b></div>
+              <div className="detail-row"><span>{project.catalogProject ? 'Планировка' : isBathProject ? 'Помещения' : 'Комнаты'}</span><b>{project.bedrooms}</b></div>
               <div className="detail-row"><span>Этажность</span><b>{project.floors}</b></div>
               <div className="detail-row"><span>Тип строительства</span><b>{project.constructionType}</b></div>
-              <div className="detail-row"><span>Стиль</span><b>{project.style || 'Современный'}</b></div>
+              {project.catalogProject ? <>
+                <div className="detail-row"><span>Код проекта</span><b>{project.projectCode}</b></div>
+                {project.livingArea ? <div className="detail-row"><span>Жилая площадь</span><b>{project.livingArea}</b></div> : null}
+                {project.buildingFootprint ? <div className="detail-row"><span>Площадь застройки</span><b>{project.buildingFootprint}</b></div> : null}
+                <div className="detail-row"><span>Фасад по исходному описанию</span><b>{project.catalogFacade}</b></div>
+                <div className="detail-row"><span>Основание в исходном описании</span><b>{project.catalogFoundation}</b></div>
+                <div className="detail-row"><span>Кровля по исходному описанию</span><b>{project.catalogRoof}</b></div>
+              </> : <div className="detail-row"><span>Стиль</span><b>{project.style || 'Современный'}</b></div>}
               <strong className="detail-price">{normalizePrice(project.priceFrom)}</strong>
-              <button className="detail-btn" onClick={() => setOpenRequest(true)}>Заявка на просчет дома</button>
+              <small className="project-price-note">{isBathProject ? 'Ориентир «от» или цена по запросу, не публичная оферта. Итог зависит от фундамента, печи и дымохода, отделки, инженерии, доставки и участка.' : 'Предварительный ориентир. Итоговая стоимость зависит от участка, инженерных решений, комплектации и актуальных цен на материалы.'}</small>
+              <button className="detail-btn" onClick={() => setOpenRequest(true)}>Рассчитать стоимость {isBathProject ? 'бани' : 'проекта'}</button>
             </aside>
+          </div>
+          <div className="project-detail-seo-sections">
+            <section className="project-detail-description project-package">
+              <p className="project-section-kicker">Состав и адаптация</p>
+              <h2>Что уточним перед расчётом</h2>
+              <p>Сначала проверим основные параметры проекта и участка, затем согласуем состав работ, материалы, инженерные решения и график. Если нужно, обсудим изменения планировки до подготовки сметы.</p>
+              {isBathProject ? <>
+                <h3>Что можно включить в планировку бани</h3>
+                <ul><li>парную с подходящей для выбранной печи планировкой;</li><li>моечную или душевую, предбанник и комнату отдыха;</li><li>крыльцо или террасу, если это позволяет участок;</li><li>варианты внутренней отделки, утепления и инженерных подключений.</li></ul>
+                <p>Схемы на этой странице — типовые идеи для первичного выбора. Печь и дымоход, основание, водоснабжение, слив и противопожарные расстояния подбираются после уточнения места строительства и действующих требований.</p>
+              </> : isGasConcrete ? <>
+                <h3>Ориентир базовой комплектации для газобетонного дома</h3>
+                <ul><li>ленточный фундамент с ростверком — после оценки грунта и рельефа участка;</li><li>стены из газобетона и кирпичная облицовка;</li><li>металлочерепица и пластиковые окна;</li><li>внутренние перегородки, входная дверь и черновая отделка.</li></ul>
+                <p>Это предварительный состав для оценки бюджета: проектные решения, объёмы материалов и необходимость изменений определяются после уточнения исходных данных.</p>
+              </> : null}
+              <div className="project-detail-process"><div><b>01</b><strong>Расскажите о задаче</strong><span>Площадь, участок, сроки и пожелания к {isBathProject ? 'бане' : 'дому'}.</span></div><div><b>02</b><strong>Сверим проект</strong><span>Обсудим планировку, конструктив и состав комплектации.</span></div><div><b>03</b><strong>Подготовим расчёт</strong><span>Сориентируем по стоимости и возможным этапам работ.</span></div></div>
+              <button className="detail-btn project-detail-bottom-cta" onClick={() => setOpenRequest(true)}>Получить расчёт по проекту</button>
+            </section>
+            <section className="project-detail-faq" aria-label="Частые вопросы о расчёте проекта">
+              <h2>Частые вопросы</h2>
+              <details><summary>Цена на странице окончательная?</summary><p>Нет. Указана ориентировочная стоимость. Точная цена зависит от выбранной комплектации, параметров участка, доставки и инженерных работ.</p></details>
+              <details><summary>Можно изменить планировку?</summary><p>Возможность изменений зависит от конструктивной схемы проекта. Обсудим желаемые изменения до подготовки сметы.</p></details>
+              <details><summary>Работаете ли вы по области?</summary><p>Да, выезжаем по Пензе и Пензенской области. Логистику и сроки для конкретного населённого пункта уточним при расчёте.</p></details>
+            </section>
           </div>
         </div>
       </section>
@@ -3300,9 +3398,9 @@ function ProjectDetailPage() {
         open={openRequest}
         onClose={() => setOpenRequest(false)}
         title={`Заявка: ${project.title}`}
-        promoText="🎁 Проект дома в подарок"
-        messagePrefix={`Заявка на просчет дома: ${project.title}`}
-        sourceTitle={`Проект дома: ${project.title}`}
+        promoText={isBathProject ? 'Предварительно рассчитаем баню для вашего участка' : '🎁 Проект дома в подарок'}
+        messagePrefix={`Заявка на расчёт ${isBathProject ? 'бани' : 'дома'}: ${project.title}`}
+        sourceTitle={`Проект ${isBathProject ? 'бани' : 'дома'}: ${project.title}`}
       />
     </div>
   );
@@ -3824,6 +3922,10 @@ function ManagedTextPage({ slug, fallbackTitle, fallbackContent, sectionTitle }:
   }, [slug, fallbackTitle, fallbackContent]);
 
   return <SubsectionPage pageSlug={slug} sectionTitle={sectionTitle} pageTitle={page.title} text={page.content} isHtml />;
+}
+
+function NotFoundPage() {
+  return <div><InternalHeader /><main className="page-not-found container"><p>404 · Страница не найдена</p><h1>Кажется, такой страницы нет</h1><span>Возможно, ссылка устарела или адрес был введён с ошибкой.</span><a href="/">На главную</a></main><SiteFooter /></div>;
 }
 
 function AdminPage() {
@@ -5483,6 +5585,7 @@ function App() {
   if (pathname.startsWith('/journal/')) return <AppLayout><JournalArticlePage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} resolveMedia={resolveMediaUrl} slug={pathname.replace('/journal/', '')} /></AppLayout>;
   if (pathname === '/design') return <AppLayout><DesignPage /></AppLayout>;
   if (pathname === '/dveri') return <AppLayout><DoorsCatalogPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} formatPhone={formatPhoneMask} /></AppLayout>;
+  if (pathname.startsWith('/dveri/')) return <AppLayout><DoorCollectionPage slug={pathname.replace('/dveri/', '')} apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} formatPhone={formatPhoneMask} /></AppLayout>;
   if (pathname === '/chany') return <AppLayout><ChanyCatalogPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} formatPhone={formatPhoneMask} /></AppLayout>;
   if (servicePage) return <AppLayout><ManagedTextPage slug={`services-${servicePage.slug}`} fallbackTitle={servicePage.title} fallbackContent={servicePage.text} sectionTitle="Услуги" /></AppLayout>;
   if (discountPage) return <AppLayout><ManagedTextPage slug={`discounts-${discountPage.slug}`} fallbackTitle={discountPage.title} fallbackContent={discountPage.text} sectionTitle="Ипотека и акции" /></AppLayout>;
@@ -5501,7 +5604,8 @@ function App() {
   if (pathname === '/furniture') return <AppLayout><ManagedTextPage slug="furniture" fallbackTitle="Мебель" fallbackContent="Изготавливаем корпусную и встроенную мебель под ваши размеры и стиль интерьера." sectionTitle="Каталог" /></AppLayout>;
   if (pathname === '/portfolio') return <AppLayout><PortfolioPage /></AppLayout>;
   if (pathname === '/contacts') return <AppLayout><ContactsPage /></AppLayout>;
-  return <AppLayout><PublicPage /></AppLayout>;
+  if (pathname === '/') return <AppLayout><PublicPage /></AppLayout>;
+  return <AppLayout><NotFoundPage /></AppLayout>;
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

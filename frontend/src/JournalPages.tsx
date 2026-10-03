@@ -38,6 +38,7 @@ export type JournalArticle = {
 
 type ProjectSummary = {
   id: string;
+  slug?: string;
   title: string;
   shortDescription: string;
   coverImage: string;
@@ -293,7 +294,7 @@ export function JournalArticlePage({ apiBase, Header, Footer, resolveMedia, slug
           </div>
           <section className="journal-author-card" aria-label="Об авторе"><div><strong>{article.author}</strong>{article.authorRole ? <span>{article.authorRole}</span> : null}</div>{article.authorBio ? <p>{article.authorBio}</p> : null}{article.reviewer ? <small>Материал проверил: {article.reviewer}</small> : null}</section>
           {article.tags.length ? <div className="journal-tags">{article.tags.map((tag) => <span key={tag}>{tag}</span>)}</div> : null}
-          {relatedProjects.length ? <section className="journal-related"><div className="journal-section-heading"><p>Подходящие решения</p><h2>Проекты по теме</h2></div><div className="journal-project-grid">{relatedProjects.map((project) => <a href={`/project/${project.id}`} key={project.id}><div>{project.coverImage ? <img src={resolveMedia(project.coverImage)} alt={`Проект дома «${project.title}»`} loading="lazy" /> : null}</div><strong>{project.title}</strong><span>{project.area} · {project.priceFrom}</span></a>)}</div></section> : null}
+          {relatedProjects.length ? <section className="journal-related"><div className="journal-section-heading"><p>Подходящие решения</p><h2>Проекты по теме</h2></div><div className="journal-project-grid">{relatedProjects.map((project) => <a href={`/project/${project.slug || project.id}`} key={project.id}><div>{project.coverImage ? <img src={resolveMedia(project.coverImage)} alt={`Проект дома «${project.title}»`} loading="lazy" /> : null}</div><strong>{project.title}</strong><span>{project.area} · {project.priceFrom}</span></a>)}</div></section> : null}
           {article.relatedServiceSlugs.length ? <section className="journal-related"><div className="journal-section-heading"><p>Можно заказать в Evtenia</p><h2>Услуги по теме</h2></div><div className="journal-service-links">{article.relatedServiceSlugs.map((service) => <a href={`/services/${service}`} key={service}>{SERVICE_NAMES[service] || service.replace(/-/g, ' ')}<span>→</span></a>)}</div></section> : null}
           <section className="journal-final-cta"><div><p>Следующий шаг</p><h2>{article.ctaTitle || 'Поможем выбрать решение'}</h2><span>{article.ctaText}</span></div><a href={article.ctaHref || '/#lead-form'}>Обсудить строительство</a></section>
         </div>

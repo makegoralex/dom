@@ -33,6 +33,7 @@ const LEAD_PRICE = '550 000 ₽';
 
 type CatalogProject = {
   id: string;
+  slug?: string;
   title: string;
   coverImage: string;
   area: string;
@@ -494,7 +495,7 @@ export function LesnoeOzeroPage({ Header, Footer, PrivacyConsent, apiBase, forma
                   || catalogProjects.find((item) => item.title.toLowerCase() === offer.fallbackTitle.toLowerCase());
                 return (
                   <article key={`${turnkeyScenario}-${offer.projectId}`}>
-                    <a className="lo-turnkey-image" href={`/project/${project?.id || offer.projectId}`}>
+                    <a className="lo-turnkey-image" href={`/project/${project?.slug || project?.id || offer.projectId}`}>
                       <img src={projectImageUrl(project?.coverImage || offer.fallbackImage)} alt={`Проект ${project?.title || offer.fallbackTitle}`} loading="lazy" />
                     </a>
                     <div className="lo-turnkey-card-body">
@@ -502,7 +503,7 @@ export function LesnoeOzeroPage({ Header, Footer, PrivacyConsent, apiBase, forma
                       <h3>{project?.title || offer.fallbackTitle}</h3>
                       <p>Участок, дом с отделкой, коммуникации, ограждение и подготовка территории.</p>
                       <strong>{offer.packagePrice}<small>за комплекс под ключ</small></strong>
-                      <div><a href={`/project/${project?.id || offer.projectId}`}>Посмотреть проект</a><button type="button" onClick={() => openDialog(`${scenario.tab}: ${project?.title || offer.fallbackTitle}, ${offer.packagePrice}`)}>Рассчитать</button></div>
+                      <div><a href={`/project/${project?.slug || project?.id || offer.projectId}`}>Посмотреть проект</a><button type="button" onClick={() => openDialog(`${scenario.tab}: ${project?.title || offer.fallbackTitle}, ${offer.packagePrice}`)}>Рассчитать</button></div>
                     </div>
                   </article>
                 );

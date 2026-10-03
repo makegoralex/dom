@@ -6,11 +6,14 @@ import nodemailer from 'nodemailer';
 import multer from 'multer';
 import sharp from 'sharp';
 import dotenv from 'dotenv';
+import { gasblockCatalogProjects } from './gasblockCatalogProjects';
+import { bathCatalogProjects } from './bathCatalogProjects';
 
 dotenv.config({ path: path.join(__dirname, '..', '.env.production') });
 
 interface HouseProject {
   id: string;
+  slug?: string;
   title: string;
   shortDescription: string;
   fullDescription: string;
@@ -24,6 +27,14 @@ interface HouseProject {
   category: 'house' | 'bath';
   badge?: string;
   style?: string;
+  catalogProject?: boolean;
+  projectCode?: string;
+  livingArea?: string;
+  buildingFootprint?: string;
+  catalogFacade?: string;
+  catalogFoundation?: string;
+  catalogRoof?: string;
+  isIllustrative?: boolean;
 }
 
 interface Lead {
@@ -384,16 +395,16 @@ const FURNITURE_STRUCTURE = [
   { title: 'КАБИНЕТЫ', brands: ['CAMEL GROUP', 'PROFOFFICE'] },
   { title: 'МАТРАСЫ', brands: ['HUKLA'] }
 ];
-const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'doors', 'chany', 'homes', 'lands', 'settlements', 'services', 'furniture', 'promotions', 'journal', 'contacts'];
+const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'baths', 'doors', 'chany', 'homes', 'lands', 'settlements', 'services', 'furniture', 'promotions', 'journal', 'contacts'];
 
 function normalizeMenuOrder(order?: string[]) {
   const incoming = Array.isArray(order) ? order.filter((item) => NAV_MENU_DEFAULT_ORDER.includes(item)) : [];
   const normalized = [...incoming, ...NAV_MENU_DEFAULT_ORDER.filter((item) => !incoming.includes(item))];
-  for (const key of ['doors', 'chany']) {
+  for (const key of ['baths', 'doors', 'chany']) {
     if (!incoming.includes(key)) normalized.splice(normalized.indexOf(key), 1);
   }
   let insertAfter = 'projects';
-  for (const key of ['doors', 'chany']) {
+  for (const key of ['baths', 'doors', 'chany']) {
     if (incoming.includes(key)) { insertAfter = key; continue; }
     normalized.splice(normalized.indexOf(insertAfter) + 1, 0, key);
     insertAfter = key;
@@ -413,6 +424,27 @@ const DEFAULT_CONTACTS = {
 function slugify(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-+|-+$/g, '');
 }
+
+const transliterate = (value: string): string => {
+  const letters: Record<string, string> = {
+    а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y',
+    к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f',
+    х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya'
+  };
+  return value.toLowerCase().split('').map((letter) => letters[letter] ?? letter)
+    .join('').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+};
+
+const getProjectSlug = (project: HouseProject, projects: HouseProject[]): string => {
+  if (project.slug) return transliterate(project.slug) || `proekt-${project.id}`;
+  const base = transliterate(project.title) || 'proekt-doma';
+  const sameTitle = projects.filter((item) => (transliterate(item.title) || 'proekt-doma') === base);
+  if (sameTitle.length < 2) return base;
+  const dimensions = transliterate(`${project.area}-${project.floors}-${project.constructionType}`);
+  const withDimensions = `${base}-${dimensions || project.id.slice(-6)}`;
+  if (sameTitle.filter((item) => `${base}-${transliterate(`${item.area}-${item.floors}-${item.constructionType}`)}` === withDimensions).length < 2) return withDimensions;
+  return `${withDimensions}-${project.id.slice(-6)}`;
+};
 
 function journalSlugify(value: string) {
   const translit: Record<string, string> = {
@@ -498,27 +530,6 @@ const seedProjects: HouseProject[] = [
     images: ['https://images.unsplash.com/photo-1593696140826-c58b021acf8b?auto=format&fit=crop&w=1200&q=80'],
     area: '82 м²', floors: '1 этаж', bedrooms: '2 спальни', priceFrom: 'от 3 600 000 ₽', constructionType: 'Строительство дачных домов под ключ', category: 'house'
   },
-  {
-    id: 'b1', title: 'Баня Б-36', shortDescription: 'Компактная баня из бруса с террасой.',
-    fullDescription: 'Функциональная парная, моечная и комната отдыха в одном проекте.',
-    coverImage: 'https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80',
-    images: ['https://images.unsplash.com/photo-1600585154154-7125d447f3d9?auto=format&fit=crop&w=1200&q=80'],
-    area: '36 м²', floors: '1 этаж', bedrooms: '1 спальня', priceFrom: 'от 1 650 000 ₽', constructionType: 'Профилированный брус', category: 'bath', badge: 'Баня'
-  },
-  {
-    id: 'b2', title: 'Баня Б-52', shortDescription: 'Баня с гостевой комнатой и большой верандой.',
-    fullDescription: 'Проект для семьи: парная, душевая, санузел и уютная зона отдыха.',
-    coverImage: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=1200&q=80',
-    images: ['https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&w=1200&q=80'],
-    area: '52 м²', floors: '1 этаж', bedrooms: '2 спальни', priceFrom: 'от 2 240 000 ₽', constructionType: 'Клееный брус', category: 'bath', badge: 'Хит'
-  },
-  {
-    id: 'b3', title: 'Баня Б-74', shortDescription: 'Двухэтажная баня-дом с мансардой.',
-    fullDescription: 'Полноценный загородный формат: банный блок, кухня-гостиная и спальни на втором уровне.',
-    coverImage: 'https://images.unsplash.com/photo-1448630360428-65456885c650?auto=format&fit=crop&w=1200&q=80',
-    images: ['https://images.unsplash.com/photo-1571055107559-3e67626fa8be?auto=format&fit=crop&w=1200&q=80'],
-    area: '74 м²', floors: '2 этажа', bedrooms: '2 спальни', priceFrom: 'от 3 480 000 ₽', constructionType: 'Оцилиндрованное бревно', category: 'bath', badge: 'Премиум'
-  }
 ];
 
 const seedPages: Record<string, ContentPage> = {
@@ -812,7 +823,7 @@ function toPublicHouseListing(home: HouseListing): HouseListing {
 const ensureDataFile = (): void => {
   if (!fs.existsSync(DATA_FILE)) {
     const initial: DataStore = {
-      projects: seedProjects,
+      projects: [...seedProjects, ...gasblockCatalogProjects, ...bathCatalogProjects],
       lands: seedLands,
       pendingLands: [],
       homes: seedHomes,
@@ -834,8 +845,22 @@ const readData = (): DataStore => {
   ensureDataFile();
   const content = fs.readFileSync(DATA_FILE, 'utf-8');
   const parsed = JSON.parse(content) as Partial<DataStore>;
+  const projects = [...(parsed.projects || seedProjects)];
+  const projectIds = new Set(projects.map((project) => project.id));
+  for (const project of gasblockCatalogProjects) {
+    if (!projectIds.has(project.id)) {
+      projects.push(project);
+      projectIds.add(project.id);
+    }
+  }
+  for (const project of bathCatalogProjects) {
+    if (!projectIds.has(project.id)) {
+      projects.push(project);
+      projectIds.add(project.id);
+    }
+  }
   return {
-    projects: parsed.projects || seedProjects,
+    projects,
     lands: Array.isArray(parsed.lands) && parsed.lands.length
       ? parsed.lands.map((land) => normalizeLandPlot(land as Partial<LandPlot> & { image?: string }, (land as Partial<LandPlot>)?.id || `land_${Date.now()}`))
       : seedLands,
@@ -998,6 +1023,12 @@ app.use(cors());
 app.use(express.json());
 ensureAssetsDirs();
 
+app.use((req, res, next) => {
+  if (req.method !== 'GET' || req.path === '/' || req.path.startsWith('/api/') || !req.path.endsWith('/')) return next();
+  const cleanPath = req.path.replace(/\/+$/, '');
+  return res.redirect(301, `${cleanPath}${req.url.slice(req.path.length)}`);
+});
+
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -1017,7 +1048,7 @@ app.get('/api/construction-types', (_req, res) => res.json(CONSTRUCTION_TYPES));
 
 app.get('/api/projects', (_req, res) => {
   const data = readData();
-  res.json(data.projects);
+  res.json(data.projects.map((project) => ({ ...project, slug: getProjectSlug(project, data.projects) })));
 });
 app.get('/api/lands', (_req, res) => res.json((readData().lands || seedLands).map(toPublicLandPlot)));
 app.get('/api/lands/:id', (req, res) => {
@@ -1238,6 +1269,7 @@ app.get('/sitemap.xml', (req, res) => {
   const entries: Array<{ path: string; lastmod?: string }> = [
     { path: '/' },
     { path: '/dveri' },
+    ...['soul', 'siciliya', 'solo', 'line', 'yukon', 'erika', 'dizayn', 'modern', 'neoklassika', 'klassika', 'eko', 'ekogrand', 'kaliforniya', 'minimal', 'notte', 'smart', 'toskana'].map((slug) => ({ path: `/dveri/${slug}` })),
     { path: '/chany' },
     { path: '/projects' },
     { path: '/baths' },
@@ -1252,7 +1284,7 @@ app.get('/sitemap.xml', (req, res) => {
       'plastikovye-okna', 'dveri', 'remont', 'lestnitsy', 'svai', 'dizainer', 'landshaftnyy-dizayn',
       'mezhevanie', 'ipoteka-oformlenie', 'strahovanie'
     ].map((slug) => ({ path: `/services/${slug}` })),
-    ...data.projects.map((project) => ({ path: `/project/${encodeURIComponent(project.id)}` })),
+    ...data.projects.map((project) => ({ path: `/project/${encodeURIComponent(getProjectSlug(project, data.projects))}` })),
     ...data.homes.map((home) => ({ path: `/homes/${encodeURIComponent(home.id)}` })),
     ...data.lands.map((land) => ({ path: `/lands/${encodeURIComponent(land.id)}` })),
     ...data.journalCategories.map((category) => ({ path: `/journal/category/${encodeURIComponent(category.slug)}` })),
@@ -1897,8 +1929,15 @@ const renderSeoDocument = (html: string, title: string, description: string, can
   const safeCanonical = escapeHtml(canonicalUrl);
   let result = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${safeTitle}</title>`);
   result = result.replace(/<meta\s+name=["']description["'][^>]*\/?\s*>/i, `<meta name="description" content="${safeDescription}" />`);
+  if (!/<meta\s+name=["']description["']/i.test(result)) {
+    result = result.replace(/<\/head>/i, `<meta name="description" content="${safeDescription}" /></head>`);
+  }
+  if (/<link\s+rel=["']canonical["'][^>]*>/i.test(result)) {
+    result = result.replace(/<link\s+rel=["']canonical["'][^>]*>/i, `<link rel="canonical" href="${safeCanonical}" />`);
+  } else {
+    result = result.replace(/<\/head>/i, `<link rel="canonical" href="${safeCanonical}" /></head>`);
+  }
   const socialTags = [
-    `<link rel="canonical" href="${safeCanonical}" />`,
     `<meta property="og:title" content="${safeTitle}" />`,
     `<meta property="og:description" content="${safeDescription}" />`,
     `<meta property="og:type" content="website" />`,
@@ -1949,6 +1988,47 @@ app.get(['/dveri', '/chany'], (req, res, next) => {
   };
   const heroImage = `${origin}/api/assets/catalog/${doorsPage ? 'doors/soul' : 'chany/ready-4'}.webp`;
   const html = renderSeoDocument(fs.readFileSync(indexPath, 'utf8'), title, description, `${origin}${pagePath}`, schema, heroImage);
+  res.set('Cache-Control', 'public, max-age=300');
+  return res.type('html').send(html);
+});
+
+const doorCollectionSeo: Record<string, { name: string; description: string; image: string; models: string[] }> = {
+  soul: { name: 'Соул', description: 'Гладкое полотно с лаконичным геометрическим рисунком для современного интерьера. Подберём отделку, фурнитуру и комплект под размеры проёмов.', image: 'soul', models: [] },
+  siciliya: { name: 'Сицилия', description: 'Межкомнатные двери «Сицилия» с мягкой филёнчатой геометрией для классических и спокойных современных интерьеров.', image: 'sicily', models: [] },
+  solo: { name: 'Соло', description: 'Лаконичная коллекция дверей с ровной поверхностью. Обсудим цвета и комплектацию для квартиры или загородного дома.', image: 'solo', models: [] },
+  line: { name: 'Лайн', description: 'Современные межкомнатные двери с линейным рисунком. Подбор полотна, коробки, наличников и фурнитуры в Пензе.', image: 'line', models: [] },
+  yukon: { name: 'Юкон', description: 'Двери «Юкон» с выразительной древесной текстурой. Уточним доступные оттенки, размеры и состав комплекта.', image: 'yukon', models: [] },
+  erika: { name: 'Эрика', description: 'Коллекция межкомнатных дверей с декоративной филёнкой и спокойными классическими пропорциями.', image: 'erika', models: [] },
+  dizayn: { name: 'Дизайн', description: 'Межкомнатные двери коллекции «Дизайн»: выразительная геометрия и варианты отделки для индивидуального интерьера.', image: 'design', models: [] },
+  modern: { name: 'Модерн', description: 'Современные двери с лаконичными декоративными элементами. Подберём вариант с глухим полотном или остеклением.', image: 'modern', models: [] },
+  neoklassika: { name: 'Неоклассика', description: 'Коллекция дверей с симметричным рельефом и сдержанным классическим рисунком.', image: 'neoclassic', models: [] },
+  klassika: { name: 'Классика', description: 'Классические межкомнатные двери с рельефными панелями. Поможем подобрать цвет, фурнитуру и размеры.', image: 'classic', models: [] },
+  eko: { name: 'Эко', description: 'Двери с древесной фактурой для тёплых и натуральных интерьеров. Уточним сочетания оттенков и покрытий.', image: 'eco', models: [] },
+  ekogrand: { name: 'ЭкоГранд', description: 'Коллекция дверей с заметным древесным рисунком. Подберём оттенок и комплектующие под отделку помещения.', image: 'eco-grand', models: [] },
+  kaliforniya: { name: 'Калифорния', description: 'Двери «Калифорния» с рельефной фрезеровкой, повторяющей силуэт арок. Модели M451, M452 и M453; поможем выбрать цвет и комплектацию.', image: 'california-1', models: ['M451', 'M452', 'M453'] },
+  minimal: { name: 'Минимал', description: 'Лаконичные межкомнатные двери с гладким полотном для жилых и коммерческих помещений. В каталоге представлены варианты Минимал 1, 2 и 4.', image: 'minimal-1', models: ['Минимал 1', 'Минимал 2', 'Минимал 4'] },
+  notte: { name: 'Ноттэ', description: 'Двери «Ноттэ» с выразительной вертикальной фрезеровкой. Варианты M371 и M372; возможны декоративные вставки — уточним отделку и наличие.', image: 'notte-1', models: ['M371', 'M372'] },
+  smart: { name: 'Смарт', description: 'Каркасно-щитовые межкомнатные двери с современным рисунком и практичным подходом к комплектации. В коллекции представлены модели 01–05.', image: 'smart-1', models: ['Смарт 01', 'Смарт 02', 'Смарт 03', 'Смарт 04', 'Смарт 05'] },
+  toskana: { name: 'Тоскана', description: 'Коллекция «Тоскана» с выразительными линиями и классическим настроением. Варианты M411, M412, M421 и M422; подбор цвета и комплекта — по запросу.', image: 'toscana-1', models: ['M411', 'M412', 'M421', 'M422'] }
+};
+
+app.get('/dveri/:slug', (req, res, next) => {
+  const collection = doorCollectionSeo[req.params.slug];
+  if (!collection) return next();
+  const indexPath = path.join(FRONTEND_DIST, 'index.html');
+  if (!fs.existsSync(indexPath)) return next();
+  const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+  const canonical = `${origin}/dveri/${req.params.slug}`;
+  const title = `Межкомнатные двери «${collection.name}» в Пензе — каталог и подбор | Evtenia`;
+  const description = `${collection.description} Консультация, замер и расчёт заказа в Пензе и Пензенской области.`;
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      { '@type': 'CollectionPage', name: `Коллекция межкомнатных дверей «${collection.name}»`, description, url: canonical, inLanguage: 'ru-RU', mainEntity: { '@type': 'ItemList', itemListElement: collection.models.map((name, index) => ({ '@type': 'ListItem', position: index + 1, name })) } },
+      { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Главная', item: `${origin}/` }, { '@type': 'ListItem', position: 2, name: 'Двери', item: `${origin}/dveri` }, { '@type': 'ListItem', position: 3, name: collection.name, item: canonical }] }
+    ]
+  };
+  const html = renderSeoDocument(fs.readFileSync(indexPath, 'utf8'), title, description, canonical, schema, `${origin}/api/assets/catalog/doors/${collection.image}.webp`);
   res.set('Cache-Control', 'public, max-age=300');
   return res.type('html').send(html);
 });
@@ -2032,11 +2112,182 @@ app.get('/design', (req, res, next) => {
   return res.type('html').send(html);
 });
 
+app.get('/index.html', (_req, res) => res.redirect(301, '/'));
+
+app.get('/', (req, res, next) => {
+  const indexPath = path.join(FRONTEND_DIST, 'index.html');
+  if (!fs.existsSync(indexPath)) return next();
+  const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+  const html = renderSeoDocument(
+    fs.readFileSync(indexPath, 'utf8'),
+    'Строительство домов под ключ в Пензе — Evtenia',
+    'Строим каркасные и газобетонные дома в Пензе и Пензенской области. Подберём проект, рассчитаем комплектацию и сроки, поможем с фундаментом, инженерией и ипотекой.',
+    `${origin}/`,
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'Evtenia',
+      url: `${origin}/`,
+      inLanguage: 'ru-RU',
+      publisher: { '@type': 'Organization', name: 'Evtenia', url: `${origin}/`, telephone: DEFAULT_CONTACTS.contactPhone }
+    }
+  );
+  res.set('Cache-Control', 'public, max-age=300');
+  return res.type('html').send(html);
+});
+
+app.get('/project/:slug', (req, res, next) => {
+  const data = readData();
+  const project = data.projects.find((item) => item.id === req.params.slug || getProjectSlug(item, data.projects) === req.params.slug);
+  if (!project) return next();
+
+  const slug = getProjectSlug(project, data.projects);
+  if (req.params.slug !== slug) return res.redirect(301, `/project/${encodeURIComponent(slug)}`);
+
+  const indexPath = path.join(FRONTEND_DIST, 'index.html');
+  if (!fs.existsSync(indexPath)) return next();
+  const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+  const canonical = `${origin}/project/${encodeURIComponent(slug)}`;
+  const material = project.constructionType || 'частного дома';
+  const materialClause = /каркас/i.test(material) ? 'по каркасной технологии'
+    : /модул/i.test(material) ? 'по модульной технологии'
+      : /газобетон/i.test(material) ? 'из газобетона'
+        : /профилирован/i.test(material) ? 'из профилированного бруса'
+          : /клеен/i.test(material) ? 'из клеёного бруса'
+            : /оцилиндр/i.test(material) ? 'из оцилиндрованного бревна'
+              : /деревн/i.test(material) || /деревян/i.test(material) ? 'из дерева'
+                : `из ${material.toLowerCase()}`;
+  const isBathProject = project.category === 'bath';
+  const projectKind = isBathProject ? 'бани' : 'дома';
+  const parentSection = isBathProject ? 'baths' : 'projects';
+  const areaText = project.area?.trim() || '';
+  const areaLabel = areaText && /(?:м2|м²|кв\.?\s*м)$/i.test(areaText) ? areaText : areaText ? `${areaText} м²` : '';
+  const descriptionText = `${project.shortDescription || project.fullDescription || `Проект ${projectKind} «${project.title}»`}`.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  const description = `${descriptionText.slice(0, 210)}${descriptionText.length > 210 ? '…' : ''} Площадь — ${project.area || 'уточняется'}, этажность — ${project.floors || 'по проекту'}, ${material}. Стоимость и комплектацию ${projectKind} в Пензе рассчитаем индивидуально.`;
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        name: `${project.title} — проект ${projectKind}`,
+        description,
+        url: canonical,
+        inLanguage: 'ru-RU',
+        primaryImageOfPage: project.coverImage || undefined,
+        about: {
+          '@type': 'Service',
+          name: `Строительство ${isBathProject ? 'бани' : 'дома'} «${project.title}»`,
+          serviceType: `${isBathProject ? 'Строительство бань' : 'Строительство домов'} ${materialClause}`,
+          areaServed: { '@type': 'AdministrativeArea', name: 'Пенза и Пензенская область' },
+          provider: { '@type': 'Organization', name: 'Evtenia', url: `${origin}/`, telephone: DEFAULT_CONTACTS.contactPhone }
+        }
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Главная', item: `${origin}/` },
+          { '@type': 'ListItem', position: 2, name: isBathProject ? 'Проекты бань' : 'Проекты домов', item: `${origin}/${parentSection}` },
+          { '@type': 'ListItem', position: 3, name: project.title, item: canonical }
+        ]
+      }
+    ]
+  };
+  const image = project.coverImage?.startsWith('http') ? project.coverImage.replace(/^http:/, 'https:') : `${origin}${project.coverImage || ''}`;
+  const html = renderSeoDocument(
+    fs.readFileSync(indexPath, 'utf8'),
+    `${project.title} — проект ${projectKind}${areaLabel ? ` ${areaLabel}` : ''} ${materialClause} | Evtenia`,
+    description,
+    canonical,
+    schema,
+    image
+  );
+  res.set('Cache-Control', 'public, max-age=300');
+  return res.type('html').send(html);
+});
+
 app.use('/assets', express.static(ASSETS_DIR));
 app.use('/api/assets', express.static(ASSETS_DIR));
 if (fs.existsSync(FRONTEND_DIST)) {
   app.use(express.static(FRONTEND_DIST));
-  app.get(/^(?!\/api).*/, (_req, res) => res.sendFile(path.join(FRONTEND_DIST, 'index.html')));
+  app.get(/^(?!\/api).*/, (req, res) => {
+    const pathname = decodeURIComponent(req.path).replace(/\/+$/, '') || '/';
+    const data = readData();
+    const exactPages: Record<string, { title: string; description: string }> = {
+      '/projects': { title: 'Проекты домов в Пензе — каталог планировок и цен | Evtenia', description: 'Каталог проектов частных домов для строительства в Пензе и Пензенской области: каркасные, модульные и газобетонные решения. Подберите площадь и получите индивидуальный расчёт.' },
+      '/baths': { title: 'Проекты бань в Пензе — планировки и строительство | Evtenia', description: 'Проекты бань для участка в Пензе и области: варианты планировок, комплектаций и строительства. Подберём решение и рассчитаем стоимость под задачу.' },
+      '/homes': { title: 'Готовые дома в Пензе и области — каталог объявлений | Evtenia', description: 'Готовые дома и коттеджи в Пензе и Пензенской области. Сравните площадь, расположение и цену, задайте вопрос и договоритесь о просмотре.' },
+      '/lands': { title: 'Земельные участки в Пензе и области — каталог | Evtenia', description: 'Земельные участки в Пензе и Пензенской области: подбор по площади, району и назначению. Поможем уточнить коммуникации и организовать просмотр.' },
+      '/journal': { title: 'Журнал о строительстве и загородной жизни — Evtenia', description: 'Практические статьи о строительстве домов, выборе проектов, фундаментах, инженерных системах, отделке и загородной жизни в Пензенской области.' },
+      '/contacts': { title: 'Контакты Evtenia — строительство домов в Пензе', description: `Свяжитесь с Evtenia в Пензе: ${DEFAULT_CONTACTS.contactPhone}. Обсудим строительство дома, проект, услуги и ориентировочную смету.` },
+      '/portfolio': { title: 'Портфолио домов и объектов Evtenia — Пенза', description: 'Примеры проектов и выполненных работ Evtenia в Пензе и Пензенской области. Посмотрите решения и обсудите подходящий вариант с командой.' },
+      '/privacy-policy': { title: 'Политика конфиденциальности — Evtenia', description: 'Информация об обработке персональных данных пользователей сайта Evtenia.' },
+      '/mortgage-calculator': { title: 'Ипотечный калькулятор на дом — рассчитать платёж | Evtenia', description: 'Рассчитайте ориентировочный ипотечный платёж на строительство или покупку дома. Условия зависят от банка, программы и параметров заявки.' },
+      '/furniture': { title: 'Мебель для дома в Пензе — подбор и заказ | Evtenia', description: 'Подбор мебели для дома и квартиры в Пензе: кухни, гостиные, спальни и решения под размеры помещения и стиль интерьера.' }
+    };
+    let page = exactPages[pathname];
+    let valid = Boolean(page);
+    const contentPage = data.pages[pathname.replace(/^\//, '')]
+      || (pathname.startsWith('/furniture/') ? data.pages[`furniture-${pathname.slice('/furniture/'.length).replace(/\//g, '-')}`] : undefined);
+    if (!valid && pathname.startsWith('/services/')) {
+      const service = data.pages[`services-${pathname.slice('/services/'.length)}`];
+      if (service) {
+        valid = true;
+        page = { title: `${service.title} в Пензе — стоимость и сроки | Evtenia`, description: `Услуга «${service.title}» в Пензе и Пензенской области: состав работ, ориентиры по цене и срокам. Оставьте заявку на предварительный расчёт.` };
+      }
+    }
+    if (!valid && pathname.startsWith('/discounts/')) {
+      const promotion = data.pages[`discounts-${pathname.slice('/discounts/'.length)}`];
+      if (promotion) {
+        valid = true;
+        page = { title: `${promotion.title} — Evtenia`, description: promotion.title };
+      }
+    }
+    if (!valid && contentPage && pathname.startsWith('/furniture/')) {
+      valid = true;
+      page = { title: `${contentPage.title} — мебель в Пензе | Evtenia`, description: `Подбор мебели ${contentPage.title} для дома и квартиры в Пензе. Уточните размеры, варианты исполнения и комплектацию у специалистов Evtenia.` };
+    }
+    if (!valid && /^\/homes\/[^/]+$/.test(pathname)) {
+      const home = data.homes.find((item) => item.id === pathname.slice('/homes/'.length));
+      if (home) { valid = true; page = { title: `${home.title} — готовый дом в Пензе | Evtenia`, description: `${home.description || 'Готовый дом'} Площадь ${home.area}, цена ${home.price}. Уточните актуальность и условия просмотра.` }; }
+    }
+    if (!valid && /^\/lands\/[^/]+$/.test(pathname)) {
+      const land = data.lands.find((item) => item.id === pathname.slice('/lands/'.length));
+      if (land) { valid = true; page = { title: `Участок ${land.area} в ${land.district} — Evtenia`, description: `${land.description || 'Земельный участок'} Площадь ${land.area}, район ${land.district}, ориентир цены ${land.price}. Условия уточняйте перед просмотром.` }; }
+    }
+    if (!valid && pathname.startsWith('/journal/category/')) {
+      const slug = pathname.slice('/journal/category/'.length);
+      const category = data.journalCategories.find((item) => item.slug === slug);
+      if (category) { valid = true; page = { title: `${category.name} — журнал Evtenia`, description: category.description }; }
+    }
+    if (!valid && pathname.startsWith('/journal/')) {
+      const slug = pathname.slice('/journal/'.length);
+      const article = data.journalArticles.find((item) => item.slug === slug && item.status === 'published');
+      if (article) { valid = true; page = { title: article.seoTitle || `${article.title} — журнал Evtenia`, description: article.seoDescription || article.excerpt }; }
+    }
+    const isAdminPage = pathname.endsWith(ADMIN_PATH);
+    if (!valid && isAdminPage) { valid = true; page = { title: 'Администрирование — Evtenia', description: 'Панель управления сайтом Evtenia.' }; }
+
+    const indexPath = path.join(FRONTEND_DIST, 'index.html');
+    if (!fs.existsSync(indexPath)) return res.status(valid ? 200 : 404).send('Not found');
+    const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+    const canonical = `${origin}${pathname === '/' ? '/' : pathname}`;
+    if (!valid || !page) {
+      const notFoundHtml = renderSeoDocument(fs.readFileSync(indexPath, 'utf8'), 'Страница не найдена — Evtenia', 'Запрошенная страница не найдена. Перейдите в каталог проектов или на главную страницу Evtenia.', canonical)
+        .replace('</head>', '<meta name="robots" content="noindex,follow" /></head>');
+      return res.status(404).type('html').send(notFoundHtml);
+    }
+    const bathProjects = pathname === '/baths' ? data.projects.filter((project) => project.category === 'bath') : [];
+    const schema = pathname === '/baths' ? {
+      '@context': 'https://schema.org',
+      '@graph': [
+        { '@type': 'CollectionPage', name: page.title, description: page.description, url: canonical, inLanguage: 'ru-RU' },
+        { '@type': 'ItemList', name: 'Типовые проекты бань для Пензы и Пензенской области', itemListElement: bathProjects.map((project, index) => ({ '@type': 'ListItem', position: index + 1, name: project.title, url: `${origin}/project/${encodeURIComponent(getProjectSlug(project, data.projects))}` })) }
+      ]
+    } : undefined;
+    const rendered = renderSeoDocument(fs.readFileSync(indexPath, 'utf8'), page.title, page.description, canonical, schema, schema ? `${origin}/api/assets/projects/catalog/bath-family.webp` : undefined);
+    res.set('Cache-Control', 'public, max-age=300');
+    return res.type('html').send(rendered);
+  });
 }
 
 syncManagedJournalArticles();
