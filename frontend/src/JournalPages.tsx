@@ -1,5 +1,14 @@
 import React, { ComponentType, useEffect, useMemo, useState } from 'react';
 
+function shortenSeoValue(value: string, maxLength: number) {
+  const clean = value.replace(/\s+/g, ' ').trim();
+  if (clean.length <= maxLength) return clean;
+  const initial = clean.slice(0, Math.max(1, maxLength - 1));
+  const lastSpace = initial.lastIndexOf(' ');
+  const excerpt = lastSpace >= Math.floor(initial.length * .6) ? initial.slice(0, lastSpace) : initial;
+  return `${excerpt.trim()}…`;
+}
+
 export type JournalCategory = {
   id: string;
   name: string;
@@ -141,14 +150,14 @@ export function JournalIndexPage({ apiBase, Header, Footer, resolveMedia, catego
   const rest = featured ? articles.filter((article) => article.id !== featured.id) : articles;
 
   useEffect(() => {
-    document.title = activeCategory ? `${activeCategory.name} — Журнал Evtenia` : 'Журнал о строительстве домов — Evtenia';
+    document.title = shortenSeoValue(activeCategory ? `${activeCategory.name} — Журнал Evtenia` : 'Журнал о строительстве домов — Evtenia', 70);
     let description = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
     if (!description) {
       description = document.createElement('meta');
       description.name = 'description';
       document.head.appendChild(description);
     }
-    description.content = activeCategory?.description || 'Практический журнал Evtenia о технологиях строительства домов, проектах, фундаментах, инженерии, ипотеке и благоустройстве.';
+    description.content = shortenSeoValue(activeCategory?.description || 'Практический журнал Evtenia о технологиях строительства домов, проектах, фундаментах, инженерии, ипотеке и благоустройстве.', 160);
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (!canonical) {
       canonical = document.createElement('link');
@@ -231,22 +240,24 @@ export function JournalArticlePage({ apiBase, Header, Footer, resolveMedia, slug
 
   useEffect(() => {
     if (!article) return;
-    document.title = article.seoTitle || `${article.title} — Evtenia`;
+    const seoTitle = shortenSeoValue(article.seoTitle || `${article.title} — Evtenia`, 70);
+    const seoDescription = shortenSeoValue(article.seoDescription || article.excerpt, 160);
+    document.title = seoTitle;
     let description = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
     if (!description) { description = document.createElement('meta'); description.name = 'description'; document.head.appendChild(description); }
-    description.content = article.seoDescription || article.excerpt;
+    description.content = seoDescription;
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.appendChild(canonical); }
     canonical.href = `${window.location.origin}/journal/${article.slug}`;
     const image = article.coverImage ? resolveMedia(article.coverImage) : `${window.location.origin}/assets/logo_small.png`;
     setMeta('meta[property="og:type"]', 'property', 'og:type', 'article');
-    setMeta('meta[property="og:title"]', 'property', 'og:title', article.seoTitle || article.title);
-    setMeta('meta[property="og:description"]', 'property', 'og:description', article.seoDescription || article.excerpt);
+    setMeta('meta[property="og:title"]', 'property', 'og:title', seoTitle);
+    setMeta('meta[property="og:description"]', 'property', 'og:description', seoDescription);
     setMeta('meta[property="og:url"]', 'property', 'og:url', canonical.href);
     setMeta('meta[property="og:image"]', 'property', 'og:image', image);
     setMeta('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
-    setMeta('meta[name="twitter:title"]', 'name', 'twitter:title', article.seoTitle || article.title);
-    setMeta('meta[name="twitter:description"]', 'name', 'twitter:description', article.seoDescription || article.excerpt);
+    setMeta('meta[name="twitter:title"]', 'name', 'twitter:title', seoTitle);
+    setMeta('meta[name="twitter:description"]', 'name', 'twitter:description', seoDescription);
     setMeta('meta[name="twitter:image"]', 'name', 'twitter:image', image);
     const previous = document.getElementById('journal-article-schema');
     previous?.remove();

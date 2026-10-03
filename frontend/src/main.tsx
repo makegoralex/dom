@@ -894,8 +894,29 @@ function getProjectPath(project: HouseProject) {
   return `/project/${project.slug || semanticSlug}`;
 }
 
+function limitSeoText(value: string, maxLength: number) {
+  const clean = value.replace(/\s+/g, ' ').trim();
+  if (clean.length <= maxLength) return clean;
+  const initial = clean.slice(0, Math.max(1, maxLength - 1));
+  const lastSpace = initial.lastIndexOf(' ');
+  const excerpt = lastSpace >= Math.floor(initial.length * .6) ? initial.slice(0, lastSpace) : initial;
+  return `${excerpt.trim()}…`;
+}
+
+function compactMoneyLabel(value: string) {
+  const raw = String(value || '').trim();
+  if (!raw || /по\s+запросу/i.test(raw)) return 'по запросу';
+  const amount = Number(raw.replace(/\D/g, ''));
+  if (!amount) return raw;
+  if (amount >= 1_000_000) return `${(amount / 1_000_000).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} млн ₽`;
+  if (amount >= 100_000) return `${Math.round(amount / 1_000).toLocaleString('ru-RU')} тыс. ₽`;
+  return `${amount.toLocaleString('ru-RU')} ₽`;
+}
+
 function writePageSEO({ title, description, path, image, schema }: { title: string; description: string; path: string; image?: string; schema?: unknown }) {
-  document.title = title;
+  const safeTitle = limitSeoText(title, 70);
+  const safeDescription = limitSeoText(description, 160);
+  document.title = safeTitle;
   const setMeta = (key: string, content: string, property = false) => {
     const selector = property ? `meta[property="${key}"]` : `meta[name="${key}"]`;
     let element = document.head.querySelector(selector) as HTMLMetaElement | null;
@@ -907,9 +928,9 @@ function writePageSEO({ title, description, path, image, schema }: { title: stri
     }
     element.content = content;
   };
-  setMeta('description', description);
-  setMeta('og:title', title, true);
-  setMeta('og:description', description, true);
+  setMeta('description', safeDescription);
+  setMeta('og:title', safeTitle, true);
+  setMeta('og:description', safeDescription, true);
   setMeta('og:type', 'website', true);
   setMeta('og:url', `${window.location.origin}${path}`, true);
   if (image) setMeta('og:image', image.startsWith('http') ? image : `${window.location.origin}${image}`, true);
@@ -2837,14 +2858,16 @@ function LandDetailPage() {
     if (!land) return undefined;
     const previousTitle = document.title;
     const rawArea = land.area.trim();
-    const areaLabel = /^\d+(?:[.,]\d+)?$/.test(rawArea) ? `${rawArea.replace(',', '.')} соток` : rawArea;
+    const areaLabel = /^\d+(?:[.,]\d+)?$/.test(rawArea) ? `${rawArea.replace('.', ',')} соток` : rawArea.replace(/(\d)\.(\d)/g, '$1,$2');
     const landText = land.description || '';
-    const purpose = land.purpose?.trim() || land.landCategory?.trim() || (/лпх/i.test(landText) ? 'ЛПХ' : /500\s*кв\.?\s*м/i.test(landText) ? '500 м²' : '');
+    const purpose = land.purpose?.trim() || land.landCategory?.trim() || (/ижс/i.test(landText) ? 'ИЖС' : /лпх/i.test(landText) ? 'ЛПХ' : /500\s*кв\.?\s*м/i.test(landText) ? '500 м²' : '');
+    const locality = land.district.split(',').map((part) => part.trim()).find((part) => /^(?:г\.|с\.|п\.|пос\.|дер\.|село\b|поселок\b)/i.test(part));
+    const district = locality || land.district.split(',')[0].trim() || 'Пензенская область';
     const rawPrice = String(land.price || '').trim();
     const priceAmount = Number(rawPrice.replace(/\D/g, ''));
     const landPrice = priceAmount > 0 ? `${priceAmount.toLocaleString('ru-RU').replace(/\u00a0/g, ' ')} ₽` : rawPrice;
-    const title = `Участок ${areaLabel}${purpose ? ` ${purpose}` : ''} в ${land.district} — ${landPrice} | Evtenia`;
-    const description = `${landText || 'Земельный участок в Пензе и Пензенской области.'} Площадь ${areaLabel}; назначение ${purpose || 'уточняется'}; цена ${landPrice}. Уточните актуальность и условия просмотра.`;
+    const title = limitSeoText(`Участок ${areaLabel}${purpose ? ` ${purpose}` : ''} в ${district} — ${compactMoneyLabel(rawPrice)} | Evtenia`, 70);
+    const description = limitSeoText(`Земельный участок в ${district}, Пензе и Пензенской области. Площадь ${areaLabel}; назначение ${purpose || 'уточняется'}; цена ${landPrice}. Уточните актуальность перед просмотром.`, 160);
     document.title = title;
     let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
     if (!meta) { meta = document.createElement('meta'); meta.name = 'description'; document.head.appendChild(meta); }

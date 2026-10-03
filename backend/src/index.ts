@@ -1978,9 +1978,18 @@ const escapeHtml = (value: string): string => value
   .replace(/"/g, '&quot;')
   .replace(/'/g, '&#39;');
 
+const truncateSeoText = (value: string, maxLength: number): string => {
+  const clean = value.replace(/\s+/g, ' ').trim();
+  if (clean.length <= maxLength) return clean;
+  const initial = clean.slice(0, Math.max(1, maxLength - 1));
+  const lastSpace = initial.lastIndexOf(' ');
+  const excerpt = lastSpace >= Math.floor(initial.length * .6) ? initial.slice(0, lastSpace) : initial;
+  return `${excerpt.trim()}…`;
+};
+
 const renderSeoDocument = (html: string, title: string, description: string, canonicalUrl: string, schema?: unknown, imageUrl?: string): string => {
-  const safeTitle = escapeHtml(title);
-  const safeDescription = escapeHtml(description);
+  const safeTitle = escapeHtml(truncateSeoText(title, 70));
+  const safeDescription = escapeHtml(truncateSeoText(description, 160));
   const safeCanonical = escapeHtml(canonicalUrl);
   let result = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${safeTitle}</title>`);
   result = result.replace(/<meta\s+name=["']description["'][^>]*\/?\s*>/i, `<meta name="description" content="${safeDescription}" />`);
@@ -2282,8 +2291,11 @@ app.get('/project/:slug', (req, res, next) => {
   const cleanTitle = project.title.replace(/[_-]+/g, ' ').trim();
   const titleBase = isBathProject
     ? (/бан/i.test(cleanTitle) ? cleanTitle : `Баня «${cleanTitle}»`)
-    : (/дом/i.test(cleanTitle) ? cleanTitle : `Проект дома «${cleanTitle}»`);
-  const seoTitle = `${titleBase}${areaLabel ? `, ${areaLabel}` : ''} — ${formatSeoPriceCompact(project.priceFrom, true)} | Evtenia`;
+    : project.catalogProject && project.projectCode
+      ? `Газобетонный дом №${project.projectCode}`
+      : (/дом/i.test(cleanTitle) ? cleanTitle : `Проект дома «${cleanTitle}»`);
+  const titleSuffix = `${areaLabel ? `, ${areaLabel}` : ''} — ${formatSeoPriceCompact(project.priceFrom, true)} | Evtenia`;
+  const seoTitle = `${truncateSeoText(titleBase, 70 - titleSuffix.length)}${titleSuffix}`;
   const description = composeSeoDescription(
     `${titleKind === 'баня' ? 'Баня' : 'Дом'} «${cleanTitle}»`,
     `${areaLabel || 'площадь уточняется'}, ${formatSeoFloors(project.floors)}; ${material.toLowerCase()}; цена ${priceLabel}. Пенза и область — расчёт комплектации.`
@@ -2387,15 +2399,17 @@ if (fs.existsSync(FRONTEND_DIST)) {
       const land = data.lands.find((item) => item.id === pathname.slice('/lands/'.length));
       if (land) {
         const rawArea = land.area.trim();
-        const areaLabel = /^\d+(?:[.,]\d+)?$/.test(rawArea) ? `${rawArea.replace(',', '.')} соток` : rawArea;
+        const areaLabel = /^\d+(?:[.,]\d+)?$/.test(rawArea) ? `${rawArea.replace('.', ',')} соток` : rawArea.replace(/(\d)\.(\d)/g, '$1,$2');
         const landText = land.description || '';
-        const purpose = land.purpose?.trim() || land.landCategory?.trim() || (/лпх/i.test(landText) ? 'ЛПХ' : /500\s*кв\.?\s*м/i.test(landText) ? '500 м²' : '');
+        const purpose = land.purpose?.trim() || land.landCategory?.trim() || (/ижс/i.test(landText) ? 'ИЖС' : /лпх/i.test(landText) ? 'ЛПХ' : /500\s*кв\.?\s*м/i.test(landText) ? '500 м²' : '');
         const landPrice = formatSeoPrice(land.price);
+        const locality = land.district.split(',').map((part) => part.trim()).find((part) => /^(?:г\.|с\.|п\.|пос\.|дер\.|село\b|поселок\b)/i.test(part));
+        const district = locality || land.district.split(',')[0].trim() || 'Пензенская область';
         const qualifier = purpose ? ` ${purpose}` : '';
         valid = true;
         page = {
-          title: `Участок ${areaLabel}${qualifier} в ${land.district} — ${landPrice} | Evtenia`,
-          description: composeSeoDescription(landText || 'Земельный участок в Пензе и Пензенской области.', `Участок ${areaLabel}; назначение ${purpose || 'уточняется'}; цена ${landPrice}. Уточните актуальность перед просмотром.`)
+          title: `Участок ${areaLabel}${qualifier} в ${district} — ${formatSeoPriceCompact(land.price)} | Evtenia`,
+          description: composeSeoDescription(`Земельный участок в ${district}, Пензе и Пензенской области.`, `Площадь ${areaLabel}; назначение ${purpose || 'уточняется'}; цена ${landPrice}. Уточните актуальность перед просмотром.`)
         };
       }
     }
