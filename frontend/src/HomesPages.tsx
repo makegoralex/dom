@@ -47,6 +47,14 @@ const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1600585154340-be6161a5
 const MARKET_LABELS: Record<HouseMarketType, string> = { new: 'Новый дом', secondary: 'Вторичное жильё' };
 const parseNumber = (value: string) => Number(String(value || '').replace(/[^\d]/g, '') || 0);
 
+function compactListingPrice(value: string) {
+  const amount = parseNumber(value);
+  if (!amount) return 'по запросу';
+  if (amount >= 1_000_000) return `${(amount / 1_000_000).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} млн ₽`;
+  if (amount >= 100_000) return `${Math.round(amount / 1_000).toLocaleString('ru-RU')} тыс. ₽`;
+  return `${new Intl.NumberFormat('ru-RU').format(amount)} ₽`;
+}
+
 function listingExcerpt(value: string, maxLength = 190) {
   const cleaned = String(value || '')
     .replace(/[•–—-]\s*/g, ' · ')
@@ -114,7 +122,6 @@ function HouseGallery({ home, resolveMedia }: { home: HouseListing; resolveMedia
   return (
     <div className="home-gallery">
       <img src={resolveMedia(images[active] || FALLBACK_IMAGE)} alt={`${home.title}, фото ${active + 1}`} />
-      <img className="evtenia-watermark" src={resolveMedia('/assets/logo_small.png')} alt="" aria-hidden="true" />
       <span className={`home-market-badge ${home.marketType}`}>{MARKET_LABELS[home.marketType]}</span>
       <span className="home-photo-count">▧ {images.length}</span>
       {images.length > 1 ? <div className="home-gallery-controls"><button type="button" onClick={() => setActive((active - 1 + images.length) % images.length)}>←</button><button type="button" onClick={() => setActive((active + 1) % images.length)}>→</button></div> : null}
@@ -243,7 +250,7 @@ export function HomeDetailPage({ apiBase, Header, Footer, LeadModal, resolveMedi
   const [notFound, setNotFound] = useState(false);
   const [requestOpen, setRequestOpen] = useState(false);
   useEffect(() => { fetch(`${apiBase}/api/homes/${encodeURIComponent(id)}`).then((response) => response.ok ? response.json() : Promise.reject()).then(setHome).catch(() => setNotFound(true)); }, [apiBase, id]);
-  useEffect(() => { if (home) document.title = `${home.title} — ${home.price} | Evtenia`; }, [home]);
+  useEffect(() => { if (home) document.title = `Готовый дом, ${home.area || 'площадь уточняется'} — ${compactListingPrice(home.price)} | Evtenia`; }, [home]);
   if (notFound) return <><Header /><main className="internal-body"><div className="container homes-not-found"><h1>Дом не найден</h1><a href="/homes">Вернуться в каталог</a></div></main><Footer /></>;
   if (!home) return <><Header /><main className="internal-body"><div className="container"><p>Загружаем дом…</p></div></main><Footer /></>;
   const schema = { '@context': 'https://schema.org', '@type': 'SingleFamilyResidence', name: home.title, description: home.description, image: home.images, address: home.address, floorSize: home.area, offers: { '@type': 'Offer', priceCurrency: 'RUB', price: parseNumber(home.price), availability: 'https://schema.org/InStock' } };

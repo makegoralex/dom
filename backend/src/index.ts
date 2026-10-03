@@ -435,7 +435,7 @@ const transliterate = (value: string): string => {
     .join('').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 };
 
-const getProjectSlug = (project: HouseProject, projects: HouseProject[]): string => {
+const getLegacyProjectSlug = (project: HouseProject, projects: HouseProject[]): string => {
   if (project.slug) return transliterate(project.slug) || `proekt-${project.id}`;
   const base = transliterate(project.title) || 'proekt-doma';
   const sameTitle = projects.filter((item) => (transliterate(item.title) || 'proekt-doma') === base);
@@ -444,6 +444,51 @@ const getProjectSlug = (project: HouseProject, projects: HouseProject[]): string
   const withDimensions = `${base}-${dimensions || project.id.slice(-6)}`;
   if (sameTitle.filter((item) => `${base}-${transliterate(`${item.area}-${item.floors}-${item.constructionType}`)}` === withDimensions).length < 2) return withDimensions;
   return `${withDimensions}-${project.id.slice(-6)}`;
+};
+
+const projectSlugBase = (project: HouseProject): string => {
+  const titleSlug = transliterate(project.slug || project.title) || `proekt-${project.id}`;
+  if (project.category === 'bath') return /^ban/.test(titleSlug) ? titleSlug : `proekt-bani-${titleSlug}`;
+  return /(^|-)dom(-|$)|(^|-)doma(-|$)|(^|-)house(-|$)/.test(titleSlug) ? titleSlug : `proekt-doma-${titleSlug}`;
+};
+
+const getProjectSlug = (project: HouseProject, projects: HouseProject[]): string => {
+  const base = projectSlugBase(project);
+  const sameSlug = projects.filter((item) => projectSlugBase(item) === base);
+  if (sameSlug.length < 2) return base;
+  const dimensions = transliterate(`${project.area}-${project.floors}-${project.constructionType}`);
+  const withDimensions = `${base}-${dimensions || project.id.slice(-6)}`;
+  if (sameSlug.filter((item) => `${base}-${transliterate(`${item.area}-${item.floors}-${item.constructionType}`)}` === withDimensions).length < 2) return withDimensions;
+  return `${withDimensions}-${project.id.slice(-6)}`;
+};
+
+const enrichHouseProjectCopy = (project: HouseProject): HouseProject => {
+  if (project.category === 'bath' || project.catalogProject) return project;
+  const title = project.title.replace(/[_-]+/g, ' ').trim();
+  const area = project.area?.trim() || 'по запросу';
+  const areaLabel = /(?:м2|м²|кв\.?\s*м)$/i.test(area) || area === 'по запросу' ? area : `${area} м²`;
+  const floors = project.floors?.trim() || 'по проекту';
+  const rooms = project.bedrooms?.trim() || 'состав помещений уточняется';
+  const material = project.constructionType?.trim() || 'индивидуальная технология';
+  const price = project.priceFrom?.trim() || 'по запросу';
+  const shortDescription = project.shortDescription?.trim() && project.shortDescription.trim().length > 35
+    ? project.shortDescription.trim()
+    : `Проект дома «${title}»: ${areaLabel}, ${floors}, ${material.toLowerCase()}. Планировку и комплектацию адаптируем под участок в Пензе или Пензенской области.`;
+  const fullDescription = project.fullDescription?.trim() && project.fullDescription.trim().length >= 120
+    ? project.fullDescription.trim()
+    : [
+        `Проект «${title}» — отправная точка для подбора дома площадью ${areaLabel}. Указанные ${floors.toLowerCase()} и помещения (${rooms.toLowerCase()}) помогают оценить масштаб решения; итоговую планировку сверяем с составом семьи и тем, как вы планируете пользоваться домом.`,
+        `Перед расчётом обсуждаем участок, подъезд, рельеф, посадку здания и исходные инженерные условия. Проверяем, какие изменения допустимы для выбранной технологии — ${material.toLowerCase()} — и какие решения потребуют отдельной проработки.`,
+        `На странице указана предварительная цена ${price}. Это ориентир для знакомства с проектом, а не публичная оферта или готовая смета: стоимость зависит от основания, комплектации, инженерных систем, отделки, доставки и актуальных цен на материалы.`,
+        `После заявки уточним желаемую комплектацию и сроки, подготовим расчёт для Пензы или населённого пункта Пензенской области и перечислим, что включено в стоимость. До согласования работ дополнительные позиции и их цена отдельно обсуждаются.`
+      ].join('\n\n');
+  return { ...project, shortDescription, fullDescription };
+};
+
+const enrichJournalCategoryCopy = (category: JournalCategory): JournalCategory => {
+  const description = category.description?.replace(/\s+/g, ' ').trim() || `${category.name}: материалы о строительстве и загородной жизни.`;
+  if (description.length >= 100) return { ...category, description };
+  return { ...category, description: `${description.replace(/[.!?]+$/, '')}. Практические разборы и рекомендации Evtenia для Пензы и Пензенской области.` };
 };
 
 function journalSlugify(value: string) {
@@ -870,7 +915,7 @@ const readData = (): DataStore => {
     }
   }
   return {
-    projects,
+    projects: projects.map(enrichHouseProjectCopy),
     lands: Array.isArray(parsed.lands) && parsed.lands.length
       ? parsed.lands.map((land) => normalizeLandPlot(land as Partial<LandPlot> & { image?: string }, (land as Partial<LandPlot>)?.id || `land_${Date.now()}`))
       : seedLands,
@@ -901,9 +946,9 @@ const readData = (): DataStore => {
       ? parsed.lesnoeOzeroPlots.map((plot) => normalizeLesnoeOzeroPlot(plot, plot.id))
       : seedLesnoeOzeroPlots,
     portfolio: parsed.portfolio || seedPortfolio,
-    journalCategories: Array.isArray(parsed.journalCategories) && parsed.journalCategories.length
+    journalCategories: (Array.isArray(parsed.journalCategories) && parsed.journalCategories.length
       ? parsed.journalCategories
-      : seedJournalCategories,
+      : seedJournalCategories).map(enrichJournalCategoryCopy),
     journalArticles: Array.isArray(parsed.journalArticles) ? parsed.journalArticles : seedJournalArticles,
     leads: parsed.leads || [],
     pages: { ...seedPages, ...(parsed.pages || {}) },
@@ -2029,8 +2074,8 @@ app.get('/dveri/:slug', (req, res, next) => {
   if (!fs.existsSync(indexPath)) return next();
   const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
   const canonical = `${origin}/dveri/${req.params.slug}`;
-  const title = `Межкомнатные двери «${collection.name}» в Пензе — каталог и подбор | Evtenia`;
-  const description = `${collection.description} Консультация, замер и расчёт заказа в Пензе и Пензенской области.`;
+  const title = `Двери «${collection.name}» в Пензе — коллекция | Evtenia`;
+  const description = composeSeoDescription(collection.description, 'Каталог и подбор в Пензе; замер и расчёт заказа.');
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -2155,18 +2200,43 @@ const formatSeoPrice = (value: unknown, startsFrom = false): string => {
   return `${prefix}${amount.toLocaleString('ru-RU').replace(/\u00a0/g, ' ')} ₽`;
 };
 
+const formatSeoPriceCompact = (value: unknown, startsFrom = false): string => {
+  const raw = String(value ?? '').trim();
+  if (!raw || /по\s+запросу/i.test(raw)) return 'по запросу';
+  const amount = Number(raw.replace(/\D/g, ''));
+  if (!Number.isFinite(amount) || amount <= 0) return raw;
+  const prefix = startsFrom || /^от\b/i.test(raw) ? 'от ' : '';
+  if (amount >= 1_000_000) return `${prefix}${(amount / 1_000_000).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} млн ₽`;
+  if (amount >= 100_000) return `${prefix}${Math.round(amount / 1_000).toLocaleString('ru-RU')} тыс. ₽`;
+  return `${prefix}${amount.toLocaleString('ru-RU')} ₽`;
+};
+
 const composeSeoDescription = (summary: string, details: string, maxLength = 160): string => {
-  const cleanSummary = summary.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-  const summaryLimit = Math.max(36, maxLength - details.length - 1);
-  const excerpt = cleanSummary.length > summaryLimit
+  const clean = (value: string) => value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  const cleanSummary = clean(summary);
+  const cleanDetails = clean(details);
+  if (!cleanDetails) return cleanSummary.slice(0, maxLength);
+  const available = maxLength - cleanDetails.length - 1;
+  if (available >= 28) {
+    const excerpt = cleanSummary.length > available
+      ? `${cleanSummary.slice(0, Math.max(1, available - 1)).replace(/\s+\S*$/, '').trim()}…`
+      : cleanSummary;
+    return `${excerpt} ${cleanDetails}`.trim().slice(0, maxLength);
+  }
+  const detailLimit = Math.max(32, maxLength - 36);
+  const detailExcerpt = cleanDetails.length > detailLimit
+    ? `${cleanDetails.slice(0, detailLimit - 1).replace(/\s+\S*$/, '').trim()}…`
+    : cleanDetails;
+  const summaryLimit = Math.max(1, maxLength - detailExcerpt.length - 1);
+  const summaryExcerpt = cleanSummary.length > summaryLimit
     ? `${cleanSummary.slice(0, Math.max(1, summaryLimit - 1)).replace(/\s+\S*$/, '').trim()}…`
     : cleanSummary;
-  return `${excerpt} ${details}`.trim().slice(0, maxLength);
+  return `${summaryExcerpt} ${detailExcerpt}`.trim().slice(0, maxLength);
 };
 
 app.get('/project/:slug', (req, res, next) => {
   const data = readData();
-  const project = data.projects.find((item) => item.id === req.params.slug || getProjectSlug(item, data.projects) === req.params.slug);
+  const project = data.projects.find((item) => item.id === req.params.slug || getProjectSlug(item, data.projects) === req.params.slug || getLegacyProjectSlug(item, data.projects) === req.params.slug);
   if (!project) return next();
 
   const slug = getProjectSlug(project, data.projects);
@@ -2190,14 +2260,14 @@ app.get('/project/:slug', (req, res, next) => {
   const parentSection = isBathProject ? 'baths' : 'projects';
   const areaText = project.area?.trim() || '';
   const areaLabel = areaText && /(?:м2|м²|кв\.?\s*м)$/i.test(areaText) ? areaText : areaText ? `${areaText} м²` : '';
-  const descriptionText = `${project.shortDescription || project.fullDescription || `Проект ${projectKind} «${project.title}»`}`;
   const priceLabel = formatSeoPrice(project.priceFrom, true);
   const titleKind = isBathProject ? 'баня' : 'дом';
-  const titleBase = /дом|бан/i.test(project.title) ? project.title : `${project.title} — ${titleKind}`;
-  const seoTitle = `${titleBase}${areaLabel ? ` ${areaLabel}` : ''}, ${priceLabel} | Evtenia`;
+  const cleanTitle = project.title.replace(/[_-]+/g, ' ').trim();
+  const titleBase = /дом|бан/i.test(cleanTitle) ? cleanTitle : `${titleKind === 'баня' ? 'Баня' : 'Дом'} «${cleanTitle}»`;
+  const seoTitle = `${titleBase}${areaLabel ? `, ${areaLabel}` : ''} — ${formatSeoPriceCompact(project.priceFrom, true)} | Evtenia`;
   const description = composeSeoDescription(
-    descriptionText,
-    `Площадь ${project.area || 'уточняется'}, ${project.floors || 'этажность по проекту'}; цена ${priceLabel}. Пенза и область.`
+    `${titleKind === 'баня' ? 'Баня' : 'Дом'} «${cleanTitle}»`,
+    `${areaLabel || 'площадь уточняется'}, ${project.floors || 'этажность по проекту'}; ${material.toLowerCase()}; цена ${priceLabel}. Пенза и область — расчёт комплектации.`
   );
   const schema = {
     '@context': 'https://schema.org',
@@ -2283,7 +2353,16 @@ if (fs.existsSync(FRONTEND_DIST)) {
     }
     if (!valid && /^\/homes\/[^/]+$/.test(pathname)) {
       const home = data.homes.find((item) => item.id === pathname.slice('/homes/'.length));
-      if (home) { valid = true; page = { title: `${home.title} — готовый дом в Пензе | Evtenia`, description: `${home.description || 'Готовый дом'} Площадь ${home.area}, цена ${home.price}. Уточните актуальность и условия просмотра.` }; }
+      if (home) {
+        const area = home.area?.trim() || 'уточняется';
+        const price = formatSeoPrice(home.price);
+        const place = home.district?.trim() || 'Пензе и области';
+        valid = true;
+        page = {
+          title: `Готовый дом, ${area} — ${formatSeoPriceCompact(home.price)} | Evtenia`,
+          description: composeSeoDescription(`Готовый дом в ${place}.`, `Площадь ${area}; ${home.floors || 'этажность уточняется'}; цена ${price}. Уточните наличие и запишитесь на просмотр.`)
+        };
+      }
     }
     if (!valid && /^\/lands\/[^/]+$/.test(pathname)) {
       const land = data.lands.find((item) => item.id === pathname.slice('/lands/'.length));

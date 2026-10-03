@@ -887,7 +887,11 @@ function journalSlugify(value: string) {
 }
 
 function getProjectPath(project: HouseProject) {
-  return `/project/${project.slug || journalSlugify(project.title) || project.id}`;
+  const titleSlug = journalSlugify(project.title) || project.id;
+  const semanticSlug = project.category === 'bath'
+    ? (/^ban/.test(titleSlug) ? titleSlug : `proekt-bani-${titleSlug}`)
+    : (/(^|-)dom(-|$)|(^|-)doma(-|$)|(^|-)house(-|$)/.test(titleSlug) ? titleSlug : `proekt-doma-${titleSlug}`);
+  return `/project/${project.slug || semanticSlug}`;
 }
 
 function writePageSEO({ title, description, path, image, schema }: { title: string; description: string; path: string; image?: string; schema?: unknown }) {
@@ -1159,9 +1163,24 @@ function HeaderNav({
     }
   };
 
-  const openDesktopMenuFor = (label: string) => {
+  const openDesktopMenuFor = (label: string, anchor?: HTMLElement) => {
     cancelDesktopMenuClose();
     setOpenDesktopMenu(label);
+    if (!anchor) return;
+    window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
+      const dropdown = anchor.querySelector<HTMLElement>(':scope > .projects-dropdown, :scope > .services-dropdown');
+      if (!dropdown) return;
+      const anchorRect = anchor.getBoundingClientRect();
+      const dropdownWidth = dropdown.getBoundingClientRect().width || dropdown.scrollWidth;
+      const overflowRight = anchorRect.left + dropdownWidth - (window.innerWidth - 16);
+      const leftOffset = Math.max(16 - anchorRect.left, Math.min(0, -overflowRight));
+      dropdown.style.position = 'absolute';
+      dropdown.style.top = '100%';
+      dropdown.style.left = `${leftOffset}px`;
+      dropdown.style.right = 'auto';
+      dropdown.style.transform = 'none';
+      dropdown.style.margin = '0';
+    }));
   };
 
   const scheduleDesktopMenuClose = () => {
@@ -1257,8 +1276,8 @@ function HeaderNav({
               <div
                 className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'БАНИ' ? 'menu-baths' : item.label === 'О КОМПАНИИ' ? 'menu-about' : item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'menu-settlements' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : item.label === 'МЕБЕЛЬ' ? 'menu-furniture' : ''}`}
                 data-open={openDesktopMenu === item.label ? 'true' : undefined}
-                onMouseEnter={() => openDesktopMenuFor(item.label)}
-                onFocus={() => openDesktopMenuFor(item.label)}
+                onMouseEnter={(event) => openDesktopMenuFor(item.label, event.currentTarget)}
+                onFocus={(event) => openDesktopMenuFor(item.label, event.currentTarget)}
               >
                 {item.href ? (
                   <a href={item.href} className={`menu-link ${item.active ? 'active' : ''}`}>{item.label} ▾</a>
@@ -2715,7 +2734,6 @@ function LandCardImageSlider({ land, href }: { land: LandPlot; href?: string }) 
   return (
     <div className="land-image-slider">
       {href ? <a className="land-image-click-target" href={href} aria-label={`Открыть участок ${land.area}`}><div className="project-image" style={{ backgroundImage: `url(${safeImage})` }} /></a> : <div className="project-image" style={{ backgroundImage: `url(${safeImage})` }} />}
-      <img className="evtenia-watermark" src={resolveMediaUrl('/assets/logo_small.png')} alt="" aria-hidden="true" />
       <span className="land-image-status">Земельный участок</span>
       <span className="land-photo-count" aria-label={`Фото ${activeIndex + 1} из ${images.length}`}>{activeIndex + 1} / {images.length}</span>
       {hasMultiple ? (
@@ -2791,7 +2809,6 @@ function LandDetailGallery({ land }: { land: LandPlot }) {
   return <div className="land-detail-gallery-shell">
     <div className="land-detail-main-photo">
       <img src={resolveMediaUrl(images[activeIndex] || LAND_IMAGE_FALLBACK)} alt={`Участок ${land.area}, фото ${activeIndex + 1}`} />
-      <img className="evtenia-watermark" src={resolveMediaUrl('/assets/logo_small.png')} alt="" aria-hidden="true" />
       <span>{activeIndex + 1} из {images.length}</span>
       {images.length > 1 ? <div className="land-detail-gallery-nav"><button type="button" onClick={() => setActiveIndex((activeIndex - 1 + images.length) % images.length)} aria-label="Предыдущее фото">‹</button><button type="button" onClick={() => setActiveIndex((activeIndex + 1) % images.length)} aria-label="Следующее фото">›</button></div> : null}
     </div>
@@ -3224,15 +3241,6 @@ function ProjectDetailPage() {
   };
 
   useEffect(() => {
-    const isBathProject = project.category === 'bath';
-    const projectNoun = isBathProject ? 'бани' : 'дома';
-    const description = `${project.shortDescription || `Проект ${projectNoun} «${project.title}»`}. Площадь ${project.area || 'уточняется'}, ${project.floors || 'этажность по проекту'}, тип строительства — ${project.constructionType}; ориентир цены ${project.priceFrom || 'уточняется'} в Пензе и области. ${project.isIllustrative ? 'Иллюстративный вариант; цена предварительная.' : 'Получите индивидуальный расчёт комплектации и сроков.'}`;
-    const areaText = project.area?.trim() || '';
-    const areaLabel = areaText && /(?:м2|м²|кв\.?\s*м)$/i.test(areaText) ? areaText : areaText ? `${areaText} м²` : '';
-    const titleBase = /дом|бан/i.test(project.title) ? project.title : `${project.title} — ${isBathProject ? 'баня' : 'дом'}`;
-    document.title = `${titleBase}${areaLabel ? ` ${areaLabel}` : ''}, ${project.priceFrom || 'цена по запросу'} | Evtenia`;
-    const descriptionTag = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-    if (descriptionTag) descriptionTag.content = description;
     let canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.appendChild(canonical); }
     canonical.href = `${window.location.origin}${getProjectPath(project)}`;

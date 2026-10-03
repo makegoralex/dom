@@ -81,6 +81,12 @@ function asset(apiBase: string, section: 'doors' | 'chany', name: string) {
   return `${apiBase}/api/assets/catalog/${section}/${name}.webp`;
 }
 
+function seoExcerpt(value: string, maxLength = 160) {
+  const clean = value.replace(/\s+/g, ' ').trim();
+  if (clean.length <= maxLength) return clean;
+  return `${clean.slice(0, maxLength - 1).replace(/\s+\S*$/, '').trim()}…`;
+}
+
 function writeCatalogSEO({ title, description, path, image, schema }: { title: string; description: string; path: string; image: string; schema: unknown }) {
   document.title = title;
   const setMeta = (key: string, content: string, property = false) => {
@@ -281,8 +287,8 @@ export function DoorsCatalogPage({ apiBase, Header, Footer, PrivacyConsent, form
 export function DoorCollectionPage({ slug, apiBase, Header, Footer, PrivacyConsent, formatPhone }: CatalogPageProps & { slug: string }) {
   const collection = DOORS.find((item) => item.slug === slug);
   const [selected, setSelected] = useState(collection?.name || '');
-  const title = collection ? `Межкомнатные двери «${collection.name}» в Пензе — каталог и подбор | Evtenia` : 'Коллекция дверей не найдена — Evtenia';
-  const description = collection ? `${collection.description} Подбор дверей, отделки и комплектации в Пензе и Пензенской области.` : 'Запрошенная коллекция дверей не найдена. Посмотрите каталог межкомнатных дверей Evtenia.';
+  const title = collection ? `Двери «${collection.name}» в Пензе — коллекция | Evtenia` : 'Коллекция дверей не найдена — Evtenia';
+  const description = collection ? seoExcerpt(`${collection.description} Каталог и подбор в Пензе; замер и расчёт заказа.`) : 'Запрошенная коллекция дверей не найдена. Посмотрите каталог межкомнатных дверей Evtenia.';
 
   useEffect(() => {
     if (!collection) return;
