@@ -2218,7 +2218,142 @@ html body, html body * { font-family: Arial, Helvetica, sans-serif !important; }
   .furniture-landing-hero h1 { font-size: 32px; }
   .furniture-brand-nav { align-items: stretch; }
   .furniture-brand-nav > span { width: 100%; }
-  .furniture-brand-nav a { justify-content: space-between; }
+.furniture-brand-nav a { justify-content: space-between; }
+}
+
+/* Keep the photograph from the inner-page header flowing into the content gap. */
+.internal-header { position: relative; z-index: 20; overflow: visible; }
+.internal-header::before {
+  position: absolute;
+  right: 0;
+  bottom: -42px;
+  left: 0;
+  z-index: 0;
+  height: 42px;
+  background-image: inherit;
+  background-position: center 72%;
+  background-size: cover;
+  content: "";
+  filter: brightness(.78);
+  pointer-events: none;
+}
+.internal-header + .internal-body,
+.internal-header + main:not(.route-loading-shell) { position: relative; z-index: 1; padding-top: 42px !important; }
+.doors-catalog > .internal-header + main,
+.chany-catalog > .internal-header + main { padding-top: 0 !important; }
+.doors-catalog > .internal-header + main > .catalog-hero,
+.chany-catalog > .internal-header + main > .catalog-hero { margin-top: 42px; }
+
+/* Project filters pin only while scrolling back up, then make room for content again. */
+.catalog-filters-slot { position: relative; z-index: 90; min-width: 0; }
+.project-filter-heading { display: flex; grid-column: 1 / -1; align-items: center; justify-content: space-between; gap: 12px; min-height: 28px; padding-bottom: 10px; border-bottom: 1px solid #e2e5dc; color: #355844; font-size: 12px; }
+.project-filter-heading button { border: 0; padding: 4px 0; color: #6d7e73; background: transparent; font: inherit; font-size: 11px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.project-filter-heading button:hover { color: #234e38; }
+.project-catalog-container .catalog-filters.is-scroll-pinned {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  z-index: 200;
+  width: min(1240px, calc(100vw - 48px));
+  max-height: calc(100dvh - 24px);
+  overflow: auto;
+  transform: translateX(-50%);
+  box-shadow: 0 16px 48px rgba(20, 48, 37, .22);
+  scrollbar-color: #9caf9f transparent;
+  scrollbar-width: thin;
+}
+
+/* Saved CMS content keeps its wording and images while empty editor spacers disappear. */
+.service-legacy-copy .cms-content,
+.service-existing-media .cms-content,
+.furniture-cms-card .cms-content { color: #53645a; font-size: 15px; line-height: 1.75; overflow-wrap: anywhere; }
+.service-legacy-copy .cms-content p,
+.service-existing-media .cms-content p,
+.furniture-cms-card .cms-content p { margin: 0 0 15px; color: #53645a !important; font-size: 15px !important; line-height: 1.75 !important; }
+.service-legacy-copy .cms-content p:last-child,
+.service-existing-media .cms-content p:last-child,
+.furniture-cms-card .cms-content p:last-child { margin-bottom: 0; }
+.service-legacy-copy .cms-content h1,
+.service-legacy-copy .cms-content h2,
+.service-legacy-copy .cms-content h3,
+.service-existing-media .cms-content h1,
+.service-existing-media .cms-content h2,
+.service-existing-media .cms-content h3,
+.furniture-cms-card .cms-content h1,
+.furniture-cms-card .cms-content h2,
+.furniture-cms-card .cms-content h3 { margin: 24px 0 12px; color: var(--ev-ink); line-height: 1.25; }
+.service-legacy-copy .cms-content > h1:first-child,
+.service-legacy-copy .cms-content > h2:first-child,
+.service-legacy-copy .cms-content > h3:first-child,
+.service-existing-media .cms-content > h1:first-child,
+.service-existing-media .cms-content > h2:first-child,
+.service-existing-media .cms-content > h3:first-child,
+.furniture-cms-card .cms-content > h1:first-child,
+.furniture-cms-card .cms-content > h2:first-child,
+.furniture-cms-card .cms-content > h3:first-child { margin-top: 0; }
+.service-legacy-copy .cms-content ul,
+.service-legacy-copy .cms-content ol,
+.service-existing-media .cms-content ul,
+.service-existing-media .cms-content ol,
+.furniture-cms-card .cms-content ul,
+.furniture-cms-card .cms-content ol { display: grid; gap: 8px; margin: 10px 0 20px; padding-left: 23px; color: #53645a; }
+.service-legacy-copy .cms-content li,
+.service-existing-media .cms-content li,
+.furniture-cms-card .cms-content li { color: #53645a !important; font-size: 14px !important; line-height: 1.65 !important; }
+.service-legacy-copy .cms-content .cms-gallery,
+.service-legacy-copy .cms-content .cms-image-grid,
+.service-existing-media .cms-content .cms-gallery,
+.service-existing-media .cms-content .cms-image-grid,
+.furniture-cms-card .cms-content .cms-gallery,
+.furniture-cms-card .cms-content .cms-image-grid { width: 100%; max-width: 100%; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 12px; margin: 22px 0; }
+.service-legacy-copy .cms-content figure,
+.service-existing-media .cms-content figure,
+.furniture-cms-card .cms-content figure { min-width: 0; margin: 0; }
+.service-legacy-copy .cms-content img,
+.service-existing-media .cms-content img,
+.furniture-cms-card .cms-content img { display: block; width: 100%; max-width: 100%; max-height: 520px; height: auto; border-radius: 14px; object-fit: cover; cursor: zoom-in; }
+.service-legacy-copy .cms-content .cms-gallery.single,
+.service-existing-media .cms-content .cms-gallery.single,
+.furniture-cms-card .cms-content .cms-gallery.single { grid-template-columns: minmax(0, 1fr); }
+.service-legacy-copy .cms-content .cms-gallery.single img,
+.service-existing-media .cms-content .cms-gallery.single img,
+.furniture-cms-card .cms-content .cms-gallery.single img { width: auto; max-width: 100%; max-height: 560px; margin-inline: auto; object-fit: contain; }
+
+/* Lazy route chunks retain the shared brand shell instead of a blank white loading screen. */
+.route-loading-shell { min-height: 54vh; padding: 42px 0 64px; background: #f5f3ed; }
+.route-loading-skeleton { display: grid; grid-template-columns: 1fr .9fr; align-items: stretch; gap: 16px; }
+.route-loading-copy,
+.route-loading-media { min-height: 300px; overflow: hidden; border-radius: 22px; background: linear-gradient(105deg, #e8e7df 25%, #f2f1eb 38%, #e8e7df 62%); background-size: 220% 100%; animation: route-skeleton-shimmer 1.5s ease-in-out infinite; }
+.route-loading-copy { display: grid; align-content: center; gap: 17px; padding: 36px; }
+.route-loading-copy span { width: 82%; height: 14px; border-radius: 999px; background: rgba(133, 143, 132, .18); }
+.route-loading-copy span:first-child { width: 42%; height: 10px; margin-bottom: 8px; }
+.route-loading-copy span:nth-child(3) { width: 68%; }
+.route-loading-copy span:last-child { width: 31%; height: 42px; margin-top: 11px; background: rgba(36, 79, 57, .15); }
+.route-loading-media { min-height: 360px; }
+@keyframes route-skeleton-shimmer { to { background-position-x: -220%; } }
+
+@media (max-width: 720px) {
+  .internal-header::before { bottom: -24px; height: 24px; }
+  .internal-header + .internal-body,
+  .internal-header + main:not(.route-loading-shell) { padding-top: 24px !important; }
+  .doors-catalog > .internal-header + main,
+  .chany-catalog > .internal-header + main { padding-top: 0 !important; }
+  .doors-catalog > .internal-header + main > .catalog-hero,
+  .chany-catalog > .internal-header + main > .catalog-hero { margin-top: 24px; }
+  .project-catalog-container .catalog-filters.is-scroll-pinned { width: calc(100vw - 20px); max-height: min(74dvh, 640px); grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px 10px; padding: 13px; }
+  .project-filter-heading { min-height: 25px; }
+  .route-loading-shell { min-height: 50vh; padding: 24px 0 42px; }
+  .route-loading-skeleton { grid-template-columns: 1fr; gap: 12px; }
+  .route-loading-copy { min-height: 210px; padding: 24px; }
+  .route-loading-media { min-height: 190px; }
+}
+@media (max-width: 480px) {
+  .project-catalog-container .catalog-filters.is-scroll-pinned { grid-template-columns: 1fr; }
+  .project-catalog-container .catalog-filters.is-scroll-pinned .filter-block-style .style-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .route-loading-copy,
+  .route-loading-media { animation: none; }
 }
 
 .why-card { border-color: rgba(35, 78, 56, .16); color: var(--ev-ink); background: #fffefa; }

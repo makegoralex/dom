@@ -1122,7 +1122,54 @@ function sanitizeCmsHtml(html: string) {
     if (normalized) node.setAttribute('class', normalized);
     else node.removeAttribute('class');
   });
+
+  // CMS editors often leave several empty paragraphs between blocks. They
+  // carry no information, but their default margins create very large gaps.
+  doc.body.querySelectorAll('p').forEach((paragraph) => {
+    const text = (paragraph.textContent || '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!text && !paragraph.querySelector('img, video, audio')) paragraph.remove();
+  });
+
+  // Promote the first short, bold paragraph to a real section heading. This
+  // keeps partner copy intact while giving furniture/service pages hierarchy.
+  const firstTextParagraph = Array.from(doc.body.querySelectorAll('p')).find((paragraph) =>
+    (paragraph.textContent || '').replace(/\s+/g, ' ').trim().length > 0
+  );
+  if (firstTextParagraph && firstTextParagraph.querySelector(':scope > b, :scope > strong')) {
+    const title = (firstTextParagraph.textContent || '').replace(/\s+/g, ' ').trim();
+    if (title.length <= 96) {
+      const heading = doc.createElement('h2');
+      heading.innerHTML = firstTextParagraph.innerHTML;
+      firstTextParagraph.replaceWith(heading);
+    }
+  }
+
+  doc.body.querySelectorAll('.cms-gallery, .cms-image-grid').forEach((gallery) => {
+    if (!gallery.querySelector('img')) gallery.remove();
+  });
   return doc.body.innerHTML;
+}
+
+function removeFirstCmsImage(html: string) {
+  if (!html) return '';
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const firstImage = doc.body.querySelector('img');
+  if (!firstImage) return html;
+  const figure = firstImage.closest('figure');
+  const gallery = firstImage.closest('.cms-gallery, .cms-image-grid');
+  firstImage.remove();
+  if (figure && !figure.querySelector('img') && !(figure.textContent || '').trim()) figure.remove();
+  if (gallery && !gallery.querySelector('img') && !(gallery.textContent || '').trim()) gallery.remove();
+  return doc.body.innerHTML;
+}
+
+function cmsSummary(html: string) {
+  const doc = new DOMParser().parseFromString(html || '', 'text/html');
+  doc.body.querySelectorAll('img, figure, .cms-gallery, .cms-image-grid').forEach((node) => node.remove());
+  const paragraphs = Array.from(doc.body.querySelectorAll('p'))
+    .map((paragraph) => (paragraph.textContent || '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim())
+    .filter((paragraph) => paragraph.length >= 70);
+  return limitSeoText(paragraphs[0] || (doc.body.textContent || '').replace(/\s+/g, ' ').trim(), 300);
 }
 
 function CmsHtmlContent({ html }: { html: string }) {
@@ -1276,7 +1323,8 @@ function HeaderNav({
           { label: 'Все проекты бань', href: '/baths' },
           { label: 'Каркасные бани', href: `/baths?type=${encodeURIComponent('Каркасные')}` },
           { label: 'Из профилированного бруса', href: `/baths?type=${encodeURIComponent('Профилированный брус')}` },
-          { label: 'Из оцилиндрованного бревна', href: `/baths?type=${encodeURIComponent('Оцилиндрованное бревно')}` }
+          { label: 'Из оцилиндрованного бревна', href: `/baths?type=${encodeURIComponent('Оцилиндрованное бревно')}` },
+          { label: 'Бани-бочки', href: `/baths?type=${encodeURIComponent('Баня-бочка')}` }
         ]
       },
       doors: { label: 'ДВЕРИ', href: '/dveri', active: currentPath === '/dveri' },
@@ -2003,6 +2051,7 @@ function PublicPage() {
                 <a href="/baths?type=Каркасные">Каркасные</a>
                 <a href="/baths?type=Профилированный%20брус">Из бруса</a>
                 <a href="/baths?type=Оцилиндрованное%20бревно">Из бревна</a>
+                <a href="/baths?type=Баня-бочка">Бани-бочки</a>
                 <a href="/baths">Смотреть все проекты бань</a>
               </div>
             </article>
@@ -2460,7 +2509,7 @@ function SiteFooter() {
           </div>
           <div className="footer-columns">
             <div><h4>Проекты домов</h4><a href="/projects?type=Модульные">Модульные</a><a href="/projects?type=Каркасные">Каркасные</a><a href="/projects?type=Из%20газобетона">Из газобетона</a></div>
-            <div><h4>Бани</h4><a href="/baths?type=Каркасные">Каркасные</a><a href="/baths?type=Профилированный%20брус">Из профилированного бруса</a><a href="/baths?type=Оцилиндрованное%20бревно">Из оцилиндрованного бревна</a></div>
+            <div><h4>Бани</h4><a href="/baths?type=Каркасные">Каркасные</a><a href="/baths?type=Профилированный%20брус">Из профилированного бруса</a><a href="/baths?type=Оцилиндрованное%20бревно">Из оцилиндрованного бревна</a><a href="/baths?type=Баня-бочка">Бани-бочки</a></div>
             <div><h4>Услуги</h4><a href="/services/fundament">Фундамент</a><a href="/services/skvazhiny">Скважины</a><a href="/services/remont">Ремонт</a><a href="/services/dizainer">Дизайнер</a><a href="/services/strahovanie">Страхование</a></div>
             <div><h4>Разделы сайта</h4><a href="/design">Проектирование</a><a href="/portfolio">Портфолио</a><a href="/discounts/vse-akcii">Ипотека и акции</a><a href="/contacts">Контакты</a></div>
           </div>
@@ -2476,6 +2525,7 @@ function SiteFooter() {
               <a href="/baths?type=Каркасные">Каркасные</a>
               <a href="/baths?type=Профилированный%20брус">Из профилированного бруса</a>
               <a href="/baths?type=Оцилиндрованное%20бревно">Из оцилиндрованного бревна</a>
+              <a href="/baths?type=Баня-бочка">Бани-бочки</a>
             </details>
             <details>
               <summary>Услуги</summary>
@@ -2570,6 +2620,39 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
   const [minPrice, setMinPrice] = useState<number | null>(null);
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [requestProject, setRequestProject] = useState<HouseProject | null>(null);
+  const [filtersPinned, setFiltersPinned] = useState(false);
+  const [filtersSlotHeight, setFiltersSlotHeight] = useState(0);
+  const filtersSlotRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const slot = filtersSlotRef.current;
+    if (!slot || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(([entry]) => {
+      setFiltersSlotHeight(Math.ceil(entry.contentRect.height));
+    });
+    observer.observe(slot);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    const onScroll = () => {
+      const currentScrollY = window.scrollY;
+      const slot = filtersSlotRef.current;
+      if (!slot) return;
+      const slotTop = slot.getBoundingClientRect().top + currentScrollY;
+      if (currentScrollY <= slotTop + 8) {
+        setFiltersPinned(false);
+      } else if (currentScrollY - lastScrollY > 3) {
+        setFiltersPinned(false);
+      } else if (lastScrollY - currentScrollY > 3) {
+        setFiltersPinned(true);
+      }
+      lastScrollY = currentScrollY;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => {
     document.title = category === 'bath'
@@ -2668,6 +2751,16 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
     return byFloor && byStyle && byArea && byRooms && byPrice;
   });
   const filteredProjects = filteredStrict;
+  const resetProjectFilters = () => {
+    setSelectedFloors([]);
+    setSelectedStyles([]);
+    setMinArea(minAreaLimit);
+    setMaxArea(maxAreaLimit);
+    setMinRooms(minRoomsLimit);
+    setMaxRooms(maxRoomsLimit);
+    setMinPrice(minPriceLimit);
+    setMaxPrice(maxPriceLimit);
+  };
 
   return (
     <div>
@@ -2688,7 +2781,13 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
             <span className="catalog-results-count" aria-live="polite">Найдено: {filteredProjects.length}</span>
           </div>
           <div className="catalog-layout">
-            <aside className="catalog-filters">
+            <div
+              className="catalog-filters-slot"
+              ref={filtersSlotRef}
+              style={filtersPinned && filtersSlotHeight ? { minHeight: `${filtersSlotHeight}px` } : undefined}
+            >
+            <aside className={`catalog-filters${filtersPinned ? ' is-scroll-pinned' : ''}`}>
+              <div className="project-filter-heading"><strong>Параметры подбора</strong><button type="button" onClick={resetProjectFilters}>Сбросить</button></div>
               <div className="filter-block">
                 <h4>Этажность</h4>
                 {floorOptions.map((floor) => (
@@ -2750,6 +2849,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
                 />
               </div>
             </aside>
+            </div>
 
             <div>
               <div className="catalog-grid">
@@ -3740,12 +3840,42 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
   const furnitureCategory = furnitureEntry ? FURNITURE_STRUCTURE.find((item) => item.title === furnitureEntry.categoryTitle) : undefined;
   const isPromotionsPage = pageSlug.startsWith('discounts-');
   const isAllPromotions = pageSlug === 'discounts-vse-akcii';
-  const cmsHeroImage = text.match(/<img\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/i)?.[1];
-  const hasCmsPhotos = Boolean(cmsHeroImage || /<(?:picture|figure)\b/i.test(text));
+  const cmsContent = isHtml ? sanitizeCmsHtml(text) : text;
+  const cmsHeroImage = cmsContent.match(/<img\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/i)?.[1];
+  const hasCmsPhotos = Boolean(cmsHeroImage || /<(?:picture|figure)\b/i.test(cmsContent));
   const serviceHeroImage = cmsHeroImage ? resolveMediaUrl(cmsHeroImage) : serviceDetail?.photo;
+  const serviceSummary = isService ? cmsSummary(cmsContent) : '';
+  const serviceContentWithoutHeroImage = isService && cmsHeroImage ? removeFirstCmsImage(cmsContent) : cmsContent;
 
   useEffect(() => {
     if (!serviceDetail) {
+      if (isService) {
+        const description = serviceSummary || `${pageTitle} в Пензе и Пензенской области. Состав работ, сроки и стоимость уточним по параметрам объекта — оставьте заявку на предварительную консультацию.`;
+        const schema = {
+          '@context': 'https://schema.org',
+          '@type': 'Service',
+          name: pageTitle,
+          serviceType: pageTitle,
+          description,
+          areaServed: { '@type': 'AdministrativeArea', name: 'Пенза и Пензенская область' },
+          provider: {
+            '@type': 'Organization',
+            name: 'Evtenia',
+            url: window.location.origin,
+            telephone: CONTACTS.mainPhoneDisplay,
+            address: { '@type': 'PostalAddress', addressLocality: 'Пенза', streetAddress: 'ул. Гоголя, 41', addressCountry: 'RU' }
+          },
+          url: `${window.location.origin}/services/${serviceSlug}`
+        };
+        writePageSEO({
+          title: seoTitle || `${pageTitle} в Пензе — цены и сроки | Evtenia`,
+          description: seoDescription || description,
+          path: `/services/${serviceSlug}`,
+          image: cmsHeroImage ? resolveMediaUrl(cmsHeroImage) : undefined,
+          schema
+        });
+        return;
+      }
       if (seoTitle && seoDescription) {
         const schema = isFurniture ? {
           '@context': 'https://schema.org',
@@ -3754,7 +3884,7 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
             { '@type': 'Service', name: isFurnitureHub ? 'Подбор мебели для дома в Пензе' : `Подбор мебели ${furnitureCategory?.title.toLocaleLowerCase('ru-RU') || ''} ${pageTitle}`, serviceType: 'Подбор и заказ мебели', areaServed: ['Пенза', 'Пензенская область'], provider: { '@type': 'Organization', name: 'Evtenia', url: window.location.origin, telephone: CONTACTS.mainPhoneDisplay } }
           ]
         } : undefined;
-        writePageSEO({ title: seoTitle, description: seoDescription, path: window.location.pathname, schema });
+        writePageSEO({ title: seoTitle, description: seoDescription, path: window.location.pathname, image: cmsHeroImage ? resolveMediaUrl(cmsHeroImage) : undefined, schema });
       } else {
         document.title = `${pageTitle} — Evtenia`;
       }
@@ -3795,7 +3925,7 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
       image: cmsHeroImage ? resolveMediaUrl(cmsHeroImage) : serviceDetail.photo,
       schema
     });
-  }, [pageTitle, serviceDetail, serviceSlug, seoTitle, seoDescription]);
+  }, [pageTitle, serviceDetail, serviceSlug, seoTitle, seoDescription, isService, serviceSummary, cmsHeroImage]);
 
   const submitServiceLead = async (event: FormEvent) => {
     event.preventDefault();
@@ -3869,7 +3999,7 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
             {hasCmsPhotos ? <section className="service-detail-card service-existing-media">
               <span className="page-kicker">Фотографии компании</span>
               <h2>Примеры и материалы по услуге</h2>
-              <CmsHtmlContent html={text} />
+              <CmsHtmlContent html={serviceContentWithoutHeroImage} />
             </section> : null}
             <section className="service-price-overview" aria-label="Предварительные ориентиры по цене и срокам">
               <div><span>Ориентир стоимости</span><strong>{serviceDetail.pricing[0]?.value || 'По смете'}</strong><small>{serviceDetail.pricing[0]?.note}</small></div>
@@ -3925,6 +4055,48 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
     );
   }
 
+  if (isService) {
+    return (
+      <div>
+        <InternalHeader />
+        <main className="internal-body service-detail-page service-legacy-page">
+          <div className="container">
+            <Breadcrumbs items={["Главная", sectionTitle, pageTitle]} />
+            <section className={`service-detail-hero${serviceHeroImage ? '' : ' without-photo'}`}>
+              <div className="service-detail-hero-copy">
+                <span className="page-kicker">Услуги в Пензе и Пензенской области</span>
+                <h1>{pageTitle}</h1>
+                <p>{serviceSummary || `Расскажите, что нужно сделать на объекте в Пензе или области. Уточним исходные данные и подготовим предварительный расчёт.`}</p>
+                <div className="service-detail-hero-actions"><a href="#service-request">Обсудить задачу и расчёт <span aria-hidden="true">→</span></a></div>
+              </div>
+              {serviceHeroImage ? <figure className="service-detail-hero-media"><img src={serviceHeroImage} alt={`Фотография услуги «${pageTitle.toLocaleLowerCase('ru-RU')}» от Evtenia`} width="1500" height="1000" fetchPriority="high" /><figcaption>Материалы по услуге · Evtenia, Пенза</figcaption></figure> : null}
+              <ul aria-label="Как работаем">
+                <li><b>01</b><span>Сохраняем ваши материалы и фотографии</span></li>
+                <li><b>02</b><span>Состав работ и цену уточняем до начала</span></li>
+                <li><b>03</b><span>Работаем по Пензе и области</span></li>
+              </ul>
+            </section>
+            <div className="service-detail-layout service-legacy-layout" id="service-request">
+              <div className="service-detail-main">
+                <section className="service-detail-card service-existing-media service-legacy-copy">
+                  <span className="page-kicker">Описание и фотографии</span>
+                  <h2>Подробнее об услуге «{pageTitle}»</h2>
+                  <CmsHtmlContent html={serviceContentWithoutHeroImage} />
+                </section>
+              </div>
+              {serviceForm}
+            </div>
+            <section className="service-bottom-cta service-legacy-cta">
+              <div><span className="page-kicker">Первичная консультация</span><h2>Подскажем, с чего начать</h2><p>Уточним объём и особенности объекта, ответим на вопросы и сориентируем по следующему шагу.</p></div>
+              <a href="#service-request">Оставить заявку <span aria-hidden="true">→</span></a>
+            </section>
+          </div>
+        </main>
+        <SiteFooter />
+      </div>
+    );
+  }
+
   if (isPromotionsPage) {
     const offers = isAllPromotions ? [
       ['10 соток земли', 'в подарок при заказе строительства дома', 'Главное предложение'],
@@ -3958,7 +4130,7 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
             </section>
             <section className="promotions-note">
               <div><span className="page-kicker">Важно знать</span><h2>Условия уточним до старта</h2></div>
-              <div className="promotions-cms-copy"><CmsHtmlContent html={text} /><p>Предложения могут зависеть от проекта, участка и выбранной комплектации. Финальные условия фиксируются после консультации.</p></div>
+              <div className="promotions-cms-copy"><CmsHtmlContent html={cmsContent} /><p>Предложения могут зависеть от проекта, участка и выбранной комплектации. Финальные условия фиксируются после консультации.</p></div>
             </section>
             <section className="promotions-cta" id="promotion-request">
               <div><span className="page-kicker">Бесплатная консультация</span><h2>Рассчитаем ваш вариант</h2><p>Расскажите, какой дом планируете. Ответим на вопросы и предложим следующий шаг.</p></div>
@@ -3998,7 +4170,7 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
             ) : furnitureCategory ? (
               <nav className="furniture-brand-nav" aria-label={`Другие бренды раздела ${furnitureCategory.title}`}><span>Другие бренды раздела</span>{relatedBrands.map((brand) => <a key={brand} href={`/furniture/${slugify(furnitureCategory.title)}/${slugify(brand)}`}>{brand}<span aria-hidden="true">→</span></a>)}</nav>
             ) : null}
-            <section className="furniture-cms-card"><div className="furniture-section-heading"><div><span className="page-kicker">Каталог Evtenia</span><h2>{isFurnitureHub ? 'Поможем выбрать формат' : `${pageTitle}: материалы и особенности`}</h2></div><p>Содержание и фотографии производителя сохранены. Наличие, варианты отделки и комплектацию подтвердим до оформления заказа.</p></div><CmsHtmlContent html={text} /></section>
+            <section className="furniture-cms-card"><div className="furniture-section-heading"><div><span className="page-kicker">Каталог Evtenia</span><h2>{isFurnitureHub ? 'Поможем выбрать формат' : `${pageTitle}: материалы и особенности`}</h2></div><p>Содержание и фотографии производителя сохранены. Наличие, варианты отделки и комплектацию подтвердим до оформления заказа.</p></div><CmsHtmlContent html={cmsContent} /></section>
             <section className="furniture-order-steps"><div><span className="page-kicker">Как оформляется заказ</span><h2>От идеи до комплекта для комнаты</h2></div><div className="furniture-order-grid"><article><b>01</b><h3>Уточняем задачу</h3><p>Разбираемся, для какой комнаты нужна мебель, какие есть размеры, пожелания и ограничения.</p></article><article><b>02</b><h3>Сверяем исполнение</h3><p>Проверяем доступные модели, покрытия, ткани, фурнитуру и необходимые комплектующие.</p></article><article><b>03</b><h3>Подтверждаем расчёт</h3><p>Согласуем стоимость, состав заказа, сроки поставки и условия доставки или монтажа.</p></article></div><p className="furniture-price-note">Стоимость зависит от размеров, выбранной конфигурации, материалов и комплектующих; итоговую цену и срок поставки подтвердим по конкретной заявке.</p></section>
             {furnitureForm}
           </div>
@@ -4017,7 +4189,7 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
           <h1>{pageTitle}</h1>
           <div className={`service-page-layout ${isService ? 'is-service' : ''}`}>
             <div className="internal-text-box">
-              {isHtml ? <CmsHtmlContent html={text} /> : <><p>{text}</p><p>Скоро добавим подробное описание услуги и примеры выполненных работ.</p></>}
+              {isHtml ? <CmsHtmlContent html={cmsContent} /> : <><p>{text}</p><p>Скоро добавим подробное описание услуги и примеры выполненных работ.</p></>}
             </div>
             {serviceForm}
           </div>
@@ -5642,7 +5814,7 @@ function AppLayout({ children }: { children: ReactNode }) {
 }
 
 function DeferredPage({ children, label = 'Загружаем страницу…' }: { children: ReactNode; label?: string }) {
-  return <React.Suspense fallback={<div className="container route-loading" role="status">{label}</div>}>{children}</React.Suspense>;
+  return <React.Suspense fallback={<><InternalHeader /><main className="route-loading-shell" role="status" aria-label={label} aria-busy="true"><div className="container route-loading-skeleton" aria-hidden="true"><div className="route-loading-copy"><span /><span /><span /><span /></div><div className="route-loading-media" /></div></main></>}>{children}</React.Suspense>;
 }
 
 function App() {
