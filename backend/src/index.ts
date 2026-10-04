@@ -2233,7 +2233,7 @@ const formatSeoPriceCompact = (value: unknown, startsFrom = false): string => {
   const amount = Number(raw.replace(/\D/g, ''));
   if (!Number.isFinite(amount) || amount <= 0) return raw;
   const prefix = startsFrom || /^от\b/i.test(raw) ? 'от ' : '';
-  if (amount >= 1_000_000) return `${prefix}${(amount / 1_000_000).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} млн ₽`;
+  if (amount >= 1_000_000) return `${prefix}${(amount / 1_000_000).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} млн ₽`;
   if (amount >= 100_000) return `${prefix}${Math.round(amount / 1_000).toLocaleString('ru-RU')} тыс. ₽`;
   return `${prefix}${amount.toLocaleString('ru-RU')} ₽`;
 };

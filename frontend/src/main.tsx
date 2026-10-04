@@ -908,7 +908,7 @@ function compactMoneyLabel(value: string) {
   if (!raw || /по\s+запросу/i.test(raw)) return 'по запросу';
   const amount = Number(raw.replace(/\D/g, ''));
   if (!amount) return raw;
-  if (amount >= 1_000_000) return `${(amount / 1_000_000).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} млн ₽`;
+  if (amount >= 1_000_000) return `${(amount / 1_000_000).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} млн ₽`;
   if (amount >= 100_000) return `${Math.round(amount / 1_000).toLocaleString('ru-RU')} тыс. ₽`;
   return `${amount.toLocaleString('ru-RU')} ₽`;
 }

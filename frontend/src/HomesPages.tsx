@@ -50,7 +50,7 @@ const parseNumber = (value: string) => Number(String(value || '').replace(/[^\d]
 function compactListingPrice(value: string) {
   const amount = parseNumber(value);
   if (!amount) return 'по запросу';
-  if (amount >= 1_000_000) return `${(amount / 1_000_000).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} млн ₽`;
+  if (amount >= 1_000_000) return `${(amount / 1_000_000).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} млн ₽`;
   if (amount >= 100_000) return `${Math.round(amount / 1_000).toLocaleString('ru-RU')} тыс. ₽`;
   return `${new Intl.NumberFormat('ru-RU').format(amount)} ₽`;
 }
