@@ -1,4 +1,5 @@
-import React, { ComponentType, FormEvent, useEffect, useState } from 'react';
+import React, { ComponentType, FormEvent, useEffect, useMemo, useState } from 'react';
+import doorCatalogProducts from '../../doorCatalogProducts.json';
 
 type CatalogPageProps = {
   apiBase: string;
@@ -18,6 +19,20 @@ type DoorCollection = {
   description: string;
   style: 'Современный стиль' | 'Классика' | 'Текстура дерева';
 };
+
+type DoorProduct = {
+  id: string;
+  name: string;
+  collection: string;
+  collectionSlug: string;
+  image: string;
+  finish: string;
+  type: 'door' | 'accessory';
+};
+
+const DOOR_PRODUCTS = doorCatalogProducts as unknown as DoorProduct[];
+const doorProductsForCollection = (slug: string) => DOOR_PRODUCTS.filter((product) => product.type === 'door' && product.collectionSlug === slug);
+const DOOR_ACCESSORIES = DOOR_PRODUCTS.filter((product) => product.type === 'accessory');
 
 type ChanyModel = {
   name: string;
@@ -163,6 +178,7 @@ function CatalogLeadForm({
       <label>Что вас интересует?
         <select value={selection} onChange={(event) => setSelection(event.target.value)}>
           <option value="">Помогите выбрать</option>
+          {selection && !options.includes(selection) ? <option value={selection}>{selection}</option> : null}
           {options.map((item) => <option key={item} value={item}>{item}</option>)}
         </select>
       </label>
@@ -242,10 +258,22 @@ export function DoorsCatalogPage({ apiBase, Header, Footer, PrivacyConsent, form
             <div className="catalog-door-grid">
               {visible.map((item) => <article className="catalog-door-card" key={item.name}>
                 <img className={item.productCutout ? 'product-cutout' : ''} src={asset(apiBase, 'doors', item.image)} alt={`Межкомнатная дверь коллекции «${item.name}»`} loading="lazy" width="700" height="1000" />
-                <div className="catalog-door-card-copy"><span>{item.style}</span><h3><a href={`/dveri/${item.slug}`}>{item.name}</a></h3><p>{item.description}</p><a className="door-collection-link" href={`/dveri/${item.slug}`}>Смотреть коллекцию <span aria-hidden="true">→</span></a><button type="button" onClick={() => requestSelection(item.name)}>Запросить комплектацию</button></div>
+                <div className="catalog-door-card-copy"><span>{item.style} · {doorProductsForCollection(item.slug).length} моделей</span><h3><a href={`/dveri/${item.slug}`}>{item.name}</a></h3><p>{item.description}</p><a className="door-collection-link" href={`/dveri/${item.slug}`}>Смотреть модели <span aria-hidden="true">→</span></a><button type="button" onClick={() => requestSelection(item.name)}>Запросить комплектацию</button></div>
               </article>)}
             </div>
             <p className="catalog-disclaimer">Фотографии показывают варианты исполнения. Оттенок покрытия на экране может отличаться; окончательный выбор делаем по образцам и доступным вариантам выбранной коллекции.</p>
+          </div>
+        </section>
+
+        <section id="door-accessories" className="catalog-section catalog-section-muted door-accessories-section">
+          <div className="catalog-container">
+            <div className="catalog-section-heading"><div><span className="catalog-eyebrow">Для полной комплектации</span><h2>Коробки, наличники и доборы</h2></div><p>Добавим к полотнам подходящие элементы, сверим размеры стен и подготовим единый расчёт. Текущую отделку и доступность комплектующих подтвердим по запросу.</p></div>
+            <div className="door-accessory-grid">
+              {DOOR_ACCESSORIES.map((product) => <article className="door-model-card" key={product.id}>
+                <img src={asset(apiBase, 'doors', product.image)} alt={`${product.name} для комплектации межкомнатной двери`} loading="lazy" width="860" height="860" />
+                <div><span>Комплектующие</span><h3>{product.name}</h3><p>{product.finish || 'Отделка и наличие уточняются при подборе.'}</p><strong>Цена — по запросу</strong><button type="button" onClick={() => requestSelection(`Комплектующие — ${product.name}`)}>Добавить в расчёт</button></div>
+              </article>)}
+            </div>
           </div>
         </section>
 
@@ -275,7 +303,7 @@ export function DoorsCatalogPage({ apiBase, Header, Footer, PrivacyConsent, form
         <section id="doors-request" className="catalog-request-section">
           <div className="catalog-container catalog-request-grid">
             <div><span className="catalog-eyebrow">Заявка на подбор</span><h2>Поможем собрать комплект дверей под ваши проёмы</h2><p>Оставьте телефон и выберите коллекцию или вариант помощи. Менеджер Evtenia уточнит количество дверей, комплектацию и удобный следующий шаг.</p><div className="catalog-phone-card"><span>Можно позвонить напрямую</span><a href="tel:+79022090179">8 902 209-01-79</a><small>Ежедневно с 9:00 до 19:00</small></div></div>
-            <CatalogLeadForm key={selected} apiBase={apiBase} formatPhone={formatPhone} PrivacyConsent={PrivacyConsent} section="doors" sectionTitle="Двери" options={DOORS.map((item) => item.name).concat(['Замер и подбор комплекта', 'Монтаж межкомнатных дверей'])} initialSelection={selected} />
+            <CatalogLeadForm key={selected} apiBase={apiBase} formatPhone={formatPhone} PrivacyConsent={PrivacyConsent} section="doors" sectionTitle="Двери" options={DOORS.map((item) => item.name).concat(['Комплектующие', 'Замер и подбор комплекта', 'Монтаж межкомнатных дверей'])} initialSelection={selected} />
           </div>
         </section>
       </main>
@@ -286,9 +314,10 @@ export function DoorsCatalogPage({ apiBase, Header, Footer, PrivacyConsent, form
 
 export function DoorCollectionPage({ slug, apiBase, Header, Footer, PrivacyConsent, formatPhone }: CatalogPageProps & { slug: string }) {
   const collection = DOORS.find((item) => item.slug === slug);
+  const models = useMemo(() => collection ? doorProductsForCollection(collection.slug) : [], [collection]);
   const [selected, setSelected] = useState(collection?.name || '');
   const title = collection ? `Двери «${collection.name}» в Пензе — коллекция | Evtenia` : 'Коллекция дверей не найдена — Evtenia';
-  const description = collection ? seoExcerpt(`${collection.description} Каталог и подбор в Пензе; замер и расчёт заказа.`) : 'Запрошенная коллекция дверей не найдена. Посмотрите каталог межкомнатных дверей Evtenia.';
+  const description = collection ? seoExcerpt(`${collection.description} В каталоге ${models.length} моделей. Подбор, замер и расчёт заказа в Пензе и области.`) : 'Запрошенная коллекция дверей не найдена. Посмотрите каталог межкомнатных дверей Evtenia.';
 
   useEffect(() => {
     if (!collection) return;
@@ -300,16 +329,15 @@ export function DoorCollectionPage({ slug, apiBase, Header, Footer, PrivacyConse
       schema: {
         '@context': 'https://schema.org',
         '@graph': [
-          { '@type': 'CollectionPage', name: `Коллекция дверей «${collection.name}»`, description, url: `https://dom.evtenia.ru/dveri/${collection.slug}`, image: `https://dom.evtenia.ru/api/assets/catalog/doors/${collection.image}.webp`, mainEntity: { '@type': 'ItemList', itemListElement: (collection.models || []).map((name, index) => ({ '@type': 'ListItem', position: index + 1, name })) } },
+          { '@type': 'CollectionPage', name: `Коллекция дверей «${collection.name}»`, description, url: `https://dom.evtenia.ru/dveri/${collection.slug}`, image: `https://dom.evtenia.ru/api/assets/catalog/doors/${collection.image}.webp`, mainEntity: { '@type': 'ItemList', itemListElement: models.map((product, index) => ({ '@type': 'ListItem', position: index + 1, name: product.name, image: `https://dom.evtenia.ru/api/assets/catalog/doors/${product.image}.webp`, description: product.finish || `Модель коллекции «${collection.name}»; цена и наличие уточняются.` })) } },
           { '@type': 'Service', name: `Подбор дверей коллекции «${collection.name}»`, areaServed: ['Пенза', 'Пензенская область'], provider: { '@type': 'Organization', name: 'Evtenia', url: 'https://dom.evtenia.ru/' } }
         ]
       }
     });
-  }, [apiBase, collection, description, title]);
+  }, [apiBase, collection, description, models, title]);
 
   if (!collection) return <div className="catalog-page doors-catalog"><Header /><main className="catalog-container page-not-found"><p>404 · Коллекция не найдена</p><h1>Такой коллекции нет в каталоге</h1><a href="/dveri">Посмотреть все двери</a></main><Footer /></div>;
 
-  const images = collection.images?.length ? collection.images : [collection.image];
   const chooseModel = (model: string) => {
     setSelected(model);
     document.getElementById('door-detail-request')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -339,9 +367,8 @@ export function DoorCollectionPage({ slug, apiBase, Header, Footer, PrivacyConse
           <div className="catalog-container">
             <div className="catalog-section-heading"><div><span className="catalog-eyebrow">Варианты исполнения</span><h2>Модели коллекции «{collection.name}»</h2></div><p>Внешний вид и оттенок на экране могут отличаться от образца. Уточним доступные исполнения, размеры и комплектующие перед заказом.</p></div>
             <div className="door-model-grid">
-              {images.map((image, index) => {
-                const model = collection.models?.[index] || `Вариант ${index + 1}`;
-                return <article className="door-model-card" key={image}><img src={asset(apiBase, 'doors', image)} alt={`Межкомнатная дверь «${collection.name}», модель ${model}`} loading={index === 0 ? 'eager' : 'lazy'} width="860" height="860" /><div><span>{collection.name}</span><h3>{model}</h3><button type="button" onClick={() => chooseModel(`${collection.name} — ${model}`)}>Запросить цену и наличие</button></div></article>;
+              {models.map((product, index) => {
+                return <article className="door-model-card" key={product.id}><img src={asset(apiBase, 'doors', product.image)} alt={`${product.name} — межкомнатная дверь коллекции «${collection.name}»`} loading={index === 0 ? 'eager' : 'lazy'} width="860" height="860" /><div><span>{collection.name} · цена по запросу</span><h3>{product.name}</h3><p>{product.finish || 'Варианты отделки и наличие уточним при подборе.'}</p><button type="button" onClick={() => chooseModel(`${collection.name} — ${product.name}`)}>Узнать цену и наличие</button></div></article>;
               })}
             </div>
           </div>
@@ -358,7 +385,7 @@ export function DoorCollectionPage({ slug, apiBase, Header, Footer, PrivacyConse
         <section id="door-detail-request" className="catalog-request-section">
           <div className="catalog-container catalog-request-grid">
             <div><span className="catalog-eyebrow">Расчёт заказа</span><h2>Подберём двери «{collection.name}» под ваши проёмы</h2><p>Оставьте телефон и нужную модель. Специалист Evtenia уточнит размеры, варианты комплектации, актуальную цену и следующий шаг.</p><div className="catalog-phone-card"><span>Можно позвонить напрямую</span><a href="tel:+79022090179">8 902 209-01-79</a><small>Ежедневно с 9:00 до 19:00</small></div></div>
-            <CatalogLeadForm key={selected} apiBase={apiBase} formatPhone={formatPhone} PrivacyConsent={PrivacyConsent} section="doors" sectionTitle={`Двери — ${collection.name}`} options={[collection.name, ...(collection.models || []), 'Замер и подбор комплекта', 'Монтаж межкомнатных дверей']} initialSelection={selected} />
+            <CatalogLeadForm key={selected} apiBase={apiBase} formatPhone={formatPhone} PrivacyConsent={PrivacyConsent} section="doors" sectionTitle={`Двери — ${collection.name}`} options={[collection.name, ...models.map((product) => product.name), 'Замер и подбор комплекта', 'Монтаж межкомнатных дверей']} initialSelection={selected} />
           </div>
         </section>
 

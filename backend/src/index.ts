@@ -1988,7 +1988,8 @@ const truncateSeoText = (value: string, maxLength: number): string => {
 };
 
 const renderSeoDocument = (html: string, title: string, description: string, canonicalUrl: string, schema?: unknown, imageUrl?: string): string => {
-  const safeTitle = escapeHtml(truncateSeoText(title, 70));
+  const plainTitle = truncateSeoText(title, 70);
+  const safeTitle = escapeHtml(plainTitle);
   const safeDescription = escapeHtml(truncateSeoText(description, 160));
   const safeCanonical = escapeHtml(canonicalUrl);
   let result = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${safeTitle}</title>`);
@@ -2014,7 +2015,31 @@ const renderSeoDocument = (html: string, title: string, description: string, can
     imageUrl ? `<meta property="og:image" content="${escapeHtml(imageUrl)}" /><meta name="twitter:image" content="${escapeHtml(imageUrl)}" />` : '',
     schema ? `<script id="catalog-jsonld" type="application/ld+json">${JSON.stringify(schema).replace(/</g, '\\u003c')}</script>` : ''
   ].join('');
+  const fallbackHeading = escapeHtml(plainTitle.replace(/\s*\|\s*Evtenia$/i, '').trim());
+  const seoFallback = `<main class="seo-fallback-content"><h1>${fallbackHeading}</h1><p>${safeDescription}</p></main>`;
+  result = result.replace(/<div\s+id=["']root["']\s*>\s*<\/div>/i, `<div id="root">${seoFallback}</div>`);
   return result.replace(/<\/head>/i, `${socialTags}</head>`);
+};
+
+interface DoorCatalogProduct {
+  id: string;
+  name: string;
+  collection: string;
+  collectionSlug: string;
+  image: string;
+  finish: string;
+  type: 'door' | 'accessory';
+}
+
+const readDoorCatalogProducts = (): DoorCatalogProduct[] => {
+  const catalogPath = path.resolve(__dirname, '../../doorCatalogProducts.json');
+  try {
+    const catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf8'));
+    return Array.isArray(catalog) ? catalog as DoorCatalogProduct[] : [];
+  } catch (error) {
+    console.error('Door catalog data is unavailable:', error);
+    return [];
+  }
 };
 
 app.get(['/dveri', '/chany'], (req, res, next) => {
@@ -2026,11 +2051,14 @@ app.get(['/dveri', '/chany'], (req, res, next) => {
     ? 'Межкомнатные двери в Пензе — каталог и цены | Evtenia'
     : 'Банные чаны в Пензе — модели и цены | Evtenia';
   const description = doorsPage
-    ? 'Подбор межкомнатных дверей в Пензе и Пензенской области: коллекции, размеры, отделка, коробки, фурнитура и монтаж. Рассчитаем цену комплекта под ваши проёмы.'
+    ? 'Подбор межкомнатных дверей в Пензе и области: модели из 17 коллекций, комплектующие, замер и монтаж. Уточним актуальную цену заказа под ваши проёмы.'
     : 'Банные чаны и купели для дачи в Пензе и области: модели от 250 000 ₽, комплектации, сталь, доставка и монтаж. Подбор и расчёт от Evtenia.';
   const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+  const doorProducts = doorsPage ? readDoorCatalogProducts().filter((product) => product.type === 'door') : [];
+  const doorCollections = Array.from(new Map(doorProducts.map((product) => [product.collectionSlug, { name: product.collection, slug: product.collectionSlug, count: 0, image: product.image }])).values());
+  for (const collection of doorCollections) collection.count = doorProducts.filter((product) => product.collectionSlug === collection.slug).length;
   const itemNames = doorsPage
-    ? ['Соул', 'Сицилия', 'Соло', 'Лайн', 'Юкон', 'Эрика', 'Дизайн', 'Модерн', 'Неоклассика', 'Классика', 'Эко', 'ЭкоГранд']
+    ? ['Соул', 'Сицилия', 'Соло', 'Лайн', 'Юкон', 'Эрика', 'Дизайн', 'Модерн', 'Неоклассика', 'Классика', 'Эко', 'ЭкоГранд', 'Калифорния', 'Минимал', 'Ноттэ', 'Смарт', 'Тоскана', 'Комплектующие']
     : ['Чан «Лайт»', 'Чан с печью-подставкой', 'Чан «Гранд»', 'Чан «Кубок»', 'Чан «Кубок Гранд»', 'Встраиваемый чан в террасу', 'Ледяная купель', 'Купель «Квадро»', 'Купель «Квадро XL»'];
   const schema = {
     '@context': 'https://schema.org',
@@ -2046,7 +2074,10 @@ app.get(['/dveri', '/chany'], (req, res, next) => {
       {
         '@type': 'ItemList',
         name: doorsPage ? 'Коллекции межкомнатных дверей' : 'Банные чаны и купели',
-        itemListElement: itemNames.map((name, index) => ({ '@type': 'ListItem', position: index + 1, name }))
+        numberOfItems: doorsPage ? doorCollections.length : itemNames.length,
+        itemListElement: doorsPage
+          ? doorCollections.map((collection, index) => ({ '@type': 'ListItem', position: index + 1, name: collection.name, url: `${origin}/dveri/${collection.slug}`, image: `${origin}/api/assets/catalog/doors/${collection.image}.webp`, numberOfItems: collection.count }))
+          : itemNames.map((name, index) => ({ '@type': 'ListItem', position: index + 1, name }))
       }
     ]
   };
@@ -2084,11 +2115,12 @@ app.get('/dveri/:slug', (req, res, next) => {
   const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
   const canonical = `${origin}/dveri/${req.params.slug}`;
   const title = `Двери «${collection.name}» в Пензе — коллекция | Evtenia`;
-  const description = composeSeoDescription(collection.description, 'Каталог и подбор в Пензе; замер и расчёт заказа.');
+  const models = readDoorCatalogProducts().filter((product) => product.type === 'door' && product.collectionSlug === req.params.slug);
+  const description = composeSeoDescription(collection.description, `В каталоге ${models.length} моделей. Подбор, замер и расчёт заказа в Пензе и области.`);
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
-      { '@type': 'CollectionPage', name: `Коллекция межкомнатных дверей «${collection.name}»`, description, url: canonical, inLanguage: 'ru-RU', mainEntity: { '@type': 'ItemList', itemListElement: collection.models.map((name, index) => ({ '@type': 'ListItem', position: index + 1, name })) } },
+      { '@type': 'CollectionPage', name: `Коллекция межкомнатных дверей «${collection.name}»`, description, url: canonical, inLanguage: 'ru-RU', mainEntity: { '@type': 'ItemList', itemListElement: models.map((product, index) => ({ '@type': 'ListItem', position: index + 1, name: product.name, image: `${origin}/api/assets/catalog/doors/${product.image}.webp`, description: product.finish || `Модель коллекции «${collection.name}»; цена и наличие уточняются.` })) } },
       { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Главная', item: `${origin}/` }, { '@type': 'ListItem', position: 2, name: 'Двери', item: `${origin}/dveri` }, { '@type': 'ListItem', position: 3, name: collection.name, item: canonical }] }
     ]
   };
@@ -2443,7 +2475,8 @@ if (fs.existsSync(FRONTEND_DIST)) {
         { '@type': 'ItemList', name: 'Типовые проекты бань для Пензы и Пензенской области', itemListElement: bathProjects.map((project, index) => ({ '@type': 'ListItem', position: index + 1, name: project.title, url: `${origin}/project/${encodeURIComponent(getProjectSlug(project, data.projects))}` })) }
       ]
     } : undefined;
-    const rendered = renderSeoDocument(fs.readFileSync(indexPath, 'utf8'), page.title, page.description, canonical, schema, schema ? `${origin}/api/assets/projects/catalog/bath-family.webp` : undefined);
+    let rendered = renderSeoDocument(fs.readFileSync(indexPath, 'utf8'), page.title, page.description, canonical, schema, schema ? `${origin}/api/assets/projects/catalog/bath-family.webp` : undefined);
+    if (isAdminPage) rendered = rendered.replace('</head>', '<meta name="robots" content="noindex,nofollow" /></head>');
     res.set('Cache-Control', 'public, max-age=300');
     return res.type('html').send(rendered);
   });

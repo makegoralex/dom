@@ -1,0 +1,1271 @@
+[
+  {
+    "id": "19099",
+    "name": "Смарт 05",
+    "collection": "Смарт",
+    "collectionSlug": "smart",
+    "image": "products/door-19099",
+    "finish": "Платина Кромка шагрень черная",
+    "type": "door"
+  },
+  {
+    "id": "19096",
+    "name": "Смарт 04",
+    "collection": "Смарт",
+    "collectionSlug": "smart",
+    "image": "products/door-19096",
+    "finish": "Муссон Молдинг черный пластиковый (8 мм) Кромка шагрень черная",
+    "type": "door"
+  },
+  {
+    "id": "19093",
+    "name": "Смарт 03",
+    "collection": "Смарт",
+    "collectionSlug": "smart",
+    "image": "products/door-19093",
+    "finish": "Текстурный белый Молдинг черный пластиковый (8 мм) Кромка шагрень черная",
+    "type": "door"
+  },
+  {
+    "id": "19090",
+    "name": "Смарт 02",
+    "collection": "Смарт",
+    "collectionSlug": "smart",
+    "image": "products/door-19090",
+    "finish": "Пепельный бетон/Орех карти Молдинг черный пластиковый (8 мм) Кромка шагрень черная",
+    "type": "door"
+  },
+  {
+    "id": "19086",
+    "name": "Смарт 01",
+    "collection": "Смарт",
+    "collectionSlug": "smart",
+    "image": "products/door-19086",
+    "finish": "Бежевый/Орех карти Молдинг черный пластиковый (8 мм) Кромка шагрень черная",
+    "type": "door"
+  },
+  {
+    "id": "18967",
+    "name": "Тоскана М422",
+    "collection": "Тоскана",
+    "collectionSlug": "toskana",
+    "image": "products/door-18967",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18964",
+    "name": "Тоскана М421",
+    "collection": "Тоскана",
+    "collectionSlug": "toskana",
+    "image": "products/door-18964",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18961",
+    "name": "Тоскана М412",
+    "collection": "Тоскана",
+    "collectionSlug": "toskana",
+    "image": "products/door-18961",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18958",
+    "name": "Тоскана М411",
+    "collection": "Тоскана",
+    "collectionSlug": "toskana",
+    "image": "products/door-18958",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18871",
+    "name": "Соул М 464",
+    "collection": "Соул",
+    "collectionSlug": "soul",
+    "image": "products/door-18871",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18868",
+    "name": "Соул М 463",
+    "collection": "Соул",
+    "collectionSlug": "soul",
+    "image": "products/door-18868",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18865",
+    "name": "Соул М 462",
+    "collection": "Соул",
+    "collectionSlug": "soul",
+    "image": "products/door-18865",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18856",
+    "name": "Соул М 461",
+    "collection": "Соул",
+    "collectionSlug": "soul",
+    "image": "products/door-18856",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18444",
+    "name": "Соло 9",
+    "collection": "Соло",
+    "collectionSlug": "solo",
+    "image": "products/door-18444",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17968",
+    "name": "Соло 8",
+    "collection": "Соло",
+    "collectionSlug": "solo",
+    "image": "products/door-17968",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17965",
+    "name": "Соло 7",
+    "collection": "Соло",
+    "collectionSlug": "solo",
+    "image": "products/door-17965",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17962",
+    "name": "Соло 6",
+    "collection": "Соло",
+    "collectionSlug": "solo",
+    "image": "products/door-17962",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17958",
+    "name": "Соло 5",
+    "collection": "Соло",
+    "collectionSlug": "solo",
+    "image": "products/door-17958",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17954",
+    "name": "Соло 4",
+    "collection": "Соло",
+    "collectionSlug": "solo",
+    "image": "products/door-17954",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17951",
+    "name": "Соло 3",
+    "collection": "Соло",
+    "collectionSlug": "solo",
+    "image": "products/door-17951",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17945",
+    "name": "Соло 2",
+    "collection": "Соло",
+    "collectionSlug": "solo",
+    "image": "products/door-17945",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17942",
+    "name": "Соло 1",
+    "collection": "Соло",
+    "collectionSlug": "solo",
+    "image": "products/door-17942",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16552",
+    "name": "Лайн 3",
+    "collection": "Лайн",
+    "collectionSlug": "line",
+    "image": "products/door-16552",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16549",
+    "name": "Лайн 2",
+    "collection": "Лайн",
+    "collectionSlug": "line",
+    "image": "products/door-16549",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16546",
+    "name": "Лайн 1",
+    "collection": "Лайн",
+    "collectionSlug": "line",
+    "image": "products/door-16546",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17316",
+    "name": "Лайн 10",
+    "collection": "Лайн",
+    "collectionSlug": "line",
+    "image": "products/door-17316",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17313",
+    "name": "Лайн 9",
+    "collection": "Лайн",
+    "collectionSlug": "line",
+    "image": "products/door-17313",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17310",
+    "name": "Лайн 9",
+    "collection": "Лайн",
+    "collectionSlug": "line",
+    "image": "products/door-17310",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17307",
+    "name": "Лайн 8",
+    "collection": "Лайн",
+    "collectionSlug": "line",
+    "image": "products/door-17307",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17304",
+    "name": "Лайн 7",
+    "collection": "Лайн",
+    "collectionSlug": "line",
+    "image": "products/door-17304",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17301",
+    "name": "Лайн 7",
+    "collection": "Лайн",
+    "collectionSlug": "line",
+    "image": "products/door-17301",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16558",
+    "name": "Лайн 5",
+    "collection": "Лайн",
+    "collectionSlug": "line",
+    "image": "products/door-16558",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16555",
+    "name": "Лайн 4",
+    "collection": "Лайн",
+    "collectionSlug": "line",
+    "image": "products/door-16555",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17939",
+    "name": "Лайн 15",
+    "collection": "Лайн",
+    "collectionSlug": "line",
+    "image": "products/door-17939",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17936",
+    "name": "Лайн 14",
+    "collection": "Лайн",
+    "collectionSlug": "line",
+    "image": "products/door-17936",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17543",
+    "name": "Лайн 13",
+    "collection": "Лайн",
+    "collectionSlug": "line",
+    "image": "products/door-17543",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17322",
+    "name": "Лайн 12",
+    "collection": "Лайн",
+    "collectionSlug": "line",
+    "image": "products/door-17322",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17319",
+    "name": "Лайн 11",
+    "collection": "Лайн",
+    "collectionSlug": "line",
+    "image": "products/door-17319",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18698",
+    "name": "Сицилия М406",
+    "collection": "Сицилия",
+    "collectionSlug": "siciliya",
+    "image": "products/door-18698",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18695",
+    "name": "Сицилия М405",
+    "collection": "Сицилия",
+    "collectionSlug": "siciliya",
+    "image": "products/door-18695",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18692",
+    "name": "Сицилия М404",
+    "collection": "Сицилия",
+    "collectionSlug": "siciliya",
+    "image": "products/door-18692",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18689",
+    "name": "Сицилия М403",
+    "collection": "Сицилия",
+    "collectionSlug": "siciliya",
+    "image": "products/door-18689",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18686",
+    "name": "Сицилия М402",
+    "collection": "Сицилия",
+    "collectionSlug": "siciliya",
+    "image": "products/door-18686",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18683",
+    "name": "Сицилия М401",
+    "collection": "Сицилия",
+    "collectionSlug": "siciliya",
+    "image": "products/door-18683",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18680",
+    "name": "Калифорния М453",
+    "collection": "Калифорния",
+    "collectionSlug": "kaliforniya",
+    "image": "products/door-18680",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18677",
+    "name": "Калифорния М452",
+    "collection": "Калифорния",
+    "collectionSlug": "kaliforniya",
+    "image": "products/door-18677",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18674",
+    "name": "Калифорния М451",
+    "collection": "Калифорния",
+    "collectionSlug": "kaliforniya",
+    "image": "products/door-18674",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18658",
+    "name": "Классика ДФГ",
+    "collection": "Классика",
+    "collectionSlug": "klassika",
+    "image": "products/door-18658",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18648",
+    "name": "Минимал 4",
+    "collection": "Минимал",
+    "collectionSlug": "minimal",
+    "image": "products/door-18648",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18614",
+    "name": "Минимал 2",
+    "collection": "Минимал",
+    "collectionSlug": "minimal",
+    "image": "products/door-18614",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18611",
+    "name": "Минимал 1",
+    "collection": "Минимал",
+    "collectionSlug": "minimal",
+    "image": "products/door-18611",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18134",
+    "name": "ЭкоГранд М254",
+    "collection": "ЭкоГранд",
+    "collectionSlug": "ekogrand",
+    "image": "products/door-18134",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18066",
+    "name": "Ноттэ M372",
+    "collection": "Ноттэ",
+    "collectionSlug": "notte",
+    "image": "products/door-18066",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18063",
+    "name": "Ноттэ  M371",
+    "collection": "Ноттэ",
+    "collectionSlug": "notte",
+    "image": "products/door-18063",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "18017",
+    "name": "ЭкоГранд М252",
+    "collection": "ЭкоГранд",
+    "collectionSlug": "ekogrand",
+    "image": "products/door-18017",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17981",
+    "name": "Дизайн М92",
+    "collection": "Дизайн",
+    "collectionSlug": "dizayn",
+    "image": "products/door-17981",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17907",
+    "name": "Классика М31 ДФГ",
+    "collection": "Классика",
+    "collectionSlug": "klassika",
+    "image": "products/door-17907",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17593",
+    "name": "НеоКлассика М602 ДФГ",
+    "collection": "Неоклассика",
+    "collectionSlug": "neoklassika",
+    "image": "products/door-17593",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17548",
+    "name": "ЭКО М121",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-17548",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17466",
+    "name": "Классика М31 ДФО",
+    "collection": "Классика",
+    "collectionSlug": "klassika",
+    "image": "products/door-17466",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17435",
+    "name": "ЭкоГранд М222",
+    "collection": "ЭкоГранд",
+    "collectionSlug": "ekogrand",
+    "image": "products/door-17435",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17429",
+    "name": "ЭкоГранд М233",
+    "collection": "ЭкоГранд",
+    "collectionSlug": "ekogrand",
+    "image": "products/door-17429",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17426",
+    "name": "ЭкоГранд М232",
+    "collection": "ЭкоГранд",
+    "collectionSlug": "ekogrand",
+    "image": "products/door-17426",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17423",
+    "name": "ЭкоГранд М220",
+    "collection": "ЭкоГранд",
+    "collectionSlug": "ekogrand",
+    "image": "products/door-17423",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17415",
+    "name": "ЭКО М145",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-17415",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17412",
+    "name": "ЭКО М144",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-17412",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17409",
+    "name": "ЭКО М142",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-17409",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17406",
+    "name": "ЭКО М141",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-17406",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17403",
+    "name": "ЭКО М140",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-17403",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17400",
+    "name": "ЭКО М137",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-17400",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17397",
+    "name": "ЭКО М134",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-17397",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17394",
+    "name": "ЭКО М133",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-17394",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17390",
+    "name": "ЭКО М124",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-17390",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17380",
+    "name": "ЭКО М114",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-17380",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17374",
+    "name": "ЭКО М103",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-17374",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17371",
+    "name": "ЭКО М101",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-17371",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17363",
+    "name": "НеоКлассика М614 ДФО",
+    "collection": "Неоклассика",
+    "collectionSlug": "neoklassika",
+    "image": "products/door-17363",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17360",
+    "name": "НеоКлассика М614 ДФГ",
+    "collection": "Неоклассика",
+    "collectionSlug": "neoklassika",
+    "image": "products/door-17360",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17357",
+    "name": "Модерн М316",
+    "collection": "Модерн",
+    "collectionSlug": "modern",
+    "image": "products/door-17357",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17352",
+    "name": "Дизайн М91",
+    "collection": "Дизайн",
+    "collectionSlug": "dizayn",
+    "image": "products/door-17352",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17295",
+    "name": "ЮКОН М327",
+    "collection": "Юкон",
+    "collectionSlug": "yukon",
+    "image": "products/door-17295",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17292",
+    "name": "ЮКОН М326",
+    "collection": "Юкон",
+    "collectionSlug": "yukon",
+    "image": "products/door-17292",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17288",
+    "name": "ЮКОН М325",
+    "collection": "Юкон",
+    "collectionSlug": "yukon",
+    "image": "products/door-17288",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17285",
+    "name": "ЮКОН М324",
+    "collection": "Юкон",
+    "collectionSlug": "yukon",
+    "image": "products/door-17285",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17282",
+    "name": "ЮКОН М323",
+    "collection": "Юкон",
+    "collectionSlug": "yukon",
+    "image": "products/door-17282",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17268",
+    "name": "Эрика М655 ДФО",
+    "collection": "Эрика",
+    "collectionSlug": "erika",
+    "image": "products/door-17268",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17265",
+    "name": "Эрика М655 ДФГ",
+    "collection": "Эрика",
+    "collectionSlug": "erika",
+    "image": "products/door-17265",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17262",
+    "name": "Эрика М654 ДФО",
+    "collection": "Эрика",
+    "collectionSlug": "erika",
+    "image": "products/door-17262",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17259",
+    "name": "Эрика М654 ДФГ",
+    "collection": "Эрика",
+    "collectionSlug": "erika",
+    "image": "products/door-17259",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17256",
+    "name": "Эрика М653 ДФО",
+    "collection": "Эрика",
+    "collectionSlug": "erika",
+    "image": "products/door-17256",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17253",
+    "name": "Эрика М653 ДФГ",
+    "collection": "Эрика",
+    "collectionSlug": "erika",
+    "image": "products/door-17253",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17250",
+    "name": "Эрика М652 ДФО",
+    "collection": "Эрика",
+    "collectionSlug": "erika",
+    "image": "products/door-17250",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17247",
+    "name": "Эрика М652 ДФГ",
+    "collection": "Эрика",
+    "collectionSlug": "erika",
+    "image": "products/door-17247",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17237",
+    "name": "Эрика М651 ДФО",
+    "collection": "Эрика",
+    "collectionSlug": "erika",
+    "image": "products/door-17237",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "17232",
+    "name": "Эрика М651 ДФГ",
+    "collection": "Эрика",
+    "collectionSlug": "erika",
+    "image": "products/door-17232",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16853",
+    "name": "Наличник телескопический",
+    "collection": "Комплектующие",
+    "collectionSlug": "komplektuyushchie",
+    "image": "products/door-16853",
+    "finish": "Материал — МДФ (10 мм) Длина — 2150 мм, Толщина — 10 мм, Ширина — 70 мм",
+    "type": "accessory"
+  },
+  {
+    "id": "16850",
+    "name": "Коробочный телескопический брус",
+    "collection": "Комплектующие",
+    "collectionSlug": "komplektuyushchie",
+    "image": "products/door-16850",
+    "finish": "Телескопический брус дверной с уплотнителем: Материал — МДФ (32 мм) Длина — 2070 мм, Толщина — 32 мм, Ширина — 70 мм",
+    "type": "accessory"
+  },
+  {
+    "id": "16847",
+    "name": "Доборный телескопический брус",
+    "collection": "Комплектующие",
+    "collectionSlug": "komplektuyushchie",
+    "image": "products/door-16847",
+    "finish": "Материал — МДФ (10 мм) Длина — 2070 мм, Толщина — 10 мм, Ширина — 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600 мм",
+    "type": "accessory"
+  },
+  {
+    "id": "16844",
+    "name": "Дизайн М97",
+    "collection": "Дизайн",
+    "collectionSlug": "dizayn",
+    "image": "products/door-16844",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16797",
+    "name": "НеоКлассика М609 ДФГ",
+    "collection": "Неоклассика",
+    "collectionSlug": "neoklassika",
+    "image": "products/door-16797",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16791",
+    "name": "НеоКлассика М607 ДФГ",
+    "collection": "Неоклассика",
+    "collectionSlug": "neoklassika",
+    "image": "products/door-16791",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16779",
+    "name": "НеоКлассика М603 ДФО",
+    "collection": "Неоклассика",
+    "collectionSlug": "neoklassika",
+    "image": "products/door-16779",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16770",
+    "name": "НеоКлассика М603 ДФГ",
+    "collection": "Неоклассика",
+    "collectionSlug": "neoklassika",
+    "image": "products/door-16770",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16767",
+    "name": "НеоКлассика М602 ДФО",
+    "collection": "Неоклассика",
+    "collectionSlug": "neoklassika",
+    "image": "products/door-16767",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16763",
+    "name": "НеоКлассика М601 ДФГ",
+    "collection": "Неоклассика",
+    "collectionSlug": "neoklassika",
+    "image": "products/door-16763",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16750",
+    "name": "Классика М88 ДФГ",
+    "collection": "Классика",
+    "collectionSlug": "klassika",
+    "image": "products/door-16750",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16747",
+    "name": "Классика М87 ДФО",
+    "collection": "Классика",
+    "collectionSlug": "klassika",
+    "image": "products/door-16747",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16733",
+    "name": "Дизайн М89",
+    "collection": "Дизайн",
+    "collectionSlug": "dizayn",
+    "image": "products/door-16733",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16690",
+    "name": "ЭкоГранд М231",
+    "collection": "ЭкоГранд",
+    "collectionSlug": "ekogrand",
+    "image": "products/door-16690",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16687",
+    "name": "ЭкоГранд М221",
+    "collection": "ЭкоГранд",
+    "collectionSlug": "ekogrand",
+    "image": "products/door-16687",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16656",
+    "name": "ЭкоГранд М204",
+    "collection": "ЭкоГранд",
+    "collectionSlug": "ekogrand",
+    "image": "products/door-16656",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16652",
+    "name": "ЭкоГранд М203",
+    "collection": "ЭкоГранд",
+    "collectionSlug": "ekogrand",
+    "image": "products/door-16652",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16649",
+    "name": "ЭкоГранд М202",
+    "collection": "ЭкоГранд",
+    "collectionSlug": "ekogrand",
+    "image": "products/door-16649",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16646",
+    "name": "ЭкоГранд М201",
+    "collection": "ЭкоГранд",
+    "collectionSlug": "ekogrand",
+    "image": "products/door-16646",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16641",
+    "name": "ЭкоГранд М200",
+    "collection": "ЭкоГранд",
+    "collectionSlug": "ekogrand",
+    "image": "products/door-16641",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16625",
+    "name": "ЭКО М131",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-16625",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16622",
+    "name": "ЭКО М130",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-16622",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16616",
+    "name": "ЭКО М126",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-16616",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16612",
+    "name": "ЭКО М125",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-16612",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16609",
+    "name": "ЭКО М120",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-16609",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16606",
+    "name": "ЭКО М119",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-16606",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16603",
+    "name": "ЭКО М118",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-16603",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16597",
+    "name": "ЭКО М116",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-16597",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16594",
+    "name": "ЭКО М112",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-16594",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16588",
+    "name": "ЭКО М111",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-16588",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16583",
+    "name": "ЭКО М110",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-16583",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16579",
+    "name": "ЭКО М109",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-16579",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16569",
+    "name": "ЭКО М106",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-16569",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16561",
+    "name": "ЭКО М102",
+    "collection": "Эко",
+    "collectionSlug": "eko",
+    "image": "products/door-16561",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16540",
+    "name": "Дизайн М85",
+    "collection": "Дизайн",
+    "collectionSlug": "dizayn",
+    "image": "products/door-16540",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16534",
+    "name": "Дизайн М83",
+    "collection": "Дизайн",
+    "collectionSlug": "dizayn",
+    "image": "products/door-16534",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16522",
+    "name": "Дизайн М78",
+    "collection": "Дизайн",
+    "collectionSlug": "dizayn",
+    "image": "products/door-16522",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16519",
+    "name": "Дизайн М77",
+    "collection": "Дизайн",
+    "collectionSlug": "dizayn",
+    "image": "products/door-16519",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16507",
+    "name": "Дизайн М72",
+    "collection": "Дизайн",
+    "collectionSlug": "dizayn",
+    "image": "products/door-16507",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16504",
+    "name": "Дизайн М71",
+    "collection": "Дизайн",
+    "collectionSlug": "dizayn",
+    "image": "products/door-16504",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16388",
+    "name": "Модерн М310",
+    "collection": "Модерн",
+    "collectionSlug": "modern",
+    "image": "products/door-16388",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16385",
+    "name": "Модерн М308",
+    "collection": "Модерн",
+    "collectionSlug": "modern",
+    "image": "products/door-16385",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16382",
+    "name": "Модерн М307",
+    "collection": "Модерн",
+    "collectionSlug": "modern",
+    "image": "products/door-16382",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16379",
+    "name": "Модерн М306",
+    "collection": "Модерн",
+    "collectionSlug": "modern",
+    "image": "products/door-16379",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16358",
+    "name": "Модерн M301",
+    "collection": "Модерн",
+    "collectionSlug": "modern",
+    "image": "products/door-16358",
+    "finish": "",
+    "type": "door"
+  },
+  {
+    "id": "16352",
+    "name": "Классика М87 ДФГ",
+    "collection": "Классика",
+    "collectionSlug": "klassika",
+    "image": "products/door-16352",
+    "finish": "",
+    "type": "door"
+  }
+]
