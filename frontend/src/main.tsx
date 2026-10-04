@@ -985,11 +985,16 @@ function chunkBy<T>(items: T[], size: number) {
   return chunks;
 }
 
-const NAV_MENU_DEFAULT_ORDER = ['home', 'projects', 'baths', 'doors', 'chany', 'lands', 'homes', 'services', 'furniture', 'settlements', 'promotions', 'journal', 'about', 'contacts'] as const;
+const FURNITURE_MENU_COLUMNS = chunkBy(FURNITURE_MENU_CHILDREN, 2);
+const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'baths', 'doors', 'chany', 'lands', 'furniture', 'services', 'promotions', 'homes', 'settlements', 'journal', 'contacts'] as const;
+const LEGACY_CROWDED_MENU_ORDER = ['home', 'about', 'projects', 'baths', 'doors', 'chany', 'lands', 'furniture', 'services', 'promotions', 'contacts', 'homes', 'settlements', 'journal'] as const;
 type NavMenuKey = (typeof NAV_MENU_DEFAULT_ORDER)[number];
 
 function normalizeMenuOrder(order?: string[]) {
   const incoming = Array.isArray(order) ? order.filter((item): item is NavMenuKey => NAV_MENU_DEFAULT_ORDER.includes(item as NavMenuKey)) : [];
+  if (incoming.length === LEGACY_CROWDED_MENU_ORDER.length && incoming.every((key, index) => key === LEGACY_CROWDED_MENU_ORDER[index])) {
+    return [...NAV_MENU_DEFAULT_ORDER];
+  }
   const normalized = [...incoming, ...NAV_MENU_DEFAULT_ORDER.filter((item) => !incoming.includes(item))];
   for (const key of ['baths', 'doors', 'chany'] as const) {
     if (!incoming.includes(key)) normalized.splice(normalized.indexOf(key), 1);
@@ -1000,6 +1005,11 @@ function normalizeMenuOrder(order?: string[]) {
     const index = normalized.indexOf(insertAfter);
     normalized.splice(index + 1, 0, key);
     insertAfter = key;
+  }
+  const contactsIndex = normalized.indexOf('contacts');
+  if (contactsIndex >= 0 && contactsIndex !== normalized.length - 1) {
+    normalized.splice(contactsIndex, 1);
+    normalized.push('contacts');
   }
   return normalized;
 }
@@ -1199,17 +1209,22 @@ function HeaderNav({
     window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
       const dropdown = anchor.querySelector<HTMLElement>(':scope > .projects-dropdown, :scope > .services-dropdown, :scope > .furniture-dropdown');
       if (!dropdown) return;
-      dropdown.style.position = 'absolute';
-      dropdown.style.top = '100%';
       dropdown.style.maxWidth = `${Math.max(220, window.innerWidth - 32)}px`;
-      dropdown.style.left = '0';
       dropdown.style.right = 'auto';
       dropdown.style.transform = 'none';
       dropdown.style.margin = '0';
+      const anchorRect = anchor.getBoundingClientRect();
+      const isWideDesktop = window.matchMedia('(min-width: 1101px)').matches;
+      dropdown.style.position = 'absolute';
+      dropdown.style.top = '100%';
+      dropdown.style.left = '0';
+      if (!isWideDesktop) {
+        return;
+      }
       window.requestAnimationFrame(() => {
-        const anchorRect = anchor.getBoundingClientRect();
         const dropdownWidth = dropdown.getBoundingClientRect().width;
-        const leftInViewport = Math.max(16, Math.min(anchorRect.left, window.innerWidth - dropdownWidth - 16));
+        const maxLeft = Math.max(16, window.innerWidth - dropdownWidth - 16);
+        const leftInViewport = Math.max(16, Math.min(anchorRect.left, maxLeft));
         dropdown.style.left = `${leftInViewport - anchorRect.left}px`;
       });
     }));
@@ -1322,10 +1337,23 @@ function HeaderNav({
                   onMouseEnter={cancelDesktopMenuClose}
                   onMouseLeave={scheduleDesktopMenuClose}
                 >
-                  {item.children.map((child, idx) => (
+                  {item.label === 'МЕБЕЛЬ' ? FURNITURE_MENU_COLUMNS.map((column, columnIndex) => (
+                    <div className="furniture-dropdown-col furniture-mega-column" key={`furniture-column-${columnIndex}`}>
+                      {column.map((child, childIndex) => (
+                        <section className="furniture-dropdown-category" key={`${child.label}_${childIndex}`}>
+                          <span className="dropdown-heading furniture-dropdown-title">{child.label}</span>
+                          <div className="furniture-dropdown-links">
+                            {child.children?.map((nested, nestedIdx) => (
+                              <a key={nested.href || `${nested.label}_${nestedIdx}`} href={nested.href} className={`dropdown-link ${nested.href && window.location.pathname === nested.href ? 'active' : ''}`}>{nested.label}</a>
+                            ))}
+                          </div>
+                        </section>
+                      ))}
+                    </div>
+                  )) : item.children.map((child, idx) => (
                     child.children ? (
-                      <div className={`dropdown-col${item.label === 'МЕБЕЛЬ' ? ' furniture-dropdown-col' : ''}`} key={`${child.label}_${idx}`}>
-                        <span className={`dropdown-heading${item.label === 'МЕБЕЛЬ' ? ' furniture-dropdown-title' : ''}`}>{child.label}</span>
+                      <div className="dropdown-col" key={`${child.label}_${idx}`}>
+                        <span className="dropdown-heading">{child.label}</span>
                         {child.children.map((nested, nestedIdx) => (
                           <a key={nested.href || `${nested.label}_${nestedIdx}`} href={nested.href} className={`dropdown-link ${nested.href && window.location.pathname === nested.href ? 'active' : ''}`}>{nested.label}</a>
                         ))}
@@ -2734,7 +2762,7 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
             <div className="bath-catalog-guide-heading">
               <span>Строительство бань в Пензе и области</span>
               <h2 id="bath-catalog-guide-title">Подберём баню под участок, привычки и бюджет</h2>
-              <p>Представленные проекты — типовые идеи для первого выбора. Мы уточним, сколько человек будет пользоваться баней, нужна ли отдельная комната отдыха, планируется ли зимняя эксплуатация и какие ограничения есть на участке.</p>
+              <p>Подскажем планировку и комплектацию под размер участка и привычный сценарий отдыха. Стоимость в карточках — стартовый ориентир; итоговый расчёт зависит от основания, печи, отделки, доставки и монтажа.</p>
             </div>
             <div className="bath-catalog-guide-grid">
               <article><h3>Небольшая дачная баня</h3><p>Площадь 12–16 м²: компактные парная и моечная, предбанник или небольшая зона отдыха. Подходит, когда важны простая планировка и небольшой занимаемый участок.</p></article>

@@ -404,8 +404,8 @@ const SERVICE_PAGE_SLUGS = [
   'plastikovye-okna', 'dveri', 'remont', 'lestnitsy', 'svai', 'dizainer', 'landshaftnyy-dizayn',
   'mezhevanie', 'ipoteka-oformlenie', 'strahovanie'
 ];
-const NAV_MENU_DEFAULT_ORDER = ['home', 'projects', 'baths', 'doors', 'chany', 'lands', 'homes', 'services', 'furniture', 'settlements', 'promotions', 'journal', 'about', 'contacts'];
 const LEGACY_CROWDED_MENU_ORDER = ['home', 'about', 'projects', 'baths', 'doors', 'chany', 'lands', 'furniture', 'services', 'promotions', 'contacts', 'homes', 'settlements', 'journal'];
+const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'baths', 'doors', 'chany', 'lands', 'furniture', 'services', 'promotions', 'homes', 'settlements', 'journal', 'contacts'];
 
 function normalizeMenuOrder(order?: string[]) {
   const incoming = Array.isArray(order) ? order.filter((item) => NAV_MENU_DEFAULT_ORDER.includes(item)) : [];
@@ -418,6 +418,11 @@ function normalizeMenuOrder(order?: string[]) {
     if (incoming.includes(key)) { insertAfter = key; continue; }
     normalized.splice(normalized.indexOf(insertAfter) + 1, 0, key);
     insertAfter = key;
+  }
+  const contactsIndex = normalized.indexOf('contacts');
+  if (contactsIndex >= 0 && contactsIndex !== normalized.length - 1) {
+    normalized.splice(contactsIndex, 1);
+    normalized.push('contacts');
   }
   return normalized;
 }
