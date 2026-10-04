@@ -2,19 +2,12 @@ import React, { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } fro
 import ReactDOM from 'react-dom/client';
 import { createPortal } from 'react-dom';
 import './styles.css';
-import type { HouseListing } from './HomesPages';
-import type { JournalArticle, JournalCategory } from './JournalPages';
+import { HomeDetailPage, HomesPage, type HouseListing } from './HomesPages';
+import { JournalArticlePage, JournalIndexPage, type JournalArticle, type JournalCategory } from './JournalPages';
+import { ChanyCatalogPage, DoorCollectionPage, DoorsCatalogPage } from './CatalogPages';
+import { LesnoeOzeroPage } from './LesnoeOzeroPage';
+import { MortgageCalculatorPage } from './MortgageCalculatorPage';
 import { LESNOE_OZERO_PHASES, type LesnoeOzeroPlot } from './lesnoeOzeroPlots';
-
-const LesnoeOzeroPage = React.lazy(() => import('./LesnoeOzeroPage').then((module) => ({ default: module.LesnoeOzeroPage })));
-const MortgageCalculatorPage = React.lazy(() => import('./MortgageCalculatorPage').then((module) => ({ default: module.MortgageCalculatorPage })));
-const HomesPage = React.lazy(() => import('./HomesPages').then((module) => ({ default: module.HomesPage })));
-const HomeDetailPage = React.lazy(() => import('./HomesPages').then((module) => ({ default: module.HomeDetailPage })));
-const JournalIndexPage = React.lazy(() => import('./JournalPages').then((module) => ({ default: module.JournalIndexPage })));
-const JournalArticlePage = React.lazy(() => import('./JournalPages').then((module) => ({ default: module.JournalArticlePage })));
-const DoorsCatalogPage = React.lazy(() => import('./CatalogPages').then((module) => ({ default: module.DoorsCatalogPage })));
-const DoorCollectionPage = React.lazy(() => import('./CatalogPages').then((module) => ({ default: module.DoorCollectionPage })));
-const ChanyCatalogPage = React.lazy(() => import('./CatalogPages').then((module) => ({ default: module.ChanyCatalogPage })));
 
 type HouseProject = {
   id: string;
@@ -1132,17 +1125,21 @@ function sanitizeCmsHtml(html: string) {
 
   // Promote the first short, bold paragraph to a real section heading. This
   // keeps partner copy intact while giving furniture/service pages hierarchy.
-  const firstTextParagraph = Array.from(doc.body.querySelectorAll('p')).find((paragraph) =>
-    (paragraph.textContent || '').replace(/\s+/g, ' ').trim().length > 0
-  );
-  if (firstTextParagraph && firstTextParagraph.querySelector(':scope > b, :scope > strong')) {
-    const title = (firstTextParagraph.textContent || '').replace(/\s+/g, ' ').trim();
-    if (title.length <= 96) {
-      const heading = doc.createElement('h2');
-      heading.innerHTML = firstTextParagraph.innerHTML;
-      firstTextParagraph.replaceWith(heading);
-    }
-  }
+  let hasPromotedHeading = false;
+  doc.body.querySelectorAll('p').forEach((paragraph) => {
+    const title = (paragraph.textContent || '').replace(/\s+/g, ' ').trim();
+    const onlyBoldText = paragraph.children.length === 1 && Boolean(paragraph.querySelector(':scope > b, :scope > strong'));
+    const isShortAllCapsLabel = title.length >= 8 && title.length <= 110 && title === title.toLocaleUpperCase('ru-RU') && /[А-ЯЁ]/.test(title);
+    if (!title || title.length > 110 || (!onlyBoldText && !isShortAllCapsLabel)) return;
+    const heading = doc.createElement(hasPromotedHeading ? 'h3' : 'h2');
+    heading.innerHTML = paragraph.innerHTML;
+    paragraph.replaceWith(heading);
+    hasPromotedHeading = true;
+  });
+
+  doc.body.querySelectorAll('p').forEach((paragraph) => {
+    if (paragraph.querySelector('img, video, audio')) paragraph.classList.add('cms-media-paragraph');
+  });
 
   doc.body.querySelectorAll('.cms-gallery, .cms-image-grid').forEach((gallery) => {
     if (!gallery.querySelector('img')) gallery.remove();
@@ -1324,6 +1321,7 @@ function HeaderNav({
           { label: 'Каркасные бани', href: `/baths?type=${encodeURIComponent('Каркасные')}` },
           { label: 'Из профилированного бруса', href: `/baths?type=${encodeURIComponent('Профилированный брус')}` },
           { label: 'Из оцилиндрованного бревна', href: `/baths?type=${encodeURIComponent('Оцилиндрованное бревно')}` },
+          { label: 'Деревянные бани', href: `/baths?type=${encodeURIComponent('Деревянная')}` },
           { label: 'Бани-бочки', href: `/baths?type=${encodeURIComponent('Баня-бочка')}` }
         ]
       },
@@ -2051,6 +2049,7 @@ function PublicPage() {
                 <a href="/baths?type=Каркасные">Каркасные</a>
                 <a href="/baths?type=Профилированный%20брус">Из бруса</a>
                 <a href="/baths?type=Оцилиндрованное%20бревно">Из бревна</a>
+                <a href="/baths?type=Деревянная">Деревянные бани</a>
                 <a href="/baths?type=Баня-бочка">Бани-бочки</a>
                 <a href="/baths">Смотреть все проекты бань</a>
               </div>
@@ -2288,6 +2287,9 @@ function InternalHeader() {
   const [menuOrder, setMenuOrder] = useState<NavMenuKey[]>([...NAV_MENU_DEFAULT_ORDER]);
   const [logoUrl, setLogoUrl] = useState(DEFAULT_LOGO_URL);
   const [headerImage, setHeaderImage] = useState('');
+  const headerBackgroundImage = headerImage
+    ? `linear-gradient(rgba(30, 73, 56, .12), rgba(18, 54, 41, .34)), url('${headerImage}')`
+    : undefined;
 
   useEffect(() => {
     fetch(`${API_BASE}/api/menu-order`)
@@ -2312,7 +2314,7 @@ function InternalHeader() {
   return (
     <header
       className="hero hero-exact internal-header"
-      style={headerImage ? { backgroundImage: `linear-gradient(rgba(30, 73, 56, .12), rgba(18, 54, 41, .34)), url('${headerImage}')` } : undefined}
+      style={headerBackgroundImage ? { backgroundImage: headerBackgroundImage } : undefined}
     >
       {!isProductCatalogHeader ? <div className="promo-strip">
         <div className="container promo-inner">
@@ -2327,6 +2329,7 @@ function InternalHeader() {
         </div>
         <HeaderNav serviceColumns={serviceColumns} currentPath={window.location.pathname} menuOrder={menuOrder} />
       </div>
+      <div className="internal-header-gap" aria-hidden="true" style={headerBackgroundImage ? { backgroundImage: headerBackgroundImage } : undefined} />
       <CallbackModal open={openCallback} onClose={() => setOpenCallback(false)} />
     </header>
   );
@@ -2509,7 +2512,7 @@ function SiteFooter() {
           </div>
           <div className="footer-columns">
             <div><h4>Проекты домов</h4><a href="/projects?type=Модульные">Модульные</a><a href="/projects?type=Каркасные">Каркасные</a><a href="/projects?type=Из%20газобетона">Из газобетона</a></div>
-            <div><h4>Бани</h4><a href="/baths?type=Каркасные">Каркасные</a><a href="/baths?type=Профилированный%20брус">Из профилированного бруса</a><a href="/baths?type=Оцилиндрованное%20бревно">Из оцилиндрованного бревна</a><a href="/baths?type=Баня-бочка">Бани-бочки</a></div>
+            <div><h4>Бани</h4><a href="/baths?type=Каркасные">Каркасные</a><a href="/baths?type=Профилированный%20брус">Из профилированного бруса</a><a href="/baths?type=Оцилиндрованное%20бревно">Из оцилиндрованного бревна</a><a href="/baths?type=Деревянная">Деревянные бани</a><a href="/baths?type=Баня-бочка">Бани-бочки</a></div>
             <div><h4>Услуги</h4><a href="/services/fundament">Фундамент</a><a href="/services/skvazhiny">Скважины</a><a href="/services/remont">Ремонт</a><a href="/services/dizainer">Дизайнер</a><a href="/services/strahovanie">Страхование</a></div>
             <div><h4>Разделы сайта</h4><a href="/design">Проектирование</a><a href="/portfolio">Портфолио</a><a href="/discounts/vse-akcii">Ипотека и акции</a><a href="/contacts">Контакты</a></div>
           </div>
@@ -2525,6 +2528,7 @@ function SiteFooter() {
               <a href="/baths?type=Каркасные">Каркасные</a>
               <a href="/baths?type=Профилированный%20брус">Из профилированного бруса</a>
               <a href="/baths?type=Оцилиндрованное%20бревно">Из оцилиндрованного бревна</a>
+              <a href="/baths?type=Деревянная">Деревянные бани</a>
               <a href="/baths?type=Баня-бочка">Бани-бочки</a>
             </details>
             <details>
@@ -2548,7 +2552,6 @@ function SiteFooter() {
         </aside>
       </div>
       <CallbackModal open={openCallback} onClose={() => setOpenCallback(false)} />
-      <a className="ghost-admin" href={`?admin=${ADMIN_KEY}`}>service</a>
     </footer>
   );
 }
@@ -2610,7 +2613,7 @@ function DualRangeSlider({
 function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; sectionTitle: string }) {
   const params = new URLSearchParams(window.location.search);
   const type = params.get('type') || 'Все типы';
-  const [projects, setProjects] = useState<HouseProject[]>([]);
+  const [projects, setProjects] = useState<HouseProject[]>(FALLBACK_PROJECTS);
   const [selectedFloors, setSelectedFloors] = useState<string[]>([]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [minArea, setMinArea] = useState<number | null>(null);
@@ -3430,10 +3433,23 @@ function ProjectDetailPage() {
   };
 
   useEffect(() => {
-    let canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-    if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.appendChild(canonical); }
-    canonical.href = `${window.location.origin}${getProjectPath(project)}`;
-  }, [project]);
+    if (!matchedProject) return;
+    const isBath = matchedProject.category === 'bath';
+    const name = matchedProject.title.replace(/[_-]+/g, ' ').trim();
+    const price = normalizePrice(matchedProject.priceFrom);
+    const title = `${isBath ? 'Проект бани' : 'Проект дома'} «${name}» в Пензе — ${price} | Evtenia`;
+    const description = [
+      matchedProject.shortDescription || matchedProject.fullDescription,
+      matchedProject.isIllustrative || matchedProject.catalogProject ? 'Иллюстративный проект; изображение не является фотографией готового объекта.' : '',
+      `Планировку, комплектацию и стоимость уточним для строительства в Пензе и Пензенской области. Ориентир: ${price}.`
+    ].filter(Boolean).join(' ');
+    writePageSEO({
+      title,
+      description,
+      path: getProjectPath(matchedProject),
+      image: matchedProject.coverImage ? resolveMediaUrl(matchedProject.coverImage) : undefined
+    });
+  }, [matchedProject]);
 
   if (!matchedProject) {
     if (!projectsLoaded) return <div><InternalHeader /><main className="project-loading" aria-live="polite">Загружаем проект…</main><SiteFooter /></div>;
@@ -5813,10 +5829,6 @@ function AppLayout({ children }: { children: ReactNode }) {
   );
 }
 
-function DeferredPage({ children, label = 'Загружаем страницу…' }: { children: ReactNode; label?: string }) {
-  return <React.Suspense fallback={<><InternalHeader /><main className="route-loading-shell" role="status" aria-label={label} aria-busy="true"><div className="container route-loading-skeleton" aria-hidden="true"><div className="route-loading-copy"><span /><span /><span /><span /></div><div className="route-loading-media" /></div></main></>}>{children}</React.Suspense>;
-}
-
 function App() {
   const url = new URL(window.location.href);
   const pathname = normalizePathname(window.location.pathname).replace(/\/+$/, '') || '/';
@@ -5856,31 +5868,31 @@ function App() {
   if (pathname === '/lands/lesnoe-ozero') {
     return (
       <AppLayout>
-        <DeferredPage label="Загружаем коттеджный посёлок…"><LesnoeOzeroPage
+        <LesnoeOzeroPage
           Header={InternalHeader}
           Footer={SiteFooter}
           PrivacyConsent={PrivacyConsent}
           apiBase={API_BASE}
           formatPhone={formatPhoneMask}
-        /></DeferredPage>
+        />
       </AppLayout>
     );
   }
   if (pathname === '/lands') return <AppLayout><LandsPage /></AppLayout>;
   if (pathname.startsWith('/lands/')) return <AppLayout><LandDetailPage /></AppLayout>;
-  if (pathname === '/homes') return <AppLayout><DeferredPage><HomesPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} LeadModal={PromoLeadModal} formatPhone={formatPhoneMask} resolveMedia={resolveMediaUrl} /></DeferredPage></AppLayout>;
-  if (pathname.startsWith('/homes/')) return <AppLayout><DeferredPage><HomeDetailPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} LeadModal={PromoLeadModal} formatPhone={formatPhoneMask} resolveMedia={resolveMediaUrl} /></DeferredPage></AppLayout>;
+  if (pathname === '/homes') return <AppLayout><HomesPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} LeadModal={PromoLeadModal} formatPhone={formatPhoneMask} resolveMedia={resolveMediaUrl} /></AppLayout>;
+  if (pathname.startsWith('/homes/')) return <AppLayout><HomeDetailPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} LeadModal={PromoLeadModal} formatPhone={formatPhoneMask} resolveMedia={resolveMediaUrl} /></AppLayout>;
   if (pathname === '/mortgage-calculator') {
-    return <AppLayout><DeferredPage label="Загружаем калькулятор…"><MortgageCalculatorPage Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} apiBase={API_BASE} formatPhone={formatPhoneMask} /></DeferredPage></AppLayout>;
+    return <AppLayout><MortgageCalculatorPage Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} apiBase={API_BASE} formatPhone={formatPhoneMask} /></AppLayout>;
   }
   if (pathname.startsWith('/project/')) return <AppLayout><ProjectDetailPage /></AppLayout>;
-  if (pathname === '/journal') return <AppLayout><DeferredPage><JournalIndexPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} resolveMedia={resolveMediaUrl} /></DeferredPage></AppLayout>;
-  if (pathname.startsWith('/journal/category/')) return <AppLayout><DeferredPage><JournalIndexPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} resolveMedia={resolveMediaUrl} categorySlug={pathname.replace('/journal/category/', '')} /></DeferredPage></AppLayout>;
-  if (pathname.startsWith('/journal/')) return <AppLayout><DeferredPage><JournalArticlePage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} resolveMedia={resolveMediaUrl} slug={pathname.replace('/journal/', '')} /></DeferredPage></AppLayout>;
+  if (pathname === '/journal') return <AppLayout><JournalIndexPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} resolveMedia={resolveMediaUrl} /></AppLayout>;
+  if (pathname.startsWith('/journal/category/')) return <AppLayout><JournalIndexPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} resolveMedia={resolveMediaUrl} categorySlug={pathname.replace('/journal/category/', '')} /></AppLayout>;
+  if (pathname.startsWith('/journal/')) return <AppLayout><JournalArticlePage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} resolveMedia={resolveMediaUrl} slug={pathname.replace('/journal/', '')} /></AppLayout>;
   if (pathname === '/design') return <AppLayout><DesignPage /></AppLayout>;
-  if (pathname === '/dveri') return <AppLayout><DeferredPage><DoorsCatalogPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} formatPhone={formatPhoneMask} /></DeferredPage></AppLayout>;
-  if (pathname.startsWith('/dveri/')) return <AppLayout><DeferredPage><DoorCollectionPage slug={pathname.replace('/dveri/', '')} apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} formatPhone={formatPhoneMask} /></DeferredPage></AppLayout>;
-  if (pathname === '/chany') return <AppLayout><DeferredPage><ChanyCatalogPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} formatPhone={formatPhoneMask} /></DeferredPage></AppLayout>;
+  if (pathname === '/dveri') return <AppLayout><DoorsCatalogPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} formatPhone={formatPhoneMask} /></AppLayout>;
+  if (pathname.startsWith('/dveri/')) return <AppLayout><DoorCollectionPage slug={pathname.replace('/dveri/', '')} apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} formatPhone={formatPhoneMask} /></AppLayout>;
+  if (pathname === '/chany') return <AppLayout><ChanyCatalogPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} formatPhone={formatPhoneMask} /></AppLayout>;
   if (servicePage) return <AppLayout><ManagedTextPage slug={`services-${servicePage.slug}`} fallbackTitle={servicePage.title} fallbackContent={servicePage.text} sectionTitle="Услуги" /></AppLayout>;
   if (discountPage) return <AppLayout><ManagedTextPage slug={`discounts-${discountPage.slug}`} fallbackTitle={discountPage.title} fallbackContent={discountPage.text} sectionTitle="Ипотека и акции" /></AppLayout>;
   if (furniturePage) {

@@ -2221,28 +2221,23 @@ html body, html body * { font-family: Arial, Helvetica, sans-serif !important; }
 .furniture-brand-nav a { justify-content: space-between; }
 }
 
-/* Keep the photograph from the inner-page header flowing into the content gap. */
+/* Reserve a real photo-backed spacer under every inner-page header. */
 .internal-header { position: relative; z-index: 20; overflow: visible; }
-.internal-header::before {
-  position: absolute;
-  right: 0;
-  bottom: -42px;
-  left: 0;
-  z-index: 0;
-  height: 42px;
-  background-image: inherit;
+.internal-header-gap {
+  height: 32px;
+  background-color: #123b2c;
   background-position: center 72%;
   background-size: cover;
-  content: "";
+  background-repeat: no-repeat;
   filter: brightness(.78);
   pointer-events: none;
 }
-.internal-header + .internal-body,
-.internal-header + main:not(.route-loading-shell) { position: relative; z-index: 1; padding-top: 42px !important; }
-.doors-catalog > .internal-header + main,
-.chany-catalog > .internal-header + main { padding-top: 0 !important; }
+.hero-exact > .internal-header-gap { z-index: 0; }
+.internal-header + * { padding-top: 0 !important; }
 .doors-catalog > .internal-header + main > .catalog-hero,
-.chany-catalog > .internal-header + main > .catalog-hero { margin-top: 42px; }
+.chany-catalog > .internal-header + main > .catalog-hero,
+.doors-catalog > main > .catalog-hero,
+.chany-catalog > main > .catalog-hero { margin-top: 0 !important; }
 
 /* Project filters pin only while scrolling back up, then make room for content again. */
 .catalog-filters-slot { position: relative; z-index: 90; min-width: 0; }
@@ -2319,41 +2314,43 @@ html body, html body * { font-family: Arial, Helvetica, sans-serif !important; }
 .service-existing-media .cms-content .cms-gallery.single img,
 .furniture-cms-card .cms-content .cms-gallery.single img { width: auto; max-width: 100%; max-height: 560px; margin-inline: auto; object-fit: contain; }
 
-/* Lazy route chunks retain the shared brand shell instead of a blank white loading screen. */
-.route-loading-shell { min-height: 54vh; padding: 42px 0 64px; background: #f5f3ed; }
-.route-loading-skeleton { display: grid; grid-template-columns: 1fr .9fr; align-items: stretch; gap: 16px; }
-.route-loading-copy,
-.route-loading-media { min-height: 300px; overflow: hidden; border-radius: 22px; background: linear-gradient(105deg, #e8e7df 25%, #f2f1eb 38%, #e8e7df 62%); background-size: 220% 100%; animation: route-skeleton-shimmer 1.5s ease-in-out infinite; }
-.route-loading-copy { display: grid; align-content: center; gap: 17px; padding: 36px; }
-.route-loading-copy span { width: 82%; height: 14px; border-radius: 999px; background: rgba(133, 143, 132, .18); }
-.route-loading-copy span:first-child { width: 42%; height: 10px; margin-bottom: 8px; }
-.route-loading-copy span:nth-child(3) { width: 68%; }
-.route-loading-copy span:last-child { width: 31%; height: 42px; margin-top: 11px; background: rgba(36, 79, 57, .15); }
-.route-loading-media { min-height: 360px; }
-@keyframes route-skeleton-shimmer { to { background-position-x: -220%; } }
+/* Keep catalogue and partner copy calm, readable, and consistent with the service pages. */
+.service-legacy-copy .cms-content > p:not(.cms-media-paragraph),
+.service-existing-media .cms-content > p:not(.cms-media-paragraph),
+.furniture-cms-card .cms-content > p:not(.cms-media-paragraph),
+.service-legacy-copy .cms-content > ul,
+.service-legacy-copy .cms-content > ol,
+.service-existing-media .cms-content > ul,
+.service-existing-media .cms-content > ol,
+.furniture-cms-card .cms-content > ul,
+.furniture-cms-card .cms-content > ol { max-width: min(100%, 78ch); margin-right: auto; margin-left: auto; }
+.service-legacy-copy .cms-content > p.cms-media-paragraph,
+.service-existing-media .cms-content > p.cms-media-paragraph,
+.furniture-cms-card .cms-content > p.cms-media-paragraph { max-width: 100%; }
+.service-legacy-copy .cms-content > h2,
+.service-existing-media .cms-content > h2,
+.furniture-cms-card .cms-content > h2 { max-width: min(100%, 78ch); margin: 26px auto 12px; font-size: clamp(21px, 2.2vw, 27px); font-weight: 750; }
+.service-legacy-copy .cms-content > h3,
+.service-existing-media .cms-content > h3,
+.furniture-cms-card .cms-content > h3 { max-width: min(100%, 78ch); margin: 22px auto 9px; font-size: clamp(17px, 1.8vw, 21px); font-weight: 750; }
+.service-legacy-copy .cms-content > h2:first-child,
+.service-legacy-copy .cms-content > h3:first-child,
+.service-existing-media .cms-content > h2:first-child,
+.service-existing-media .cms-content > h3:first-child,
+.furniture-cms-card .cms-content > h2:first-child,
+.furniture-cms-card .cms-content > h3:first-child { margin-top: 0; }
+.service-legacy-copy .cms-content > p.cms-media-paragraph,
+.service-existing-media .cms-content > p.cms-media-paragraph,
+.furniture-cms-card .cms-content > p.cms-media-paragraph { margin-right: 0; margin-left: 0; }
 
 @media (max-width: 720px) {
-  .internal-header::before { bottom: -24px; height: 24px; }
-  .internal-header + .internal-body,
-  .internal-header + main:not(.route-loading-shell) { padding-top: 24px !important; }
-  .doors-catalog > .internal-header + main,
-  .chany-catalog > .internal-header + main { padding-top: 0 !important; }
-  .doors-catalog > .internal-header + main > .catalog-hero,
-  .chany-catalog > .internal-header + main > .catalog-hero { margin-top: 24px; }
+  .internal-header-gap { height: 22px; }
   .project-catalog-container .catalog-filters.is-scroll-pinned { width: calc(100vw - 20px); max-height: min(74dvh, 640px); grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px 10px; padding: 13px; }
   .project-filter-heading { min-height: 25px; }
-  .route-loading-shell { min-height: 50vh; padding: 24px 0 42px; }
-  .route-loading-skeleton { grid-template-columns: 1fr; gap: 12px; }
-  .route-loading-copy { min-height: 210px; padding: 24px; }
-  .route-loading-media { min-height: 190px; }
 }
 @media (max-width: 480px) {
   .project-catalog-container .catalog-filters.is-scroll-pinned { grid-template-columns: 1fr; }
   .project-catalog-container .catalog-filters.is-scroll-pinned .filter-block-style .style-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .route-loading-copy,
-  .route-loading-media { animation: none; }
 }
 
 .why-card { border-color: rgba(35, 78, 56, .16); color: var(--ev-ink); background: #fffefa; }
