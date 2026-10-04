@@ -371,7 +371,7 @@ const SERVICE_PAGE_DETAILS: Record<string, ServicePageDetail> = {
     pricing: [{ item: 'Монтаж станции без учета оборудования и нестандартной подготовки', value: 'ориентировочно от 17 000 ₽', note: 'Грунт, глубина трассы, земляные работы, доставка и дренаж могут заметно изменить бюджет.' }],
     duration: 'Типовой монтаж часто занимает 1–3 рабочих дня. Скальный, мокрый или плывущий грунт, длинная трасса и удаленный участок требуют больше времени.',
     result: 'Система, подходящая реальному режиму жизни, с учетом обслуживания и особенностей отвода воды, а не только объема корпуса.',
-    photo: servicePhoto('site-survey'), photoAlt: 'Осмотр загородного участка перед размещением инженерного оборудования',
+    photo: servicePhoto('septic-installation'), photoAlt: 'Монтаж автономной канализации на загородном участке в Пензенской области',
     seoTitle: 'Установка септика в Пензе и Пензенской области — расчет | Evtenia',
     seoDescription: 'Подбор и монтаж септика для дома и дачи в Пензе. Учитываем состав семьи, грунт, уровень воды и отвод стока; смета после осмотра участка.',
     faq: [
@@ -985,7 +985,7 @@ function chunkBy<T>(items: T[], size: number) {
   return chunks;
 }
 
-const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'baths', 'doors', 'chany', 'homes', 'lands', 'settlements', 'services', 'furniture', 'promotions', 'journal', 'contacts'] as const;
+const NAV_MENU_DEFAULT_ORDER = ['home', 'projects', 'baths', 'doors', 'chany', 'lands', 'homes', 'services', 'furniture', 'settlements', 'promotions', 'journal', 'about', 'contacts'] as const;
 type NavMenuKey = (typeof NAV_MENU_DEFAULT_ORDER)[number];
 
 function normalizeMenuOrder(order?: string[]) {
@@ -1197,17 +1197,21 @@ function HeaderNav({
     setOpenDesktopMenu(label);
     if (!anchor) return;
     window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
-      const dropdown = anchor.querySelector<HTMLElement>(':scope > .projects-dropdown, :scope > .services-dropdown');
+      const dropdown = anchor.querySelector<HTMLElement>(':scope > .projects-dropdown, :scope > .services-dropdown, :scope > .furniture-dropdown');
       if (!dropdown) return;
-      const anchorRect = anchor.getBoundingClientRect();
-      const rightAligned = anchor.classList.contains('menu-settlements') || anchor.classList.contains('menu-promotions') || anchor.classList.contains('menu-furniture');
       dropdown.style.position = 'absolute';
       dropdown.style.top = '100%';
-      dropdown.style.maxWidth = `${Math.max(220, rightAligned ? anchorRect.right - 16 : window.innerWidth - anchorRect.left - 16)}px`;
-      dropdown.style.left = rightAligned ? 'auto' : `${Math.max(0, 16 - anchorRect.left)}px`;
-      dropdown.style.right = rightAligned ? '0' : 'auto';
+      dropdown.style.maxWidth = `${Math.max(220, window.innerWidth - 32)}px`;
+      dropdown.style.left = '0';
+      dropdown.style.right = 'auto';
       dropdown.style.transform = 'none';
       dropdown.style.margin = '0';
+      window.requestAnimationFrame(() => {
+        const anchorRect = anchor.getBoundingClientRect();
+        const dropdownWidth = dropdown.getBoundingClientRect().width;
+        const leftInViewport = Math.max(16, Math.min(anchorRect.left, window.innerWidth - dropdownWidth - 16));
+        dropdown.style.left = `${leftInViewport - anchorRect.left}px`;
+      });
     }));
   };
 
@@ -1313,15 +1317,15 @@ function HeaderNav({
                   <button type="button" className={`menu-link menu-link-btn ${item.active ? 'active' : ''}`}>{item.label} ▾</button>
                 )}
                 <div
-                  className={item.label === 'ПРОЕКТЫ ДОМОВ' || item.label === 'ПРОЕКТЫ БАНЬ' || item.label === 'О КОМПАНИИ' || item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'projects-dropdown' : 'services-dropdown'}
+                  className={item.label === 'ПРОЕКТЫ ДОМОВ' || item.label === 'ПРОЕКТЫ БАНЬ' || item.label === 'О КОМПАНИИ' || item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'projects-dropdown' : item.label === 'МЕБЕЛЬ' ? 'furniture-dropdown' : 'services-dropdown'}
                   style={openDesktopMenu === item.label ? { display: 'grid' } : undefined}
                   onMouseEnter={cancelDesktopMenuClose}
                   onMouseLeave={scheduleDesktopMenuClose}
                 >
                   {item.children.map((child, idx) => (
                     child.children ? (
-                      <div className="dropdown-col" key={`${child.label}_${idx}`}>
-                        <span className="dropdown-heading">{child.label}</span>
+                      <div className={`dropdown-col${item.label === 'МЕБЕЛЬ' ? ' furniture-dropdown-col' : ''}`} key={`${child.label}_${idx}`}>
+                        <span className={`dropdown-heading${item.label === 'МЕБЕЛЬ' ? ' furniture-dropdown-title' : ''}`}>{child.label}</span>
                         {child.children.map((nested, nestedIdx) => (
                           <a key={nested.href || `${nested.label}_${nestedIdx}`} href={nested.href} className={`dropdown-link ${nested.href && window.location.pathname === nested.href ? 'active' : ''}`}>{nested.label}</a>
                         ))}
@@ -1507,6 +1511,27 @@ const FALLBACK_PROJECTS: HouseProject[] = [
     fullDescription: 'Иллюстративная концепция; стоимость — по запросу после уточнения конструкции и инженерных систем.',
     coverImage: '/api/assets/projects/catalog/bath-guest-v2.webp', images: ['/api/assets/projects/catalog/bath-guest-v2.webp'],
     priceFrom: 'по запросу', constructionType: 'Деревянная', style: 'Гостевой формат', category: 'bath', isIllustrative: true
+  },
+  {
+    id: 'bath-barrel-4m', title: 'Баня-бочка 4 м', area: '8 м²', floors: '1 этаж', bedrooms: 'Парная · предбанник',
+    shortDescription: 'Компактная круглая баня 4 м: парная и небольшой предбанник для дачи.',
+    fullDescription: 'Иллюстративная модель для небольшого участка. Ориентир — от 289 000 ₽ за базовое исполнение; основание, утепление, печь и дымоход, доставка и монтаж рассчитываются по комплектации.',
+    coverImage: '/api/assets/projects/catalog/bath-barrel-4m.jpg', images: ['/api/assets/projects/catalog/bath-barrel-4m.jpg', '/api/assets/projects/catalog/bath-barrel-4m-interior.jpg'],
+    priceFrom: 'от 289 000 ₽', constructionType: 'Баня-бочка', style: 'Компактная', category: 'bath', isIllustrative: true
+  },
+  {
+    id: 'bath-barrel-5m-terrace', title: 'Баня-бочка 5 м с террасой', area: '10 м²', floors: '1 этаж', bedrooms: 'Парная · входная зона · терраса',
+    shortDescription: 'Удлинённая модель с парной, входной зоной и небольшим местом для отдыха.',
+    fullDescription: 'Концепция для семьи и гостей с открытой площадкой у входа. Ориентир — от 349 000 ₽ в базовой комплектации; отделка, печь, основание, доставка и монтаж меняют итоговую стоимость.',
+    coverImage: '/api/assets/projects/catalog/bath-barrel-5m-terrace.jpg', images: ['/api/assets/projects/catalog/bath-barrel-5m-terrace.jpg'],
+    priceFrom: 'от 349 000 ₽', constructionType: 'Баня-бочка', style: 'С террасой', category: 'bath', isIllustrative: true
+  },
+  {
+    id: 'bath-barrel-quadra-5m', title: 'Баня-бочка «Квадро» 5 м', area: '12 м²', floors: '1 этаж', bedrooms: 'Парная · зона отдыха',
+    shortDescription: 'Прямоугольный корпус с более удобным внутренним объёмом и крыльцом.',
+    fullDescription: 'Квадратный формат сохраняет компактную длину бани-бочки и даёт более привычную геометрию внутри. Предварительный ориентир — от 379 000 ₽; точную комплектацию, доставку и установку подтвердим по запросу.',
+    coverImage: '/api/assets/projects/catalog/bath-barrel-quadra.jpg', images: ['/api/assets/projects/catalog/bath-barrel-quadra.jpg'],
+    priceFrom: 'от 379 000 ₽', constructionType: 'Баня-бочка', style: 'Квадро', category: 'bath', isIllustrative: true
   },
   {
     id: 'demo8',
@@ -1698,6 +1723,12 @@ function ProjectTile({ project, onRequest, showGallery = false }: { project: Hou
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const imageUrl = images[activeImageIndex] || images[0] || '';
   const hasGallery = showGallery && images.length > 1;
+  const cardSummary = (() => {
+    const description = String(project.shortDescription || '').trim();
+    if (description && !/^проект дома\b/i.test(description) && !/планировку и комплектацию адаптируем/i.test(description)) return description;
+    const construction = project.constructionType === 'Из газобетона' ? 'Газобетон' : project.constructionType.replace(/\s+$/, '');
+    return [construction, project.area, project.floors, project.bedrooms].filter(Boolean).join(' · ');
+  })();
 
   const changeImage = (direction: -1 | 1) => {
     setActiveImageIndex((index) => (index + direction + images.length) % images.length);
@@ -1709,7 +1740,6 @@ function ProjectTile({ project, onRequest, showGallery = false }: { project: Hou
         <div className="project-card-gallery">
           <a className="project-card-photo-link" href={getProjectPath(project)} aria-label={`Открыть проект ${project.title}`}>
             <div className={`project-image${project.catalogProject || project.isIllustrative ? ' project-image-catalog' : ''}`} style={{ backgroundImage: imageUrl ? `url(${imageUrl})` : undefined }}>
-              {project.catalogProject || project.isIllustrative ? <span className="catalog-illustration-label">Иллюстрация</span> : null}
             </div>
           </a>
           {hasGallery ? (
@@ -1723,10 +1753,9 @@ function ProjectTile({ project, onRequest, showGallery = false }: { project: Hou
       ) : null}
       <a className="project-card-link" href={getProjectPath(project)}>
       {!showGallery ? <div className={`project-image${project.catalogProject || project.isIllustrative ? ' project-image-catalog' : ''}`} style={{ backgroundImage: imageUrl ? `url(${imageUrl})` : undefined }}>
-        {project.catalogProject || project.isIllustrative ? <span className="catalog-illustration-label">Иллюстрация</span> : null}
       </div> : null}
       <div className="project-content">
-        <p className="project-desc">{project.shortDescription}</p>
+        <p className="project-desc">{cardSummary}</p>
         <h3>{project.title}</h3>
         <div className="project-meta">
           <span><small>Площадь:</small><strong>{project.area}</strong></span>
@@ -2616,14 +2645,20 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
     <div>
       <InternalHeader />
       <section className="internal-body">
-        <div className="container">
+        <div className="container project-catalog-container">
           <Breadcrumbs items={["Главная", sectionTitle, effectiveType]} />
           <h1>{isBathCatalog ? 'Проекты бань в Пензе' : sectionTitle}</h1>
           {isBathCatalog ? <div className="bath-catalog-intro">
-            <p>Отдельный каталог проектов бань для дачи и загородного участка в Пензе и Пензенской области: компактные каркасные варианты, брус и просторные банные дома.</p>
-            <p>Это примерные концепции для выбора площади и состава помещений, а не каталог готовых построек. Фотографии служат иллюстрациями. Цены «от» — приблизительные рыночные ориентиры начальной комплектации; точный расчёт зависит от основания, печи и дымохода, отделки, инженерии, доставки и условий участка.</p>
+            <p>Типовые идеи бань для дачи и загородного участка в Пензе и области: от компактных каркасных решений до брусовых банных домов. Планировку и комплектацию подберём под участок и бюджет.</p>
             <a href="tel:+79022090179">Обсудить баню с менеджером <span aria-hidden="true">→</span></a>
           </div> : null}
+          <div className="type-chips catalog-type-chips">
+            <button className={effectiveType === 'Все типы' ? 'active' : ''} onClick={() => { window.location.href = `${window.location.pathname}?type=${encodeURIComponent('Все типы')}`; }}>Все типы</button>
+            {typeOptions.map((option) => (
+              <button key={option} className={effectiveType === option ? 'active' : ''} onClick={() => { window.location.href = `${window.location.pathname}?type=${encodeURIComponent(option)}`; }}>{option}</button>
+            ))}
+            <span className="catalog-results-count" aria-live="polite">Найдено: {filteredProjects.length}</span>
+          </div>
           <div className="catalog-layout">
             <aside className="catalog-filters">
               <div className="filter-block">
@@ -2689,14 +2724,8 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
             </aside>
 
             <div>
-              <div className="type-chips">
-                <button className={effectiveType === 'Все типы' ? 'active' : ''} onClick={() => { window.location.href = `${window.location.pathname}?type=${encodeURIComponent('Все типы')}`; }}>Все типы</button>
-                {typeOptions.map((option) => (
-                  <button key={option} className={effectiveType === option ? 'active' : ''} onClick={() => { window.location.href = `${window.location.pathname}?type=${encodeURIComponent(option)}`; }}>{option}</button>
-                ))}
-              </div>
               <div className="catalog-grid">
-                {filteredProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} />)}
+                {filteredProjects.map((project) => <ProjectTile project={project} key={project.id} onRequest={setRequestProject} showGallery />)}
               </div>
               {!filteredProjects.length ? <div className="bath-catalog-empty"><h2>Подходящих вариантов пока нет</h2><p>Расскажите, какая площадь и планировка вам нужны — подготовим индивидуальный ориентир.</p><a href="tel:+79022090179">Позвонить в Evtenia</a></div> : null}
             </div>
@@ -3677,16 +3706,27 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
   const isService = sectionTitle === 'Услуги';
   const serviceSlug = pageSlug.startsWith('services-') ? pageSlug.replace('services-', '') : '';
   const serviceDetail = SERVICE_PAGE_DETAILS[serviceSlug];
+  const isFurniture = sectionTitle === 'Мебель' || pageSlug === 'furniture';
+  const isFurnitureHub = pageSlug === 'furniture';
+  const furnitureEntry = isFurnitureHub ? undefined : FURNITURE_LEAF_PAGES.find((item) => item.href === window.location.pathname);
+  const furnitureCategory = furnitureEntry ? FURNITURE_STRUCTURE.find((item) => item.title === furnitureEntry.categoryTitle) : undefined;
   const isPromotionsPage = pageSlug.startsWith('discounts-');
   const isAllPromotions = pageSlug === 'discounts-vse-akcii';
   const cmsHeroImage = text.match(/<img\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/i)?.[1];
   const hasCmsPhotos = Boolean(cmsHeroImage || /<(?:picture|figure)\b/i.test(text));
-  const serviceHeroImage = hasCmsPhotos ? undefined : serviceDetail?.photo;
+  const serviceHeroImage = cmsHeroImage ? resolveMediaUrl(cmsHeroImage) : serviceDetail?.photo;
 
   useEffect(() => {
     if (!serviceDetail) {
       if (seoTitle && seoDescription) {
-        writePageSEO({ title: seoTitle, description: seoDescription, path: window.location.pathname });
+        const schema = isFurniture ? {
+          '@context': 'https://schema.org',
+          '@graph': [
+            { '@type': 'CollectionPage', name: pageTitle, description: seoDescription, url: `${window.location.origin}${window.location.pathname}`, inLanguage: 'ru-RU' },
+            { '@type': 'Service', name: isFurnitureHub ? 'Подбор мебели для дома в Пензе' : `Подбор мебели ${furnitureCategory?.title.toLocaleLowerCase('ru-RU') || ''} ${pageTitle}`, serviceType: 'Подбор и заказ мебели', areaServed: ['Пенза', 'Пензенская область'], provider: { '@type': 'Organization', name: 'Evtenia', url: window.location.origin, telephone: CONTACTS.mainPhoneDisplay } }
+          ]
+        } : undefined;
+        writePageSEO({ title: seoTitle, description: seoDescription, path: window.location.pathname, schema });
       } else {
         document.title = `${pageTitle} — Evtenia`;
       }
@@ -3736,11 +3776,11 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
       const res = await fetch(`${API_BASE}/api/leads`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      body: JSON.stringify({
           name,
           phone,
-          message: [`Заявка на услугу: ${pageTitle}.`, requestMessage.trim()].filter(Boolean).join(' '),
-          sourceTitle: `Услуга: ${pageTitle}`
+          message: [`Заявка на ${isFurniture ? `мебель${furnitureCategory ? ` · ${furnitureCategory.title.toLocaleLowerCase('ru-RU')}` : ''} · ${pageTitle}` : `услугу: ${pageTitle}`}.`, requestMessage.trim()].filter(Boolean).join(' '),
+          sourceTitle: isFurniture ? `Мебель: ${pageTitle}` : `Услуга: ${pageTitle}`
         })
       });
       if (!res.ok) throw new Error('bad');
@@ -3770,6 +3810,13 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
     </aside>
   ) : null;
 
+  const furnitureForm = isFurniture ? (
+    <form className="furniture-lead-form" id="furniture-request" onSubmit={submitServiceLead}>
+      <div className="furniture-form-copy"><span className="page-kicker">Подбор и расчёт</span><h2>{isFurnitureHub ? 'Поможем собрать интерьер под ваш дом' : `Подберём ${furnitureCategory?.title.toLocaleLowerCase('ru-RU') || 'мебель'} ${pageTitle}`}</h2><p>Оставьте телефон и пару деталей — уточним размеры, доступные исполнения, сроки поставки и ориентировочную стоимость комплекта.</p><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a></div>
+      <div className="furniture-form-fields"><label>Ваше имя<input autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} required /></label><label>Телефон<input autoComplete="tel" type="tel" placeholder="+7 (___) ___-__-__" value={phone} onChange={(event) => setPhone(formatPhoneMask(event.target.value))} required /></label><label className="furniture-form-message">Что подбираем?<textarea value={requestMessage} onChange={(event) => setRequestMessage(event.target.value)} rows={3} placeholder="Комната, размеры, пожелания по стилю и срокам — по желанию" /></label><PrivacyConsent /><button type="submit">Запросить подбор и стоимость <span aria-hidden="true">→</span></button>{serviceStatus ? <p className="furniture-form-status" role="status">{serviceStatus}</p> : null}</div>
+    </form>
+  ) : null;
+
   if (serviceDetail) {
     return (
       <div>
@@ -3782,9 +3829,9 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
                 <span className="page-kicker">Услуги в Пензе и Пензенской области</span>
                 <h1>{pageTitle}</h1>
                 <p>{serviceDetail.summary}</p>
-                <a href="#service-request">Узнать стоимость и сроки <span>→</span></a>
+                <div className="service-detail-hero-actions"><a href="#service-request">Узнать стоимость и сроки <span>→</span></a>{serviceSlug === 'dveri' ? <a className="service-catalog-link" href="/dveri">Смотреть каталог межкомнатных дверей <span aria-hidden="true">↗</span></a> : null}</div>
               </div>
-              {serviceHeroImage ? <figure className="service-detail-hero-media"><img src={serviceHeroImage} alt={serviceDetail.photoAlt || `Иллюстрация к услуге «${pageTitle}» в Пензе`} width="1500" height="1000" fetchPriority="high" /><figcaption>Иллюстрация к услуге · Evtenia, Пенза</figcaption></figure> : null}
+              {serviceHeroImage ? <figure className="service-detail-hero-media"><img src={serviceHeroImage} alt={cmsHeroImage ? `Фотография компании: ${pageTitle.toLocaleLowerCase('ru-RU')} в Пензе` : serviceDetail.photoAlt || `Иллюстрация к услуге «${pageTitle}» в Пензе`} width="1500" height="1000" fetchPriority="high" /><figcaption>{cmsHeroImage ? 'Фото компании · Evtenia, Пенза' : 'Иллюстрация к услуге · Evtenia, Пенза'}</figcaption></figure> : null}
               <ul aria-label="Что получает заказчик">
                 <li><b>01</b><span>Состав и ориентир до начала работ</span></li>
                 <li><b>02</b><span>Согласование этапов и комплектации</span></li>
@@ -3889,6 +3936,43 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
               <div><span className="page-kicker">Бесплатная консультация</span><h2>Рассчитаем ваш вариант</h2><p>Расскажите, какой дом планируете. Ответим на вопросы и предложим следующий шаг.</p></div>
               <div><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a><a href="/#lead-form">Оставить заявку →</a></div>
             </section>
+          </div>
+        </main>
+        <SiteFooter />
+      </div>
+    );
+  }
+
+  if (isFurniture) {
+    const relatedBrands = furnitureCategory?.brands.filter((brand) => brand !== furnitureEntry?.brandTitle) || [];
+    const categoryDescription: Record<string, string> = {
+      'КУХНИ': 'Планировка, фасады, столешницы, системы хранения и техника — под реальные размеры помещения.',
+      'ОБЕДЕННЫЕ ГРУППЫ': 'Столы и стулья для ежедневных семейных обедов, приёма гостей и компактных кухонь.',
+      'СПАЛЬНИ': 'Кровати, прикроватные тумбы и системы хранения, собранные в спокойный интерьер.',
+      'ГОСТИНЫЕ И СТЕНКИ': 'Композиции для ТВ-зоны, хранения и отдыха с учётом расположения розеток и техники.',
+      'МЯГКАЯ МЕБЕЛЬ': 'Диваны и кресла по размеру комнаты, сценарию использования и желаемой обивке.',
+      'ДЕТСКИЕ': 'Рабочие места и мебель для детской, которую можно адаптировать к возрасту и росту ребёнка.',
+      'КАБИНЕТЫ': 'Рабочие столы, кресла и системы хранения для домашнего кабинета и рабочего пространства.',
+      'МАТРАСЫ': 'Подбор размера и уровня комфорта матраса под кровать, привычки сна и пожелания по жёсткости.'
+    };
+    return (
+      <div>
+        <InternalHeader />
+        <main className="internal-body furniture-landing-page">
+          <div className="container">
+            <Breadcrumbs items={isFurnitureHub ? ['Главная', 'Мебель'] : ['Главная', 'Мебель', furnitureCategory?.title || 'Каталог', pageTitle]} />
+            <section className="furniture-landing-hero">
+              <div><span className="page-kicker">Мебель для дома · подбор в Пензе</span><h1>{isFurnitureHub ? 'Мебель, которая подходит вашему пространству' : `${furnitureCategory?.title.toLocaleLowerCase('ru-RU') || 'Мебель'} ${pageTitle}`}</h1><p>{isFurnitureHub ? 'Помогаем подобрать кухни, спальни, обеденные группы и другую мебель по размерам помещения, стилю интерьера и бюджету.' : `Подберём мебель ${furnitureCategory?.title.toLocaleLowerCase('ru-RU') || ''} ${pageTitle} под размеры и задачу вашего пространства. Проверим доступные исполнения, комплектующие и сроки.`}</p><div><a href="#furniture-request">Получить подбор и расчёт <span aria-hidden="true">→</span></a><a href={CONTACTS.mainPhoneHref}>Позвонить {CONTACTS.mainPhoneDisplay}</a></div></div>
+              <ul><li><b>01</b><span>Подбор по плану, размерам или фото комнаты</span></li><li><b>02</b><span>Сверка доступных цветов, материалов и комплектов</span></li><li><b>03</b><span>Доставка и монтаж — условия согласуем заранее</span></li></ul>
+            </section>
+            {isFurnitureHub ? (
+              <section className="furniture-category-section"><div className="furniture-section-heading"><div><span className="page-kicker">Разделы каталога</span><h2>С чего начнём подбор</h2></div><p>Выберите категорию — откроем страницу бренда с информацией и фотографиями из каталога.</p></div><div className="furniture-category-grid">{FURNITURE_STRUCTURE.map((category) => <article key={category.title}><span>{category.brands.length} {category.brands.length === 1 ? 'бренд' : 'бренда'}</span><h3>{category.title}</h3><p>{categoryDescription[category.title]}</p><div>{category.brands.map((brand) => <a key={brand} href={`/furniture/${slugify(category.title)}/${slugify(brand)}`}>{brand}</a>)}</div></article>)}</div></section>
+            ) : furnitureCategory ? (
+              <nav className="furniture-brand-nav" aria-label={`Другие бренды раздела ${furnitureCategory.title}`}><span>Другие бренды раздела</span>{relatedBrands.map((brand) => <a key={brand} href={`/furniture/${slugify(furnitureCategory.title)}/${slugify(brand)}`}>{brand}<span aria-hidden="true">→</span></a>)}</nav>
+            ) : null}
+            <section className="furniture-cms-card"><div className="furniture-section-heading"><div><span className="page-kicker">Каталог Evtenia</span><h2>{isFurnitureHub ? 'Поможем выбрать формат' : `${pageTitle}: материалы и особенности`}</h2></div><p>Содержание и фотографии производителя сохранены. Наличие, варианты отделки и комплектацию подтвердим до оформления заказа.</p></div><CmsHtmlContent html={text} /></section>
+            <section className="furniture-order-steps"><div><span className="page-kicker">Как оформляется заказ</span><h2>От идеи до комплекта для комнаты</h2></div><div className="furniture-order-grid"><article><b>01</b><h3>Уточняем задачу</h3><p>Разбираемся, для какой комнаты нужна мебель, какие есть размеры, пожелания и ограничения.</p></article><article><b>02</b><h3>Сверяем исполнение</h3><p>Проверяем доступные модели, покрытия, ткани, фурнитуру и необходимые комплектующие.</p></article><article><b>03</b><h3>Подтверждаем расчёт</h3><p>Согласуем стоимость, состав заказа, сроки поставки и условия доставки или монтажа.</p></article></div><p className="furniture-price-note">Стоимость зависит от размеров, выбранной конфигурации, материалов и комплектующих; итоговую цену и срок поставки подтвердим по конкретной заявке.</p></section>
+            {furnitureForm}
           </div>
         </main>
         <SiteFooter />
@@ -5613,7 +5697,7 @@ function App() {
       </AppLayout>
     );
   }
-  if (pathname === '/furniture') return <AppLayout><ManagedTextPage slug="furniture" fallbackTitle="Мебель" fallbackContent="Изготавливаем корпусную и встроенную мебель под ваши размеры и стиль интерьера." sectionTitle="Каталог" /></AppLayout>;
+  if (pathname === '/furniture') return <AppLayout><ManagedTextPage slug="furniture" fallbackTitle="Мебель" fallbackContent="Изготавливаем корпусную и встроенную мебель под ваши размеры и стиль интерьера." sectionTitle="Каталог" seoTitle="Мебель в Пензе — кухни, спальни и гостиные | Evtenia" seoDescription="Подбор мебели для дома в Пензе и области: кухни, спальни, гостиные, обеденные группы и кабинеты. Поможем сверить размеры, комплектацию, цену и сроки." /></AppLayout>;
   if (pathname === '/portfolio') return <AppLayout><PortfolioPage /></AppLayout>;
   if (pathname === '/contacts') return <AppLayout><ContactsPage /></AppLayout>;
   if (pathname === '/') return <AppLayout><PublicPage /></AppLayout>;

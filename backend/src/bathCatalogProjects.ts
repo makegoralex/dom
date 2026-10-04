@@ -23,6 +23,10 @@ const terrace = '/api/assets/projects/catalog/bath-terrace-v2.webp';
 const timber = '/api/assets/projects/catalog/bath-timber-v2.webp';
 const log = '/api/assets/projects/catalog/bath-log-v2.webp';
 const guest = '/api/assets/projects/catalog/bath-guest-v2.webp';
+const barrel4 = '/api/assets/projects/catalog/bath-barrel-4m.jpg';
+const barrel4Interior = '/api/assets/projects/catalog/bath-barrel-4m-interior.jpg';
+const barrel5Terrace = '/api/assets/projects/catalog/bath-barrel-5m-terrace.jpg';
+const barrelQuadra = '/api/assets/projects/catalog/bath-barrel-quadra.jpg';
 
 /** Illustrative starting points for a bespoke estimate, not completed builds or fixed offers. */
 export const bathCatalogProjects: BathCatalogProject[] = [
@@ -74,5 +78,26 @@ export const bathCatalogProjects: BathCatalogProject[] = [
     fullDescription: 'Идея совмещает банный блок с отдельным помещением для отдыха и размещения гостей. Планировку важно увязать с режимом эксплуатации: круглогодичное отопление, вентиляция, горячая вода, канализация и противопожарные решения требуют отдельного проектирования. Цена — по запросу после уточнения материала, основания, состава инженерии, отделки и подъезда на участок; типовой ориентир карточки не является сметой или офертой.',
     coverImage: guest, images: [guest], area: '48 м²', floors: '1–2 этажа', bedrooms: 'Банный блок · отдых · гостевая зона',
     priceFrom: 'по запросу', constructionType: 'Деревянная', category: 'bath', style: 'Гостевой формат', isIllustrative: true
+  },
+  {
+    id: 'bath-barrel-4m', title: 'Баня-бочка 4 м',
+    shortDescription: 'Компактная круглая баня 4 м: парная и небольшой предбанник для дачи.',
+    fullDescription: 'Иллюстративная модель для небольшого участка и коротких поездок за город. Внутри можно предусмотреть парную и компактную входную зону; точную планировку проверяем по выбранной длине и комплектации. Ориентир — от 289 000 ₽ за базовое исполнение. Основание, утепление, печь и дымоход, доставка и монтаж рассчитываются отдельно после уточнения адреса и условий установки.',
+    coverImage: barrel4, images: [barrel4, barrel4Interior], area: '8 м²', floors: '1 этаж', bedrooms: 'Парная · предбанник',
+    priceFrom: 'от 289 000 ₽', constructionType: 'Баня-бочка', category: 'bath', style: 'Компактная', isIllustrative: true
+  },
+  {
+    id: 'bath-barrel-5m-terrace', title: 'Баня-бочка 5 м с террасой',
+    shortDescription: 'Удлинённая модель с парной, входной зоной и небольшим местом для отдыха.',
+    fullDescription: 'Концепция для семьи и гостей: более длинный корпус позволяет обсудить разделение парной и зоны переодевания, а открытая площадка у входа добавляет место для отдыха в тёплый сезон. Ориентир — от 349 000 ₽ в базовой комплектации. Порода и обработка древесины, печь, утепление, основание, опции, доставка и монтаж меняют итоговую стоимость; точное предложение готовим после выбора состава работ.',
+    coverImage: barrel5Terrace, images: [barrel5Terrace], area: '10 м²', floors: '1 этаж', bedrooms: 'Парная · входная зона · терраса',
+    priceFrom: 'от 349 000 ₽', constructionType: 'Баня-бочка', category: 'bath', style: 'С террасой', isIllustrative: true
+  },
+  {
+    id: 'bath-barrel-quadra-5m', title: 'Баня-бочка «Квадро» 5 м',
+    shortDescription: 'Прямоугольный корпус с более удобным внутренним объёмом и крыльцом.',
+    fullDescription: 'Квадратный формат выбирают, когда хочется сохранить компактную длину бани-бочки, но получить более привычную геометрию внутри. Возможны парная, место для переодевания и небольшая зона отдыха — фактический состав зависит от планировки производителя и исполнения. Предварительный ориентир — от 379 000 ₽; цену, размеры, оснащение печью и дымоходом, доставку и установку подтвердим по выбранному варианту.',
+    coverImage: barrelQuadra, images: [barrelQuadra], area: '12 м²', floors: '1 этаж', bedrooms: 'Парная · зона отдыха',
+    priceFrom: 'от 379 000 ₽', constructionType: 'Баня-бочка', category: 'bath', style: 'Квадро', isIllustrative: true
   }
 ];

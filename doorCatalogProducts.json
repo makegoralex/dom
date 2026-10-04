@@ -508,7 +508,7 @@
     "name": "Классика М31 ДФГ",
     "collection": "Классика",
     "collectionSlug": "klassika",
-    "image": "products/door-17907",
+    "image": "products/door-17907-clean",
     "finish": "",
     "type": "door"
   },
@@ -517,7 +517,7 @@
     "name": "НеоКлассика М602 ДФГ",
     "collection": "Неоклассика",
     "collectionSlug": "neoklassika",
-    "image": "products/door-17593",
+    "image": "products/door-17593-clean",
     "finish": "",
     "type": "door"
   },
@@ -823,7 +823,7 @@
     "name": "Эрика М652 ДФО",
     "collection": "Эрика",
     "collectionSlug": "erika",
-    "image": "products/door-17250",
+    "image": "products/door-17250-clean",
     "finish": "",
     "type": "door"
   },
@@ -895,7 +895,7 @@
     "name": "НеоКлассика М609 ДФГ",
     "collection": "Неоклассика",
     "collectionSlug": "neoklassika",
-    "image": "products/door-16797",
+    "image": "products/door-16797-clean",
     "finish": "",
     "type": "door"
   },
@@ -1156,7 +1156,7 @@
     "name": "ЭКО М102",
     "collection": "Эко",
     "collectionSlug": "eko",
-    "image": "products/door-16561",
+    "image": "products/door-16561-clean",
     "finish": "",
     "type": "door"
   },

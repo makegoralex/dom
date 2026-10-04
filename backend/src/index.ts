@@ -404,7 +404,8 @@ const SERVICE_PAGE_SLUGS = [
   'plastikovye-okna', 'dveri', 'remont', 'lestnitsy', 'svai', 'dizainer', 'landshaftnyy-dizayn',
   'mezhevanie', 'ipoteka-oformlenie', 'strahovanie'
 ];
-const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'baths', 'doors', 'chany', 'homes', 'lands', 'settlements', 'services', 'furniture', 'promotions', 'journal', 'contacts'];
+const NAV_MENU_DEFAULT_ORDER = ['home', 'projects', 'baths', 'doors', 'chany', 'lands', 'homes', 'services', 'furniture', 'settlements', 'promotions', 'journal', 'about', 'contacts'];
+const LEGACY_CROWDED_MENU_ORDER = ['home', 'about', 'projects', 'baths', 'doors', 'chany', 'lands', 'furniture', 'services', 'promotions', 'contacts', 'homes', 'settlements', 'journal'];
 
 function normalizeMenuOrder(order?: string[]) {
   const incoming = Array.isArray(order) ? order.filter((item) => NAV_MENU_DEFAULT_ORDER.includes(item)) : [];
@@ -925,6 +926,10 @@ const readData = (): DataStore => {
       projectIds.add(project.id);
     }
   }
+  const savedMenuOrder = Array.isArray(parsed.menuOrder) ? parsed.menuOrder : [];
+  const isLegacyCrowdedMenu = savedMenuOrder.length === LEGACY_CROWDED_MENU_ORDER.length
+    && savedMenuOrder.every((key, index) => key === LEGACY_CROWDED_MENU_ORDER[index]);
+  const menuOrder = isLegacyCrowdedMenu ? [...NAV_MENU_DEFAULT_ORDER] : normalizeMenuOrder(parsed.menuOrder);
   return {
     projects: projects.map(enrichHouseProjectCopy),
     lands: Array.isArray(parsed.lands) && parsed.lands.length
@@ -963,7 +968,7 @@ const readData = (): DataStore => {
     journalArticles: Array.isArray(parsed.journalArticles) ? parsed.journalArticles : seedJournalArticles,
     leads: parsed.leads || [],
     pages: { ...seedPages, ...(parsed.pages || {}) },
-    menuOrder: normalizeMenuOrder(parsed.menuOrder),
+    menuOrder,
     siteSettings: {
       logoUrl: typeof parsed.siteSettings?.logoUrl === 'string' && parsed.siteSettings.logoUrl.trim()
         ? parsed.siteSettings.logoUrl
@@ -2565,7 +2570,7 @@ if (fs.existsSync(FRONTEND_DIST)) {
       '/portfolio': { title: 'Портфолио домов и объектов Evtenia — Пенза', description: 'Примеры проектов и выполненных работ Evtenia в Пензе и Пензенской области. Посмотрите решения и обсудите подходящий вариант с командой.' },
       '/privacy-policy': { title: 'Политика конфиденциальности — Evtenia', description: 'Информация об обработке персональных данных пользователей сайта Evtenia.' },
       '/mortgage-calculator': { title: 'Ипотечный калькулятор на дом — рассчитать платёж | Evtenia', description: 'Рассчитайте ориентировочный ипотечный платёж на строительство или покупку дома. Условия зависят от банка, программы и параметров заявки.' },
-      '/furniture': { title: 'Мебель для дома в Пензе — подбор и заказ | Evtenia', description: 'Подбор мебели для дома и квартиры в Пензе: кухни, гостиные, спальни и решения под размеры помещения и стиль интерьера.' }
+  '/furniture': { title: 'Мебель в Пензе — кухни, спальни и гостиные | Evtenia', description: 'Подбор мебели для дома в Пензе и области: кухни, спальни, гостиные, обеденные группы и кабинеты. Поможем сверить размеры, комплектацию, цену и сроки.' }
     };
     let page = exactPages[pathname];
     let valid = Boolean(page);
