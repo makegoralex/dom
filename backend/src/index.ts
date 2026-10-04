@@ -1990,6 +1990,24 @@ const escapeHtml = (value: string): string => value
   .replace(/"/g, '&quot;')
   .replace(/'/g, '&#39;');
 
+const SEO_FALLBACK_LINKS: Array<[label: string, href: string]> = [
+  ['Главная', '/'],
+  ['О компании', '/about'],
+  ['Проекты домов', '/projects'],
+  ['Проекты бань', '/baths'],
+  ['Двери', '/dveri'],
+  ['Банные чаны', '/chany'],
+  ['Готовые дома', '/homes'],
+  ['Земельные участки', '/lands'],
+  ['Коттеджный посёлок «Лесное озеро»', '/lands/lesnoe-ozero'],
+  ['Мебель', '/furniture'],
+  ['Проектирование', '/design'],
+  ['Ипотека и акции', '/discounts/ipoteka-i-kredit'],
+  ['Журнал', '/journal'],
+  ['Портфолио', '/portfolio'],
+  ['Контакты', '/contacts']
+];
+
 const truncateSeoText = (value: string, maxLength: number): string => {
   const clean = value.replace(/\s+/g, ' ').trim();
   if (clean.length <= maxLength) return clean;
@@ -2028,7 +2046,10 @@ const renderSeoDocument = (html: string, title: string, description: string, can
     schema ? `<script id="catalog-jsonld" type="application/ld+json">${JSON.stringify(schema).replace(/</g, '\\u003c')}</script>` : ''
   ].join('');
   const fallbackHeading = escapeHtml(plainTitle.replace(/\s*\|\s*Evtenia$/i, '').trim());
-  const seoFallback = fallbackHtml || `<main class="seo-fallback-content"><h1>${fallbackHeading}</h1><p>${safeDescription}</p></main>`;
+  const fallbackNavigation = `<nav class="seo-fallback-nav" aria-label="Основные разделы сайта"><h2>Разделы сайта Evtenia</h2><ul>${SEO_FALLBACK_LINKS.map(([label, href]) => `<li><a href="${escapeHtml(href)}">${escapeHtml(label)}</a></li>`).join('')}</ul></nav>`;
+  const seoFallback = fallbackHtml
+    ? fallbackHtml.replace(/<\/main>\s*$/i, `${fallbackNavigation}</main>`)
+    : `<main class="seo-fallback-content"><h1>${fallbackHeading}</h1><p>${safeDescription}</p>${fallbackNavigation}</main>`;
   result = result.replace(/<div\s+id=["']root["']\s*>\s*<\/div>/i, `<div id="root">${seoFallback}</div>`);
   return result.replace(/<\/head>/i, `${socialTags}</head>`);
 };
