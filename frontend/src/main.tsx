@@ -967,7 +967,9 @@ const FURNITURE_LEAF_PAGES = FURNITURE_STRUCTURE.flatMap((category) =>
   category.brands.map((brand) => ({
     categoryTitle: category.title,
     brandTitle: brand,
-    href: `/furniture/${slugify(category.title)}/${slugify(brand)}`
+    href: `/furniture/${slugify(category.title)}/${slugify(brand)}`,
+    seoTitle: `${brand} — ${category.title.toLocaleLowerCase('ru-RU')} в Пензе | Evtenia`,
+    seoDescription: `Мебель ${category.title.toLocaleLowerCase('ru-RU')} ${brand}: поможем подобрать конфигурацию, материалы и размеры для дома в Пензе. Стоимость и сроки уточняются по проекту.`
   }))
 );
 
@@ -1868,7 +1870,7 @@ function PublicPage() {
       <header
         className="hero hero-exact"
         style={heroImage ? {
-          backgroundImage: `linear-gradient(rgba(30, 73, 56, .28), rgba(18, 54, 41, .52)), url('${heroImage}')`
+          backgroundImage: `linear-gradient(rgba(30, 73, 56, .10), rgba(18, 54, 41, .30)), url('${heroImage}')`
         } : undefined}
       >
         <div className="promo-strip">
@@ -2199,7 +2201,7 @@ function InternalHeader() {
   return (
     <header
       className="hero hero-exact internal-header"
-      style={headerImage ? { backgroundImage: `linear-gradient(rgba(30, 73, 56, .32), rgba(18, 54, 41, .56)), url('${headerImage}')` } : undefined}
+      style={headerImage ? { backgroundImage: `linear-gradient(rgba(30, 73, 56, .12), rgba(18, 54, 41, .34)), url('${headerImage}')` } : undefined}
     >
       {!isProductCatalogHeader ? <div className="promo-strip">
         <div className="container promo-inner">
@@ -2740,12 +2742,6 @@ function BathsPage() {
   return <CatalogPage category="bath" sectionTitle="Бани" />;
 }
 
-const LAND_FALLBACK: LandPlot[] = [
-  { id: 'land1', cadastralNumber: 'По запросу', area: '10 соток', price: '1 250 000 ₽', district: 'Пензенский район', images: ['https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80'] },
-  { id: 'land2', cadastralNumber: 'По запросу', area: '12 соток', price: '1 480 000 ₽', district: 'Бессоновский район', images: ['https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1200&q=80'] },
-  { id: 'land3', cadastralNumber: 'По запросу', area: '8 соток', price: '980 000 ₽', district: 'Железнодорожный район', images: ['https://images.unsplash.com/photo-1493815793585-d94ccbc86df8?auto=format&fit=crop&w=1200&q=80'] }
-];
-
 function LandCardImageSlider({ land, href }: { land: LandPlot; href?: string }) {
   const images = (land.images || []).length ? (land.images || []) : [LAND_IMAGE_FALLBACK];
   const [activeIndex, setActiveIndex] = useState(0);
@@ -2913,7 +2909,8 @@ function LandDetailPage() {
 }
 
 function LandsPage() {
-  const [lands, setLands] = useState<LandPlot[]>(LAND_FALLBACK);
+  const [lands, setLands] = useState<LandPlot[]>([]);
+  const [landsLoadState, setLandsLoadState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [district, setDistrict] = useState('Все районы');
   const [minPrice, setMinPrice] = useState<number>(0);
   const [maxPrice, setMaxPrice] = useState<number>(0);
@@ -2936,8 +2933,14 @@ function LandsPage() {
     document.title = 'Земля — Evtenia';
     fetch(`${API_BASE}/api/lands`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('no lands'))))
-      .then((data: LandPlot[]) => Array.isArray(data) && data.length ? setLands(data) : setLands(LAND_FALLBACK))
-      .catch(() => setLands(LAND_FALLBACK));
+      .then((data: LandPlot[]) => {
+        setLands(Array.isArray(data) ? data : []);
+        setLandsLoadState('ready');
+      })
+      .catch(() => {
+        setLands([]);
+        setLandsLoadState('error');
+      });
   }, []);
   const districts = ['Все районы', ...Array.from(new Set(lands.map((item) => item.district)))];
   const parsePrice = (value: string) => Number(value.replace(/[^\d]/g, '') || '0');
@@ -3054,7 +3057,7 @@ function LandsPage() {
                 <button type="button" onClick={() => setOpenSellLand(true)}>Продать свою землю</button>
               </div>
               <div className="lands-hero-stats">
-                <div><strong>{lands.length}</strong><span>предложений в каталоге</span></div>
+                <div><strong>{landsLoadState === 'loading' ? '—' : lands.length}</strong><span>предложений в каталоге</span></div>
                 <div><strong>ИЖС</strong><span>земля под строительство</span></div>
                 <div><strong>Под ключ</strong><span>участок, проект и дом</span></div>
               </div>
@@ -3166,9 +3169,10 @@ function LandsPage() {
               {!filtered.length ? (
                 <div className="lands-empty">
                   <span aria-hidden="true">⌕</span>
-                  <h3>По этим параметрам участков пока нет</h3>
-                  <p>Сбросьте фильтры или оставьте заявку — предложим варианты из закрытой базы.</p>
-                  <button type="button" onClick={resetFilters}>Сбросить фильтры</button>
+                  <h3>{landsLoadState === 'loading' ? 'Загружаем актуальные объявления' : landsLoadState === 'error' ? 'Не удалось загрузить каталог участков' : lands.length ? 'По этим параметрам участков пока нет' : 'Сейчас участков в каталоге нет'}</h3>
+                  <p>{landsLoadState === 'loading' ? 'Покажем только актуальные предложения после загрузки каталога.' : 'Оставьте заявку — уточним доступные варианты в Пензе и области и поможем подобрать участок.'}</p>
+                  {lands.length && filtersChanged ? <button type="button" onClick={resetFilters}>Сбросить фильтры</button> : null}
+                  {landsLoadState !== 'loading' ? <button type="button" onClick={() => setOpenSelection(true)}>Подобрать участок</button> : null}
                 </div>
               ) : null}
             </div>
@@ -3651,7 +3655,7 @@ function DesignPage() {
   );
 }
 
-function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = false }: { pageSlug: string; sectionTitle: string; pageTitle: string; text: string; isHtml?: boolean }) {
+function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = false, seoTitle, seoDescription }: { pageSlug: string; sectionTitle: string; pageTitle: string; text: string; isHtml?: boolean; seoTitle?: string; seoDescription?: string }) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [requestMessage, setRequestMessage] = useState('');
@@ -3667,7 +3671,11 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
 
   useEffect(() => {
     if (!serviceDetail) {
-      document.title = `${pageTitle} — Evtenia`;
+      if (seoTitle && seoDescription) {
+        writePageSEO({ title: seoTitle, description: seoDescription, path: window.location.pathname });
+      } else {
+        document.title = `${pageTitle} — Evtenia`;
+      }
       return;
     }
     const schema = {
@@ -3705,7 +3713,7 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
       image: cmsHeroImage ? resolveMediaUrl(cmsHeroImage) : serviceDetail.photo,
       schema
     });
-  }, [pageTitle, serviceDetail, serviceSlug]);
+  }, [pageTitle, serviceDetail, serviceSlug, seoTitle, seoDescription]);
 
   const submitServiceLead = async (event: FormEvent) => {
     event.preventDefault();
@@ -3895,7 +3903,7 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
 }
 
 
-function ManagedTextPage({ slug, fallbackTitle, fallbackContent, sectionTitle }: { slug: string; fallbackTitle: string; fallbackContent: string; sectionTitle: string }) {
+function ManagedTextPage({ slug, fallbackTitle, fallbackContent, sectionTitle, seoTitle, seoDescription }: { slug: string; fallbackTitle: string; fallbackContent: string; sectionTitle: string; seoTitle?: string; seoDescription?: string }) {
   const [page, setPage] = useState<ContentPage>({ slug, title: fallbackTitle, content: fallbackContent });
 
   useEffect(() => {
@@ -3905,7 +3913,7 @@ function ManagedTextPage({ slug, fallbackTitle, fallbackContent, sectionTitle }:
       .catch(() => setPage({ slug, title: fallbackTitle, content: fallbackContent }));
   }, [slug, fallbackTitle, fallbackContent]);
 
-  return <SubsectionPage pageSlug={slug} sectionTitle={sectionTitle} pageTitle={page.title} text={page.content} isHtml />;
+  return <SubsectionPage pageSlug={slug} sectionTitle={sectionTitle} pageTitle={page.title} text={page.content} isHtml seoTitle={seoTitle} seoDescription={seoDescription} />;
 }
 
 function NotFoundPage() {
@@ -5581,6 +5589,8 @@ function App() {
           fallbackTitle={furniturePage.brandTitle}
           fallbackContent={`Раздел мебели: ${furniturePage.categoryTitle}. Подберем решение под размер помещения, стиль интерьера и бюджет.`}
           sectionTitle="Мебель"
+          seoTitle={furniturePage.seoTitle}
+          seoDescription={furniturePage.seoDescription}
         />
       </AppLayout>
     );

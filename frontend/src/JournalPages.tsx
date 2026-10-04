@@ -150,6 +150,9 @@ export function JournalIndexPage({ apiBase, Header, Footer, resolveMedia, catego
   const rest = featured ? articles.filter((article) => article.id !== featured.id) : articles;
 
   useEffect(() => {
+    // Keep the server-rendered category metadata while its name is being loaded.
+    // Otherwise every journal category briefly overwrites its unique SEO title with the index title.
+    if (categorySlug && (loading || !activeCategory)) return;
     document.title = shortenSeoValue(activeCategory ? `${activeCategory.name} — Журнал Evtenia` : 'Журнал о строительстве домов — Evtenia', 70);
     let description = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
     if (!description) {
@@ -167,7 +170,7 @@ export function JournalIndexPage({ apiBase, Header, Footer, resolveMedia, catego
     canonical.href = activeCategory
       ? `${window.location.origin}/journal/category/${activeCategory.slug}`
       : `${window.location.origin}/journal`;
-  }, [activeCategory]);
+  }, [activeCategory, categorySlug, loading]);
 
   return (
     <>
