@@ -1209,6 +1209,7 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 
 body { background: var(--ev-paper); color: var(--ev-ink); }
 .container { width: min(1240px, calc(100% - 48px)); }
+.route-loading { display: grid; min-height: min(42vh, 380px); place-items: center; color: var(--ev-muted); font-size: 15px; }
 
 .hero-exact {
   min-height: 720px;

@@ -1,4 +1,5 @@
 import React, { ComponentType, useEffect, useMemo, useState } from 'react';
+import './journal.css';
 
 function shortenSeoValue(value: string, maxLength: number) {
   const clean = value.replace(/\s+/g, ' ').trim();

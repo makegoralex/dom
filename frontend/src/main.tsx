@@ -2,13 +2,19 @@ import React, { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } fro
 import ReactDOM from 'react-dom/client';
 import { createPortal } from 'react-dom';
 import './styles.css';
-import './journal.css';
-import { LesnoeOzeroPage } from './LesnoeOzeroPage';
-import { MortgageCalculatorPage } from './MortgageCalculatorPage';
-import { LESNOE_OZERO_PHASES, LesnoeOzeroPlot } from './lesnoeOzeroPlots';
-import { HomeDetailPage, HomesPage, HouseListing } from './HomesPages';
-import { JournalArticle, JournalArticlePage, JournalCategory, JournalIndexPage } from './JournalPages';
-import { ChanyCatalogPage, DoorCollectionPage, DoorsCatalogPage } from './CatalogPages';
+import type { HouseListing } from './HomesPages';
+import type { JournalArticle, JournalCategory } from './JournalPages';
+import { LESNOE_OZERO_PHASES, type LesnoeOzeroPlot } from './lesnoeOzeroPlots';
+
+const LesnoeOzeroPage = React.lazy(() => import('./LesnoeOzeroPage').then((module) => ({ default: module.LesnoeOzeroPage })));
+const MortgageCalculatorPage = React.lazy(() => import('./MortgageCalculatorPage').then((module) => ({ default: module.MortgageCalculatorPage })));
+const HomesPage = React.lazy(() => import('./HomesPages').then((module) => ({ default: module.HomesPage })));
+const HomeDetailPage = React.lazy(() => import('./HomesPages').then((module) => ({ default: module.HomeDetailPage })));
+const JournalIndexPage = React.lazy(() => import('./JournalPages').then((module) => ({ default: module.JournalIndexPage })));
+const JournalArticlePage = React.lazy(() => import('./JournalPages').then((module) => ({ default: module.JournalArticlePage })));
+const DoorsCatalogPage = React.lazy(() => import('./CatalogPages').then((module) => ({ default: module.DoorsCatalogPage })));
+const DoorCollectionPage = React.lazy(() => import('./CatalogPages').then((module) => ({ default: module.DoorCollectionPage })));
+const ChanyCatalogPage = React.lazy(() => import('./CatalogPages').then((module) => ({ default: module.ChanyCatalogPage })));
 
 type HouseProject = {
   id: string;
@@ -5515,6 +5521,10 @@ function AppLayout({ children }: { children: ReactNode }) {
   );
 }
 
+function DeferredPage({ children, label = 'Загружаем страницу…' }: { children: ReactNode; label?: string }) {
+  return <React.Suspense fallback={<div className="container route-loading" role="status">{label}</div>}>{children}</React.Suspense>;
+}
+
 function App() {
   const url = new URL(window.location.href);
   const pathname = normalizePathname(window.location.pathname).replace(/\/+$/, '') || '/';
@@ -5554,31 +5564,31 @@ function App() {
   if (pathname === '/lands/lesnoe-ozero') {
     return (
       <AppLayout>
-        <LesnoeOzeroPage
+        <DeferredPage label="Загружаем коттеджный посёлок…"><LesnoeOzeroPage
           Header={InternalHeader}
           Footer={SiteFooter}
           PrivacyConsent={PrivacyConsent}
           apiBase={API_BASE}
           formatPhone={formatPhoneMask}
-        />
+        /></DeferredPage>
       </AppLayout>
     );
   }
   if (pathname === '/lands') return <AppLayout><LandsPage /></AppLayout>;
   if (pathname.startsWith('/lands/')) return <AppLayout><LandDetailPage /></AppLayout>;
-  if (pathname === '/homes') return <AppLayout><HomesPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} LeadModal={PromoLeadModal} formatPhone={formatPhoneMask} resolveMedia={resolveMediaUrl} /></AppLayout>;
-  if (pathname.startsWith('/homes/')) return <AppLayout><HomeDetailPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} LeadModal={PromoLeadModal} formatPhone={formatPhoneMask} resolveMedia={resolveMediaUrl} /></AppLayout>;
+  if (pathname === '/homes') return <AppLayout><DeferredPage><HomesPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} LeadModal={PromoLeadModal} formatPhone={formatPhoneMask} resolveMedia={resolveMediaUrl} /></DeferredPage></AppLayout>;
+  if (pathname.startsWith('/homes/')) return <AppLayout><DeferredPage><HomeDetailPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} LeadModal={PromoLeadModal} formatPhone={formatPhoneMask} resolveMedia={resolveMediaUrl} /></DeferredPage></AppLayout>;
   if (pathname === '/mortgage-calculator') {
-    return <AppLayout><MortgageCalculatorPage Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} apiBase={API_BASE} formatPhone={formatPhoneMask} /></AppLayout>;
+    return <AppLayout><DeferredPage label="Загружаем калькулятор…"><MortgageCalculatorPage Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} apiBase={API_BASE} formatPhone={formatPhoneMask} /></DeferredPage></AppLayout>;
   }
   if (pathname.startsWith('/project/')) return <AppLayout><ProjectDetailPage /></AppLayout>;
-  if (pathname === '/journal') return <AppLayout><JournalIndexPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} resolveMedia={resolveMediaUrl} /></AppLayout>;
-  if (pathname.startsWith('/journal/category/')) return <AppLayout><JournalIndexPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} resolveMedia={resolveMediaUrl} categorySlug={pathname.replace('/journal/category/', '')} /></AppLayout>;
-  if (pathname.startsWith('/journal/')) return <AppLayout><JournalArticlePage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} resolveMedia={resolveMediaUrl} slug={pathname.replace('/journal/', '')} /></AppLayout>;
+  if (pathname === '/journal') return <AppLayout><DeferredPage><JournalIndexPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} resolveMedia={resolveMediaUrl} /></DeferredPage></AppLayout>;
+  if (pathname.startsWith('/journal/category/')) return <AppLayout><DeferredPage><JournalIndexPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} resolveMedia={resolveMediaUrl} categorySlug={pathname.replace('/journal/category/', '')} /></DeferredPage></AppLayout>;
+  if (pathname.startsWith('/journal/')) return <AppLayout><DeferredPage><JournalArticlePage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} resolveMedia={resolveMediaUrl} slug={pathname.replace('/journal/', '')} /></DeferredPage></AppLayout>;
   if (pathname === '/design') return <AppLayout><DesignPage /></AppLayout>;
-  if (pathname === '/dveri') return <AppLayout><DoorsCatalogPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} formatPhone={formatPhoneMask} /></AppLayout>;
-  if (pathname.startsWith('/dveri/')) return <AppLayout><DoorCollectionPage slug={pathname.replace('/dveri/', '')} apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} formatPhone={formatPhoneMask} /></AppLayout>;
-  if (pathname === '/chany') return <AppLayout><ChanyCatalogPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} formatPhone={formatPhoneMask} /></AppLayout>;
+  if (pathname === '/dveri') return <AppLayout><DeferredPage><DoorsCatalogPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} formatPhone={formatPhoneMask} /></DeferredPage></AppLayout>;
+  if (pathname.startsWith('/dveri/')) return <AppLayout><DeferredPage><DoorCollectionPage slug={pathname.replace('/dveri/', '')} apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} formatPhone={formatPhoneMask} /></DeferredPage></AppLayout>;
+  if (pathname === '/chany') return <AppLayout><DeferredPage><ChanyCatalogPage apiBase={API_BASE} Header={InternalHeader} Footer={SiteFooter} PrivacyConsent={PrivacyConsent} formatPhone={formatPhoneMask} /></DeferredPage></AppLayout>;
   if (servicePage) return <AppLayout><ManagedTextPage slug={`services-${servicePage.slug}`} fallbackTitle={servicePage.title} fallbackContent={servicePage.text} sectionTitle="Услуги" /></AppLayout>;
   if (discountPage) return <AppLayout><ManagedTextPage slug={`discounts-${discountPage.slug}`} fallbackTitle={discountPage.title} fallbackContent={discountPage.text} sectionTitle="Ипотека и акции" /></AppLayout>;
   if (furniturePage) {
