@@ -8,6 +8,7 @@ import sharp from 'sharp';
 import dotenv from 'dotenv';
 import { gasblockCatalogProjects } from './gasblockCatalogProjects';
 import { bathCatalogProjects } from './bathCatalogProjects';
+import { legacyProjectCopy } from './legacyProjectCopy';
 
 dotenv.config({ path: path.join(__dirname, '..', '.env.production') });
 
@@ -466,6 +467,8 @@ const getProjectSlug = (project: HouseProject, projects: HouseProject[]): string
 
 const enrichHouseProjectCopy = (project: HouseProject): HouseProject => {
   if (project.category === 'bath' || project.catalogProject) return project;
+  const specificCopy = legacyProjectCopy[project.id];
+  if (specificCopy) return { ...project, ...specificCopy };
   const title = project.title.replace(/[_-]+/g, ' ').trim();
   const area = project.area?.trim() || 'по запросу';
   const areaLabel = /(?:м2|м²|кв\.?\s*м)$/i.test(area) || area === 'по запросу' ? area : `${area} м²`;

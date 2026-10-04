@@ -3299,6 +3299,8 @@ function ProjectDetailPage() {
     : isBathProject
       ? (/бан/i.test(cleanProjectTitle) ? cleanProjectTitle : `Баня «${cleanProjectTitle}»`)
       : `${projectTypeHeadline} «${cleanProjectTitle}»`;
+  const projectDescription = project.fullDescription || project.shortDescription || `Проект частного дома из материала «${project.constructionType}». Планировку, габариты и состав работ можно уточнить у специалиста.`;
+  const projectDescriptionParagraphs = projectDescription.split(/\n\s*\n/).map((paragraph) => paragraph.replace(/\s*\n\s*/g, ' ').trim()).filter(Boolean);
 
   return (
     <div>
@@ -3339,7 +3341,7 @@ function ProjectDetailPage() {
               </div>
               <div className="project-detail-description">
                 <h2>О проекте «{shownTitle}»</h2>
-                <p>{project.fullDescription || project.shortDescription || `Проект частного дома из материала «${project.constructionType}». Планировку, габариты и состав работ можно уточнить у специалиста.`}</p>
+                {projectDescriptionParagraphs.map((paragraph, index) => <p key={`${project.id}-description-${index}`}>{paragraph}</p>)}
               </div>
             </div>
             <aside className="project-detail-side">
