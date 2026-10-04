@@ -1253,7 +1253,7 @@ function HeaderNav({
       },
       projects: { label: 'ПРОЕКТЫ ДОМОВ', href: '/projects', active: currentPath === '/projects', children: projectsChildren },
       baths: {
-        label: 'БАНИ', href: '/baths', active: currentPath === '/baths', children: [
+        label: 'ПРОЕКТЫ БАНЬ', href: '/baths', active: currentPath === '/baths' || /^\/project\/(?:proekt-bani-|banya-|bannyy-dom-)/.test(currentPath), children: [
           { label: 'Все проекты бань', href: '/baths' },
           { label: 'Каркасные бани', href: `/baths?type=${encodeURIComponent('Каркасные')}` },
           { label: 'Из профилированного бруса', href: `/baths?type=${encodeURIComponent('Профилированный брус')}` },
@@ -1302,7 +1302,7 @@ function HeaderNav({
           <React.Fragment key={item.label}>
             {item.children ? (
               <div
-                className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'БАНИ' ? 'menu-baths' : item.label === 'О КОМПАНИИ' ? 'menu-about' : item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'menu-settlements' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : item.label === 'МЕБЕЛЬ' ? 'menu-furniture' : ''}`}
+                className={`menu-services ${item.label === 'ПРОЕКТЫ ДОМОВ' ? 'menu-projects' : item.label === 'ПРОЕКТЫ БАНЬ' ? 'menu-baths' : item.label === 'О КОМПАНИИ' ? 'menu-about' : item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'menu-settlements' : item.label === 'ИПОТЕКА И АКЦИИ' ? 'menu-promotions' : item.label === 'МЕБЕЛЬ' ? 'menu-furniture' : ''}`}
                 data-open={openDesktopMenu === item.label ? 'true' : undefined}
                 onMouseEnter={(event) => openDesktopMenuFor(item.label, event.currentTarget)}
                 onFocus={(event) => openDesktopMenuFor(item.label, event.currentTarget)}
@@ -1313,7 +1313,7 @@ function HeaderNav({
                   <button type="button" className={`menu-link menu-link-btn ${item.active ? 'active' : ''}`}>{item.label} ▾</button>
                 )}
                 <div
-                  className={item.label === 'ПРОЕКТЫ ДОМОВ' || item.label === 'БАНИ' || item.label === 'О КОМПАНИИ' || item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'projects-dropdown' : 'services-dropdown'}
+                  className={item.label === 'ПРОЕКТЫ ДОМОВ' || item.label === 'ПРОЕКТЫ БАНЬ' || item.label === 'О КОМПАНИИ' || item.label === 'ЖК И КОТТЕДЖНЫЕ ПОСЕЛКИ' ? 'projects-dropdown' : 'services-dropdown'}
                   style={openDesktopMenu === item.label ? { display: 'grid' } : undefined}
                   onMouseEnter={cancelDesktopMenuClose}
                   onMouseLeave={scheduleDesktopMenuClose}
@@ -1461,45 +1461,45 @@ const FALLBACK_PROJECTS: HouseProject[] = [
   },
   {
     id: 'bath-compact-12', title: 'Компакт 12', area: '12 м²', floors: '1 этаж', bedrooms: 'Парная · моечная · предбанник',
-    shortDescription: 'Компактная каркасная баня 3 × 4 м: парная, моечная и предбанник.',
-    fullDescription: 'Иллюстративная планировка; комплектация, цена и устройство основания уточняются индивидуально.',
+    shortDescription: 'Компактная каркасная баня 3 × 4 м: парная, моечная и небольшая входная зона.',
+    fullDescription: 'Иллюстративная планировка для дачи и небольшого участка. Цена «от 750 000 ₽» — ориентир базового варианта, а не фиксированная смета; основание, утепление, отделка парной, печь, доставка и монтаж зависят от комплектации.',
     coverImage: '/api/assets/projects/catalog/bath-compact-v2.webp', images: ['/api/assets/projects/catalog/bath-compact-v2.webp'],
-    priceFrom: 'от 550 000 ₽', constructionType: 'Каркасные', style: 'Компактный', category: 'bath', isIllustrative: true
+    priceFrom: 'от 750 000 ₽', constructionType: 'Каркасные', style: 'Компактный', category: 'bath', isIllustrative: true
   },
   {
     id: 'bath-country-16', title: 'Дачная 16', area: '16 м²', floors: '1 этаж', bedrooms: 'Парная · моечная · отдых',
-    shortDescription: 'Каркасная баня 4 × 4 м с парной, моечной и комнатой отдыха.',
-    fullDescription: 'Иллюстративная планировка; печь, фундамент, доставка и отделка рассчитываются по выбранной комплектации.',
+    shortDescription: 'Баня 4 × 4 м с парной, моечной и отдельным местом для отдыха.',
+    fullDescription: 'Универсальный дачный формат площадью 16 м² с планировкой, которую можно адаптировать к участку. Ориентир «от 850 000 ₽» относится к базовому каркасному исполнению; фундамент, печь с дымоходом, инженерные подключения, отделка, доставка и монтаж влияют на итоговую смету.',
     coverImage: '/api/assets/projects/catalog/bath-country-v2.webp', images: ['/api/assets/projects/catalog/bath-country-v2.webp'],
-    priceFrom: 'от 700 000 ₽', constructionType: 'Каркасные', style: 'Компактный', category: 'bath', isIllustrative: true
+    priceFrom: 'от 850 000 ₽', constructionType: 'Каркасные', style: 'Компактный', category: 'bath', isIllustrative: true
   },
   {
     id: 'bath-family-20', title: 'Семейная 20', area: '20 м²', floors: '1 этаж', bedrooms: 'Парная · моечная · отдых',
-    shortDescription: 'Планировка 4 × 5 м с парной, моечной и отдельной комнатой отдыха.',
-    fullDescription: 'Иллюстративная идея семейной бани; точная стоимость зависит от основания, инженерии, печи и отделки.',
+    shortDescription: 'Семейная каркасная баня 4 × 5 м с отдельной комнатой отдыха.',
+    fullDescription: 'Вариант площадью 20 м² для отдыха семьи и гостей: парная и моечная соседствуют с общей комнатой. Цена «от 950 000 ₽» — ориентир начальной комплектации; основание, утепление, отделка парной, печь и дымоход, инженерные сети, доставка и монтаж считаются по заданию.',
     coverImage: '/api/assets/projects/catalog/bath-family-v2.webp', images: ['/api/assets/projects/catalog/bath-family-v2.webp'],
-    priceFrom: 'от 850 000 ₽', constructionType: 'Каркасные', style: 'С комнатой отдыха', category: 'bath', isIllustrative: true
+    priceFrom: 'от 950 000 ₽', constructionType: 'Каркасные', style: 'С комнатой отдыха', category: 'bath', isIllustrative: true
   },
   {
     id: 'bath-terrace-24', title: 'С террасой 24', area: '24 м²', floors: '1 этаж', bedrooms: 'Парная · моечная · отдых · терраса',
-    shortDescription: 'Каркасная баня 4 × 6 м с комнатой отдыха и открытой террасой.',
-    fullDescription: 'Иллюстративный вариант; размеры террасы, фундамент, коммуникации, печь и чистовая отделка уточняются отдельно.',
+    shortDescription: 'Каркасная баня 4 × 6 м: парная, моечная, комната отдыха и терраса.',
+    fullDescription: 'Планировка с отдельным банным блоком, комнатой отдыха и открытой террасой. Цена «от 1 200 000 ₽» — предварительный ориентир для базового исполнения; размер террасы, основание, печь, коммуникации, отделка, доставка и монтаж уточняются перед расчётом.',
     coverImage: '/api/assets/projects/catalog/bath-terrace-v2.webp', images: ['/api/assets/projects/catalog/bath-terrace-v2.webp'],
-    priceFrom: 'от 1 050 000 ₽', constructionType: 'Каркасные', style: 'С террасой', category: 'bath', isIllustrative: true
+    priceFrom: 'от 1 200 000 ₽', constructionType: 'Каркасные', style: 'С террасой', category: 'bath', isIllustrative: true
   },
   {
     id: 'bath-timber-24', title: 'Брусовая 24', area: '24 м²', floors: '1 этаж', bedrooms: 'Парная · моечная · отдых · веранда',
     shortDescription: 'Баня 4 × 6 м из профилированного бруса с верандой.',
-    fullDescription: 'Иллюстративный вариант; цену определяют характеристики бруса, усадка, основание, печь, инженерия и отделка.',
+    fullDescription: 'Деревянный формат площадью 24 м² с парной, моечной, комнатой отдыха и верандой. Цена «от 1 550 000 ₽» — ориентир, не готовая смета; стоимость зависит от параметров бруса, основания, усадки, печи, инженерии, доставки и отделки.',
     coverImage: '/api/assets/projects/catalog/bath-timber-v2.webp', images: ['/api/assets/projects/catalog/bath-timber-v2.webp'],
-    priceFrom: 'от 1 450 000 ₽', constructionType: 'Профилированный брус', style: 'Деревянная', category: 'bath', isIllustrative: true
+    priceFrom: 'от 1 550 000 ₽', constructionType: 'Профилированный брус', style: 'Деревянная', category: 'bath', isIllustrative: true
   },
   {
     id: 'bath-log-36', title: 'Банный дом 36', area: '36 м²', floors: '1 этаж', bedrooms: 'Парная · моечная · отдых · веранда',
     shortDescription: 'Бревенчатая баня 6 × 6 м с комнатой отдыха и верандой.',
-    fullDescription: 'Иллюстративный проектный ориентир; диаметр бревна, усадка и состав работ влияют на смету и сроки.',
+    fullDescription: 'Просторная концепция 36 м² с парной, моечной, комнатой отдыха и крытой входной зоной. Ориентир «от 2 200 000 ₽» зависит от диаметра бревна, основания, кровли, печи, усадки, отделки, доставки и состава работ.',
     coverImage: '/api/assets/projects/catalog/bath-log-v2.webp', images: ['/api/assets/projects/catalog/bath-log-v2.webp'],
-    priceFrom: 'от 1 950 000 ₽', constructionType: 'Оцилиндрованное бревно', style: 'Деревянная', category: 'bath', isIllustrative: true
+    priceFrom: 'от 2 200 000 ₽', constructionType: 'Оцилиндрованное бревно', style: 'Деревянная', category: 'bath', isIllustrative: true
   },
   {
     id: 'bath-guest-48', title: 'Баня-гостевой дом 48', area: '48 м²', floors: '1–2 этажа', bedrooms: 'Банный блок · отдых · гостевая зона',
@@ -2620,8 +2620,8 @@ function CatalogPage({ category, sectionTitle }: { category: 'house' | 'bath'; s
           <Breadcrumbs items={["Главная", sectionTitle, effectiveType]} />
           <h1>{isBathCatalog ? 'Проекты бань в Пензе' : sectionTitle}</h1>
           {isBathCatalog ? <div className="bath-catalog-intro">
-            <p>Типовые идеи бань для дачи и загородного участка в Пензе и Пензенской области: от компактных каркасных решений до просторных деревянных банных домов.</p>
-            <p>Карточки помогают выбрать площадь и состав помещений. Изображения — иллюстрации вариантов, а не фотографии построенных объектов. Цены указаны ориентировочно «от»; точный расчёт зависит от основания, печи и дымохода, отделки, инженерии, доставки и особенностей участка.</p>
+            <p>Отдельный каталог проектов бань для дачи и загородного участка в Пензе и Пензенской области: компактные каркасные варианты, брус и просторные банные дома.</p>
+            <p>Это примерные концепции для выбора площади и состава помещений, а не каталог готовых построек. Фотографии служат иллюстрациями. Цены «от» — приблизительные рыночные ориентиры начальной комплектации; точный расчёт зависит от основания, печи и дымохода, отделки, инженерии, доставки и условий участка.</p>
             <a href="tel:+79022090179">Обсудить баню с менеджером <span aria-hidden="true">→</span></a>
           </div> : null}
           <div className="catalog-layout">
