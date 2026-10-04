@@ -398,6 +398,12 @@ const FURNITURE_STRUCTURE = [
   { title: 'КАБИНЕТЫ', brands: ['CAMEL GROUP', 'PROFOFFICE'] },
   { title: 'МАТРАСЫ', brands: ['HUKLA'] }
 ];
+const SERVICE_PAGE_SLUGS = [
+  'fundament', 'besedki', 'septik', 'zabory', 'skvazhiny', 'elektromontazh', 'umnyy-dom',
+  'vyvoz-musora', 'styazhka-pola', 'konditsionery', 'interernoe-ozelenenie', 'otsenka-nedvizhimosti',
+  'plastikovye-okna', 'dveri', 'remont', 'lestnitsy', 'svai', 'dizainer', 'landshaftnyy-dizayn',
+  'mezhevanie', 'ipoteka-oformlenie', 'strahovanie'
+];
 const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'baths', 'doors', 'chany', 'homes', 'lands', 'settlements', 'services', 'furniture', 'promotions', 'journal', 'contacts'];
 
 function normalizeMenuOrder(order?: string[]) {
@@ -1345,12 +1351,7 @@ app.get('/sitemap.xml', (req, res) => {
     { path: '/furniture' },
     ...FURNITURE_STRUCTURE.flatMap((category) => category.brands.map((brand) => ({ path: `/furniture/${slugify(category.title)}/${slugify(brand)}` }))),
     ...Object.keys(data.pages).filter((slug) => slug.startsWith('discounts-')).map((slug) => ({ path: `/discounts/${slug.slice('discounts-'.length)}` })),
-    ...[
-      'fundament', 'besedki', 'septik', 'zabory', 'skvazhiny', 'elektromontazh', 'umnyy-dom',
-      'vyvoz-musora', 'styazhka-pola', 'konditsionery', 'interernoe-ozelenenie', 'otsenka-nedvizhimosti',
-      'plastikovye-okna', 'dveri', 'remont', 'lestnitsy', 'svai', 'dizainer', 'landshaftnyy-dizayn',
-      'mezhevanie', 'ipoteka-oformlenie', 'strahovanie'
-    ].map((slug) => ({ path: `/services/${slug}` })),
+    ...SERVICE_PAGE_SLUGS.map((slug) => ({ path: `/services/${slug}` })),
     ...data.projects.map((project) => ({ path: `/project/${encodeURIComponent(getProjectSlug(project, data.projects))}` })),
     ...data.homes.map((home) => ({ path: `/homes/${encodeURIComponent(home.id)}` })),
     ...data.lands.map((land) => ({ path: `/lands/${encodeURIComponent(land.id)}` })),
@@ -2008,6 +2009,102 @@ const SEO_FALLBACK_LINKS: Array<[label: string, href: string]> = [
   ['Контакты', '/contacts']
 ];
 
+interface SeoFallbackIndexSection {
+  title: string;
+  links: Array<{ label: string; href: string }>;
+}
+
+const getSeoFallbackSections = (pathname: string, data: ReturnType<typeof readData>): SeoFallbackIndexSection[] => {
+  const projects = data.projects || [];
+  const homes = data.homes || [];
+  const lands = data.lands || [];
+  const publishedArticles = (data.journalArticles || []).filter((article) => article.status === 'published');
+  const categories = data.journalCategories || [];
+  const projectLink = (project: HouseProject) => ({
+    label: `${project.title}${project.area ? ` — ${project.area}` : ''}`,
+    href: `/project/${encodeURIComponent(getProjectSlug(project, projects))}`
+  });
+  const serviceLinks = SERVICE_PAGE_SLUGS.flatMap((slug) => {
+    const page = data.pages[`services-${slug}`];
+    return page ? [{ label: page.title, href: `/services/${slug}` }] : [];
+  });
+
+  if (pathname === '/') {
+    return [
+      { title: 'Услуги в Пензе и области', links: serviceLinks },
+      { title: 'Популярные проекты домов', links: projects.filter((project) => project.category !== 'bath').slice(0, 6).map(projectLink) },
+      { title: 'Проекты бань', links: projects.filter((project) => project.category === 'bath').map(projectLink) }
+    ];
+  }
+  if (pathname === '/projects' || pathname === '/baths') {
+    const isBaths = pathname === '/baths';
+    return [{
+      title: isBaths ? 'Все проекты бань' : 'Все проекты домов',
+      links: projects.filter((project) => (project.category === 'bath') === isBaths).map(projectLink)
+    }];
+  }
+  if (pathname.startsWith('/project/')) {
+    const currentSlug = pathname.slice('/project/'.length);
+    const current = projects.find((project) => getProjectSlug(project, projects) === currentSlug);
+    const related = projects.filter((project) => project.category === current?.category && getProjectSlug(project, projects) !== currentSlug).slice(0, 8);
+    return [{ title: current?.category === 'bath' ? 'Другие проекты бань' : 'Другие проекты домов', links: related.map(projectLink) }];
+  }
+  if (pathname === '/homes' || pathname.startsWith('/homes/')) {
+    const currentId = pathname.startsWith('/homes/') ? pathname.slice('/homes/'.length) : '';
+    const related = homes.filter((home) => home.id !== currentId).slice(0, 12);
+    return [{
+      title: pathname === '/homes' ? 'Объявления о готовых домах' : 'Другие готовые дома',
+      links: related.map((home) => ({ label: `${home.title}${home.area ? ` — ${home.area} м²` : ''}`, href: `/homes/${encodeURIComponent(home.id)}` }))
+    }];
+  }
+  if (pathname === '/lands' || pathname.startsWith('/lands/')) {
+    const currentId = pathname.startsWith('/lands/') && pathname !== '/lands/lesnoe-ozero' ? pathname.slice('/lands/'.length) : '';
+    const links = lands.filter((land) => land.id !== currentId).map((land) => ({
+      label: `Участок ${land.area ? `${land.area} соток` : ''}${land.district ? ` — ${land.district}` : ''}`.trim(),
+      href: `/lands/${encodeURIComponent(land.id)}`
+    }));
+    if (pathname === '/lands') links.unshift({ label: 'Коттеджный посёлок «Лесное озеро»', href: '/lands/lesnoe-ozero' });
+    return [{ title: 'Участки и предложения', links }];
+  }
+  if (pathname === '/journal' || pathname.startsWith('/journal/')) {
+    const categorySlug = pathname.startsWith('/journal/category/') ? pathname.slice('/journal/category/'.length) : '';
+    const category = categorySlug ? categories.find((item) => item.slug === categorySlug) : undefined;
+    const articles = category ? publishedArticles.filter((article) => article.categoryId === category.id) : publishedArticles;
+    const categoryLinks = categories.map((item) => ({ label: item.name, href: `/journal/category/${encodeURIComponent(item.slug)}` }));
+    const articleLinks = articles.map((article) => ({ label: article.title, href: `/journal/${encodeURIComponent(article.slug)}` }));
+    return [
+      { title: 'Темы журнала', links: categoryLinks },
+      { title: category ? `Статьи: ${category.name}` : 'Статьи журнала', links: articleLinks }
+    ];
+  }
+  if (pathname === '/furniture' || pathname.startsWith('/furniture/')) {
+    const currentCategorySlug = pathname.split('/')[2] || '';
+    const furnitureLinks = FURNITURE_STRUCTURE.flatMap((category) => category.brands.map((brand) => ({
+      label: `${category.title.toLocaleLowerCase('ru-RU')} — ${brand}`,
+      href: `/furniture/${slugify(category.title)}/${slugify(brand)}`
+    })));
+    const categoryLinks = FURNITURE_STRUCTURE.map((category) => ({
+      label: category.title,
+      href: `/furniture/${slugify(category.title)}/${slugify(category.brands[0])}`
+    }));
+    if (pathname === '/furniture') return [{ title: 'Категории мебели', links: categoryLinks }, { title: 'Бренды и подборки', links: furnitureLinks }];
+    const currentCategory = FURNITURE_STRUCTURE.find((category) => slugify(category.title) === currentCategorySlug);
+    const siblings = currentCategory ? currentCategory.brands.map((brand) => ({ label: brand, href: `/furniture/${currentCategorySlug}/${slugify(brand)}` })) : categoryLinks;
+    return [{ title: 'Другие подборки мебели', links: siblings }];
+  }
+  if (pathname.startsWith('/services/')) {
+    return [{ title: 'Другие услуги Evtenia', links: serviceLinks.filter((link) => link.href !== pathname) }];
+  }
+  if (pathname.startsWith('/discounts/')) {
+    const promotions = Object.keys(data.pages).filter((slug) => slug.startsWith('discounts-')).map((slug) => ({
+      label: data.pages[slug].title,
+      href: `/discounts/${slug.slice('discounts-'.length)}`
+    }));
+    return [{ title: 'Ипотека и акции', links: promotions.filter((link) => link.href !== pathname) }];
+  }
+  return [];
+};
+
 const truncateSeoText = (value: string, maxLength: number): string => {
   const clean = value.replace(/\s+/g, ' ').trim();
   if (clean.length <= maxLength) return clean;
@@ -2017,7 +2114,7 @@ const truncateSeoText = (value: string, maxLength: number): string => {
   return `${excerpt.trim()}…`;
 };
 
-const renderSeoDocument = (html: string, title: string, description: string, canonicalUrl: string, schema?: unknown, imageUrl?: string, fallbackHtml?: string): string => {
+const renderSeoDocument = (html: string, title: string, description: string, canonicalUrl: string, schema?: unknown, imageUrl?: string, fallbackHtml?: string, fallbackSections: SeoFallbackIndexSection[] = []): string => {
   const plainTitle = truncateSeoText(title, 70);
   const safeTitle = escapeHtml(plainTitle);
   const safeDescription = escapeHtml(truncateSeoText(description, 160));
@@ -2047,9 +2144,11 @@ const renderSeoDocument = (html: string, title: string, description: string, can
   ].join('');
   const fallbackHeading = escapeHtml(plainTitle.replace(/\s*\|\s*Evtenia$/i, '').trim());
   const fallbackNavigation = `<nav class="seo-fallback-nav" aria-label="Основные разделы сайта"><h2>Разделы сайта Evtenia</h2><ul>${SEO_FALLBACK_LINKS.map(([label, href]) => `<li><a href="${escapeHtml(href)}">${escapeHtml(label)}</a></li>`).join('')}</ul></nav>`;
+  const fallbackIndex = fallbackSections.filter((section) => section.links.length).map((section) => `<section><h3>${escapeHtml(section.title)}</h3><ul>${section.links.map((link) => `<li><a href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a></li>`).join('')}</ul></section>`).join('');
+  const fallbackIndexNav = fallbackIndex ? `<nav class="seo-fallback-index" aria-label="Ссылки по теме">${fallbackIndex}</nav>` : '';
   const seoFallback = fallbackHtml
-    ? fallbackHtml.replace(/<\/main>\s*$/i, `${fallbackNavigation}</main>`)
-    : `<main class="seo-fallback-content"><h1>${fallbackHeading}</h1><p>${safeDescription}</p>${fallbackNavigation}</main>`;
+    ? fallbackHtml.replace(/<\/main>\s*$/i, `${fallbackIndexNav}${fallbackNavigation}</main>`)
+    : `<main class="seo-fallback-content"><h1>${fallbackHeading}</h1><p>${safeDescription}</p>${fallbackIndexNav}${fallbackNavigation}</main>`;
   result = result.replace(/<div\s+id=["']root["']\s*>\s*<\/div>/i, `<div id="root">${seoFallback}</div>`);
   return result.replace(/<\/head>/i, `${socialTags}</head>`);
 };
@@ -2115,7 +2214,11 @@ app.get(['/dveri', '/chany'], (req, res, next) => {
     ]
   };
   const heroImage = `${origin}/api/assets/catalog/${doorsPage ? 'doors/soul' : 'chany/ready-4'}.webp`;
-  const html = renderSeoDocument(fs.readFileSync(indexPath, 'utf8'), title, description, `${origin}${pagePath}`, schema, heroImage);
+  const fallbackSections = doorsPage ? [{
+    title: 'Коллекции межкомнатных дверей',
+    links: doorCollections.map((collection) => ({ label: `${collection.name} — ${collection.count} моделей`, href: `/dveri/${collection.slug}` }))
+  }] : [];
+  const html = renderSeoDocument(fs.readFileSync(indexPath, 'utf8'), title, description, `${origin}${pagePath}`, schema, heroImage, undefined, fallbackSections);
   res.set('Cache-Control', 'public, max-age=300');
   return res.type('html').send(html);
 });
@@ -2157,7 +2260,12 @@ app.get('/dveri/:slug', (req, res, next) => {
       { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Главная', item: `${origin}/` }, { '@type': 'ListItem', position: 2, name: 'Двери', item: `${origin}/dveri` }, { '@type': 'ListItem', position: 3, name: collection.name, item: canonical }] }
     ]
   };
-  const html = renderSeoDocument(fs.readFileSync(indexPath, 'utf8'), title, description, canonical, schema, `${origin}/api/assets/catalog/doors/${collection.image}.webp`);
+  const siblingCollections = Object.entries(doorCollectionSeo)
+    .filter(([slug]) => slug !== req.params.slug)
+    .map(([slug, item]) => ({ label: item.name, href: `/dveri/${slug}` }));
+  const html = renderSeoDocument(fs.readFileSync(indexPath, 'utf8'), title, description, canonical, schema, `${origin}/api/assets/catalog/doors/${collection.image}.webp`, undefined, [
+    { title: 'Другие коллекции дверей', links: siblingCollections }
+  ]);
   res.set('Cache-Control', 'public, max-age=300');
   return res.type('html').send(html);
 });
@@ -2200,7 +2308,8 @@ app.get('/services/:slug', (req, res, next) => {
   const indexPath = path.join(FRONTEND_DIST, 'index.html');
   if (!fs.existsSync(indexPath)) return next();
   const slug = String(req.params.slug || '');
-  const page = readData().pages[`services-${slug}`];
+  const data = readData();
+  const page = data.pages[`services-${slug}`];
   if (!page) return next();
   const origin = SEO_ORIGIN;
   const canonical = `${origin}/services/${encodeURIComponent(slug)}`;
@@ -2222,7 +2331,7 @@ app.get('/services/:slug', (req, res, next) => {
     url: canonical
   } : undefined;
   const image = isInsurance ? `${origin}/api/assets/services/project-consultation.jpg` : undefined;
-  const html = renderSeoDocument(fs.readFileSync(indexPath, 'utf8'), title, description, canonical, schema, image);
+  const html = renderSeoDocument(fs.readFileSync(indexPath, 'utf8'), title, description, canonical, schema, image, undefined, getSeoFallbackSections(`/services/${slug}`, data));
   res.set('Cache-Control', 'public, max-age=300');
   return res.type('html').send(html);
 });
@@ -2231,11 +2340,16 @@ app.get('/design', (req, res, next) => {
   const indexPath = path.join(FRONTEND_DIST, 'index.html');
   if (!fs.existsSync(indexPath)) return next();
   const origin = SEO_ORIGIN;
+  const data = readData();
   const html = renderSeoDocument(
     fs.readFileSync(indexPath, 'utf8'),
     'Проектирование домов в Пензе — архитектура и конструктив | Evtenia',
     'Проектирование частных домов и коттеджей в Пензе и области. Эскизные, архитектурные и конструктивные решения; состав и сроки согласуем по задаче.',
-    `${origin}/design`
+    `${origin}/design`,
+    undefined,
+    undefined,
+    undefined,
+    getSeoFallbackSections('/services/design', data)
   );
   res.set('Cache-Control', 'public, max-age=300');
   return res.type('html').send(html);
@@ -2247,6 +2361,7 @@ app.get('/', (req, res, next) => {
   const indexPath = path.join(FRONTEND_DIST, 'index.html');
   if (!fs.existsSync(indexPath)) return next();
   const origin = SEO_ORIGIN;
+  const data = readData();
   const html = renderSeoDocument(
     fs.readFileSync(indexPath, 'utf8'),
     'Строительство домов под ключ в Пензе — Evtenia',
@@ -2259,7 +2374,10 @@ app.get('/', (req, res, next) => {
       url: `${origin}/`,
       inLanguage: 'ru-RU',
       publisher: { '@type': 'Organization', name: 'Evtenia', url: `${origin}/`, telephone: DEFAULT_CONTACTS.contactPhone }
-    }
+    },
+    undefined,
+    undefined,
+    getSeoFallbackSections('/', data)
   );
   res.set('Cache-Control', 'public, max-age=300');
   return res.type('html').send(html);
@@ -2422,7 +2540,8 @@ app.get('/project/:slug', (req, res, next) => {
     canonical,
     schema,
     image,
-    projectFallback
+    projectFallback,
+    getSeoFallbackSections(`/project/${req.params.slug}`, data)
   );
   res.set('Cache-Control', 'public, max-age=300');
   return res.type('html').send(html);
@@ -2544,7 +2663,7 @@ if (fs.existsSync(FRONTEND_DIST)) {
         { '@type': 'ItemList', name: 'Типовые проекты бань для Пензы и Пензенской области', itemListElement: bathProjects.map((project, index) => ({ '@type': 'ListItem', position: index + 1, name: project.title, url: `${origin}/project/${encodeURIComponent(getProjectSlug(project, data.projects))}` })) }
       ]
     } : undefined;
-    let rendered = renderSeoDocument(fs.readFileSync(indexPath, 'utf8'), page.title, page.description, canonical, schema, schema ? `${origin}/api/assets/projects/catalog/bath-family.webp` : undefined);
+    let rendered = renderSeoDocument(fs.readFileSync(indexPath, 'utf8'), page.title, page.description, canonical, schema, schema ? `${origin}/api/assets/projects/catalog/bath-family.webp` : undefined, undefined, getSeoFallbackSections(pathname, data));
     if (isAdminPage) rendered = rendered.replace('</head>', '<meta name="robots" content="noindex,nofollow" /></head>');
     res.set('Cache-Control', 'public, max-age=300');
     return res.type('html').send(rendered);

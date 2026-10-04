@@ -10,6 +10,12 @@ body {margin: 0; background: #fff; overflow-x:hidden;}
 .seo-fallback-nav ul { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .seo-fallback-nav a { display: inline-flex; min-height: 40px; align-items: center; border: 1px solid #d8e0d8; border-radius: 999px; padding: 8px 14px; color: #193d31; background: #fff; font-size: 14px; text-decoration: none; }
 .seo-fallback-nav a:hover, .seo-fallback-nav a:focus-visible { border-color: #b6c7bb; background: #edf3ee; }
+.seo-fallback-index { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 18px 28px; margin-top: 24px; padding-top: 22px; border-top: 1px solid #dfe5dc; }
+.seo-fallback-index section { min-width: 0; }
+.seo-fallback-index h3 { margin: 0 0 9px; color: #193d31; font-size: 15px; line-height: 1.35; }
+.seo-fallback-index ul { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.seo-fallback-index a { color: #53635a; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; text-decoration: underline; text-decoration-color: #c5d0c8; text-underline-offset: 2px; }
+.seo-fallback-index a:hover, .seo-fallback-index a:focus-visible { color: #193d31; text-decoration-color: currentColor; }
 
 .hero-exact {
   color: #fff;
@@ -1938,7 +1944,7 @@ html body, html body * { font-family: Arial, Helvetica, sans-serif !important; }
 
 @media (min-width: 1101px) {
   /* Keep the positioned ancestor the same height as its label, not the entire grid row. */
-  .hero-nav .menu-services { position: relative; align-self: center; height: fit-content; }
+  .hero-nav .menu-services { position: relative; align-self: center; height: 40px; }
   .hero-nav .menu-services > .projects-dropdown,
   .hero-nav .menu-services > .services-dropdown { top: calc(100% + 1px); }
   .hero-nav .menu-about > .projects-dropdown { top: 100%; left: 0; right: auto; width: min(320px, calc(100vw - 32px)); max-width: calc(100vw - 32px); min-width: 0; transform: none; }

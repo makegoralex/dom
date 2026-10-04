@@ -1200,13 +1200,12 @@ function HeaderNav({
       const dropdown = anchor.querySelector<HTMLElement>(':scope > .projects-dropdown, :scope > .services-dropdown');
       if (!dropdown) return;
       const anchorRect = anchor.getBoundingClientRect();
-      const dropdownWidth = dropdown.getBoundingClientRect().width || dropdown.scrollWidth;
-      const overflowRight = anchorRect.left + dropdownWidth - (window.innerWidth - 16);
-      const leftOffset = Math.max(16 - anchorRect.left, Math.min(0, -overflowRight));
+      const rightAligned = anchor.classList.contains('menu-settlements') || anchor.classList.contains('menu-promotions') || anchor.classList.contains('menu-furniture');
       dropdown.style.position = 'absolute';
       dropdown.style.top = '100%';
-      dropdown.style.left = `${leftOffset}px`;
-      dropdown.style.right = 'auto';
+      dropdown.style.maxWidth = `${Math.max(220, rightAligned ? anchorRect.right - 16 : window.innerWidth - anchorRect.left - 16)}px`;
+      dropdown.style.left = rightAligned ? 'auto' : `${Math.max(0, 16 - anchorRect.left)}px`;
+      dropdown.style.right = rightAligned ? '0' : 'auto';
       dropdown.style.transform = 'none';
       dropdown.style.margin = '0';
     }));
