@@ -11,6 +11,8 @@ import { bathCatalogProjects } from './bathCatalogProjects';
 
 dotenv.config({ path: path.join(__dirname, '..', '.env.production') });
 
+const SEO_ORIGIN = 'https://dom.evtenia.ru';
+
 interface HouseProject {
   id: string;
   slug?: string;
@@ -1320,7 +1322,7 @@ const escapeXml = (value: string): string => value
 
 app.get('/sitemap.xml', (req, res) => {
   const data = readData();
-  const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+  const origin = SEO_ORIGIN;
   const entries: Array<{ path: string; lastmod?: string }> = [
     { path: '/' },
     { path: '/dveri' },
@@ -1331,8 +1333,15 @@ app.get('/sitemap.xml', (req, res) => {
     { path: '/design' },
     { path: '/homes' },
     { path: '/lands' },
+    { path: '/lands/lesnoe-ozero' },
     { path: '/about' },
     { path: '/journal' },
+    { path: '/contacts' },
+    { path: '/portfolio' },
+    { path: '/mortgage-calculator' },
+    { path: '/furniture' },
+    ...FURNITURE_STRUCTURE.flatMap((category) => category.brands.map((brand) => ({ path: `/furniture/${slugify(category.title)}/${slugify(brand)}` }))),
+    ...Object.keys(data.pages).filter((slug) => slug.startsWith('discounts-')).map((slug) => ({ path: `/discounts/${slug.slice('discounts-'.length)}` })),
     ...[
       'fundament', 'besedki', 'septik', 'zabory', 'skvazhiny', 'elektromontazh', 'umnyy-dom',
       'vyvoz-musora', 'styazhka-pola', 'konditsionery', 'interernoe-ozelenenie', 'otsenka-nedvizhimosti',
@@ -1356,7 +1365,7 @@ app.get('/sitemap.xml', (req, res) => {
 });
 
 app.get('/robots.txt', (req, res) => {
-  const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+  const origin = SEO_ORIGIN;
   res.set('Cache-Control', 'public, max-age=3600');
   return res.type('text/plain').send(`User-agent: Yandex\nAllow: /\nDisallow: /catalog-control-7f3a\nClean-param: type&page\nClean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&utm_id&yclid&gclid\nSitemap: ${origin}/sitemap.xml\n\nUser-agent: *\nAllow: /\nDisallow: /catalog-control-7f3a\nSitemap: ${origin}/sitemap.xml\n`);
 });
@@ -1987,7 +1996,7 @@ const truncateSeoText = (value: string, maxLength: number): string => {
   return `${excerpt.trim()}…`;
 };
 
-const renderSeoDocument = (html: string, title: string, description: string, canonicalUrl: string, schema?: unknown, imageUrl?: string): string => {
+const renderSeoDocument = (html: string, title: string, description: string, canonicalUrl: string, schema?: unknown, imageUrl?: string, fallbackHtml?: string): string => {
   const plainTitle = truncateSeoText(title, 70);
   const safeTitle = escapeHtml(plainTitle);
   const safeDescription = escapeHtml(truncateSeoText(description, 160));
@@ -2016,7 +2025,7 @@ const renderSeoDocument = (html: string, title: string, description: string, can
     schema ? `<script id="catalog-jsonld" type="application/ld+json">${JSON.stringify(schema).replace(/</g, '\\u003c')}</script>` : ''
   ].join('');
   const fallbackHeading = escapeHtml(plainTitle.replace(/\s*\|\s*Evtenia$/i, '').trim());
-  const seoFallback = `<main class="seo-fallback-content"><h1>${fallbackHeading}</h1><p>${safeDescription}</p></main>`;
+  const seoFallback = fallbackHtml || `<main class="seo-fallback-content"><h1>${fallbackHeading}</h1><p>${safeDescription}</p></main>`;
   result = result.replace(/<div\s+id=["']root["']\s*>\s*<\/div>/i, `<div id="root">${seoFallback}</div>`);
   return result.replace(/<\/head>/i, `${socialTags}</head>`);
 };
@@ -2053,7 +2062,7 @@ app.get(['/dveri', '/chany'], (req, res, next) => {
   const description = doorsPage
     ? 'Подбор межкомнатных дверей в Пензе и области: модели из 17 коллекций, комплектующие, замер и монтаж. Уточним актуальную цену заказа под ваши проёмы.'
     : 'Банные чаны и купели для дачи в Пензе и области: модели от 250 000 ₽, комплектации, сталь, доставка и монтаж. Подбор и расчёт от Evtenia.';
-  const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+  const origin = SEO_ORIGIN;
   const doorProducts = doorsPage ? readDoorCatalogProducts().filter((product) => product.type === 'door') : [];
   const doorCollections = Array.from(new Map(doorProducts.map((product) => [product.collectionSlug, { name: product.collection, slug: product.collectionSlug, count: 0, image: product.image }])).values());
   for (const collection of doorCollections) collection.count = doorProducts.filter((product) => product.collectionSlug === collection.slug).length;
@@ -2112,7 +2121,7 @@ app.get('/dveri/:slug', (req, res, next) => {
   if (!collection) return next();
   const indexPath = path.join(FRONTEND_DIST, 'index.html');
   if (!fs.existsSync(indexPath)) return next();
-  const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+  const origin = SEO_ORIGIN;
   const canonical = `${origin}/dveri/${req.params.slug}`;
   const title = `Двери «${collection.name}» в Пензе — коллекция | Evtenia`;
   const models = readDoorCatalogProducts().filter((product) => product.type === 'door' && product.collectionSlug === req.params.slug);
@@ -2132,7 +2141,7 @@ app.get('/dveri/:slug', (req, res, next) => {
 app.get('/about', (req, res, next) => {
   const indexPath = path.join(FRONTEND_DIST, 'index.html');
   if (!fs.existsSync(indexPath)) return next();
-  const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+  const origin = SEO_ORIGIN;
   const image = `${origin}/api/assets/about/director-evgeniya.webp`;
   const schema = {
     '@context': 'https://schema.org',
@@ -2169,7 +2178,7 @@ app.get('/services/:slug', (req, res, next) => {
   const slug = String(req.params.slug || '');
   const page = readData().pages[`services-${slug}`];
   if (!page) return next();
-  const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+  const origin = SEO_ORIGIN;
   const canonical = `${origin}/services/${encodeURIComponent(slug)}`;
   const isInsurance = slug === 'strahovanie';
   const title = isInsurance
@@ -2197,7 +2206,7 @@ app.get('/services/:slug', (req, res, next) => {
 app.get('/design', (req, res, next) => {
   const indexPath = path.join(FRONTEND_DIST, 'index.html');
   if (!fs.existsSync(indexPath)) return next();
-  const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+  const origin = SEO_ORIGIN;
   const html = renderSeoDocument(
     fs.readFileSync(indexPath, 'utf8'),
     'Проектирование домов в Пензе — архитектура и конструктив | Evtenia',
@@ -2213,7 +2222,7 @@ app.get('/index.html', (_req, res) => res.redirect(301, '/'));
 app.get('/', (req, res, next) => {
   const indexPath = path.join(FRONTEND_DIST, 'index.html');
   if (!fs.existsSync(indexPath)) return next();
-  const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+  const origin = SEO_ORIGIN;
   const html = renderSeoDocument(
     fs.readFileSync(indexPath, 'utf8'),
     'Строительство домов под ключ в Пензе — Evtenia',
@@ -2303,7 +2312,7 @@ app.get('/project/:slug', (req, res, next) => {
 
   const indexPath = path.join(FRONTEND_DIST, 'index.html');
   if (!fs.existsSync(indexPath)) return next();
-  const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+  const origin = SEO_ORIGIN;
   const canonical = `${origin}/project/${encodeURIComponent(slug)}`;
   const material = project.constructionType || 'частного дома';
   const materialClause = /каркас/i.test(material) ? 'по каркасной технологии'
@@ -2321,15 +2330,26 @@ app.get('/project/:slug', (req, res, next) => {
   const priceLabel = formatSeoPrice(project.priceFrom, true);
   const titleKind = isBathProject ? 'баня' : 'дом';
   const cleanTitle = project.title.replace(/[_-]+/g, ' ').trim();
+  const projectTypeHeadline = /каркас/i.test(project.constructionType) ? 'Каркасный дом'
+    : /модул/i.test(project.constructionType) ? 'Модульный дом'
+      : /газобетон/i.test(project.constructionType) ? 'Дом из газобетона'
+        : /арболит/i.test(project.constructionType) ? 'Дом из арболита'
+          : /кирпич/i.test(project.constructionType) ? 'Дом из кирпича'
+            : 'Проект дома';
+  const projectDisplayTitle = project.catalogProject || /\bдом\b/i.test(cleanTitle)
+    ? cleanTitle
+    : isBathProject
+      ? (/бан/i.test(cleanTitle) ? cleanTitle : `Баня «${cleanTitle}»`)
+      : `${projectTypeHeadline} «${cleanTitle}»`;
   const titleBase = isBathProject
-    ? (/бан/i.test(cleanTitle) ? cleanTitle : `Баня «${cleanTitle}»`)
+    ? projectDisplayTitle
     : project.catalogProject && project.projectCode
       ? `Газобетонный дом №${project.projectCode}`
-      : (/дом/i.test(cleanTitle) ? cleanTitle : `Проект дома «${cleanTitle}»`);
+      : projectDisplayTitle;
   const titleSuffix = `${areaLabel ? `, ${areaLabel}` : ''} — ${formatSeoPriceCompact(project.priceFrom, true)} | Evtenia`;
   const seoTitle = `${truncateSeoText(titleBase, 70 - titleSuffix.length)}${titleSuffix}`;
   const description = composeSeoDescription(
-    `${titleKind === 'баня' ? 'Баня' : 'Дом'} «${cleanTitle}»`,
+    projectDisplayTitle,
     `${areaLabel || 'площадь уточняется'}, ${formatSeoFloors(project.floors)}; ${material.toLowerCase()}; цена ${priceLabel}. Пенза и область — расчёт комплектации.`
   );
   const schema = {
@@ -2337,14 +2357,14 @@ app.get('/project/:slug', (req, res, next) => {
     '@graph': [
       {
         '@type': 'WebPage',
-        name: `${project.title} — проект ${projectKind}`,
+        name: `${projectDisplayTitle} — проект ${projectKind}`,
         description,
         url: canonical,
         inLanguage: 'ru-RU',
         primaryImageOfPage: project.coverImage || undefined,
         about: {
           '@type': 'Service',
-          name: `Строительство ${isBathProject ? 'бани' : 'дома'} «${project.title}»`,
+          name: `Строительство ${isBathProject ? 'бани' : 'дома'} «${projectDisplayTitle}»`,
           serviceType: `${isBathProject ? 'Строительство бань' : 'Строительство домов'} ${materialClause}`,
           areaServed: { '@type': 'AdministrativeArea', name: 'Пенза и Пензенская область' },
           provider: { '@type': 'Organization', name: 'Evtenia', url: `${origin}/`, telephone: DEFAULT_CONTACTS.contactPhone }
@@ -2355,19 +2375,30 @@ app.get('/project/:slug', (req, res, next) => {
         itemListElement: [
           { '@type': 'ListItem', position: 1, name: 'Главная', item: `${origin}/` },
           { '@type': 'ListItem', position: 2, name: isBathProject ? 'Проекты бань' : 'Проекты домов', item: `${origin}/${parentSection}` },
-          { '@type': 'ListItem', position: 3, name: project.title, item: canonical }
+          { '@type': 'ListItem', position: 3, name: projectDisplayTitle, item: canonical }
         ]
       }
     ]
   };
   const image = project.coverImage?.startsWith('http') ? project.coverImage.replace(/^http:/, 'https:') : `${origin}${project.coverImage || ''}`;
+  const projectFallbackTitle = escapeHtml(projectDisplayTitle);
+  const projectFallbackIntro = escapeHtml(project.shortDescription || `${projectDisplayTitle}: ${areaLabel || 'площадь уточняется'}, ${formatSeoFloors(project.floors)}. Планировку и состав работ можно адаптировать под участок в Пензе или Пензенской области.`);
+  const projectFallbackParagraphs = (project.fullDescription || project.shortDescription || '')
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean)
+    .slice(0, 4)
+    .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
+    .join('');
+  const projectFallback = `<main class="seo-fallback-content"><nav aria-label="Хлебные крошки"><a href="/">Главная</a> / <a href="/${parentSection}">${isBathProject ? 'Проекты бань' : 'Проекты домов'}</a></nav><h1>${projectFallbackTitle}</h1><p>${projectFallbackIntro}</p><ul><li>Площадь: ${escapeHtml(areaLabel || 'уточняется')}</li><li>Этажность: ${escapeHtml(formatSeoFloors(project.floors))}</li><li>Технология: ${escapeHtml(material)}</li><li>Ориентир цены: ${escapeHtml(priceLabel)}</li></ul><section><h2>Об этом проекте</h2>${projectFallbackParagraphs || `<p>${escapeHtml(description)}</p>`}</section><p>Оставьте заявку — уточним участок, комплектацию и подготовим индивидуальный расчёт для Пензы или Пензенской области.</p><p><a href="/contacts">Связаться с Evtenia и обсудить проект</a></p></main>`;
   const html = renderSeoDocument(
     fs.readFileSync(indexPath, 'utf8'),
     seoTitle,
     description,
     canonical,
     schema,
-    image
+    image,
+    projectFallback
   );
   res.set('Cache-Control', 'public, max-age=300');
   return res.type('html').send(html);
@@ -2385,6 +2416,7 @@ if (fs.existsSync(FRONTEND_DIST)) {
       '/baths': { title: 'Проекты бань в Пензе — планировки и строительство | Evtenia', description: 'Проекты бань для участка в Пензе и области: варианты планировок, комплектаций и строительства. Подберём решение и рассчитаем стоимость под задачу.' },
       '/homes': { title: 'Готовые дома в Пензе и области — каталог объявлений | Evtenia', description: 'Готовые дома и коттеджи в Пензе и Пензенской области. Сравните площадь, расположение и цену, задайте вопрос и договоритесь о просмотре.' },
       '/lands': { title: 'Земельные участки в Пензе и области — каталог | Evtenia', description: 'Земельные участки в Пензе и Пензенской области: подбор по площади, району и назначению. Поможем уточнить коммуникации и организовать просмотр.' },
+      '/lands/lesnoe-ozero': { title: 'Участки в коттеджном посёлке «Лесное озеро» — Пенза | Evtenia', description: 'Выберите земельный участок в коттеджном посёлке «Лесное озеро» в Пензенском районе. Смотрите расположение, площадь и статус участков, уточняйте актуальную цену и условия подключения коммуникаций.' },
       '/journal': { title: 'Журнал о строительстве и загородной жизни — Evtenia', description: 'Практические статьи о строительстве домов, выборе проектов, фундаментах, инженерных системах, отделке и загородной жизни в Пензенской области.' },
       '/contacts': { title: 'Контакты Evtenia — строительство домов в Пензе', description: `Свяжитесь с Evtenia в Пензе: ${DEFAULT_CONTACTS.contactPhone}. Обсудим строительство дома, проект, услуги и ориентировочную смету.` },
       '/portfolio': { title: 'Портфолио домов и объектов Evtenia — Пенза', description: 'Примеры проектов и выполненных работ Evtenia в Пензе и Пензенской области. Посмотрите решения и обсудите подходящий вариант с командой.' },
@@ -2407,12 +2439,25 @@ if (fs.existsSync(FRONTEND_DIST)) {
       const promotion = data.pages[`discounts-${pathname.slice('/discounts/'.length)}`];
       if (promotion) {
         valid = true;
-        page = { title: `${promotion.title} — Evtenia`, description: promotion.title };
+        const promotionDescriptions: Record<string, string> = {
+          'ipoteka-i-kredit': 'Подберём ипотечную программу или кредит на строительство дома в Пензе: сравним условия, поможем собрать документы и передадим заявку партнёрам. Условия банка уточняются.',
+          'vse-akcii': 'Все действующие акции Evtenia на строительство домов в Пензе и области. Проверьте сроки и условия предложения и оставьте заявку на персональный расчёт.'
+        };
+        page = {
+          title: `${promotion.title} в Пензе — условия и расчёт | Evtenia`,
+          description: promotionDescriptions[pathname.slice('/discounts/'.length)] || composeSeoDescription(promotion.title, promotion.content)
+        };
       }
     }
     if (!valid && contentPage && pathname.startsWith('/furniture/')) {
       valid = true;
-      page = { title: `${contentPage.title} — мебель в Пензе | Evtenia`, description: `Подбор мебели ${contentPage.title} для дома и квартиры в Пензе. Уточните размеры, варианты исполнения и комплектацию у специалистов Evtenia.` };
+      const categorySlug = pathname.split('/')[2];
+      const furnitureCategory = FURNITURE_STRUCTURE.find((category) => slugify(category.title) === categorySlug);
+      const categoryName = furnitureCategory?.title.toLocaleLowerCase('ru-RU') || 'мебель';
+      page = {
+        title: `${contentPage.title} — ${categoryName} в Пензе | Evtenia`,
+        description: `Мебель бренда ${contentPage.title} для категории «${categoryName}» в Пензе и области. Подбор размеров, вариантов исполнения и комплектации под ваш интерьер; состав заказа и стоимость уточним индивидуально.`
+      };
     }
     if (!valid && /^\/homes\/[^/]+$/.test(pathname)) {
       const home = data.homes.find((item) => item.id === pathname.slice('/homes/'.length));
@@ -2460,7 +2505,7 @@ if (fs.existsSync(FRONTEND_DIST)) {
 
     const indexPath = path.join(FRONTEND_DIST, 'index.html');
     if (!fs.existsSync(indexPath)) return res.status(valid ? 200 : 404).send('Not found');
-    const origin = `https://${req.get('host') || 'dom.evtenia.ru'}`;
+    const origin = SEO_ORIGIN;
     const canonical = `${origin}${pathname === '/' ? '/' : pathname}`;
     if (!valid || !page) {
       const notFoundHtml = renderSeoDocument(fs.readFileSync(indexPath, 'utf8'), 'Страница не найдена — Evtenia', 'Запрошенная страница не найдена. Перейдите в каталог проектов или на главную страницу Evtenia.', canonical)

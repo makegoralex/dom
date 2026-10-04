@@ -3277,14 +3277,25 @@ function ProjectDetailPage() {
   const isGasConcrete = /газобетон/i.test(project.constructionType);
   const isBathProject = project.category === 'bath';
   const priceText = normalizePrice(project.priceFrom);
-  const shownTitle = project.title.replace(/[_-]+/g, ' ').trim();
+  const cleanProjectTitle = project.title.replace(/[_-]+/g, ' ').trim();
+  const projectTypeHeadline = /каркас/i.test(project.constructionType) ? 'Каркасный дом'
+    : /модул/i.test(project.constructionType) ? 'Модульный дом'
+      : /газобетон/i.test(project.constructionType) ? 'Дом из газобетона'
+        : /арболит/i.test(project.constructionType) ? 'Дом из арболита'
+          : /кирпич/i.test(project.constructionType) ? 'Дом из кирпича'
+            : 'Проект дома';
+  const shownTitle = project.catalogProject || /\bдом\b/i.test(cleanProjectTitle)
+    ? cleanProjectTitle
+    : isBathProject
+      ? (/бан/i.test(cleanProjectTitle) ? cleanProjectTitle : `Баня «${cleanProjectTitle}»`)
+      : `${projectTypeHeadline} «${cleanProjectTitle}»`;
 
   return (
     <div>
       <InternalHeader />
       <section className="internal-body">
         <div className="container">
-          <Breadcrumbs items={["Главная", project.category === 'bath' ? "Бани" : "Проекты домов", project.title]} />
+          <Breadcrumbs items={["Главная", project.category === 'bath' ? "Бани" : "Проекты домов", shownTitle]} />
           <h1 className="project-page-title">{shownTitle}</h1>
           <p className="project-detail-lead">{project.catalogProject
             ? `Каталожный проект №${project.projectCode} из газобетона, ${project.floors.toLowerCase()}, общей площадью ${project.area}${project.livingArea ? ` и жилой площадью ${project.livingArea}` : ''}. Иллюстрация показывает общий характер дома, а не точную визуализацию проекта. Обсудим адаптацию под участок и состав семьи в Пензе и области.`
