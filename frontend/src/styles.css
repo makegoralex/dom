@@ -2233,11 +2233,11 @@ html body, html body * { font-family: Arial, Helvetica, sans-serif !important; }
   pointer-events: none;
 }
 .hero-exact > .internal-header-gap { z-index: 0; }
-.internal-header + * { padding-top: 0 !important; }
+.internal-header + .internal-body { padding-top: 36px; }
 .doors-catalog > .internal-header + main > .catalog-hero,
 .chany-catalog > .internal-header + main > .catalog-hero,
 .doors-catalog > main > .catalog-hero,
-.chany-catalog > main > .catalog-hero { margin-top: 0 !important; }
+.chany-catalog > main > .catalog-hero { margin-top: 0 !important; padding-top: 35px; }
 
 /* Project filters pin only while scrolling back up, then make room for content again. */
 .catalog-filters-slot { position: relative; z-index: 90; min-width: 0; }
@@ -2345,6 +2345,11 @@ html body, html body * { font-family: Arial, Helvetica, sans-serif !important; }
 
 @media (max-width: 720px) {
   .internal-header-gap { height: 22px; }
+  .internal-header + .internal-body { padding-top: 24px; }
+  .doors-catalog > .internal-header + main > .catalog-hero,
+  .chany-catalog > .internal-header + main > .catalog-hero,
+  .doors-catalog > main > .catalog-hero,
+  .chany-catalog > main > .catalog-hero { padding-top: 24px; }
   .project-catalog-container .catalog-filters.is-scroll-pinned { width: calc(100vw - 20px); max-height: min(74dvh, 640px); grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px 10px; padding: 13px; }
   .project-filter-heading { min-height: 25px; }
 }
