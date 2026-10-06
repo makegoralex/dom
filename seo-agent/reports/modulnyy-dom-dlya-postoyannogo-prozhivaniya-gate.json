@@ -1,0 +1,16 @@
+{
+  "clusterId": "modulnyy-dom-dlya-postoyannogo-prozhivaniya",
+  "checkedAt": "2026-10-06",
+  "result": "pass",
+  "rules": [
+    {"id": "ownership", "result": "pass", "evidence": "The page owns year-round residence readiness; the existing review, utilities and delivery guides keep their narrower intents."},
+    {"id": "answer-first", "result": "pass", "evidence": "The lead directly explains that a modular house can be a permanent home when the whole building and systems are designed for the local climate and continuous use."},
+    {"id": "sources", "result": "pass", "evidence": "Technical context relies on current Rosstandart standard and code cards checked on 2026-10-06."},
+    {"id": "unsupported-claims", "result": "pass", "evidence": "No universal prices, schedules, service-life figures, wall thicknesses or guarantees are used."},
+    {"id": "internal-links", "result": "pass", "evidence": "The article links to the modular catalogue, foundation service and three relevant Journal guides."},
+    {"id": "human-review", "result": "pass", "evidence": "Technical author and reviewer attribution to Oleg Ivanovich Kislyakov is approved by the site owner."},
+    {"id": "conversion", "result": "pass", "evidence": "The CTA offers a site- and climate-specific project check rather than a universal promise."},
+    {"id": "metadata", "result": "pass", "evidence": "Title, slug, excerpt, category, author, reviewer, SEO title and description are complete."}
+  ],
+  "publicationBlockers": []
+}

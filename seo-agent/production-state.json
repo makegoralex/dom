@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-10-02",
+  "updated": "2026-10-06",
   "clusters": {
     "modulnye-doma-otzyvy-i-minusy": {
       "semanticStatus": "published",
@@ -49,6 +49,16 @@
       "reservedAt": "2026-10-02",
       "publishedAt": "2026-10-02",
       "notes": "Fifth Journal article. Prepared manually and published through managed production sync."
+    },
+    "modulnyy-dom-dlya-postoyannogo-prozhivaniya": {
+      "semanticStatus": "published",
+      "queueStatus": "published",
+      "brief": "briefs/modulnyy-dom-dlya-postoyannogo-prozhivaniya.md",
+      "draft": "drafts/modulnyy-dom-dlya-postoyannogo-prozhivaniya.json",
+      "report": "reports/modulnyy-dom-dlya-postoyannogo-prozhivaniya-gate.json",
+      "reservedAt": "2026-10-06",
+      "publishedAt": "2026-10-06",
+      "notes": "Sixth Journal article. Prepared manually and published through managed production sync."
     }
   }
 }

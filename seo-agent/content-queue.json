@@ -135,16 +135,24 @@
       "owner": "/journal/modulnyy-dom-dlya-postoyannogo-prozhivaniya",
       "region": "Россия",
       "author": "Олег Иванович Кисляков",
-      "reviewer": null,
+      "reviewer": "Олег Иванович Кисляков, технический директор",
       "verifiedMainVolume": 734,
       "score": 91,
-      "status": "ready_for_brief",
+      "status": "published",
+      "artifacts": {
+        "brief": "briefs/modulnyy-dom-dlya-postoyannogo-prozhivaniya.md",
+        "draft": "drafts/modulnyy-dom-dlya-postoyannogo-prozhivaniya.json"
+      },
       "blockers": [
         "evtenia_module_specs",
         "technical_review"
       ],
       "requiredLinks": [
-        "/projects/modulnye-doma"
+        "/projects?type=Модульные",
+        "/journal/modulnye-doma-otzyvy-i-minusy",
+        "/journal/modulnyy-dom-s-kommunikaciyami",
+        "/journal/dostavka-i-montazh-modulnogo-doma",
+        "/services/fundament"
       ],
       "nextAction": "Prepare a SERP/content brief for “минусы модульных домов для постоянного проживания”, collect Evtenia examples, then run the quality gate."
     },
