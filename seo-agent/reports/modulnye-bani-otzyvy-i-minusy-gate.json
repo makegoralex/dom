@@ -1,0 +1,19 @@
+{
+  "clusterId": "modulnye-bani-otzyvy-i-minusy",
+  "checkedAt": "2026-10-09",
+  "result": "pass",
+  "rules": [
+    {"id": "ownership-and-separation", "result": "pass", "evidence": "The target owns informational review and risk-evaluation intent. The protected /baths page owns project/order intent; the article links to it without presenting it as an Evtenia modular-bath offer."},
+    {"id": "answer-first", "result": "pass", "evidence": "The lead directly explains what makes owner reviews useful: identifiable construction, use, scope, delivery and installation context."},
+    {"id": "search-intent-and-value", "result": "pass", "evidence": "The article covers review signals, conditional benefits, risks, a pre-contract checklist, fit and FAQs. It adds a comparison checklist rather than repeating generic promotional claims."},
+    {"id": "company-evidence", "result": "pass", "evidence": "The live /baths catalog was checked on 2026-10-09. It labels listed projects as frame, timber and log construction, not modular; the article states this plainly and invents no Evtenia cases or customer reviews."},
+    {"id": "sources-and-safety", "result": "pass", "evidence": "Fire-safety context links to current MChS guidance checked on 2026-10-09. The article gives no installation clearances or DIY stove instructions and directs readers to equipment documentation and a qualified installer."},
+    {"id": "unsupported-claims", "result": "pass", "evidence": "No claimed survey of reviews, universal prices, schedules, warranties, heat-up times, service life or quantified performance. Advantages and downsides are expressed conditionally."},
+    {"id": "internal-links", "result": "pass", "evidence": "Includes contextual links to /baths (required commercial owner), /services/fundament and /contacts."},
+    {"id": "human-review", "result": "pass", "evidence": "Oleg Ivanovich Kislyakov is the technical author/reviewer. The site owner previously approved review attribution for him on technical articles."},
+    {"id": "metadata-and-indexing", "result": "pass", "evidence": "Unique Latin slug, title, excerpt, category, author, reviewer and 137-character SEO description are set. Existing production robots.txt allows public pages and names the sitemap; the backend emits self-canonical article pages and includes published articles in sitemap.xml."},
+    {"id": "markup-and-rendering", "result": "pass", "evidence": "1,268 body words; no H1 inside content, placeholders, scripts, iframes, inline handlers or javascript URLs. Frontend sanitizer preserves the used semantic elements and journal classes."},
+    {"id": "production-sync", "result": "pass", "evidence": "The new slug is registered in managed production sync and gets a dedicated Journal category idempotently. Production URL and sitemap entry are to be verified immediately after deployment."}
+  ],
+  "publicationBlockers": []
+}

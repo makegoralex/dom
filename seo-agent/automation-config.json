@@ -63,7 +63,8 @@
         "фундаменты",
         "строительство",
         "материалы",
-        "инженерные системы"
+        "инженерные системы",
+        "бани и дополнительные строения"
       ]
     }
   },
@@ -77,7 +78,7 @@
     "Участок и оформление": "journal-category-foundation",
     "Строительство дома": "journal-category-construction",
     "Инженерные системы": "journal-category-construction",
-    "Бани и дополнительные строения": "journal-category-construction",
+    "Бани и дополнительные строения": "journal-category-baths",
     "Выбор подрядчика": "journal-category-construction",
     "Ипотека и документы": "journal-category-finance",
     "Стоимость и бюджет": "journal-category-finance",

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-10-06",
+  "updated": "2026-10-09",
   "clusters": {
     "modulnye-doma-otzyvy-i-minusy": {
       "semanticStatus": "published",
@@ -59,6 +59,16 @@
       "reservedAt": "2026-10-06",
       "publishedAt": "2026-10-06",
       "notes": "Sixth Journal article. Prepared manually and published through managed production sync."
+    },
+    "modulnye-bani-otzyvy-i-minusy": {
+      "semanticStatus": "published",
+      "queueStatus": "published",
+      "brief": "briefs/modulnye-bani-otzyvy-i-minusy.md",
+      "draft": "drafts/modulnye-bani-otzyvy-i-minusy.json",
+      "report": "reports/modulnye-bani-otzyvy-i-minusy-gate.json",
+      "reservedAt": "2026-10-09",
+      "publishedAt": "2026-10-09",
+      "notes": "Seventh Journal article. Technical review attribution approved; manual article published through managed production sync. Clearly distinguishes Evtenia's listed bath project types from modular construction and contains no fabricated owner testimonials."
     }
   }
 }

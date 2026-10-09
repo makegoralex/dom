@@ -1264,14 +1264,14 @@
     {
       "id": "modulnye-bani-otzyvy-i-minusy",
       "page": "/journal/modulnye-bani-otzyvy-i-minusy",
-      "status": "planned",
+      "status": "published",
       "pageType": "article",
       "intent": "informational_investigation",
       "funnel": "consideration",
       "category": "Бани и дополнительные строения",
       "region": "Россия",
       "author": "Олег Иванович Кисляков",
-      "reviewer": null,
+      "reviewer": "Олег Иванович Кисляков",
       "main": {
         "q": "модульная баня отзывы",
         "vol": 507
@@ -1296,7 +1296,7 @@
       ],
       "priority": 100,
       "humanReviewRequired": true,
-      "indexingState": "planned",
+      "indexingState": "published",
       "requiredLinks": [
         "/baths"
       ],

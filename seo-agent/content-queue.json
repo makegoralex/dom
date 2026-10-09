@@ -163,10 +163,14 @@
       "owner": "/journal/modulnye-bani-otzyvy-i-minusy",
       "region": "Россия",
       "author": "Олег Иванович Кисляков",
-      "reviewer": null,
+      "reviewer": "Олег Иванович Кисляков",
       "verifiedMainVolume": 507,
       "score": 90,
-      "status": "ready_for_brief",
+      "status": "published",
+      "artifacts": {
+        "brief": "briefs/modulnye-bani-otzyvy-i-minusy.md",
+        "draft": "drafts/modulnye-bani-otzyvy-i-minusy.json"
+      },
       "blockers": [
         "author_review",
         "evtenia_examples"

@@ -718,7 +718,8 @@ const seedJournalCategories: JournalCategory[] = [
   { id: 'journal-category-construction', name: 'Строительство и инженерия', slug: 'stroitelstvo-i-inzheneriya', description: 'Этапы работ, материалы, утепление, кровля, скважины и коммуникации.', order: 40 },
   { id: 'journal-category-finance', name: 'Ипотека, цены и документы', slug: 'ipoteka-tseny-i-dokumenty', description: 'Смета, ипотека на строительство, договоры, земля и межевание.', order: 50 },
   { id: 'journal-category-finishing', name: 'Отделка и благоустройство', slug: 'otdelka-i-blagoustroystvo', description: 'Ремонт, двери, мебель, заборы, дизайн и благоустройство участка.', order: 60 },
-  { id: 'journal-category-cases', name: 'Объекты и опыт Evtenia', slug: 'obekty-i-opyt', description: 'Разборы построенных домов, практические решения и опыт команды.', order: 70 }
+  { id: 'journal-category-cases', name: 'Объекты и опыт Evtenia', slug: 'obekty-i-opyt', description: 'Разборы построенных домов, практические решения и опыт команды.', order: 70 },
+  { id: 'journal-category-baths', name: 'Бани и дополнительные строения', slug: 'bani-i-dopolnitelnye-stroeniya', description: 'Выбор проекта бани, комплектация, подготовка участка и строительство дополнительных строений.', order: 80 }
 ];
 
 const seedJournalArticles: JournalArticle[] = [];
@@ -1008,6 +1009,7 @@ const syncManagedJournalArticles = (): void => {
   const data = readData();
   const draftsDir = path.join(__dirname, '..', '..', 'seo-agent', 'drafts');
   const managed = [
+    { slug: 'modulnye-bani-otzyvy-i-minusy', repairMalformed: false },
     { slug: 'modulnye-doma-otzyvy-i-minusy', repairMalformed: true },
     { slug: 'kakuyu-tekhnologiyu-doma-vybrat', repairMalformed: false },
     { slug: 'dostavka-i-montazh-modulnogo-doma', repairMalformed: false },
@@ -1016,6 +1018,12 @@ const syncManagedJournalArticles = (): void => {
     { slug: 'modulnyy-dom-dlya-postoyannogo-prozhivaniya', repairMalformed: false }
   ];
   let changed = false;
+
+  const bathCategory = seedJournalCategories.find((category) => category.id === 'journal-category-baths');
+  if (bathCategory && !data.journalCategories.some((category) => category.id === bathCategory.id)) {
+    data.journalCategories.push(bathCategory);
+    changed = true;
+  }
 
   for (const item of managed) {
     const jsonPath = path.join(draftsDir, `${item.slug}.json`);
