@@ -295,6 +295,124 @@ type ServicePageDetail = {
   faq: { question: string; answer: string }[];
 };
 
+type ServicePortfolioPhoto = { src: string; alt: string; caption: string };
+type ServicePortfolio = { title: string; description: string; photos: ServicePortfolioPhoto[] };
+
+const servicePortfolioPhoto = (number: number, alt: string, caption: string): ServicePortfolioPhoto => ({
+  src: `/assets/service-portfolio/${String(number).padStart(3, '0')}.webp`,
+  alt,
+  caption
+});
+
+const SERVICE_PORTFOLIOS: Record<string, ServicePortfolio> = {
+  remont: {
+    title: 'Фото с объектов ремонта',
+    description: 'Реальные кадры отделки помещений и частных домов. Состав работ на каждом объекте отличается и определяется после осмотра.',
+    photos: [
+      servicePortfolioPhoto(21, 'Внутреннее помещение дома на этапе отделки', 'Подготовка интерьера дома.'),
+      servicePortfolioPhoto(1, 'Отделка ванной комнаты плиткой, общий вид помещения', 'Отделка ванной комнаты: общий вид.'),
+      servicePortfolioPhoto(2, 'Облицовка стен ванной комнаты и подготовка сантехнических выводов', 'Плитка и сантехнические выводы.'),
+      servicePortfolioPhoto(7, 'Установка сантехники и тумбы с раковиной в ванной комнате', 'Монтаж сантехники и мебели.'),
+      servicePortfolioPhoto(12, 'Подготовка комнаты к внутренней отделке', 'Подготовка помещения к отделке.'),
+      servicePortfolioPhoto(14, 'Отделка жилой комнаты и устройство потолочного освещения', 'Работы в жилом помещении.'),
+      servicePortfolioPhoto(18, 'Укладка напольной плитки в санузле', 'Укладка напольной плитки.'),
+      servicePortfolioPhoto(19, 'Частный дом после наружных строительных и отделочных работ', 'Внешний вид частного дома.'),
+      servicePortfolioPhoto(26, 'Работы по стенам и потолку в жилом помещении', 'Отделочные работы внутри дома.'),
+      servicePortfolioPhoto(29, 'Комната частного дома на этапе подготовки к чистовой отделке', 'Подготовка комнат к чистовой отделке.'),
+      servicePortfolioPhoto(31, 'Облицовка плиткой душевой зоны', 'Отделка душевой зоны.'),
+      servicePortfolioPhoto(34, 'Разметка и укладка плитки на полу в санузле', 'Работы по укладке плитки.'),
+      servicePortfolioPhoto(36, 'Укладка напольной плитки в ванной комнате', 'Плиточные работы в санузле.'),
+      servicePortfolioPhoto(41, 'Подготовка ванной комнаты к отделке и монтажу сантехники', 'Подготовка ванной комнаты.'),
+      servicePortfolioPhoto(43, 'Подготовительные работы в душевой зоне перед облицовкой', 'Подготовка душевой зоны.')
+    ]
+  },
+  elektromontazh: {
+    title: 'Электромонтаж на объектах',
+    description: 'Фото монтажа и подготовки электрики до завершения отделки. Схему, оборудование и состав работ подбирают под конкретный дом.',
+    photos: [
+      servicePortfolioPhoto(47, 'Прокладка и подключение кабелей потолочного освещения', 'Линии освещения до отделки.'),
+      servicePortfolioPhoto(44, 'Монтаж электрической розетки в стене дома', 'Установка розетки.'),
+      servicePortfolioPhoto(45, 'Подготовка потолка к установке встроенных светильников', 'Подготовка точек освещения.'),
+      servicePortfolioPhoto(48, 'Прокладка электропроводки в помещении частного дома', 'Проводка на этапе монтажа.'),
+      servicePortfolioPhoto(50, 'Электромонтаж скрытой проводки перед внутренней отделкой', 'Разводка кабеля в комнате.'),
+      servicePortfolioPhoto(52, 'Подготовка электрических линий в доме до чистовой отделки', 'Электрика до завершения отделки.'),
+      servicePortfolioPhoto(54, 'Прокладка кабелей и подготовка помещения к монтажу электрооборудования', 'Подготовка электрики на объекте.')
+    ]
+  },
+  zabory: {
+    title: 'Заборы и въездные группы на объектах',
+    description: 'Примеры установленных ограждений, ворот и калиток. Конструкция, заполнение и автоматика подбираются по участку и пожеланиям владельца.',
+    photos: [
+      servicePortfolioPhoto(55, 'Металлические ворота и калитка у частного дома', 'Ворота и калитка.'),
+      servicePortfolioPhoto(59, 'Въездная группа с металлическими воротами', 'Оформление въезда на участок.'),
+      servicePortfolioPhoto(61, 'Ограждение участка с калиткой и проходом во двор', 'Ограждение двора.'),
+      servicePortfolioPhoto(63, 'Металлическое ограждение частного участка', 'Ограждение по периметру.'),
+      servicePortfolioPhoto(64, 'Забор вокруг загородного дома в зимний период', 'Ограждение частного дома.'),
+      servicePortfolioPhoto(66, 'Металлический забор вдоль участка зимой', 'Металлическое ограждение.'),
+      servicePortfolioPhoto(68, 'Ограждение участка рядом с частным домом', 'Забор у жилого дома.'),
+      servicePortfolioPhoto(69, 'Линия металлического забора вдоль улицы', 'Забор вдоль участка.'),
+      servicePortfolioPhoto(73, 'Загородный дом с установленным ограждением участка', 'Дом и ограждение участка.'),
+      servicePortfolioPhoto(81, 'Декоративная металлическая калитка в секционном ограждении', 'Декоративная калитка.'),
+      servicePortfolioPhoto(93, 'Металлический забор с коричневым заполнением', 'Забор с коричневым заполнением.'),
+      servicePortfolioPhoto(95, 'Установленный металлический забор на загородном участке', 'Готовое ограждение участка.'),
+      servicePortfolioPhoto(107, 'Въездная группа и ограждение частного участка', 'Ограждение и въезд на участок.')
+    ]
+  },
+  lestnitsy: {
+    title: 'Лестницы и ограждения на объектах',
+    description: 'Фотографии изготовления и монтажа лестничных конструкций, ступеней и ограждений. Итоговую геометрию рассчитывают по месту.',
+    photos: [
+      servicePortfolioPhoto(78, 'Каркас наружной лестницы с деревянными ступенями', 'Монтаж лестницы с деревянными ступенями.'),
+      servicePortfolioPhoto(71, 'Металлические элементы лестничной конструкции в мастерской', 'Изготовление элементов металлической лестницы.'),
+      servicePortfolioPhoto(76, 'Металлический каркас лестницы внутри помещения', 'Каркас лестницы в доме.'),
+      servicePortfolioPhoto(77, 'Наружная лестница и площадка у входа в дом', 'Наружная входная лестница.'),
+      servicePortfolioPhoto(79, 'Готовые деревянные ступени у входа в загородный дом', 'Деревянные ступени у дома.'),
+      servicePortfolioPhoto(83, 'Металлическая лестничная конструкция и ограждение внутри здания', 'Металлическая лестница и ограждение.'),
+      servicePortfolioPhoto(86, 'Металлическое ограждение открытой террасы', 'Ограждение террасы.'),
+      servicePortfolioPhoto(102, 'Наружные ступени и площадка перед входом в дом', 'Входные ступени и площадка.')
+    ]
+  },
+  'plastikovye-okna': {
+    title: 'Пластиковые окна на объектах',
+    description: 'Примеры ПВХ-окон, установленных в частных домах. Конфигурацию, стеклопакет и комплектацию подбирают после замера.',
+    photos: [
+      servicePortfolioPhoto(85, 'Пластиковые окна в фасаде частного дома', 'Окна в загородном доме.'),
+      servicePortfolioPhoto(82, 'Установка белого ПВХ-окна в частном доме', 'Монтаж пластикового окна.')
+    ]
+  },
+  dveri: {
+    title: 'Входные двери на объектах',
+    description: 'Фотографии входных групп в частных домах. Модель двери, размеры проема, отделку и монтажные решения согласуем отдельно.',
+    photos: [
+      servicePortfolioPhoto(77, 'Входная дверь и наружная лестница в частном доме', 'Входная группа частного дома.'),
+      servicePortfolioPhoto(85, 'Входная дверь и окна в фасаде загородного дома', 'Входная дверь в доме.')
+    ]
+  }
+};
+
+function ServicePortfolioGallery({ serviceTitle, portfolio, photos }: { serviceTitle: string; portfolio: ServicePortfolio; photos: ServicePortfolioPhoto[] }) {
+  if (!photos.length) return null;
+  return (
+    <section className="service-portfolio-gallery" aria-labelledby={`service-portfolio-${serviceTitle}`}>
+      <div className="service-portfolio-heading">
+        <span className="page-kicker">Фото с объектов</span>
+        <h2 id={`service-portfolio-${serviceTitle}`}>{portfolio.title}</h2>
+        <p>{portfolio.description}</p>
+      </div>
+      <div className="service-portfolio-grid">
+        {photos.map((photo) => (
+          <figure key={photo.src}>
+            <a href={photo.src} target="_blank" rel="noreferrer" aria-label={`Открыть фотографию: ${photo.caption}`}>
+              <img src={photo.src} alt={photo.alt} width="800" height="600" loading="lazy" decoding="async" />
+            </a>
+            <figcaption>{photo.caption}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 const servicePhoto = (name: string) => `${API_BASE}/api/assets/services/${name}.jpg`;
 
 const SERVICE_PAGE_DETAILS: Record<string, ServicePageDetail> = {
@@ -3859,7 +3977,19 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
   const cmsContent = isHtml ? sanitizeCmsHtml(text) : text;
   const cmsHeroImage = cmsContent.match(/<img\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/i)?.[1];
   const hasCmsPhotos = Boolean(cmsHeroImage || /<(?:picture|figure)\b/i.test(cmsContent));
-  const serviceHeroImage = cmsHeroImage ? resolveMediaUrl(cmsHeroImage) : serviceDetail?.photo;
+  const servicePortfolio = SERVICE_PORTFOLIOS[serviceSlug];
+  const servicePortfolioHeroPhoto = servicePortfolio?.photos[0];
+  const serviceHeroImage = cmsHeroImage ? resolveMediaUrl(cmsHeroImage) : servicePortfolioHeroPhoto?.src || serviceDetail?.photo;
+  const serviceHeroImageAlt = cmsHeroImage
+    ? `Фотография компании: ${pageTitle.toLocaleLowerCase('ru-RU')} в Пензе`
+    : servicePortfolioHeroPhoto?.alt || serviceDetail?.photoAlt || `Иллюстрация к услуге «${pageTitle}» в Пензе`;
+  const serviceHeroImageCaption = cmsHeroImage
+    ? 'Фото компании · Evtenia, Пенза'
+    : servicePortfolioHeroPhoto
+      ? 'Фото с объекта · Evtenia'
+      : 'Иллюстрация к услуге · Evtenia, Пенза';
+  const servicePortfolioPhotos = servicePortfolio?.photos.filter((_, index) => Boolean(cmsHeroImage) || index > 0) || [];
+  const servicePortfolioGallery = servicePortfolio ? <ServicePortfolioGallery serviceTitle={serviceSlug} portfolio={servicePortfolio} photos={servicePortfolioPhotos} /> : null;
   const serviceSummary = isService ? cmsSummary(cmsContent) : '';
   const serviceContentWithoutHeroImage = isService && cmsHeroImage ? removeFirstCmsImage(cmsContent) : cmsContent;
 
@@ -3887,7 +4017,7 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
           title: seoTitle || `${pageTitle} в Пензе — цены и сроки | Evtenia`,
           description: seoDescription || description,
           path: `/services/${serviceSlug}`,
-          image: cmsHeroImage ? resolveMediaUrl(cmsHeroImage) : undefined,
+          image: serviceHeroImage,
           schema
         });
         return;
@@ -3900,7 +4030,7 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
             { '@type': 'Service', name: isFurnitureHub ? 'Подбор мебели для дома в Пензе' : `Подбор мебели ${furnitureCategory?.title.toLocaleLowerCase('ru-RU') || ''} ${pageTitle}`, serviceType: 'Подбор и заказ мебели', areaServed: ['Пенза', 'Пензенская область'], provider: { '@type': 'Organization', name: 'Evtenia', url: window.location.origin, telephone: CONTACTS.mainPhoneDisplay } }
           ]
         } : undefined;
-        writePageSEO({ title: seoTitle, description: seoDescription, path: window.location.pathname, image: cmsHeroImage ? resolveMediaUrl(cmsHeroImage) : undefined, schema });
+        writePageSEO({ title: seoTitle, description: seoDescription, path: window.location.pathname, image: serviceHeroImage, schema });
       } else {
         document.title = `${pageTitle} — Evtenia`;
       }
@@ -3938,10 +4068,10 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
       title: serviceDetail.seoTitle,
       description: serviceDetail.seoDescription,
       path: `/services/${serviceSlug}`,
-      image: cmsHeroImage ? resolveMediaUrl(cmsHeroImage) : serviceDetail.photo,
+      image: serviceHeroImage,
       schema
     });
-  }, [pageTitle, serviceDetail, serviceSlug, seoTitle, seoDescription, isService, serviceSummary, cmsHeroImage]);
+  }, [pageTitle, serviceDetail, serviceSlug, seoTitle, seoDescription, isService, serviceSummary, serviceHeroImage]);
 
   const submitServiceLead = async (event: FormEvent) => {
     event.preventDefault();
@@ -4005,7 +4135,7 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
                 <p>{serviceDetail.summary}</p>
                 <div className="service-detail-hero-actions"><a href="#service-request">Узнать стоимость и сроки <span>→</span></a>{serviceSlug === 'dveri' ? <a className="service-catalog-link" href="/dveri">Смотреть каталог межкомнатных дверей <span aria-hidden="true">↗</span></a> : null}</div>
               </div>
-              {serviceHeroImage ? <figure className="service-detail-hero-media"><img src={serviceHeroImage} alt={cmsHeroImage ? `Фотография компании: ${pageTitle.toLocaleLowerCase('ru-RU')} в Пензе` : serviceDetail.photoAlt || `Иллюстрация к услуге «${pageTitle}» в Пензе`} width="1500" height="1000" fetchPriority="high" /><figcaption>{cmsHeroImage ? 'Фото компании · Evtenia, Пенза' : 'Иллюстрация к услуге · Evtenia, Пенза'}</figcaption></figure> : null}
+              {serviceHeroImage ? <figure className="service-detail-hero-media"><img className={!cmsHeroImage && servicePortfolioHeroPhoto ? 'service-portfolio-hero-image' : undefined} src={serviceHeroImage} alt={serviceHeroImageAlt} width="1500" height="1000" fetchPriority="high" /><figcaption>{serviceHeroImageCaption}</figcaption></figure> : null}
               <ul aria-label="Что получает заказчик">
                 <li><b>01</b><span>Состав и ориентир до начала работ</span></li>
                 <li><b>02</b><span>Согласование этапов и комплектации</span></li>
@@ -4017,6 +4147,7 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
               <h2>Примеры и материалы по услуге</h2>
               <CmsHtmlContent html={serviceContentWithoutHeroImage} />
             </section> : null}
+            {servicePortfolioGallery}
             <section className="service-price-overview" aria-label="Предварительные ориентиры по цене и срокам">
               <div><span>Ориентир стоимости</span><strong>{serviceDetail.pricing[0]?.value || 'По смете'}</strong><small>{serviceDetail.pricing[0]?.note}</small></div>
               <div><span>Сроки</span><strong>Индивидуально по объекту</strong><small>{serviceDetail.duration}</small></div>
@@ -4085,13 +4216,14 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
                 <p>{serviceSummary || `Расскажите, что нужно сделать на объекте в Пензе или области. Уточним исходные данные и подготовим предварительный расчёт.`}</p>
                 <div className="service-detail-hero-actions"><a href="#service-request">Обсудить задачу и расчёт <span aria-hidden="true">→</span></a></div>
               </div>
-              {serviceHeroImage ? <figure className="service-detail-hero-media"><img src={serviceHeroImage} alt={`Фотография услуги «${pageTitle.toLocaleLowerCase('ru-RU')}» от Evtenia`} width="1500" height="1000" fetchPriority="high" /><figcaption>Материалы по услуге · Evtenia, Пенза</figcaption></figure> : null}
+              {serviceHeroImage ? <figure className="service-detail-hero-media"><img className={!cmsHeroImage && servicePortfolioHeroPhoto ? 'service-portfolio-hero-image' : undefined} src={serviceHeroImage} alt={serviceHeroImageAlt} width="1500" height="1000" fetchPriority="high" /><figcaption>{serviceHeroImageCaption}</figcaption></figure> : null}
               <ul aria-label="Как работаем">
                 <li><b>01</b><span>Сохраняем ваши материалы и фотографии</span></li>
                 <li><b>02</b><span>Состав работ и цену уточняем до начала</span></li>
                 <li><b>03</b><span>Работаем по Пензе и области</span></li>
               </ul>
             </section>
+            {servicePortfolioGallery}
             <div className="service-detail-layout service-legacy-layout" id="service-request">
               <div className="service-detail-main">
                 <section className="service-detail-card service-existing-media service-legacy-copy">
