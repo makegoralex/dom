@@ -1,0 +1,17 @@
+{
+  "clusterId": "kak-vybrat-vhodnuyu-dver-v-dom",
+  "checkedAt": "2026-10-13",
+  "result": "pass",
+  "rules": [
+    {"id": "ownership-and-separation", "result": "pass", "evidence": "The article answers informational selection queries. The protected /services/dveri page remains the service/order owner; selection, glass, size and thermal-break intent is excluded from that commercial cluster."},
+    {"id": "answer-first", "result": "pass", "evidence": "The lead explains to evaluate the whole door block, operating location and measured opening rather than one advertising feature."},
+    {"id": "sources", "result": "pass", "evidence": "Technical scope references current official Rosstandart cards for GOST 31173-2016 steel door blocks and GOST 30698-2014 tempered glass. The article does not treat these standards as proof of a specific model's performance."},
+    {"id": "unsupported-company-claims", "result": "pass", "evidence": "Live Evtenia service/catalog content was checked 2026-10-13. Copy states the service page mentions entry and interior doors while the public model catalog is for interior collections; no specific exterior product, thermal rating, security class, price, size or guarantee is promised."},
+    {"id": "tradeoffs-and-decision-aid", "result": "pass", "evidence": "The article compares street, vestibule, glazing, wide opening and quote-scope cases and includes a pre-order checklist without prescribing a universal size or configuration."},
+    {"id": "internal-links", "result": "pass", "evidence": "Contextual links to /services/dveri, /dveri and /contacts; required commercial owner link is present."},
+    {"id": "human-review", "result": "pass", "evidence": "The site owner previously approved Oleg Ivanovich Kislyakov's technical author/reviewer attribution workflow and explicitly authorized publication of the article."},
+    {"id": "company-range-confirmation", "result": "pass", "evidence": "The article makes no model-specific claim that Evtenia currently supplies an exterior door with particular glass or thermal-break configurations. It accurately distinguishes the general door service from the public interior-door catalog and asks readers to confirm current availability and scope."},
+    {"id": "metadata-and-markup", "result": "pass", "evidence": "Latin slug, unique title, excerpt, existing CMS category, author, reviewer, CTA and SEO metadata are complete. Body uses one external set of H2s and no embedded H1, scripts, iframes or inline handlers."}
+  ],
+  "publicationBlockers": []
+}

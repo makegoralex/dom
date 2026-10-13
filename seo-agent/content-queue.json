@@ -187,10 +187,14 @@
       "owner": "/journal/kak-vybrat-vhodnuyu-dver-v-dom",
       "region": "Пензенская область",
       "author": "Олег Иванович Кисляков",
-      "reviewer": null,
+      "reviewer": "Олег Иванович Кисляков",
       "verifiedMainVolume": 135,
       "score": 86,
-      "status": "ready_for_brief",
+      "status": "published",
+      "artifacts": {
+        "brief": "briefs/kak-vybrat-vhodnuyu-dver-v-dom.md",
+        "draft": "drafts/kak-vybrat-vhodnuyu-dver-v-dom.json"
+      },
       "blockers": [
         "author_review",
         "evtenia_examples"

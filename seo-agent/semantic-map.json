@@ -2016,14 +2016,14 @@
     {
       "id": "kak-vybrat-vhodnuyu-dver-v-dom",
       "page": "/journal/kak-vybrat-vhodnuyu-dver-v-dom",
-      "status": "planned",
+      "status": "published",
       "pageType": "article",
       "intent": "informational_commercial",
       "funnel": "consideration",
       "category": "Отделка и ремонт",
       "region": "Пензенская область",
       "author": "Олег Иванович Кисляков",
-      "reviewer": null,
+      "reviewer": "Олег Иванович Кисляков",
       "main": {
         "q": "дверь стекло в частном доме",
         "vol": 135
@@ -2080,7 +2080,7 @@
       ],
       "priority": 100,
       "humanReviewRequired": true,
-      "indexingState": "planned",
+      "indexingState": "published",
       "requiredLinks": [
         "/services/dveri"
       ],

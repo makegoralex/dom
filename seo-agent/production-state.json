@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-10-09",
+  "updated": "2026-10-13",
   "clusters": {
     "modulnye-doma-otzyvy-i-minusy": {
       "semanticStatus": "published",
@@ -69,6 +69,16 @@
       "reservedAt": "2026-10-09",
       "publishedAt": "2026-10-09",
       "notes": "Seventh Journal article. Technical review attribution approved; manual article published through managed production sync. Clearly distinguishes Evtenia's listed bath project types from modular construction and contains no fabricated owner testimonials."
+    },
+    "kak-vybrat-vhodnuyu-dver-v-dom": {
+      "semanticStatus": "published",
+      "queueStatus": "published",
+      "brief": "briefs/kak-vybrat-vhodnuyu-dver-v-dom.md",
+      "draft": "drafts/kak-vybrat-vhodnuyu-dver-v-dom.json",
+      "report": "reports/kak-vybrat-vhodnuyu-dver-v-dom-gate.json",
+      "reservedAt": "2026-10-13",
+      "publishedAt": "2026-10-13",
+      "notes": "Eighth Journal article. Published manually through managed production sync after owner approval. No product-specific exterior-door specifications, prices, guarantees or dimensions are claimed; readers are directed to confirm current availability and package."
     }
   }
 }

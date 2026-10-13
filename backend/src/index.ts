@@ -1015,7 +1015,8 @@ const syncManagedJournalArticles = (): void => {
     { slug: 'dostavka-i-montazh-modulnogo-doma', repairMalformed: false },
     { slug: 'modulnyy-dom-s-kommunikaciyami', repairMalformed: false },
     { slug: 'modulnyy-ili-karkasnyy-dom', repairMalformed: false },
-    { slug: 'modulnyy-dom-dlya-postoyannogo-prozhivaniya', repairMalformed: false }
+    { slug: 'modulnyy-dom-dlya-postoyannogo-prozhivaniya', repairMalformed: false },
+    { slug: 'kak-vybrat-vhodnuyu-dver-v-dom', repairMalformed: false }
   ];
   let changed = false;
 
