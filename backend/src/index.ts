@@ -402,7 +402,7 @@ const SERVICE_PAGE_SLUGS = [
   'fundament', 'besedki', 'septik', 'zabory', 'skvazhiny', 'elektromontazh', 'umnyy-dom',
   'vyvoz-musora', 'styazhka-pola', 'konditsionery', 'interernoe-ozelenenie', 'otsenka-nedvizhimosti',
   'plastikovye-okna', 'dveri', 'remont', 'lestnitsy', 'svai', 'dizainer', 'landshaftnyy-dizayn',
-  'mezhevanie', 'ipoteka-oformlenie', 'strahovanie'
+  'mezhevanie', 'ipoteka-oformlenie', 'strahovanie', 'proektirovanie-teplogazosnabzheniya-i-ventilyatsii'
 ];
 const LEGACY_CROWDED_MENU_ORDER = ['home', 'about', 'projects', 'baths', 'doors', 'chany', 'lands', 'furniture', 'services', 'promotions', 'contacts', 'homes', 'settlements', 'journal'];
 const NAV_MENU_DEFAULT_ORDER = ['home', 'about', 'projects', 'baths', 'doors', 'chany', 'lands', 'furniture', 'services', 'promotions', 'homes', 'settlements', 'journal', 'contacts'];

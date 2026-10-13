@@ -84,6 +84,14 @@ const DOOR_FAQ = [
   ['Как выбрать дверь для ванной или кухни?', 'Сначала учитывают влажность, вентиляцию, нужную приватность и ширину проёма. Менеджер поможет подобрать покрытие, остекление, коробку и подходящую фурнитуру под помещение.']
 ];
 
+const DOOR_INSTALLATION_PHOTOS = [
+  { src: '/assets/client-portfolio-2026-10/interior-door.webp', alt: 'Установленная белая межкомнатная дверь в готовом проёме', caption: 'Межкомнатная дверь в подготовленном проёме.' },
+  { src: '/assets/client-portfolio-2026-10/interior-doors-hall.webp', alt: 'Две межкомнатные двери в отделанном коридоре', caption: 'Двери в интерьере коридора.' },
+  { src: '/assets/client-portfolio-2026-10/interior-door-hallway.webp', alt: 'Белая межкомнатная дверь с чёрной ручкой', caption: 'Фурнитура и наличники после установки.' },
+  { src: '/assets/client-portfolio-2026-10/interior-door-white.webp', alt: 'Белая межкомнатная дверь с чёрной фурнитурой в коридоре', caption: 'Дверь в готовом интерьере.' },
+  { src: '/assets/client-portfolio-2026-10/interior-door-single.webp', alt: 'Установленная белая дверь в светлом коридоре', caption: 'Завершённый дверной проём.' }
+];
+
 const CHANY_FAQ = [
   ['От чего зависит цена банного чана?', 'На итог влияют марка стали, модель, отделка камнем, печь, лестница, крышка и дополнительные функции. В карточках приведены ориентиры из каталога; комплектацию и актуальную цену подтвердим перед заказом.'],
   ['Сколько места нужно для установки?', 'Для круглых моделей диаметром 200 см в каталоге указана площадка примерно 2 × 3 м. Нужно также предусмотреть безопасный проход, место для обслуживания печи и дымохода. Для террасы и купели планирование отличается.'],
@@ -262,6 +270,15 @@ export function DoorsCatalogPage({ apiBase, Header, Footer, PrivacyConsent, form
               </article>)}
             </div>
             <p className="catalog-disclaimer">Фотографии показывают варианты исполнения. Оттенок покрытия на экране может отличаться; окончательный выбор делаем по образцам и доступным вариантам выбранной коллекции.</p>
+          </div>
+        </section>
+
+        <section className="catalog-section catalog-section-muted door-installations-section">
+          <div className="catalog-container">
+            <div className="catalog-section-heading"><div><span className="catalog-eyebrow">Фото с объектов</span><h2>Межкомнатные двери после монтажа</h2></div><p>Примеры готовых дверных проёмов в жилых интерьерах. Набор комплектующих и возможность монтажа уточняются под конкретный объект.</p></div>
+            <div className="catalog-real-photo-grid">
+              {DOOR_INSTALLATION_PHOTOS.map((photo) => <figure key={photo.src}><img src={photo.src} alt={photo.alt} loading="lazy" decoding="async" width="800" height="600" /><figcaption>{photo.caption}</figcaption></figure>)}
+            </div>
           </div>
         </section>
 

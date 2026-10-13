@@ -2389,3 +2389,22 @@ html body, html body * { font-family: Arial, Helvetica, sans-serif !important; }
 .service-portfolio-grid figcaption { min-height: 50px; padding: 11px 13px 13px; color: #40584c; font-size: 12px; line-height: 1.45; }
 @media (max-width: 900px) { .service-portfolio-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } }
 @media (max-width: 560px) { .service-portfolio-gallery { margin: 19px 0 24px; border-radius: 18px; padding: 20px 15px; } .service-portfolio-grid { grid-template-columns: 1fr; gap: 11px; } .service-portfolio-grid a { aspect-ratio: 16 / 11; } .service-portfolio-grid figcaption { min-height: auto; padding: 10px 12px 12px; } }
+
+.portfolio-photo-projects { margin-top: 44px; }
+.portfolio-photo-projects-heading { max-width: 760px; margin-bottom: 24px; }
+.portfolio-photo-projects-heading h2 { margin: 8px 0 9px; color: var(--ev-ink); font-family: Georgia, "Times New Roman", serif; font-size: clamp(27px, 3vw, 38px); font-weight: 500; line-height: 1.1; letter-spacing: -.025em; }
+.portfolio-photo-projects-heading p { margin: 0; color: #65746b; font-size: 14px; line-height: 1.65; }
+.portfolio-showcase-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.portfolio-showcase-card { min-width: 0; overflow: hidden; border: 1px solid rgba(24, 66, 49, .12); border-radius: 19px; padding: 19px; background: #fffefa; box-shadow: 0 12px 36px rgba(25, 51, 39, .05); }
+.portfolio-showcase-card > header { margin: 0 0 16px; }
+.portfolio-showcase-card > header h3 { margin: 0 0 7px; color: var(--ev-ink); font-size: 19px; line-height: 1.25; }
+.portfolio-showcase-card > header p { margin: 0; color: #65746b; font-size: 12px; line-height: 1.55; }
+.portfolio-showcase-photos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+.portfolio-showcase-photos figure { min-width: 0; overflow: hidden; margin: 0; border: 1px solid rgba(24, 66, 49, .1); border-radius: 11px; background: #f1efe8; }
+.portfolio-showcase-photos a { display: block; overflow: hidden; aspect-ratio: 4 / 3; background: #e9e7df; }
+.portfolio-showcase-photos a:focus-visible { outline: 3px solid var(--ev-gold); outline-offset: -3px; }
+.portfolio-showcase-photos img { display: block; width: 100%; height: 100%; object-fit: contain; transition: transform .3s ease; }
+.portfolio-showcase-photos a:hover img { transform: scale(1.04); }
+.portfolio-showcase-photos figcaption { min-height: 43px; padding: 8px 9px 10px; color: #40584c; font-size: 10px; line-height: 1.4; }
+@media (max-width: 900px) { .portfolio-showcase-photos { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .portfolio-photo-projects { margin-top: 30px; } .portfolio-showcase-grid { grid-template-columns: 1fr; gap: 13px; } .portfolio-showcase-card { border-radius: 16px; padding: 15px; } .portfolio-showcase-photos { gap: 8px; } }
