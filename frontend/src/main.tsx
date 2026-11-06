@@ -10,6 +10,7 @@ import { LesnoeOzeroPage } from './LesnoeOzeroPage';
 import { MortgageCalculatorPage } from './MortgageCalculatorPage';
 import { LESNOE_OZERO_PHASES, type LesnoeOzeroPlot } from './lesnoeOzeroPlots';
 import { GiftOffer, PortfolioAlbum, PriceAnnotations, PRICE_NOTICE } from './SiteEnhancements';
+import { GiftQuiz } from './GiftQuiz';
 
 type HouseProject = {
   id: string;
@@ -1672,7 +1673,7 @@ function HeaderNav({
                     ) : child.heading ? (
                       <span key={`${child.label}_${idx}`} className="dropdown-heading">{child.label}</span>
                     ) : (
-                      <a key={child.href || `${child.label}_${idx}`} href={child.href} className={`dropdown-link ${child.href && window.location.pathname + window.location.search === child.href ? 'active' : ''}`}>{child.label}</a>
+                      <a key={`${child.href || child.label}_${idx}`} href={child.href} className={`dropdown-link ${child.href && window.location.pathname + window.location.search === child.href ? 'active' : ''}`}>{child.label}</a>
                     )
                   ))}
                 </div>
@@ -1708,7 +1709,7 @@ function HeaderNav({
                   ) : item.heading ? (
                     <strong key={`${item.label}_${idx}`} className="mobile-menu-item">{item.label}</strong>
                   ) : (
-                    <a key={item.href || `${item.label}_${idx}`} href={item.href} className={`mobile-menu-item ${item.href && window.location.pathname + window.location.search === item.href ? 'active' : ''}`}>{item.label}</a>
+                    <a key={`${item.href || item.label}_${idx}`} href={item.href} className={`mobile-menu-item ${item.href && window.location.pathname + window.location.search === item.href ? 'active' : ''}`}>{item.label}</a>
                   )
                 ))
                 : menuItems.map((item) => (
@@ -2018,6 +2019,7 @@ function PromoLeadModal({
     window.addEventListener('keydown', escape);
     return () => window.removeEventListener('keydown', escape);
   }, [open, onClose]);
+  if (messagePrefix.includes('10 соток')) return <GiftQuiz open={open} onClose={onClose} apiBase={API_BASE} formatPhone={formatPhoneMask} Consent={PrivacyConsent} />;
   if (!open) return null;
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -4300,7 +4302,7 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
         <main className="internal-body service-detail-page">
           <div className="container">
             <Breadcrumbs items={["Главная", sectionTitle, pageTitle]} />
-            <section className={`service-detail-hero${serviceHeroImage ? '' : ' without-photo'}`}>
+            <section className={`service-detail-hero service-hero-${serviceSlug}${serviceHeroImage ? '' : ' without-photo'}`}>
               <div className="service-detail-hero-copy">
                 <span className="page-kicker">Услуги в Пензе и Пензенской области</span>
                 <h1>{pageTitle}</h1>
@@ -4454,7 +4456,7 @@ function SubsectionPage({ pageSlug, sectionTitle, pageTitle, text, isHtml = fals
             </section>
             <section className="promotions-cta" id="promotion-request">
               <div><span className="page-kicker">Бесплатная консультация</span><h2>Рассчитаем ваш вариант</h2><p>Расскажите, какой дом планируете. Ответим на вопросы и предложим следующий шаг.</p></div>
-              <div><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a><a href="/#lead-form">Оставить заявку →</a></div>
+              <div><a href={CONTACTS.mainPhoneHref}>{CONTACTS.mainPhoneDisplay}</a>{isAllPromotions ? <button type="button" className="promotion-quiz-trigger" onClick={() => window.dispatchEvent(new Event('evtenia:gift-quiz'))}>Подобрать дом и получить подарок →</button> : <a href="/#lead-form">Оставить заявку →</a>}</div>
             </section>
           </div>
         </main>
@@ -6109,6 +6111,12 @@ function AppLayout({ children }: { children: ReactNode }) {
   const [showToTop, setShowToTop] = useState(false);
   const [openCallback, setOpenCallback] = useState(false);
   const [openGiftOffer, setOpenGiftOffer] = useState(false);
+
+  useEffect(() => {
+    const showQuiz = () => setOpenGiftOffer(true);
+    window.addEventListener('evtenia:gift-quiz', showQuiz);
+    return () => window.removeEventListener('evtenia:gift-quiz', showQuiz);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setShowToTop(window.scrollY > 320);
