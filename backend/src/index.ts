@@ -399,6 +399,7 @@ const FURNITURE_STRUCTURE = [
   { title: 'МАТРАСЫ', brands: ['HUKLA'] }
 ];
 const SERVICE_PAGE_SLUGS = [
+  'okna',
   'fundament', 'besedki', 'septik', 'zabory', 'skvazhiny', 'elektromontazh', 'umnyy-dom',
   'vyvoz-musora', 'styazhka-pola', 'konditsionery', 'interernoe-ozelenenie', 'otsenka-nedvizhimosti',
   'plastikovye-okna', 'dveri', 'remont', 'lestnitsy', 'svai', 'dizainer', 'landshaftnyy-dizayn',
@@ -595,6 +596,7 @@ const seedProjects: HouseProject[] = [
 ];
 
 const seedPages: Record<string, ContentPage> = {
+  'services-okna': { slug: 'services-okna', title: 'Окна', content: '<p>Подбор и установка окон в Пензе и области: замер, выбор профиля и стеклопакета, доставка, монтаж и отделка проёмов. Комплектацию и стоимость согласуем по объекту.</p>' },
   about: {
     slug: 'about',
     title: 'О компании',
@@ -717,6 +719,9 @@ const seedPortfolio: PortfolioItem[] = [
 ];
 
 const seedJournalCategories: JournalCategory[] = [
+  { id: 'journal-category-valuation', name: 'Оценка', slug: 'otsenka', description: 'Оценка недвижимости: подготовка документов, цели оценки и требования к отчёту.', order: 90 },
+  { id: 'journal-category-electrical-smart-home', name: 'Электромонтаж и умный дом', slug: 'elektromontazh-i-umnyy-dom', description: 'Электрика, освещение, автоматизация и управление системами дома.', order: 100 },
+  { id: 'journal-category-renovation', name: 'Ремонт', slug: 'remont', description: 'Этапы ремонта, перегородки, отделочные материалы и готовые интерьеры.', order: 110 },
   { id: 'journal-category-technologies', name: 'Технологии домов', slug: 'tekhnologii-domov', description: 'Каркасные, модульные и газобетонные дома: сравнения и выбор технологии.', order: 10 },
   { id: 'journal-category-projects', name: 'Проекты и планировки', slug: 'proekty-i-planirovki', description: 'Как выбрать площадь, этажность, комнаты и подходящий проект дома.', order: 20 },
   { id: 'journal-category-foundation', name: 'Фундамент и участок', slug: 'fundament-i-uchastok', description: 'Грунты, фундаменты, посадка дома и подготовка участка к строительству.', order: 30 },
@@ -1025,10 +1030,11 @@ const syncManagedJournalArticles = (): void => {
   ];
   let changed = false;
 
-  const bathCategory = seedJournalCategories.find((category) => category.id === 'journal-category-baths');
-  if (bathCategory && !data.journalCategories.some((category) => category.id === bathCategory.id)) {
-    data.journalCategories.push(bathCategory);
-    changed = true;
+  for (const category of seedJournalCategories.filter((item) => ['journal-category-baths', 'journal-category-valuation', 'journal-category-electrical-smart-home', 'journal-category-renovation'].includes(item.id))) {
+    if (!data.journalCategories.some((existing) => existing.id === category.id || existing.slug === category.slug)) {
+      data.journalCategories.push(category);
+      changed = true;
+    }
   }
 
   for (const item of managed) {

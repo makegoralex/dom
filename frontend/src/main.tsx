@@ -2,12 +2,14 @@ import React, { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } fro
 import ReactDOM from 'react-dom/client';
 import { createPortal } from 'react-dom';
 import './styles.css';
+import './site-enhancements.css';
 import { HomeDetailPage, HomesPage, type HouseListing } from './HomesPages';
 import { JournalArticlePage, JournalIndexPage, type JournalArticle, type JournalCategory } from './JournalPages';
 import { ChanyCatalogPage, DoorCollectionPage, DoorsCatalogPage } from './CatalogPages';
 import { LesnoeOzeroPage } from './LesnoeOzeroPage';
 import { MortgageCalculatorPage } from './MortgageCalculatorPage';
 import { LESNOE_OZERO_PHASES, type LesnoeOzeroPlot } from './lesnoeOzeroPlots';
+import { GiftOffer, PortfolioAlbum, PriceAnnotations, PRICE_NOTICE } from './SiteEnhancements';
 
 type HouseProject = {
   id: string;
@@ -249,6 +251,7 @@ const DEFAULT_CONTACT_PROFILE = {
 const LAND_IMAGE_FALLBACK = 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80';
 
 const SERVICES_MENU = [
+  { slug: 'okna', title: 'Окна', text: 'Подбор окон, замер, остекление и монтаж с отделкой проёмов в Пензе и области.' },
   { slug: 'fundament', title: 'Фундамент', text: 'Проектируем и устраиваем фундаменты под тип грунта и нагрузку дома.' },
   { slug: 'besedki', title: 'Беседки', text: 'Строим беседки под ключ: от эскиза до финальной отделки.' },
   { slug: 'septik', title: 'Септик', text: 'Подбираем и монтируем септики с учетом объема стоков и участка.' },
@@ -277,6 +280,13 @@ const SERVICES_MENU = [
 const PROMOTIONS_MENU = [
   { slug: 'ipoteka-i-kredit', title: 'Ипотека и кредит', text: 'Подберем комфортную программу ипотеки или кредита на строительство.' },
   { slug: 'vse-akcii', title: 'Все акции', text: 'Здесь публикуем актуальные скидки, акции и специальные предложения.' }
+];
+
+const SERVICE_GROUPS = [
+  { label: 'Строительство', slugs: ['fundament', 'svai', 'besedki', 'lestnitsy'] },
+  { label: 'Инженерные системы', slugs: ['proektirovanie-teplogazosnabzheniya-i-ventilyatsii', 'elektromontazh', 'umnyy-dom', 'septik', 'skvazhiny', 'konditsionery'] },
+  { label: 'Отделка и обустройство', slugs: ['okna', 'plastikovye-okna', 'dveri', 'remont', 'styazhka-pola', 'dizainer', 'interernoe-ozelenenie'] },
+  { label: 'Участок и документы', slugs: ['zabory', 'landshaftnyy-dizayn', 'vyvoz-musora', 'mezhevanie', 'otsenka-nedvizhimosti', 'strahovanie', 'ipoteka-oformlenie'] }
 ];
 
 type ServiceDetailPoint = { title: string; description: string };
@@ -311,6 +321,10 @@ const addedProjectPhoto = (filename: string, alt: string, caption: string): Serv
 });
 
 const SERVICE_PORTFOLIOS: Record<string, ServicePortfolio> = {
+  okna: {
+    title: 'Остекление на наших объектах', description: 'Балконное остекление и окна в готовом доме — фотографии выполненных работ.',
+    photos: [addedProjectPhoto('apartment-balcony-window', 'Остеклённый балкон после отделки', 'Балконное остекление.'), addedProjectPhoto('modular-home-window-heater', 'Установленное окно в модульном доме', 'Окно в жилом помещении.')]
+  },
   remont: {
     title: 'Фото с объектов ремонта',
     description: 'Реальные кадры отделки помещений и частных домов. Состав работ на каждом объекте отличается и определяется после осмотра.',
@@ -413,11 +427,17 @@ const SERVICE_PORTFOLIOS: Record<string, ServicePortfolio> = {
 
 const PORTFOLIO_SHOWCASES: { title: string; description: string; photos: ServicePortfolioPhoto[] }[] = [
   {
-    title: 'Ремонт квартиры и отделка помещений',
-    description: 'От подготовки перегородок до чистовой отделки кухни, комнаты, санузла и балкона.',
+    title: 'Возведение перегородок',
+    description: 'Устройство гипсокартонных перегородок и дверных проёмов. Показываем этап подготовки до чистовой отделки.',
     photos: [
-      addedProjectPhoto('drywall-room', 'Новая гипсокартонная перегородка до чистовой отделки', 'Перегородка и подготовка стен.'),
-      addedProjectPhoto('drywall-doorway', 'Дверной проём в гипсокартонной перегородке', 'Подготовленный проём.'),
+      addedProjectPhoto('drywall-room', 'Новая гипсокартонная перегородка до чистовой отделки', 'Возведённая перегородка и обработанные стыки.'),
+      addedProjectPhoto('drywall-doorway', 'Дверной проём в гипсокартонной перегородке', 'Дверной проём в новой перегородке.')
+    ]
+  },
+  {
+    title: 'Ремонт квартиры и отделка помещений',
+    description: 'Чистовая отделка кухни, комнаты, санузла и балкона — детали готовых интерьеров.',
+    photos: [
       addedProjectPhoto('apartment-kitchen', 'Кухня после ремонта и установки мебели', 'Кухня.'),
       addedProjectPhoto('apartment-living-room', 'Жилая комната после чистовой отделки', 'Жилая комната.'),
       addedProjectPhoto('apartment-bathroom', 'Отделанная плиткой ванная комната', 'Санузел.'),
@@ -485,6 +505,37 @@ function ServicePortfolioGallery({ serviceTitle, portfolio, photos }: { serviceT
 const servicePhoto = (name: string) => `${API_BASE}/api/assets/services/${name}.jpg`;
 
 const SERVICE_PAGE_DETAILS: Record<string, ServicePageDetail> = {
+  okna: {
+    summary: 'Окна для дома, квартиры и дачи в Пензе и области: поможем подобрать остекление, согласуем комплектацию, выполним замер и монтаж с отделкой проёмов.',
+    intro: [
+      'Начинаем с назначения помещения: для круглогодичного дома важны теплоизоляция и герметичность, для спальни — защита от уличного шума, для солнечной стороны — комфорт летом. Обсудим обычные и панорамные окна, балконные блоки и остекление террасы; применимость выбранной системы проверим по размерам проёмов и условиям эксплуатации.',
+      'Подбираем профиль, стеклопакет, фурнитуру и способ открывания в комплексе. Учитываем массу створок, безопасность детей, москитные сетки, цвет и вентиляцию. Для деревянного дома отдельно проверяем подготовку проёма и необходимость обсадной коробки с учётом усадки.',
+      'Перед заказом согласуем каждую позицию: изделие, доставку, демонтаж, монтажный шов, подоконники, отливы и откосы. Вы получите понятную спецификацию по проёмам и расчёт без неоговорённых дополнений.'
+    ],
+    scope: [
+      { title: 'Консультация и замер', description: 'Измеряем проёмы, проверяем основание и доступ для монтажа. Уточняем шум, освещённость, отопление и сценарии проветривания.' },
+      { title: 'Выбор остекления', description: 'Сравниваем ПВХ-системы и другие доступные решения под задачу. Обсуждаем энергосберегающий стеклопакет, солнцезащиту, безопасное стекло и ограничения по размерам.' },
+      { title: 'Спецификация и смета', description: 'Фиксируем размеры, цвет, открывание, фурнитуру и дополнительные элементы. Отдельно указываем стоимость изделий и работ.' },
+      { title: 'Доставка и подготовка', description: 'Согласуем сроки изготовления и доставки, подъём, демонтаж старых рам и подготовку площадки. Заранее определяем порядок вывоза демонтированных конструкций.' },
+      { title: 'Установка и отделка', description: 'Выставляем и закрепляем раму, выполняем герметизацию монтажного шва. Монтируем согласованные отливы, подоконники и откосы.' },
+      { title: 'Проверка и передача', description: 'Проверяем геометрию, работу створок, прижим и фурнитуру. Передаём рекомендации по уходу, проветриванию и регулировке.' }
+    ],
+    pricing: [{ item: 'Окна и монтаж по размерам проёмов', value: 'Индивидуальный расчёт', note: 'На стоимость влияют площадь, профиль, стеклопакет, открывание, цвет, доступность объекта и состав отделки.' }],
+    pricingKicker: 'Стоимость по комплектации',
+    pricingDisclaimer: 'Предварительный расчёт уточняется после замера. Состав заказа, стоимость, сроки и гарантийные условия фиксируются в договоре.',
+    duration: 'Срок изготовления зависит от системы, цвета и размеров. Даты доставки и монтажа согласуем после замера и подтверждения комплектации.',
+    result: 'Установленное и отрегулированное остекление с согласованной отделкой проёмов и понятными условиями обслуживания.',
+    photo: '/assets/client-portfolio-2026-10/apartment-balcony-window.webp', photoAlt: 'Остекление балкона на объекте Evtenia',
+    seoTitle: 'Окна в Пензе — подбор, остекление и установка | Evtenia',
+    seoDescription: 'Окна для дома и квартиры в Пензе: замер, подбор профиля и стеклопакетов, доставка, монтаж и отделка проёмов. Расчёт по комплектации.',
+    faq: [
+      { question: 'Как узнать точную стоимость?', answer: 'Пришлите размеры или фото проёмов и пожелания к открыванию. Подготовим предварительный расчёт, а окончательную комплектацию и цену подтвердим после замера.' },
+      { question: 'Чем отличается тёплое остекление от холодного?', answer: 'Тёплую систему подбирают для отапливаемых помещений. Холодное остекление используют для защиты неотапливаемых пространств от осадков и ветра; оно не заменяет утепление и отопление.' },
+      { question: 'Можно ли сделать панорамные окна?', answer: 'Проверим размеры, нагрузки и подходящую систему. Для больших проёмов отдельно рассматриваем безопасность стекла, массу створок, монтаж и организацию отопления.' },
+      { question: 'Входят ли откосы и демонтаж в заказ?', answer: 'Включаем их по согласованию и отдельными позициями в смете. До заказа вы увидите, что входит в цену изделия и монтажа.' },
+      { question: 'Нужна ли вентиляция после замены окон?', answer: 'Герметичные окна меняют воздухообмен. Обсудим проветривание и совместимость с существующей вентиляцией, чтобы поддерживать комфорт и уменьшить риск конденсата.' }
+    ]
+  },
   fundament: {
     summary: 'Рассчитываем и устраиваем фундамент для дома, бани и пристройки в Пензе и Пензенской области — с учетом проекта, нагрузок и условий участка.',
     intro: [
@@ -1548,9 +1599,9 @@ function HeaderNav({
         active: currentPath === '/lands/lesnoe-ozero',
         children: [{ label: 'ЖК «Лесное озеро»', href: '/lands/lesnoe-ozero' }]
       },
-      services: { label: 'УСЛУГИ', active: currentPath.startsWith('/services/') || currentPath === '/design', children: [{ label: 'Проектирование', href: '/design' }, ...serviceColumns.flatMap((column) => column.map((item) => ({ label: item.title, href: `/services/${item.slug}` })))] },
+      services: { label: 'УСЛУГИ', active: currentPath.startsWith('/services/') || currentPath === '/design', children: SERVICE_GROUPS.map((group, index) => ({ label: group.label, children: [...(index === 0 ? [{ label: 'Проектирование домов', href: '/design' }] : []), ...group.slugs.map((slug) => ({ label: SERVICES_MENU.find((service) => service.slug === slug)!.title, href: `/services/${slug}` }))] })) },
       furniture: { label: 'МЕБЕЛЬ', href: '/furniture', active: currentPath === '/furniture' || currentPath.startsWith('/furniture/'), children: FURNITURE_MENU_CHILDREN },
-      promotions: { label: 'ИПОТЕКА И АКЦИИ', active: currentPath.startsWith('/discounts/') || currentPath === '/mortgage-calculator', children: [{ label: 'Ипотечный калькулятор', href: '/mortgage-calculator' }, ...PROMOTIONS_MENU.map((item) => ({ label: item.title, href: `/discounts/${item.slug}` }))] },
+      promotions: { label: 'ИПОТЕКА И АКЦИИ', active: currentPath.startsWith('/discounts/') || currentPath === '/mortgage-calculator', children: [{ label: '🎁 10 соток в подарок', href: '/discounts/vse-akcii' }, { label: 'Ипотечный калькулятор', href: '/mortgage-calculator' }, ...PROMOTIONS_MENU.map((item) => ({ label: item.title, href: `/discounts/${item.slug}` })), { label: 'Страхование', href: '/services/strahovanie' }, { label: 'Оценка недвижимости', href: '/services/otsenka-nedvizhimosti' }] },
       journal: { label: 'ЖУРНАЛ EVTENIA', href: '/journal', active: currentPath === '/journal' || currentPath.startsWith('/journal/') },
       contacts: { label: 'КОНТАКТЫ', href: '/contacts', active: currentPath === '/contacts' }
     };
@@ -1961,6 +2012,12 @@ function PromoLeadModal({
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [status, setStatus] = useState('');
+  useEffect(() => {
+    if (!open) return;
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', escape);
+    return () => window.removeEventListener('keydown', escape);
+  }, [open, onClose]);
   if (!open) return null;
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -1982,7 +2039,8 @@ function PromoLeadModal({
   };
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-card promo-request-card" role="dialog" aria-modal="true" aria-label={title} onClick={(e) => e.stopPropagation()}>
+        <button type="button" className="gift-offer-close" aria-label="Закрыть форму" onClick={onClose}>×</button>
         <h3>{title}</h3>
         <p>{promoText}</p>
         <form onSubmit={submit}>
@@ -2717,7 +2775,7 @@ function SiteFooter() {
       <div className="container footer-layout">
         <div className="footer-main">
           <p className="footer-copy">© 2014-{currentYear}</p>
-          <p className="footer-note">Сайт носит информационный характер и не является публичной офертой.</p>
+          <p className="footer-note" id="price-notice"><strong>* Информация о ценах</strong><br />{PRICE_NOTICE}</p>
           <div className="footer-links">
             <a href="/about">О компании</a>
             <a href="/contacts">Контакты</a>
@@ -3857,6 +3915,7 @@ function ContactsPage() {
 
 function PortfolioPage() {
   const [items, setItems] = useState<PortfolioItem[]>([]);
+  const [album, setAlbum] = useState('Все работы');
 
   useEffect(() => {
     document.title = 'Портфолио — Evtenia';
@@ -3869,16 +3928,16 @@ function PortfolioPage() {
   return (
     <div>
       <InternalHeader />
-      <section className="internal-body">
+      <section className="internal-body portfolio-page">
         <div className="container">
           <Breadcrumbs items={["Главная", "Портфолио"]} />
-          <h1>ПОРТФОЛИО</h1>
+          <header className="portfolio-editorial-hero"><div><span className="page-kicker">Портфолио Evtenia · реальные объекты</span><h1>От первого проёма<br />до готового дома</h1><p>Дома, интерьеры и детали нашей работы. Выберите направление и листайте фотографии — от этапов строительства до готового результата.</p><a href="#portfolio-albums">Смотреть фото с объектов ↓</a></div><img src="/assets/client-portfolio-2026-10/modular-home-front.webp" alt="Построенный модульный дом с деревянной террасой" width="1200" height="800" fetchPriority="high" /></header>
+          {items.length ? <h2 className="portfolio-section-title">Дома и отзывы заказчиков</h2> : null}
           <div className="portfolio-grid">
             {items.map((item) => (
               <article className="portfolio-card" key={item.id}>
-                <div className="portfolio-image" style={{ backgroundImage: `url(${resolveMediaUrl(item.image)})` }}>
-                  <h3>{item.title}</h3>
-                </div>
+                <PortfolioAlbum title={item.title} photos={[{ src: resolveMediaUrl(item.image), alt: item.title, caption: item.title }]} />
+                <h3 className="portfolio-card-title">{item.title}</h3>
                 <div className="portfolio-meta-row">
                   <div><strong>Стоимость коробки</strong><span>{item.boxPrice}</span></div>
                   <div><strong>Сроки строительства</strong><span>{item.buildDuration}</span></div>
@@ -3894,29 +3953,22 @@ function PortfolioPage() {
               </article>
             ))}
           </div>
-          <section className="portfolio-photo-projects" aria-labelledby="portfolio-photo-projects-title">
+          <section id="portfolio-albums" className="portfolio-photo-projects" aria-labelledby="portfolio-photo-projects-title">
             <div className="portfolio-photo-projects-heading">
-              <span className="page-kicker">Дополнительные примеры работ</span>
+              <span className="page-kicker">В деталях и с разных ракурсов</span>
               <h2 id="portfolio-photo-projects-title">Фото с объектов</h2>
               <p>Ремонт и отделка, монтаж дверей, модульный дом и ограждение участка. Состав и технология работ на каждом объекте могут отличаться.</p>
             </div>
+            <div className="portfolio-album-filters" aria-label="Направления работ">{['Все работы', ...PORTFOLIO_SHOWCASES.map((project) => project.title)].map((title) => <button type="button" key={title} aria-pressed={album === title} onClick={() => setAlbum(title)}>{title}</button>)}</div>
             <div className="portfolio-showcase-grid">
-              {PORTFOLIO_SHOWCASES.map((project) => (
+              {PORTFOLIO_SHOWCASES.filter((project) => album === 'Все работы' || album === project.title).map((project) => (
                 <article className="portfolio-showcase-card" key={project.title}>
                   <header><h3>{project.title}</h3><p>{project.description}</p></header>
-                  <div className="portfolio-showcase-photos">
-                    {project.photos.map((photo) => (
-                      <figure key={photo.src}>
-                        <a href={photo.src} target="_blank" rel="noreferrer" aria-label={`Открыть фотографию: ${photo.caption}`}>
-                          <img src={photo.src} alt={photo.alt} width="800" height="600" loading="lazy" decoding="async" />
-                        </a>
-                        <figcaption>{photo.caption}</figcaption>
-                      </figure>
-                    ))}
-                  </div>
+                  <PortfolioAlbum title={project.title} photos={project.photos} />
                 </article>
               ))}
             </div>
+            <div className="portfolio-contact-cta"><div><span className="page-kicker">Ваш объект — следующий</span><h2>Обсудим похожую задачу?</h2><p>Расскажите о доме, квартире или участке — поможем определить состав работ.</p></div><a href="/contacts">Связаться с командой →</a></div>
           </section>
         </div>
       </section>
@@ -6056,6 +6108,7 @@ function CookieNotice() {
 function AppLayout({ children }: { children: ReactNode }) {
   const [showToTop, setShowToTop] = useState(false);
   const [openCallback, setOpenCallback] = useState(false);
+  const [openGiftOffer, setOpenGiftOffer] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setShowToTop(window.scrollY > 320);
@@ -6067,6 +6120,9 @@ function AppLayout({ children }: { children: ReactNode }) {
   return (
     <>
       {children}
+      <PriceAnnotations />
+      <GiftOffer onRequest={() => setOpenGiftOffer(true)} />
+      <PromoLeadModal open={openGiftOffer} onClose={() => setOpenGiftOffer(false)} title="10 соток земли в подарок" promoText="При заказе строительства дома. Доступные участки, комплектацию дома и условия участия уточним перед заключением договора." messagePrefix="Заявка по акции: 10 соток в подарок" sourceTitle="Горячее предложение: 10 соток" />
       <div className="floating-actions">
         {showToTop ? <button className="to-top-btn" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Наверх">↑</button> : null}
         <button className="floating-call-fixed" onClick={() => setOpenCallback(true)} aria-label="Заказать звонок">

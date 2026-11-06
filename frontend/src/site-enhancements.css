@@ -1,0 +1,76 @@
+[data-price-notice] { text-decoration-skip-ink: auto; }
+#price-notice { max-width: 780px; line-height: 1.65; font-size: 13px; }
+.hero-nav .services-dropdown .dropdown-col { display: flex; flex-direction: column; align-items: stretch; gap: 2px; }
+.hero-nav .services-dropdown .dropdown-col .dropdown-heading { color: #4d765e; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; padding: 10px; border-bottom: 1px solid #dbe5db; margin-bottom: 7px; }
+.promo-strip { background: #efb82f !important; color: #172e23 !important; border-bottom: 2px solid #ffd36a; }
+.promo-strip a { color: #172e23 !important; }
+.promo-strip strong { letter-spacing: .03em; }
+.hero-buttons .btn-gift { background: #f4b829; color: #142c20; box-shadow: 0 8px 28px #e8a01b50; }
+.gift-offer-tab { position: fixed; left: 22px; bottom: 24px; z-index: 700; display: flex; align-items: center; gap: 12px; padding: 14px 20px; background: #f6bc35; color: #173426; border: 1px solid #ffe39a; border-radius: 14px; box-shadow: 0 8px 30px #172c2930; font: inherit; font-weight: 800; text-align: left; cursor: pointer; }
+.gift-offer-tab > span:first-child { font-size: 28px; }
+.gift-offer-tab small { display: block; font-size: 11px; font-weight: 500; margin-top: 3px; }
+.gift-offer-popup { position: fixed; left: 24px; bottom: 108px; z-index: 701; width: min(380px, calc(100vw - 32px)); padding: 32px 28px 24px; border-radius: 20px; color: white; background: radial-gradient(circle at 100% 0%, #637a39, transparent 60%), #183b2b; box-shadow: 0 20px 70px #0e211b50; border: 1px solid #6e8654; animation: gift-arrival .35s ease-out; }
+.gift-offer-kicker { color: #ffd477; text-transform: uppercase; letter-spacing: .09em; font-size: 10px; font-weight: 800; }
+.gift-offer-popup strong { display: block; font-size: 32px; line-height: 1.15; margin: 18px 0 14px; }
+.gift-offer-popup p { color: #e2e9de; line-height: 1.6; font-size: 14px; }
+.gift-offer-cta { display: block; width: 100%; padding: 15px 12px; background: #ffc34b; color: #183525; border: none; border-radius: 8px; font: inherit; font-weight: 800; cursor: pointer; margin: 20px 0 14px; }
+.gift-offer-popup > a { color: #e4e8dc; font-size: 11px; text-underline-offset: 4px; }
+.gift-offer-close { position: absolute; right: 10px; top: 8px; border: 0; background: transparent; color: inherit; font-size: 28px; line-height: 1; padding: 8px; cursor: pointer; }
+.promo-request-card { position: relative; padding-top: 44px; }
+body:has(.mobile-menu-overlay, .modal-backdrop, dialog[open], .cms-lightbox) :is(.gift-offer-tab, .gift-offer-popup) { display: none; }
+.promotions-page .promotion-card-grid article:first-child { background: #193e2c; color: #fff; border: 2px solid #edbc50; box-shadow: 0 12px 35px #25472d18; }
+.promotions-page .promotion-card-grid article:first-child h3 { color: #ffce65; font-size: clamp(28px, 3vw, 42px); }
+.promotions-page .promotion-card-grid article:first-child p, .promotions-page .promotion-card-grid article:first-child span { color: #e5eddf; }
+.portfolio-page { background: #f7f8f3; }
+.portfolio-editorial-hero { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; padding: 26px 0 64px; }
+.portfolio-editorial-hero h1 { font-size: clamp(34px, 4.3vw, 64px); line-height: 1.08; letter-spacing: -.045em; color: #1b3d2b; margin: 20px 0; text-transform: none; }
+.portfolio-editorial-hero p { max-width: 520px; font-size: 17px; line-height: 1.75; color: #657165; }
+.portfolio-editorial-hero img { width: 100%; height: 440px; object-fit: cover; border-radius: 100px 14px 14px 14px; }
+.portfolio-editorial-hero a { display: inline-block; color: #244a33; font-weight: 700; margin-top: 18px; text-underline-offset: 7px; }
+.portfolio-section-title { margin: 10px 0 28px; color: #264b35; }
+.portfolio-page .portfolio-card { background: white; border-radius: 16px; overflow: hidden; border: 1px solid #e0e6da; box-shadow: none; }
+.portfolio-card-title { padding: 0 22px; font-size: 22px; }
+.portfolio-page .portfolio-photo-projects { border: none; margin-top: 70px; }
+.portfolio-album-filters { display: flex; flex-wrap: wrap; gap: 10px; margin: 26px 0 32px; }
+.portfolio-album-filters button { padding: 11px 17px; border-radius: 24px; background: white; color: #3d5a43; border: 1px solid #d6dfcf; cursor: pointer; font: inherit; font-size: 13px; }
+.portfolio-album-filters button[aria-pressed=true] { background: #244a33; color: white; border-color: #244a33; }
+.portfolio-page .portfolio-showcase-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+.portfolio-page .portfolio-showcase-card { padding: 0; border-radius: 16px; overflow: hidden; background: white; border: 1px solid #dfe5d9; }
+.portfolio-showcase-card header { padding: 26px 26px 10px; }
+.portfolio-showcase-card h3 { margin: 0 0 10px; font-size: 23px; color: #294a34; }
+.portfolio-showcase-card header p { line-height: 1.6; color: #72806f; min-height: 50px; }
+.portfolio-album-stage { position: relative; background: #e9ede4; }
+.portfolio-album-open { position: relative; padding: 0; width: 100%; display: block; border: 0; cursor: zoom-in; background: transparent; }
+.portfolio-album-open img { display: block; width: 100%; height: 380px; object-fit: cover; }
+.portfolio-album-open > span { position: absolute; left: 16px; bottom: 16px; color: white; background: #183126b8; padding: 8px 12px; border-radius: 6px; font-size: 11px; }
+.album-prev, .album-next { position: absolute; top: 45%; width: 44px; height: 44px; border-radius: 50%; border: 1px solid #ffffff70; background: #ffffffee; color: #234431; font-size: 30px; line-height: 1; cursor: pointer; box-shadow: 0 4px 15px #142f2320; }
+.album-prev { left: 14px; } .album-next { right: 14px; }
+.album-count { position: absolute; right: 16px; bottom: 16px; background: #173426ba; color: white; padding: 7px 12px; border-radius: 20px; font-size: 12px; pointer-events: none; }
+.album-caption { margin: 0; padding: 16px 22px 8px; color: #60715f; font-size: 13px; line-height: 1.5; min-height: 45px; }
+.album-thumbnails { display: flex; gap: 8px; overflow-x: auto; padding: 10px 22px 24px; }
+.album-thumbnails button { flex: 0 0 66px; height: 54px; padding: 3px; border: 2px solid transparent; border-radius: 7px; background: #ecf0e8; cursor: pointer; }
+.album-thumbnails button[aria-pressed=true] { border-color: #3d694a; }
+.album-thumbnails img { width: 100%; height: 100%; object-fit: cover; border-radius: 3px; }
+.portfolio-lightbox { padding: 0; width: min(1200px, 96vw); max-width: 96vw; max-height: 94dvh; border: 0; border-radius: 12px; color: white; background: #14221a; }
+.portfolio-lightbox::backdrop { background: #08130de8; }
+.portfolio-lightbox-content { position: relative; text-align: center; }
+.portfolio-lightbox-content > img { max-height: 77dvh; width: 100%; object-fit: contain; display: block; }
+.portfolio-lightbox-content p { padding: 12px 48px; margin: 0; font-size: 14px; }
+.portfolio-lightbox-content small { display: block; color: #bac9ba; margin-top: 6px; }
+.album-close { position: absolute; z-index: 1; top: 10px; right: 10px; background: #14251dde; color: white; border: 1px solid #ffffff50; width: 44px; height: 44px; border-radius: 50%; font-size: 28px; cursor: pointer; }
+.portfolio-contact-cta { margin: 60px 0 20px; padding: 38px; background: #e7eddf; border-radius: 16px; display: flex; gap: 28px; align-items: center; justify-content: space-between; }
+.portfolio-contact-cta h2 { color: #284e35; } .portfolio-contact-cta a { background: #294e35; color: white; padding: 17px 24px; border-radius: 8px; white-space: nowrap; }
+@keyframes gift-arrival { from { transform: translateY(18px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@media (max-width: 760px) {
+  body:has(.cookie-notice) .gift-offer-tab { bottom: 175px; }
+  .portfolio-editorial-hero { grid-template-columns: 1fr; gap: 24px; padding-bottom: 36px; }
+  .portfolio-editorial-hero img { height: 300px; border-radius: 60px 12px 12px; }
+  .portfolio-page .portfolio-showcase-grid { grid-template-columns: 1fr; }
+  .portfolio-album-open img { height: 300px; }
+  .portfolio-contact-cta { flex-direction: column; align-items: flex-start; padding: 26px; }
+  .gift-offer-tab { left: 12px; bottom: 14px; padding: 11px 14px; font-size: 12px; gap: 8px; }
+  .gift-offer-tab > span:first-child { font-size: 22px; }
+  .gift-offer-tab small { font-size: 10px; }
+  .gift-offer-popup { left: 12px; bottom: 90px; padding: 28px 24px 22px; }
+}
+@media (prefers-reduced-motion: reduce) { .gift-offer-popup { animation: none; } }
